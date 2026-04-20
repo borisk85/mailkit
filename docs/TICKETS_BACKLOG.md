@@ -34,3 +34,6 @@
   - Scope: Next.js 16 minification, legacy-JS target, bundle analysis,
     font preload
   - Tracked on GitHub Issue #7 (legacy — новые подобные сюда, не в Issues)
+- Prettier drift на scaffold/shadcn файлах (30 шт), фиксить отдельным
+  chore-PR без функциональных правок. Фиксируется одним запуском
+  `pnpm format`; ревью сжимается до diff-а (generated-only).
