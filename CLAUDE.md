@@ -29,6 +29,9 @@ Post-launch support: 30-day guarantee + self-serve diagnostics + $3 re-setup
 or $3/mo monitoring subscription. See [docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md)
 "Post-launch Support Model".
 
+Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
+(owner responsibility, not in code scope).
+
 ## Architecture constraints (важно)
 - **Gmail `sendAs.create` blocked on personal @gmail** — the API method requires
   Workspace with domain-wide delegation. MVP accepts a **3-min guided manual
