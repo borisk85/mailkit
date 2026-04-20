@@ -1,5 +1,8 @@
 # MailKit — Tickets Backlog
 
+> Single source of truth для всех tasks/tech debt/ideas. Issues на
+> GitHub не создаем (см. CLAUDE.md "Issues policy").
+
 ## ✅ Completed
 - #1 Feasibility Spike
 
@@ -22,6 +25,12 @@
 - #15 Multi-domain dashboard
 
 ## 🧹 Tech debt
-- [#6](https://github.com/borisk85/mailkit/issues/6) Tighten waitlist insert via anon key + RLS INSERT policy (switch off service_role for public form)
+- [GH #6](https://github.com/borisk85/mailkit/issues/6) Tighten waitlist insert via anon key + RLS INSERT policy (switch off service_role for public form)
 - Проверить Vercel Framework Preset = Next.js при каждом мажорном
   merge в main (автоматизировать через GitHub Action в будущем)
+- Landing performance optimization on live
+  - Goal: Performance ≥90, LCP <2.5s, FCP <1.8s, TBT <200ms на EN/RU
+  - Current: EN Perf 74, LCP 3.8s, FCP 3.6s, TBT 320ms
+  - Scope: Next.js 16 minification, legacy-JS target, bundle analysis,
+    font preload
+  - Tracked on GitHub Issue #7 (legacy — новые подобные сюда, не в Issues)

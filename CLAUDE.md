@@ -140,6 +140,30 @@ Playwright+Lighthouse integration.
 Если PR ломает метрики — НЕ мержим. Либо фикс в том же PR, либо явное
 решение архитектора принять регрессию.
 
+## Issues policy — solo vibe-coding mode
+
+Проект ведется в solo режиме (владелец + Claude Code). GitHub Issues
+избыточны для нашего размера команды. Единственный источник правды
+для трекинга задач — [docs/TICKETS_BACKLOG.md](docs/TICKETS_BACKLOG.md).
+
+### Не создавать Issues по умолчанию
+
+Для tech debt, feature ideas, refactoring tasks — писать прямо в
+`TICKETS_BACKLOG.md` в соответствующую секцию (MVP, Post-validation,
+Tech debt).
+
+### Когда Issues все-таки уместны
+
+- Bug, который пользователь может воспроизвести (нужна трассируемая
+  история с комментариями)
+- Внешний контрибьютор мог бы подхватить (open source scenario)
+- Критичный блокер релиза — хочется видеть в GitHub UI для owner'а
+
+### Существующий Issue #7 (performance) — оставляем
+
+Не закрываем. Но новые подобные задачи идут в `TICKETS_BACKLOG.md`,
+не в Issues.
+
 ## Communication style with owner
 - На «ты», коротко, без маркдауна в простых ответах, без лекций
 - НИКОГДА Е/ё — только Е/е (все, еще, свое, прошел)
