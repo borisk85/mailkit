@@ -39,3 +39,55 @@ framework'ом уже в `main`. Порядок:
 
 Если порядок нарушен (как у нас: docs-PR'ы до scaffold'а) — после
 merge scaffold'а руками проверить Framework Preset в Vercel Settings.
+
+## 2026-04-21 — Quality gate exception для perf baseline PR
+
+### Симптом
+Первый PR по оптимизации лендинга (PR #9 `feat/landing-perf`) не
+добирает до `Performance ≥ 90` на EN в 2h-cap: median 3-прогонов на
+prod = 87 (runs 82/87/88). CLAUDE.md "Performance quality gate"
+говорит "Если PR ломает метрики — НЕ мержим".
+
+### Причина
+Гейт формулировался как anti-regression guard (защита от deterioration
+существующих метрик), а не как absolute-value block для первого
+baseline PR. Baseline до PR #9 был EN 73 — PR дал +14, RU +4. Это
+gain, не регрессия. Но буквальное чтение гейта ("не merge при фейле
+любого") блокирует даже частичное улучшение, что делает первый
+perf-PR нерелизуемым и замораживает progress.
+
+Отдельно — достичь 90 одним PR невозможно без сверх-scope: остаточные
+причины (Turbopack browserslist transpile gap, framework chunk
+size, hero font-display) каждая требует своего PR по scope discipline.
+
+### Фикс
+Архитекторский exception (2026-04-21): partial improvement одобрен к
+merge. Гейт ≥90 переносится в follow-up perf-PR, пункт зафиксирован
+в `docs/TICKETS_BACKLOG.md` секция "Tech debt → Landing performance
+optimization on live" с 4 ранжированными гипотезами. Follow-up
+открывается **после** Ticket #4a — setup pipeline приоритетнее чем
+добивка perf-баланса.
+
+Post-merge prod medians (3 runs / locale):
+
+| Metric | EN (median / runs) | RU (median / runs) |
+|---|---|---|
+| Performance | **87** / 82,87,88 | **87** / 87,87,88 |
+| LCP | 3.18s | 3.18s |
+| FCP | 3.02s | 3.04s |
+| TBT | 68ms | 70ms |
+| CLS | 0.000 | 0.002 |
+
+### Правило
+Гейт `Perf ≥ 90 / SEO ≥ 95 / A11y ≥ 90 / BP ≥ 90 / LCP < 2.5s /
+FCP < 1.8s / TBT < 200ms / CLS < 0.1` применяется к non-perf-baseline
+PR'ам (feature/UI-тикеты, которые не должны ронять метрики).
+
+Perf-baseline PR'ы — отдельный класс:
+- Оцениваются по **delta vs previous baseline**, не по absolute.
+- Если target не взят в 2h-cap — документируй gap с числами и
+  гипотезами в `TICKETS_BACKLOG.md`, merge partial, follow-up отдельным
+  PR.
+- Post-merge: median 3-прогонов на prod, не single-run (Lighthouse
+  noise ±5). Если median просел ниже pre-PR baseline — rollback через
+  Vercel Deployments → Promote previous, разбор отдельно.
