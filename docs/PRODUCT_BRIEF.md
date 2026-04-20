@@ -19,6 +19,50 @@ Predecessor: [archive/PRODUCT_BRIEF_v1_pre_spike.md](archive/PRODUCT_BRIEF_v1_pr
 
 ---
 
+## MVP v1 Scope — STRICT BOUNDARY
+
+Это решение архитектора от 2026-04-20. НЕ расширять без явного разрешения
+владельца проекта.
+
+### What's IN MVP v1 (ship in 3-4 weeks)
+
+1. Landing page (EN + RU, минимальная стилизация)
+2. Google OAuth sign-in
+3. Cloudflare connection (paste API token ИЛИ OAuth если успеем)
+4. Setup pipeline: Cloudflare Email Routing + Brevo sender domain автомат
+5. Guided Gmail Send-As UI (3-minute copy-paste шаг с in-product guidance)
+6. Lemon Squeezy integration — один SKU: $5 per single mailbox setup
+7. Минимальный dashboard: список купленных setup'ов + их email-адреса
+8. Email-only support via support@getmailkit.com
+
+### What's OUT of MVP v1 (backlog, NOT building yet)
+
+- Self-serve diagnostics / Re-verify button (Ticket #8)
+- Paid re-setup flow ($3)
+- Monitoring subscription ($3/mo)
+- 3-mailbox bundle ($12) — только $5 single в v1
+- Chrome Extension
+- Workspace-only automation (Phase B)
+- White-label for agencies
+- Multi-domain dashboard
+- Deliverability reputation tools
+- Email signature editor
+- Any analytics dashboards / metrics exports
+- Team members / multi-user accounts
+- API для developers
+
+### Rule of engagement
+
+**Не писать код на эти фичи пока первые 100 платящих юзеров явно не
+попросят.** Документы и backlog храним как roadmap, не как спецификацию
+к сборке.
+
+Каждая фича из backlog → пишется только после:
+1. Прямых запросов от минимум 10 платящих юзеров
+2. Либо явного решения архитектора после анализа метрик
+
+---
+
 ## Суть продукта
 
 SaaS для автоматической настройки корпоративной почты `hello@yourdomain.com`
@@ -221,8 +265,78 @@ social proofs, не reviews-за-деньги.
 
 ---
 
+## Post-launch Support Model
+
+### Что может сломаться post-setup
+
+1. DKIM ротация в Brevo (раз в 6-12 мес)
+2. Юзер сам сломал DNS при других изменениях
+3. Brevo деактивировал sender domain (inactivity / ToS)
+4. Gmail отозвал Send-As (редко)
+5. Истек домен / смена регистратора
+6. Brevo free tier лимит 300 emails/day исчерпан
+
+Большинство — внешние события, не наши баги. Но юзер приходит к нам.
+
+### Модель поддержки (3 уровня)
+
+**Уровень 1. 30-day guarantee (free, all users)**
+- Любая поломка в первые 30 дней после покупки = free fix
+- Покрывает: наши баги, раннюю DKIM-пропагацию, любые claim'ы юзера
+- Цена нам: ~0, реальных обращений <2%
+
+**Уровень 2. Self-serve diagnostic (free, forever)**
+- Кнопка "Re-verify my setup" в дашборде юзера
+- Автопроверка: MX, SPF, DKIM, DMARC, Send-As status, Brevo domain status
+- Вывод: green/yellow/red по каждому пункту + конкретные next steps
+- 90% проблем юзер решает без тикета
+
+**Уровень 3. Paid re-setup & support (after 30 days)**
+
+| SKU | Price | Use case |
+|---|---|---|
+| One-click Re-setup | $3 | Автоматический re-run pipeline (DKIM ротация, DNS восстановление) |
+| Manual debug & fix | $10 | Когда Re-setup не помог, сложный кейс |
+| Monitoring subscription | $3/mo | Unlimited re-setups + proactive alerts |
+
+**Natural upsell:** юзер с поломкой через полгода выбирает между $3 разово
+или $3/мес подпиской. ~30-40% конвертируются в подписку.
+
+### Support channel
+
+**Single channel: email `support@getmailkit.com`**
+- Async, SLA 24h
+- Owner отвечает лично до ~500 юзеров
+- После этого — Claude-powered auto-responses для типовых кейсов
+- No live chat, no phone (too expensive for $5 product)
+
+**Expected load at MVP scale (first 500 users):** 2-4 тикета/неделю.
+
+### ToS clause (legal protection)
+
+В Terms of Service прописываем:
+
+> "MailKit provides a one-time setup service. After 30 days from purchase,
+> the setup is considered accepted. Subsequent DNS changes, provider
+> migrations, or external outages are not covered by the base price.
+> For ongoing monitoring and auto-fixes, subscribe to Monitoring at $3/mo."
+
+### Dev implications
+
+Новый **Ticket #8: Self-serve diagnostics & re-setup flow.**
+- Dashboard кнопка "Verify my setup"
+- Reuse setup pipeline code для re-verify
+- One-click re-setup с Lemon Squeezy payment ($3)
+- Email template для failure notifications (подготовка к monitoring)
+
+Dev effort: 3-5 days после основного MVP. Окупается с 1-го re-setup платежа.
+
+---
+
 ## Links
 
 - Spike findings: [SPIKE_FINDINGS.md](SPIKE_FINDINGS.md)
+- Marketing angles: [MARKETING_ANGLES.md](MARKETING_ANGLES.md)
+- Tickets backlog: [TICKETS_BACKLOG.md](TICKETS_BACKLOG.md)
 - Original v1 brief (pre-spike): [archive/PRODUCT_BRIEF_v1_pre_spike.md](archive/PRODUCT_BRIEF_v1_pre_spike.md)
 - PR #1 (spike merged): https://github.com/borisk85/mailkit/pull/1
