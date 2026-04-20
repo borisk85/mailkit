@@ -54,6 +54,7 @@
        client-only секции в Suspense + defer.
   - Scope на следующий перф-PR: (1), (2), (3). (4) отложить до
     measurement-after-(1..3).
+  - Follow-up attempt 2: LCP/FCP — framework split + hero critical inline CSS + image priority (after Ticket #4a merged)
   - Tracked on GitHub Issue #7 (legacy — новые подобные сюда, не в Issues)
 - Prettier drift на scaffold/shadcn файлах (30 шт), фиксить отдельным
   chore-PR без функциональных правок. Фиксируется одним запуском
