@@ -6,6 +6,8 @@ user's domain, then guides the user through the Gmail Send-As final step via a
 3-minute copy-paste wizard. Target: **$5 per mailbox** setup for indie hackers
 with personal Gmail accounts.
 
+Marketing angles and objection handling: see [docs/MARKETING_ANGLES.md](docs/MARKETING_ANGLES.md)
+
 ## Architecture constraints (важно)
 - **Gmail `sendAs.create` blocked on personal @gmail** — the API method requires
   Workspace with domain-wide delegation. MVP accepts a **3-min guided manual
