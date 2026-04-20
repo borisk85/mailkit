@@ -30,9 +30,30 @@
   merge в main (автоматизировать через GitHub Action в будущем)
 - Landing performance optimization on live
   - Goal: Performance ≥90, LCP <2.5s, FCP <1.8s, TBT <200ms на EN/RU
-  - Current: EN Perf 74, LCP 3.8s, FCP 3.6s, TBT 320ms
-  - Scope: Next.js 16 minification, legacy-JS target, bundle analysis,
-    font preload
+  - Current после PR #9 (preview): EN Perf 83 (+10), RU 81 (noise).
+    LCP EN 3.2s, RU 3.3s. FCP EN 3.2s, RU 3.3s. TBT EN 180ms ✓ (target
+    <200ms взят на EN), RU 250ms ❌.
+  - Remaining gap (hypotheses, by expected impact):
+    1. **LCP candidate = hero H1 `font-display: swap` + network** —
+       после PR #9 fonts self-hosted + preloaded, но H1 рендерится после
+       font swap. Try: render H1 c `font-display: block` для критичного
+       hero шрифта, остальные — `swap`. Или inline CSS с `size-adjust`
+       fallback чтобы layout stable до Geist загрузки.
+    2. **Polyfills chunk 113 KB** — `03~yq9q893hmn.js` в
+       `polyfillFiles`. С .browserslistrc модерн-таргетом Turbopack все
+       равно эмитит fallback polyfill. Ожидалось снижение, не произошло.
+       Нужно либо убедиться что Turbopack читает .browserslistrc для
+       transpile target (env `NEXT_TELEMETRY_DEBUG=1` может показать),
+       либо `experimental.browsersListForSwc` / отдельный target hint.
+    3. **Root 228 KB chunk** — `00ymx19_r9hnz.js` на каждой странице.
+       Подозреваю tw-animate-css + sonner + lucide, часть не нужна на
+       landing. Решается `dynamic()` для Toaster и Sign-in-button
+       (mount после interaction).
+    4. **TBT RU 250ms** — hydration landing. Landing не нуждается в
+       client Waitlist form до скролла к CTA; rule: оборачивать
+       client-only секции в Suspense + defer.
+  - Scope на следующий перф-PR: (1), (2), (3). (4) отложить до
+    measurement-after-(1..3).
   - Tracked on GitHub Issue #7 (legacy — новые подобные сюда, не в Issues)
 - Prettier drift на scaffold/shadcn файлах (30 шт), фиксить отдельным
   chore-PR без функциональных правок. Фиксируется одним запуском
