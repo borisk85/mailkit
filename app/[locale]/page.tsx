@@ -15,7 +15,9 @@ export default async function LandingPage({
   return (
     <>
       <Header />
-      <Hero />
+      <main className="flex flex-1 flex-col">
+        <Hero />
+      </main>
       <Footer />
     </>
   );

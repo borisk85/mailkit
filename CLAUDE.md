@@ -57,7 +57,7 @@ Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
 - Aliases: free bundled with paid mailbox (unlimited via CF Email Routing)
 
 ## Honest positioning
-- Tagline: "Email on your domain in 4 minutes, guaranteed."
+- Tagline: "Email on your domain in 5 minutes, guaranteed."
 - Metric when asked: "We automate 100% of the technical complexity. You do 3
   simple copy-paste actions."
 - **Never** say: "0 clicks", "full auto", "90% automation", "zero setup" — it's
@@ -70,7 +70,7 @@ Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
 - Chrome Extension planned for v2 to reduce Gmail step to ~20 sec (legal
   research + Chrome Store ToS review required BEFORE dev)
 - Brevo ops: single shared account handles all customer sender domains
-- Honest positioning: "4-5 min, guaranteed" — no "0 clicks" claims
+- Honest positioning: "5 min, guaranteed" — no "0 clicks" claims
 
 ## What NOT to do
 - Don't build audit tool / DNS checker — out of scope for MVP
