@@ -31,6 +31,13 @@
     "alreadyIn": "Вы уже в списке ожидания.",
     "invalidEmail": "Пожалуйста, введите корректный email."
   },
+  "auth": {
+    "signInWithGoogle": "Войти через Google",
+    "signOut": "Выйти",
+    "welcomeBack": "С возвращением, {name}",
+    "friendFallback": "друг",
+    "redirecting": "Перенаправляем..."
+  },
   "footer": {
     "tagline": "Настройка почты без возни с DNS.",
     "copyright": "© 2026 MailKit. Все права защищены."
