@@ -20,3 +20,6 @@
 - #13 Workspace-only automation (Phase B)
 - #14 White-label for agencies
 - #15 Multi-domain dashboard
+
+## 🧹 Tech debt
+- [#6](https://github.com/borisk85/mailkit/issues/6) Tighten waitlist insert via anon key + RLS INSERT policy (switch off service_role for public form)
