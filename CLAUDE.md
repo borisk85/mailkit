@@ -71,6 +71,9 @@ Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
   research + Chrome Store ToS review required BEFORE dev)
 - Brevo ops: single shared account handles all customer sender domains
 - Honest positioning: "5 min, guaranteed" — no "0 clicks" claims
+- Vercel Framework Preset фиксируется при первом подключении repo.
+  Если подключил до scaffold merge — руками поправить в Settings
+  после merge. См. [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)
 
 ## What NOT to do
 - Don't build audit tool / DNS checker — out of scope for MVP

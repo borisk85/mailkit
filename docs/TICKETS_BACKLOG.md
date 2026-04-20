@@ -23,3 +23,5 @@
 
 ## 🧹 Tech debt
 - [#6](https://github.com/borisk85/mailkit/issues/6) Tighten waitlist insert via anon key + RLS INSERT policy (switch off service_role for public form)
+- Проверить Vercel Framework Preset = Next.js при каждом мажорном
+  merge в main (автоматизировать через GitHub Action в будущем)

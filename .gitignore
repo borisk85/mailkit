@@ -55,7 +55,7 @@ spike.log
 # IDE
 .idea/
 .vscode/
-/.claude/settings.local.json
+/.claude/
 
 # Playwright
 /test-results/
