@@ -55,9 +55,21 @@ spike.log
 # IDE
 .idea/
 .vscode/
+/.claude/settings.local.json
 
 # Playwright
 /test-results/
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+/.playwright-mcp/
+
+# Lighthouse reports (keep numbers in PR comments, not repo)
+/lighthouse-*.json
+/lighthouse-*.html
+
+# UI verification screenshots (artifacts, attach to PR instead)
+/shot-*.png
+/i18n-*.png
+/waitlist-*.png
+/deploy-*.png

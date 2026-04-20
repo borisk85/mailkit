@@ -34,6 +34,8 @@ Predecessor: [archive/PRODUCT_BRIEF_v1_pre_spike.md](archive/PRODUCT_BRIEF_v1_pr
 6. Lemon Squeezy integration — один SKU: $5 per single mailbox setup
 7. Минимальный dashboard: список купленных setup'ов + их email-адреса
 8. Email-only support via support@getmailkit.com
+9. Performance baseline: Lighthouse ≥90 / SEO ≥95 / Core Web Vitals
+   в зеленой зоне на всех публичных страницах (EN и RU)
 
 ### What's OUT of MVP v1 (backlog, NOT building yet)
 
