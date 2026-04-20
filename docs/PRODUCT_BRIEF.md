@@ -8,9 +8,9 @@ Predecessor: [archive/PRODUCT_BRIEF_v1_pre_spike.md](archive/PRODUCT_BRIEF_v1_pr
 
 ## Tagline
 
-**EN:** Email on your domain in 4 minutes, guaranteed. Skip 30 minutes of DNS hell.
+**EN:** Email on your domain in 5 minutes, guaranteed. Skip 30 minutes of DNS hell.
 
-**RU:** Почта на домене за 4 минуты. С гарантией что все работает. Без 30 минут возни с DNS.
+**RU:** Почта на домене за 5 минут. С гарантией что все работает. Без 30 минут возни с DNS.
 
 ### Не говорим никогда
 «0 clicks», «full auto», «90% automation», «zero setup» — это натяжка. Реальность:
@@ -34,6 +34,8 @@ Predecessor: [archive/PRODUCT_BRIEF_v1_pre_spike.md](archive/PRODUCT_BRIEF_v1_pr
 6. Lemon Squeezy integration — один SKU: $5 per single mailbox setup
 7. Минимальный dashboard: список купленных setup'ов + их email-адреса
 8. Email-only support via support@getmailkit.com
+9. Performance baseline: Lighthouse ≥90 / SEO ≥95 / Core Web Vitals
+   в зеленой зоне на всех публичных страницах (EN и RU)
 
 ### What's OUT of MVP v1 (backlog, NOT building yet)
 
@@ -67,7 +69,7 @@ Predecessor: [archive/PRODUCT_BRIEF_v1_pre_spike.md](archive/PRODUCT_BRIEF_v1_pr
 
 SaaS для автоматической настройки корпоративной почты `hello@yourdomain.com`
 в существующем Gmail. Убираем боль ручного DNS, SMTP и Send-As setup —
-юзер получает готовый почтовый адрес за 4-5 минут вместо 30-45.
+юзер получает готовый почтовый адрес за 5 минут вместо 30-45.
 
 ---
 
@@ -79,7 +81,7 @@ SaaS для автоматической настройки корпоратив
 - Cloudflare Email Routing + DNS (MX/SPF/DKIM/DMARC) — полностью автоматом через API
 - Brevo sender domain + DKIM + SMTP creds — полностью автоматом через API (на нашем shared аккаунте)
 - Gmail Send-As — guided UI-wizard: juзер копирует SMTP host/port/username/password в Gmail Settings (deep link), получает verification email, кликает ссылку
-**Time to setup:** 4-5 минут
+**Time to setup:** 5 минут
 **Positioning:** "We automate 100% of the technical complexity. You do 3 simple copy-paste actions."
 
 ### Path B — v2 (Workspace, 3-6 мес после MVP)
@@ -108,7 +110,7 @@ Gmail API метод `users.settings.sendAs.create` с SMTP MSA возвраща
 | 5 | Guided Gmail Send-As: copy (1 клик) → Gmail deep link → paste → click verify link | показывает SMTP creds, deep link в `mail.google.com/mail/u/0/#settings/accounts` | 3 min |
 | 6 | Клик "Done" в MailKit | посылает тестовое письмо, проверяет headers `spf/dkim/dmarc=pass` | 10 sec |
 
-**TOTAL:** 4-5 минут.
+**TOTAL:** 5 минут.
 
 Ручных действий: 3 OAuth-клика + 4 paste-действия в Gmail + 1 клик на verify-link + 1 клик Done.
 
@@ -258,7 +260,7 @@ social proofs, не reviews-за-деньги.
 
 - **Метрика автоматизации, когда спросят:** "We automate 100% of the technical
   complexity. You do 3 simple copy-paste actions." Все.
-- **Говорим о времени:** 4-5 минут, а не «5 минут» и не «0 minutes» — честно
+- **Говорим о времени:** 5 минут — верхняя граница реального user-journey, никакого «0 minutes» или «0 clicks»
 - **Говорим о процессе:** «guided Gmail setup» а не «Gmail automation» — мы не
   автоматизируем, мы направляем
 - **Guarantee:** деньги назад если дольше 5 минут — подтверждает обещание делом

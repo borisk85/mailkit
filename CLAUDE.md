@@ -57,7 +57,7 @@ Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
 - Aliases: free bundled with paid mailbox (unlimited via CF Email Routing)
 
 ## Honest positioning
-- Tagline: "Email on your domain in 4 minutes, guaranteed."
+- Tagline: "Email on your domain in 5 minutes, guaranteed."
 - Metric when asked: "We automate 100% of the technical complexity. You do 3
   simple copy-paste actions."
 - **Never** say: "0 clicks", "full auto", "90% automation", "zero setup" — it's
@@ -70,7 +70,7 @@ Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
 - Chrome Extension planned for v2 to reduce Gmail step to ~20 sec (legal
   research + Chrome Store ToS review required BEFORE dev)
 - Brevo ops: single shared account handles all customer sender domains
-- Honest positioning: "4-5 min, guaranteed" — no "0 clicks" claims
+- Honest positioning: "5 min, guaranteed" — no "0 clicks" claims
 
 ## What NOT to do
 - Don't build audit tool / DNS checker — out of scope for MVP
@@ -83,6 +83,59 @@ Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
 - Don't offer free lifetime support — upsell to monitoring or charge for
   re-setup after 30 days
 - Don't build live chat for MVP — email only
+
+## UI Verification Workflow (важно)
+
+Для любой работы над UI компонентами ОБЯЗАНО проверять результат через
+Playwright MCP, не полагаясь на «код выглядит правильно».
+
+Правильный цикл:
+1. Написать/изменить компонент
+2. Запустить `pnpm dev` в фоне
+3. Через Playwright MCP: открыть страницу, сделать скриншот
+4. Визуально проверить результат
+5. Если есть проблемы — итерировать
+6. Только когда визуально все ок — показывать владельцу
+
+**Не присылай владельцу на проверку незавершенный UI.** Владелец не будет
+делать скриншоты сам — если нужна визуальная проверка, делай через MCP.
+
+### Что MCP МОЖЕТ проверить
+- Layout страниц, responsive поведение
+- Состояния компонентов (hover, disabled, loading, error)
+- Формы: валидация, submit
+- Навигация между страницами
+- i18n переключение EN/RU
+- Console errors в браузере
+
+### Что MCP НЕ может проверить (попросить владельца)
+- Реальный Google OAuth flow (нужен живой Google аккаунт)
+- Реальный Lemon Squeezy checkout (нужны реальные платежи)
+- Реальная отправка/приход email через Gmail
+- Внешние API calls к Cloudflare/Brevo с реальными ключами (money/time
+  burn — лучше мокать в dev)
+
+Для этих кейсов — в PR description секция "Manual verification needed
+from owner" со списком что и как проверить.
+
+### Performance quality gate (обязательно для всех UI-тикетов)
+
+Перед merge любого PR с изменениями публичных страниц (landing, auth,
+onboarding, dashboard) запускай Lighthouse через `npx lighthouse` или
+Playwright+Lighthouse integration.
+
+Минимальные таргеты (не merge при фейле любого):
+- Performance: ≥90
+- SEO: ≥95
+- Accessibility: ≥90
+- Best Practices: ≥90
+- LCP <2.5s, CLS <0.1, TBT <200ms, FCP <1.8s
+
+Проверять обе локали: `/en` и `/ru` — Next.js i18n может добавить
+нагрузку на инициализацию.
+
+Если PR ломает метрики — НЕ мержим. Либо фикс в том же PR, либо явное
+решение архитектора принять регрессию.
 
 ## Communication style with owner
 - На «ты», коротко, без маркдауна в простых ответах, без лекций

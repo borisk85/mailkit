@@ -5,10 +5,10 @@
 
 ## Core value prop
 
-**EN:** "Email on your domain in 4 minutes. Skip 90 minutes of DNS hell,
+**EN:** "Email on your domain in 5 minutes. Skip 90 minutes of DNS hell,
 Brevo gotchas, and Gmail setup dance."
 
-**RU:** "Почта на домене за 4 минуты. Без часа возни с DNS, граблей Brevo
+**RU:** "Почта на домене за 5 минут. Без часа возни с DNS, граблей Brevo
 и танцев с Gmail Send-As."
 
 ## Time comparison (actual)
@@ -16,7 +16,7 @@ Brevo gotchas, and Gmail setup dance."
 | Scenario | Inexperienced user | Experienced but forgetful |
 |---|---|---|
 | Fully manual (2026 reality with ChatGPT help) | 60-90 min | 45-60 min |
-| With MailKit MVP | 4-5 min | 3-4 min |
+| With MailKit MVP | 5 min | 5 min |
 | With MailKit + Extension (v2) | ~1.5 min | ~1 min |
 
 Time savings MVP: 90%+
@@ -61,12 +61,12 @@ SPF/DKIM. MailKit реально все настраивает.
 
 **Primary — Serial Indie Hackers:**
 - Pain: "запускаю новый проект раз в месяц, каждый раз email-ад"
-- Hook: "Your 10th side project. Your 1st 4-min email setup."
+- Hook: "Your 10th side project. Your 1st 5-min email setup."
 - Channels: X/Twitter, Indie Hackers, Product Hunt
 
 **Secondary — Agency owners / Freelancers:**
 - Pain: "делаю клиентам лендинги, настройка почты ест время"
-- Hook: "Ship email setup as part of your deliverable. 4 minutes each."
+- Hook: "Ship email setup as part of your deliverable. 5 minutes each."
 - Channels: X, LinkedIn, агентские Telegram-чаты (RU)
 
 **Tertiary — Non-tech founders:**
@@ -87,12 +87,12 @@ SPF/DKIM. MailKit реально все настраивает.
 ## Tagline candidates (для A/B на лендинге)
 
 EN:
-- "Email on your domain in 4 minutes. Guaranteed."
+- "Email on your domain in 5 minutes. Guaranteed."
 - "Skip 90 minutes of email setup hell."
-- "Your 10th project. Your 1st 4-min email setup."
+- "Your 10th project. Your 1st 5-min email setup."
 
 RU:
-- "Почта на домене за 4 минуты."
+- "Почта на домене за 5 минут."
 - "Пропусти час возни с DNS."
 - "Десятый проект. Первая быстрая настройка почты."
 

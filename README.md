@@ -1,6 +1,6 @@
 # MailKit
 
-**Email on your domain in 4 minutes, guaranteed.** Skip 30 minutes of DNS hell.
+**Email on your domain in 5 minutes, guaranteed.** Skip 30 minutes of DNS hell.
 
 MailKit is a hybrid-MVP SaaS that automates **Cloudflare Email Routing** and
 **Brevo SMTP** setup for a user's domain, then guides them through the final
