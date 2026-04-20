@@ -1,5 +1,22 @@
 # MailKit — CLAUDE.md
 
+## ⚠ Scope Discipline (критично)
+
+MVP v1 scope зафиксирован в [docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md)
+раздел **"MVP v1 Scope — STRICT BOUNDARY"**.
+
+**Default action при любом предложении новой фичи:** сначала проверь,
+входит ли в MVP v1 scope. Если НЕТ — не писать код, добавить в backlog,
+напомнить владельцу о scope discipline.
+
+**Не писать код на фичи из backlog** (self-serve diagnostics, re-setup,
+monitoring, bundles, Chrome Extension, Workspace version, white-label,
+multi-domain, etc.) до явного разрешения после валидации с реальными
+юзерами.
+
+Если в сессии возникает идея «а давай еще добавим...» — остановись,
+проверь scope, спроси владельца.
+
 ## Quick context
 Hybrid MVP SaaS: automates Cloudflare Email Routing + Brevo SMTP setup on the
 user's domain, then guides the user through the Gmail Send-As final step via a
@@ -7,6 +24,13 @@ user's domain, then guides the user through the Gmail Send-As final step via a
 with personal Gmail accounts.
 
 Marketing angles and objection handling: see [docs/MARKETING_ANGLES.md](docs/MARKETING_ANGLES.md)
+
+Post-launch support: 30-day guarantee + self-serve diagnostics + $3 re-setup
+or $3/mo monitoring subscription. See [docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md)
+"Post-launch Support Model".
+
+Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
+(owner responsibility, not in code scope).
 
 ## Architecture constraints (важно)
 - **Gmail `sendAs.create` blocked on personal @gmail** — the API method requires
@@ -56,6 +80,9 @@ Marketing angles and objection handling: see [docs/MARKETING_ANGLES.md](docs/MAR
 - Don't touch Cloudflare/Brevo/Gmail code without reading
   [docs/SPIKE_FINDINGS.md](docs/SPIKE_FINDINGS.md) first
 - Don't re-introduce Resend — Brevo handles transactional too
+- Don't offer free lifetime support — upsell to monitoring or charge for
+  re-setup after 30 days
+- Don't build live chat for MVP — email only
 
 ## Communication style with owner
 - На «ты», коротко, без маркдауна в простых ответах, без лекций
