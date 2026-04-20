@@ -1,5 +1,7 @@
 import { useTranslations } from "next-intl";
 
+import { SignInButton } from "@/components/auth/sign-in-button";
+
 import { WaitlistForm } from "./waitlist-form";
 
 export function Hero() {
@@ -15,11 +17,14 @@ export function Hero() {
       <p className="max-w-2xl text-balance text-base text-zinc-600 sm:text-lg dark:text-zinc-400">
         {t("subtitle")}
       </p>
+      <SignInButton />
       <WaitlistForm />
       <p className="max-w-xl text-sm text-zinc-500 dark:text-zinc-500">
         {t("honest")}
       </p>
-      <p className="text-xs text-zinc-500 dark:text-zinc-500">{t("guarantee")}</p>
+      <p className="text-xs text-zinc-500 dark:text-zinc-500">
+        {t("guarantee")}
+      </p>
     </section>
   );
 }

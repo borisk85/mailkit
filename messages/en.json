@@ -31,6 +31,13 @@
     "alreadyIn": "You're already on the waitlist.",
     "invalidEmail": "Please enter a valid email."
   },
+  "auth": {
+    "signInWithGoogle": "Sign in with Google",
+    "signOut": "Sign out",
+    "welcomeBack": "Welcome back, {name}",
+    "friendFallback": "friend",
+    "redirecting": "Redirecting..."
+  },
   "footer": {
     "tagline": "Email setup without the DNS nightmare.",
     "copyright": "© 2026 MailKit. All rights reserved."
