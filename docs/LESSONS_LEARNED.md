@@ -91,3 +91,74 @@ Perf-baseline PR'ы — отдельный класс:
 - Post-merge: median 3-прогонов на prod, не single-run (Lighthouse
   noise ±5). Если median просел ниже pre-PR baseline — rollback через
   Vercel Deployments → Promote previous, разбор отдельно.
+
+## 2026-04-21 — Vercel CDN cold-cache perf-measurement artifact
+
+### Симптом
+Сразу после merge PR #10 (Ticket #4a Cloudflare pipeline) prod
+Lighthouse median 3×3 показал резкую регрессию landing'а:
+EN 87 → 71 (warm), RU 87 → 55 (warm). TBT RU взлетел с 70ms до 1008ms.
+Открыл `chore/perf-post-4a-regression-fix` по директиве "fix-forward",
+начал искать причину в bundle. **Ни одна из гипотез (lucide barrel /
+zod client leak / sonner root / shadcn) не подтвердилась числами.**
+
+### Причина
+Никакой регрессии в коде или bundle не было — это был **cold-cache
+measurement artifact** Vercel Edge CDN.
+
+Bundle diff pre (`5ef5157`) vs post (`a16f14a`) через Turbopack
+`build-manifest.json` + `stat -c %s .next/static/chunks/*`:
+
+| | Pre | Post | Delta |
+|---|---|---|---|
+| Landing `/en` total JS served | 984.23 KB | 984.49 KB | +256 bytes |
+| `rootMainFiles` count | 5 | 6 | +1 |
+| `rootMain` total | ~456 KB | ~458 KB | +2 KB |
+| Polyfills chunk | 113 KB | 113 KB | 0 |
+
+Grep по post client chunks: 0 упоминаний `lucide-react`, 0 упоминаний
+`zod`/`ZodError`. Sonner/shadcn chunks идентичны по размеру.
+
+Local Lighthouse (одинаковая среда, без CDN) median 3× перед вы после:
+EN 67 → 70, RU 66 → 65 — в пределах single-run noise ±5. **Код не
+регрессировал.**
+
+Prod warm re-measure через ~1 час после deploy (CDN edge cache
+прогрелся):
+- EN Perf median: 71 (cold) → **77** (warm)
+- RU Perf median: 55 (cold) → **74** (warm)
+
+RU подскочил +19 пунктов просто от прогрева кеша. Первоначальное
+измерение я делал в первые ~10 минут после Vercel `readyState=READY`,
+когда edge региона к которому подключался Lighthouse-chrome еще не
+имел прогретого кеша статики, и метрики LCP/FCP/TBT были непомерно
+высокими против baseline PR #9, который я мерил через час+ после
+merge.
+
+### Фикс
+Post-hoc "fix-forward" PR не применим, когда причина — noise
+measurement. Ветка `chore/perf-post-4a-regression-fix` сброшена,
+ничего не коммитилось. Prod остается на `a16f14a`.
+
+Стабильный re-measure запланирован на следующий день после merge
+(≥12h warm cache) — если median ≥85 → подтверждение noise;
+80-84 → measured baseline в attempt-2 perf-PR; <80 → открывается
+investigation PR, возврат к анализу.
+
+### Правило
+Lighthouse post-deploy baseline снимать **не раньше чем через 60 мин
+после Vercel `readyState=READY`**, либо после 10+ последовательных
+прогревающих `curl` с разных регионов (Vercel edge cache prime).
+
+Single-edge cold run в первые 10 мин после deploy — **не метрика,
+measurement noise ±15 points** от стабильного значения (конкретно в
+этой истории: cold EN 71 / RU 55 vs warm EN 77 / RU 74 через час).
+
+Перед тем как объявлять perf-регрессию:
+1. Сверить bundle diff через `.next/static/chunks` sizes + `build-manifest.json` pre/post. Identical → noise hypothesis.
+2. Прогнать local Lighthouse 3× медиану для pre vs post builds в одинаковой среде. Identical в пределах ±5 → noise.
+3. Перемерить prod через 1+ час warm cache. Если recover'ил 10+
+   points → cache cold was the cause, не код.
+
+Только если все три показывают реальную разницу — открывать
+fix-forward PR. Иначе: документировать noise, continue.
