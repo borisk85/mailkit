@@ -73,3 +73,6 @@ spike.log
 /i18n-*.png
 /waitlist-*.png
 /deploy-*.png
+/wizard-*.png
+/auth-*.png
+/live-*.png
