@@ -189,16 +189,14 @@ describe("verifyCloudflareToken", () => {
     vi.mocked(sbModule.createClient).mockResolvedValue(
       sb as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
     );
-    const listZones = vi
-      .fn()
-      .mockResolvedValue([
-        {
-          id: "z1",
-          name: "ex.com",
-          status: "active",
-          account: { id: "acc1", name: "A" },
-        },
-      ]);
+    const listZones = vi.fn().mockResolvedValue([
+      {
+        id: "z1",
+        name: "ex.com",
+        status: "active",
+        account: { id: "acc1", name: "A" },
+      },
+    ]);
     vi.mocked(cfModule.createCloudflareClient).mockReturnValue({
       listZones,
     } as unknown as ReturnType<typeof cfModule.createCloudflareClient>);
@@ -347,11 +345,11 @@ describe("startSetupRun — happy path", () => {
     expect(listDestIdx).toBeLessThan(listRulesIdx);
     expect(listRulesIdx).toBeLessThan(createRuleIdx);
 
-    // DNS: 3 MX + 1 SPF + 1 DMARC → 5 creates
+    // DNS: 1 SPF + 1 DMARC → 2 creates (MX is managed by CF Email Routing).
     const createDnsCount = callOrder.filter((c) =>
       c.startsWith("createDnsRecord:"),
     ).length;
-    expect(createDnsCount).toBe(5);
+    expect(createDnsCount).toBe(2);
 
     const row = admin.rows[0];
     expect(row.status).toBe("cf_done");
@@ -377,22 +375,18 @@ describe("startSetupRun — fail mid-flow", () => {
     );
 
     const cf = {
-      listZones: vi
-        .fn()
-        .mockResolvedValue([
-          {
-            id: "z1",
-            name: "ex.com",
-            status: "active",
-            account: { id: "acc1", name: "A" },
-          },
-        ]),
-      enableEmailRouting: vi
-        .fn()
-        .mockResolvedValue({
-          status: { enabled: true, status: "ready" },
-          skipped: false,
-        }),
+      listZones: vi.fn().mockResolvedValue([
+        {
+          id: "z1",
+          name: "ex.com",
+          status: "active",
+          account: { id: "acc1", name: "A" },
+        },
+      ]),
+      enableEmailRouting: vi.fn().mockResolvedValue({
+        status: { enabled: true, status: "ready" },
+        skipped: false,
+      }),
       listDnsRecords: vi.fn().mockResolvedValue([]),
       createDnsRecord: vi.fn().mockRejectedValue(
         new CloudflareError({

@@ -76,3 +76,6 @@ spike.log
 /wizard-*.png
 /auth-*.png
 /live-*.png
+
+# Ad-hoc smoke scripts (not shipped, run manually)
+/scripts/

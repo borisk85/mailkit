@@ -328,42 +328,18 @@ async function runCfPipeline(
     return mapCfError(e);
   }
 
-  // Step: DNS upsert (MX × 3, SPF, DMARC)
+  // Step: DNS upsert (SPF + DMARC only).
+  // MX records are managed by Cloudflare Email Routing automatically once
+  // routing is enabled. Touching them via /dns_records returns CF error
+  // 890190 ("This zone is managed by Email Routing. Disable Email Routing
+  // to add/modify MX records."). SPF and DMARC stay under our control —
+  // Email Routing does not create them and users need valid DMARC for
+  // deliverability.
   const dmarcContent = `v=DMARC1; p=none; rua=mailto:postmaster@${zoneName}`;
   const desiredDns: Array<{
-    key: "mx1" | "mx2" | "mx3" | "spf" | "dmarc";
+    key: "spf" | "dmarc";
     record: DnsRecordInput;
   }> = [
-    {
-      key: "mx1",
-      record: {
-        type: "MX",
-        name: zoneName,
-        content: "route1.mx.cloudflare.net",
-        priority: 1,
-        ttl: 1,
-      },
-    },
-    {
-      key: "mx2",
-      record: {
-        type: "MX",
-        name: zoneName,
-        content: "route2.mx.cloudflare.net",
-        priority: 2,
-        ttl: 1,
-      },
-    },
-    {
-      key: "mx3",
-      record: {
-        type: "MX",
-        name: zoneName,
-        content: "route3.mx.cloudflare.net",
-        priority: 3,
-        ttl: 1,
-      },
-    },
     {
       key: "spf",
       record: {
