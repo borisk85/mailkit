@@ -7,9 +7,20 @@
 - #1 Feasibility Spike
 
 ## 🔨 MVP v1 (build now, 3-4 weeks total)
-- #2 Production scaffold (in progress)
-- #3 Auth + Google OAuth flow
+- #2 Production scaffold (done)
+- #3 Auth + Google OAuth flow (done, PR #8)
 - #4 Setup pipeline backend (Cloudflare + Brevo in TS)
+  - #4a Cloudflare pipeline (done, merged PR #10)
+  - #4b Brevo SMTP integration
+    - **Pre-requisites (MUST fix before Brevo API calls):**
+      - **SPF merge policy**: если `@ TXT v=spf1` уже существует — merge
+        (добавить `include:<brevo>` сохранив existing includes), не
+        overwrite. Нужен parser для SPF mechanism list
+        (`include:`, `ip4:`, `ip6:`, `a:`, `mx:`, `~all`/`-all`/`+all`).
+      - **Content-pattern upsert**: match TXT records по content prefix
+        (`v=spf1` / `v=DMARC1` / `brevo-code:` /
+        `google-site-verification:`), не first-match по позиции. В
+        `listDnsRecords` добавить фильтр + pattern-match helper.
 - #5 Onboarding UI wizard
 - #6 Gmail Send-As guided step UI
 - #7 Lemon Squeezy payment ($5 single SKU)
@@ -55,6 +66,8 @@
   - Scope на следующий перф-PR: (1), (2), (3). (4) отложить до
     measurement-after-(1..3).
   - Follow-up attempt 2: LCP/FCP — framework split + hero critical inline CSS + image priority (after Ticket #4a merged)
+  - Attempt 2 scope **также включает `/app/setup`** — authenticated route, single-run preview Perf EN 78 / RU 70 по замеру в PR #10. Чинится той же работой по framework chunk split / polyfills, не отдельный PR.
+  - **Post-#4a-merge regression на landing** (2026-04-21, prod commit 626ed14): median 3×3 прогонов — EN 76→71 (warm), RU 63→55 (warm), TBT RU взлетел до 1008ms (было 70ms). Кандидат: `lucide-react` icons (AlertCircle, CheckCircle2, Loader2) из wizard + `zod` от setup-actions попали в shared chunk landing'а через code-split. Attempt 2 должен замерить bundle-analyzer diff pre/post-#4a и либо изолировать app/setup icons через `dynamic()`, либо tree-shake lucide по named imports.
   - Tracked on GitHub Issue #7 (legacy — новые подобные сюда, не в Issues)
 - Prettier drift на scaffold/shadcn файлах (30 шт), фиксить отдельным
   chore-PR без функциональных правок. Фиксируется одним запуском
