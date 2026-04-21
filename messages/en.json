@@ -102,10 +102,23 @@
       "no_primary_email": "Your Google account email is missing — sign out and sign back in.",
       "not_authenticated": "You are not signed in.",
       "run_not_found": "Setup run not found.",
-      "run_wrong_state": "This setup run is not in the awaiting-verification state.",
+      "run_wrong_state": "This setup run is not in the right state for this action.",
       "run_corrupt": "Setup run is missing required data; start a new one.",
       "db_insert_failed": "Could not record the setup run. Try again.",
-      "unexpected": "Something unexpected happened."
+      "unexpected": "Something unexpected happened.",
+      "brevo_invalid_token": "Brevo rejected our API key. Hold tight while we rotate it — nothing for you to do.",
+      "brevo_domain_taken": "Brevo already knows this domain from a previous run — we picked up the existing setup.",
+      "brevo_rate_limited": "Brevo throttled our requests. Retrying shortly.",
+      "brevo_unavailable": "Brevo is temporarily unavailable. Try again in a few minutes.",
+      "brevo_verify_timeout": "Brevo could not verify your domain yet. DNS propagation can take a few minutes — retry soon.",
+      "spf_conflict": "Your SPF record ends in -all (strict policy). Soften it to ~all so Brevo can send on your behalf, then retry.",
+      "dns_write_failed": "We could not write a DNS record cleanly. Details: {details}"
+    },
+    "brevoSteps": {
+      "sender": "Brevo sender domain claimed",
+      "dns": "Brevo DNS records written (DKIM, brevo-code, SPF merged, DMARC)",
+      "verify": "Brevo verified the domain",
+      "done": "SMTP ready — sending as {mailbox}@{domain}"
     }
   },
   "footer": {

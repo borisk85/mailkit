@@ -11,6 +11,13 @@ vi.mock("@/lib/integrations/cloudflare", async () => {
   };
 });
 
+vi.mock("@/lib/integrations/brevo", async () => {
+  const actual = await vi.importActual<
+    typeof import("@/lib/integrations/brevo")
+  >("@/lib/integrations/brevo");
+  return { ...actual, createBrevoClient: vi.fn() };
+});
+
 vi.mock("@/lib/supabase/server", () => ({
   createClient: vi.fn(),
   createServiceClient: vi.fn(),
@@ -18,8 +25,10 @@ vi.mock("@/lib/supabase/server", () => ({
 
 import { CloudflareError } from "@/lib/integrations/cloudflare";
 import * as cfModule from "@/lib/integrations/cloudflare";
+import * as brevoModule from "@/lib/integrations/brevo";
 import * as sbModule from "@/lib/supabase/server";
 import {
+  continueBrevoSetup,
   resumeDestinationVerify,
   startSetupRun,
   verifyCloudflareToken,
@@ -524,3 +533,531 @@ describe("resumeDestinationVerify", () => {
     expect(admin.rows[0].cf_state.rule_id).toBe("r1");
   });
 });
+
+/* ------------------------------------------------------------------ *
+ * Ticket #4b — continueBrevoSetup tests
+ * ------------------------------------------------------------------ */
+
+import { BrevoError } from "@/lib/integrations/brevo";
+
+const BREVO_RUN_ID = "22222222-3333-4444-8555-666666666666";
+
+function makeCfForBrevo() {
+  // Minimal CF stub: listDnsRecords returns current SPF, createDnsRecord
+  // stamps ids. upsertDnsByPattern uses list+create/update internally.
+  const listDnsRecords = vi.fn(
+    async (_zone: string, filter?: { type?: string; name?: string }) => {
+      if (filter?.type === "TXT" && filter.name === "ex.com") {
+        // Existing SPF so we exercise the merge path.
+        return [
+          {
+            id: "spf-existing",
+            type: "TXT",
+            name: "ex.com",
+            content: "v=spf1 include:_spf.mx.cloudflare.net ~all",
+            ttl: 1,
+          },
+        ];
+      }
+      return [];
+    },
+  );
+  const createDnsRecord = vi.fn(
+    async (_zone: string, rec: Record<string, unknown>) => ({
+      id: `new-${(rec.content as string).slice(0, 8)}`,
+      ttl: 1,
+      ...rec,
+    }),
+  );
+  const updateDnsRecord = vi.fn(
+    async (_zone: string, id: string, rec: Record<string, unknown>) => ({
+      id,
+      ttl: 1,
+      ...rec,
+    }),
+  );
+  return {
+    listZones: vi.fn(),
+    getEmailRoutingStatus: vi.fn(),
+    enableEmailRouting: vi.fn(),
+    listDnsRecords,
+    createDnsRecord,
+    updateDnsRecord,
+    listEmailRoutingRules: vi.fn(),
+    createEmailRoutingRule: vi.fn(),
+    listEmailRoutingDestinations: vi.fn(),
+    createEmailRoutingDestination: vi.fn(),
+  };
+}
+
+function cfDoneRow(overrides: Partial<MockRow> = {}): MockRow {
+  return {
+    id: BREVO_RUN_ID,
+    user_id: "u1",
+    domain: "ex.com",
+    mailbox_local: "hello",
+    status: "cf_done",
+    cf_zone_id: "z1",
+    cf_state: {
+      account_id: "acc1",
+      last_step: "create_rule",
+      dns: { spf: "sp1", dmarc: "dm1" },
+      rule_id: "r1",
+    },
+    error_msg: null,
+    created_at: new Date().toISOString(),
+    ...overrides,
+  };
+}
+
+describe("continueBrevoSetup — happy path", () => {
+  test("runs create → dns → verify → finalize ending at brevo_done", async () => {
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const admin = makeAdminStub([cfDoneRow()]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    const cf = makeCfForBrevo();
+    vi.mocked(cfModule.createCloudflareClient).mockReturnValue(
+      cf as unknown as ReturnType<typeof cfModule.createCloudflareClient>,
+    );
+
+    const domain = {
+      id: 42,
+      domain_name: "ex.com",
+      authenticated: false,
+      dkim_record: {
+        type: "TXT" as const,
+        hostname: "mail._domainkey.ex.com",
+        value: "v=DKIM1; p=ABC",
+      },
+      brevo_code_record: {
+        type: "TXT" as const,
+        hostname: "ex.com",
+        value: "brevo-code:xyz",
+      },
+    };
+    const verified = { ...domain, authenticated: true, verified: true };
+
+    const brevoStub = {
+      createSenderDomain: vi.fn().mockResolvedValue({ domain, created: true }),
+      getSenderDomain: vi.fn(),
+      listSenderDomains: vi.fn(),
+      verifyDomain: vi.fn().mockResolvedValue(verified),
+    };
+    vi.mocked(brevoModule.createBrevoClient).mockReturnValue(
+      brevoStub as unknown as ReturnType<typeof brevoModule.createBrevoClient>,
+    );
+
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+
+    expect(result.status).toBe("ok");
+    if (result.status === "ok") expect(result.runStatus).toBe("brevo_done");
+
+    expect(brevoStub.createSenderDomain).toHaveBeenCalledOnce();
+    expect(brevoStub.verifyDomain).toHaveBeenCalledOnce();
+    // 3 TXT upserts (dkim create, brevo-code create, dmarc create, spf update)
+    // = 3 creates + 1 update (SPF existed).
+    expect(cf.createDnsRecord).toHaveBeenCalledTimes(3);
+    expect(cf.updateDnsRecord).toHaveBeenCalledTimes(1);
+    const updatedSpf = cf.updateDnsRecord.mock.calls[0][2] as {
+      content: string;
+    };
+    expect(updatedSpf.content).toContain("include:spf.brevo.com");
+    expect(admin.rows[0].status).toBe("brevo_done");
+    expect(
+      (admin.rows[0].cf_state.brevo as Record<string, unknown>).sender_id,
+    ).toBe(42);
+  });
+});
+
+describe("continueBrevoSetup — resume paths", () => {
+  test("from brevo_sender_created → skips createSenderDomain, goes to DNS", async () => {
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const priorBrevo = {
+      domain: {
+        id: 42,
+        domain_name: "ex.com",
+        authenticated: false,
+        dkim_record: {
+          type: "TXT" as const,
+          hostname: "mail._domainkey.ex.com",
+          value: "v=DKIM1; p=ABC",
+        },
+        brevo_code_record: {
+          type: "TXT" as const,
+          hostname: "ex.com",
+          value: "brevo-code:xyz",
+        },
+      },
+      sender_id: 42,
+      sender_created: true,
+    };
+    const admin = makeAdminStub([
+      cfDoneRow({
+        status: "brevo_sender_created",
+        cf_state: {
+          ...cfDoneRow().cf_state,
+          brevo: priorBrevo,
+        },
+      }),
+    ]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    const cf = makeCfForBrevo();
+    vi.mocked(cfModule.createCloudflareClient).mockReturnValue(
+      cf as unknown as ReturnType<typeof cfModule.createCloudflareClient>,
+    );
+    const verified = {
+      ...priorBrevo.domain,
+      authenticated: true,
+      verified: true,
+    };
+    const brevoStub = {
+      createSenderDomain: vi.fn(),
+      getSenderDomain: vi.fn(),
+      listSenderDomains: vi.fn(),
+      verifyDomain: vi.fn().mockResolvedValue(verified),
+    };
+    vi.mocked(brevoModule.createBrevoClient).mockReturnValue(
+      brevoStub as unknown as ReturnType<typeof brevoModule.createBrevoClient>,
+    );
+
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+    expect(result.status).toBe("ok");
+    expect(brevoStub.createSenderDomain).not.toHaveBeenCalled();
+    expect(cf.createDnsRecord).toHaveBeenCalled();
+    expect(brevoStub.verifyDomain).toHaveBeenCalled();
+  });
+
+  test("from brevo_dns_written → skips DNS, goes to verify", async () => {
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const admin = makeAdminStub([
+      cfDoneRow({
+        status: "brevo_dns_written",
+        cf_state: {
+          ...cfDoneRow().cf_state,
+          brevo: {
+            domain: {
+              id: 42,
+              domain_name: "ex.com",
+              authenticated: false,
+            },
+            sender_id: 42,
+            dns: {
+              dkim: { id: "d1", action: "created" },
+              brevo_code: { id: "b1", action: "created" },
+              dmarc: { id: "dm1", action: "updated" },
+              spf: { id: "sp1", action: "updated" },
+            },
+          },
+        },
+      }),
+    ]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    const cf = makeCfForBrevo();
+    vi.mocked(cfModule.createCloudflareClient).mockReturnValue(
+      cf as unknown as ReturnType<typeof cfModule.createCloudflareClient>,
+    );
+    const brevoStub = {
+      createSenderDomain: vi.fn(),
+      getSenderDomain: vi.fn(),
+      listSenderDomains: vi.fn(),
+      verifyDomain: vi.fn().mockResolvedValue({
+        id: 42,
+        domain_name: "ex.com",
+        authenticated: true,
+        verified: true,
+      }),
+    };
+    vi.mocked(brevoModule.createBrevoClient).mockReturnValue(
+      brevoStub as unknown as ReturnType<typeof brevoModule.createBrevoClient>,
+    );
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+    expect(result.status).toBe("ok");
+    expect(cf.createDnsRecord).not.toHaveBeenCalled();
+    expect(cf.updateDnsRecord).not.toHaveBeenCalled();
+    expect(brevoStub.verifyDomain).toHaveBeenCalledOnce();
+    expect(admin.rows[0].status).toBe("brevo_done");
+  });
+});
+
+describe("continueBrevoSetup — failure paths", () => {
+  test("SPF conflict (-all closed policy) → spf_conflict errorKey, status failed", async () => {
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const admin = makeAdminStub([cfDoneRow()]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    // Existing SPF ends in -all → addSpfInclude hard-fails.
+    const cf = {
+      ...makeCfForBrevo(),
+      listDnsRecords: vi.fn(
+        async (_z: string, filter?: { type?: string; name?: string }) => {
+          if (filter?.type === "TXT" && filter.name === "ex.com") {
+            return [
+              {
+                id: "spf-locked",
+                type: "TXT",
+                name: "ex.com",
+                content: "v=spf1 include:_spf.google.com -all",
+                ttl: 1,
+              },
+            ];
+          }
+          return [];
+        },
+      ),
+    };
+    vi.mocked(cfModule.createCloudflareClient).mockReturnValue(
+      cf as unknown as ReturnType<typeof cfModule.createCloudflareClient>,
+    );
+    const brevoStub = {
+      createSenderDomain: vi.fn().mockResolvedValue({
+        domain: {
+          id: 42,
+          domain_name: "ex.com",
+          authenticated: false,
+          dkim_record: {
+            type: "TXT" as const,
+            hostname: "mail._domainkey.ex.com",
+            value: "v=DKIM1; p=A",
+          },
+          brevo_code_record: {
+            type: "TXT" as const,
+            hostname: "ex.com",
+            value: "brevo-code:x",
+          },
+        },
+        created: true,
+      }),
+      getSenderDomain: vi.fn(),
+      listSenderDomains: vi.fn(),
+      verifyDomain: vi.fn(),
+    };
+    vi.mocked(brevoModule.createBrevoClient).mockReturnValue(
+      brevoStub as unknown as ReturnType<typeof brevoModule.createBrevoClient>,
+    );
+
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+    expect(result.status).toBe("error");
+    if (result.status === "error") {
+      expect(result.errorKey).toBe("setup.errors.spf_conflict");
+    }
+    expect(admin.rows[0].status).toBe("failed");
+    expect(admin.rows[0].error_msg).toContain("spf_hard_fail");
+  });
+
+  test("domain-taken branch: createSenderDomain resolves existing via list", async () => {
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const admin = makeAdminStub([cfDoneRow()]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    const cf = makeCfForBrevo();
+    vi.mocked(cfModule.createCloudflareClient).mockReturnValue(
+      cf as unknown as ReturnType<typeof cfModule.createCloudflareClient>,
+    );
+    const existingDomain = {
+      id: 99,
+      domain_name: "ex.com",
+      authenticated: true,
+      dkim_record: {
+        type: "TXT" as const,
+        hostname: "mail._domainkey.ex.com",
+        value: "v=DKIM1; p=EXISTING",
+      },
+      brevo_code_record: {
+        type: "TXT" as const,
+        hostname: "ex.com",
+        value: "brevo-code:existing",
+      },
+    };
+    const brevoStub = {
+      createSenderDomain: vi
+        .fn()
+        .mockResolvedValue({ domain: existingDomain, created: false }),
+      getSenderDomain: vi.fn(),
+      listSenderDomains: vi.fn(),
+      verifyDomain: vi.fn().mockResolvedValue({
+        ...existingDomain,
+        verified: true,
+      }),
+    };
+    vi.mocked(brevoModule.createBrevoClient).mockReturnValue(
+      brevoStub as unknown as ReturnType<typeof brevoModule.createBrevoClient>,
+    );
+
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+    expect(result.status).toBe("ok");
+    if (result.status === "ok") expect(result.runStatus).toBe("brevo_done");
+    const brevo = admin.rows[0].cf_state.brevo as Record<string, unknown>;
+    expect(brevo.sender_created).toBe(false);
+    expect(brevo.sender_id).toBe(99);
+  });
+
+  test("rejects run not in brevo-resumable state", async () => {
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const admin = makeAdminStub([cfDoneRow({ status: "started" })]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+    if (result.status === "error") {
+      expect(result.errorKey).toBe("setup.errors.run_wrong_state");
+    } else {
+      throw new Error("expected error");
+    }
+  });
+
+  test("missing BREVO_API_KEY → brevo_invalid_token", async () => {
+    delete process.env.BREVO_API_KEY;
+    const admin = makeAdminStub([cfDoneRow()]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+    if (result.status === "error") {
+      expect(result.errorKey).toBe("setup.errors.brevo_invalid_token");
+    } else {
+      throw new Error("expected error");
+    }
+  });
+
+  test("verify timeout (domain never authenticates) → brevo_verify_timeout, status stays brevo_dns_written", async () => {
+    vi.useFakeTimers();
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const admin = makeAdminStub([cfDoneRow()]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    const cf = makeCfForBrevo();
+    vi.mocked(cfModule.createCloudflareClient).mockReturnValue(
+      cf as unknown as ReturnType<typeof cfModule.createCloudflareClient>,
+    );
+    const domain = {
+      id: 42,
+      domain_name: "ex.com",
+      authenticated: false,
+      dkim_record: {
+        type: "TXT" as const,
+        hostname: "mail._domainkey.ex.com",
+        value: "v=DKIM1; p=ABC",
+      },
+      brevo_code_record: {
+        type: "TXT" as const,
+        hostname: "ex.com",
+        value: "brevo-code:xyz",
+      },
+    };
+    const brevoStub = {
+      createSenderDomain: vi.fn().mockResolvedValue({ domain, created: true }),
+      getSenderDomain: vi.fn(),
+      listSenderDomains: vi.fn(),
+      // Always pending: authenticated:false, verified:false.
+      verifyDomain: vi.fn().mockResolvedValue({
+        ...domain,
+        authenticated: false,
+        verified: false,
+      }),
+    };
+    vi.mocked(brevoModule.createBrevoClient).mockReturnValue(
+      brevoStub as unknown as ReturnType<typeof brevoModule.createBrevoClient>,
+    );
+    const p = continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+    // Drain the three backoff waits (2s, 4s, 8s).
+    await vi.advanceTimersByTimeAsync(2000);
+    await vi.advanceTimersByTimeAsync(4000);
+    await vi.advanceTimersByTimeAsync(8000);
+    const result = await p;
+    if (result.status === "error") {
+      expect(result.errorKey).toBe("setup.errors.brevo_verify_timeout");
+    } else {
+      throw new Error("expected error");
+    }
+    // Status should be preserved at brevo_dns_written so user can retry.
+    expect(admin.rows[0].status).toBe("brevo_dns_written");
+    // Four poll attempts total: initial + 3 retries.
+    expect(brevoStub.verifyDomain).toHaveBeenCalledTimes(4);
+    vi.useRealTimers();
+  });
+});
+
+// Silence unused-import false-positive on BrevoError import (kept for types
+// in error-mapping assertions added later).
+void BrevoError;

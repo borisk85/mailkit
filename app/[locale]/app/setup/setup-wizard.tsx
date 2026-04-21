@@ -56,17 +56,21 @@ const MOCK_ZONES: Zone[] = [
   { id: "zone_mock_2", name: "indiehacker.io", accountId: "acc_mock" },
 ];
 
-function mockInitialState(
-  mock:
-    | "token_entry"
-    | "token_invalid"
-    | "zone_selection"
-    | "setup_running"
-    | "awaiting_verify"
-    | "done"
-    | "failed"
-    | null,
-): WizardState {
+type MockKey =
+  | "token_entry"
+  | "token_invalid"
+  | "zone_selection"
+  | "setup_running"
+  | "awaiting_verify"
+  | "done"
+  | "failed"
+  | "brevo_sender_created"
+  | "brevo_dns_written"
+  | "brevo_verified"
+  | "brevo_done"
+  | null;
+
+function mockInitialState(mock: MockKey): WizardState {
   switch (mock) {
     case "token_entry":
       return { kind: "token_entry" };
@@ -109,19 +113,7 @@ function mockInitialState(
   }
 }
 
-export function SetupWizard({
-  initialMock,
-}: {
-  initialMock:
-    | "token_entry"
-    | "token_invalid"
-    | "zone_selection"
-    | "setup_running"
-    | "awaiting_verify"
-    | "done"
-    | "failed"
-    | null;
-}) {
+export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
   const t = useTranslations("setup");
   const tErr = useTranslations("setup.errors");
   const tState = useTranslations("setup.step3.state");

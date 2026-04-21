@@ -19,12 +19,22 @@ export default defineConfig({
           statements: 80,
           branches: 70,
         },
+        "lib/integrations/brevo.ts": {
+          lines: 80,
+          functions: 80,
+          statements: 80,
+          branches: 70,
+        },
       },
     },
   },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "."),
+      // server-only throws on import outside a Next.js server runtime.
+      // Vitest runs plain Node, so alias it to an empty stub — the
+      // module is purely a build-time boundary guard, no runtime value.
+      "server-only": path.resolve(__dirname, "vitest.server-only-stub.ts"),
     },
   },
 });

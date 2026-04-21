@@ -8,6 +8,16 @@ import {
   type CloudflareClient,
   type DnsRecordInput,
 } from "@/lib/integrations/cloudflare";
+import {
+  upsertDnsByPattern,
+  DnsUpsertError,
+} from "@/lib/integrations/cloudflare-dns-upsert";
+import { addSpfInclude, SpfMergeHardFail } from "@/lib/integrations/dns-merge";
+import {
+  BrevoError,
+  createBrevoClient,
+  type SenderDomain,
+} from "@/lib/integrations/brevo";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 /**
@@ -30,6 +40,11 @@ const STEP = {
   createDestination: "create_destination",
   listRules: "list_rules",
   createRule: "create_rule",
+  brevoCreateSender: "brevo_create_sender",
+  brevoDnsUpsert: "brevo_dns_upsert",
+  brevoSpfMerge: "brevo_spf_merge",
+  brevoVerify: "brevo_verify",
+  brevoFinalize: "brevo_finalize",
 } as const;
 type Step = (typeof STEP)[keyof typeof STEP];
 
@@ -609,6 +624,304 @@ async function patchRun(
 
 function errMsg(e: unknown): string {
   if (e instanceof CloudflareError) return `${e.code}: ${e.message}`;
+  if (e instanceof BrevoError) return `brevo ${e.code}: ${e.message}`;
+  if (e instanceof SpfMergeHardFail) return `spf_hard_fail: ${e.message}`;
+  if (e instanceof DnsUpsertError) return `dns_upsert: ${e.message}`;
   if (e instanceof Error) return e.message;
   return String(e);
+}
+
+/* ------------------------------------------------------------------ *
+ * Ticket #4b — Brevo continuation
+ * ------------------------------------------------------------------ */
+
+const BREVO_RESUMABLE = new Set([
+  "cf_done",
+  "brevo_sender_created",
+  "brevo_dns_written",
+  "brevo_verified",
+]);
+
+const BREVO_VERIFY_POLL_DELAYS_MS = [2000, 4000, 8000] as const;
+const BREVO_SPF_INCLUDE_HOST = "spf.brevo.com";
+
+type BrevoOk = {
+  status: "ok";
+  runId: string;
+  runStatus:
+    | "brevo_sender_created"
+    | "brevo_dns_written"
+    | "brevo_verified"
+    | "brevo_done";
+};
+
+const brevoContinueSchema = z.object({
+  runId: z.string().uuid(),
+  cfToken: z.string().min(20).max(200),
+});
+
+function mapBrevoError(e: unknown): ActionError {
+  if (e instanceof SpfMergeHardFail) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.spf_conflict",
+      details: { message: e.message },
+    };
+  }
+  if (e instanceof DnsUpsertError) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.dns_write_failed",
+      details: { message: e.message },
+    };
+  }
+  if (e instanceof BrevoError) {
+    const http = e.httpStatus;
+    const code = String(e.code);
+    if (http === 401 || http === 403 || code === "unauthorized") {
+      return { status: "error", errorKey: "setup.errors.brevo_invalid_token" };
+    }
+    if (http === 429) {
+      return { status: "error", errorKey: "setup.errors.brevo_rate_limited" };
+    }
+    if (http >= 500) {
+      return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
+    }
+    return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
+  }
+  if (e instanceof CloudflareError) {
+    return mapCfError(e);
+  }
+  return { status: "error", errorKey: "setup.errors.unexpected" };
+}
+
+export async function continueBrevoSetup(input: {
+  runId: string;
+  cfToken: string;
+}): Promise<BrevoOk | ActionError> {
+  const parsed = brevoContinueSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.invalid_input",
+      details: parsed.error.flatten(),
+    };
+  }
+
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return { status: "error", errorKey: "setup.errors.not_authenticated" };
+  }
+
+  const brevoKey = process.env.BREVO_API_KEY;
+  if (!brevoKey) {
+    return { status: "error", errorKey: "setup.errors.brevo_invalid_token" };
+  }
+
+  const admin = createServiceClient();
+  const { data: row } = await admin
+    .from("setup_runs")
+    .select("id, user_id, domain, mailbox_local, status, cf_zone_id, cf_state")
+    .eq("id", parsed.data.runId)
+    .maybeSingle();
+
+  if (!row || row.user_id !== user.id) {
+    return { status: "error", errorKey: "setup.errors.run_not_found" };
+  }
+  if (!BREVO_RESUMABLE.has(row.status)) {
+    return { status: "error", errorKey: "setup.errors.run_wrong_state" };
+  }
+
+  const zoneId = row.cf_zone_id;
+  const zoneName = row.domain;
+  if (!zoneId || !zoneName) {
+    return { status: "error", errorKey: "setup.errors.run_corrupt" };
+  }
+
+  const cf = createCloudflareClient(parsed.data.cfToken);
+  const brevo = createBrevoClient(brevoKey);
+
+  try {
+    let runStatus = row.status as string;
+    let brevoState =
+      ((row.cf_state as Record<string, unknown>)?.brevo as
+        | Record<string, unknown>
+        | undefined) ?? {};
+
+    // Step 1: sender domain create or resume.
+    let domain: SenderDomain | null = brevoState.domain as SenderDomain | null;
+    if (runStatus === "cf_done") {
+      const { domain: created, created: wasCreated } =
+        await brevo.createSenderDomain(zoneName);
+      domain = created;
+      brevoState = {
+        ...brevoState,
+        domain: created,
+        sender_id: created.id,
+        sender_created: wasCreated,
+      };
+      await patchBrevoState(admin, row.id, {
+        status: "brevo_sender_created",
+        brevoState,
+        step: STEP.brevoCreateSender,
+      });
+      runStatus = "brevo_sender_created";
+    } else if (!domain) {
+      // Resuming at brevo_sender_created+ without cached domain → refetch.
+      domain = await brevo.getSenderDomain(zoneName);
+      brevoState = { ...brevoState, domain, sender_id: domain.id };
+    }
+
+    // Step 2: DNS upsert (DKIM + brevo-code + DMARC + SPF merge).
+    if (runStatus === "brevo_sender_created") {
+      const dkim = domain.dkim_record;
+      const brevoCode = domain.brevo_code_record;
+      if (!dkim || !brevoCode) {
+        throw new BrevoError({
+          message: "Brevo response missing DKIM or brevo-code record",
+          code: "missing_records",
+          httpStatus: 0,
+        });
+      }
+      const dkimRes = await upsertDnsByPattern(cf, zoneId, {
+        pattern: "v=dkim1",
+        record: {
+          type: "TXT",
+          name: dkim.hostname,
+          content: dkim.value,
+          ttl: 1,
+        },
+      });
+      const brevoCodeRes = await upsertDnsByPattern(cf, zoneId, {
+        pattern: "brevo-code:",
+        record: {
+          type: "TXT",
+          name: brevoCode.hostname,
+          content: brevoCode.value,
+          ttl: 1,
+        },
+      });
+      const dmarcRes = await upsertDnsByPattern(cf, zoneId, {
+        pattern: "v=dmarc1",
+        record: {
+          type: "TXT",
+          name: `_dmarc.${zoneName}`,
+          content:
+            domain.dmarc_record?.value ??
+            `v=DMARC1; p=none; rua=mailto:postmaster@${zoneName}`,
+          ttl: 1,
+        },
+      });
+      // SPF merge: if an SPF exists on @, merge include:spf.brevo.com;
+      // otherwise create a minimal record.
+      const existingTxt = await cf.listDnsRecords(zoneId, {
+        type: "TXT",
+        name: zoneName,
+      });
+      const existingSpf = existingTxt.find((r) =>
+        r.content.toLowerCase().startsWith("v=spf1"),
+      );
+      const spfContent = existingSpf
+        ? addSpfInclude(existingSpf.content, BREVO_SPF_INCLUDE_HOST)
+        : `v=spf1 include:${BREVO_SPF_INCLUDE_HOST} ~all`;
+      const spfRes = await upsertDnsByPattern(cf, zoneId, {
+        pattern: "v=spf1",
+        record: { type: "TXT", name: zoneName, content: spfContent, ttl: 1 },
+      });
+
+      brevoState = {
+        ...brevoState,
+        dns: {
+          dkim: { id: dkimRes.id, action: dkimRes.action },
+          brevo_code: { id: brevoCodeRes.id, action: brevoCodeRes.action },
+          dmarc: { id: dmarcRes.id, action: dmarcRes.action },
+          spf: { id: spfRes.id, action: spfRes.action },
+        },
+      };
+      await patchBrevoState(admin, row.id, {
+        status: "brevo_dns_written",
+        brevoState,
+        step: STEP.brevoDnsUpsert,
+      });
+      runStatus = "brevo_dns_written";
+    }
+
+    // Step 3: Brevo verify with polling.
+    if (runStatus === "brevo_dns_written") {
+      let verifiedDomain: SenderDomain | null = null;
+      let attempt = 0;
+      while (attempt <= BREVO_VERIFY_POLL_DELAYS_MS.length) {
+        const d = await brevo.verifyDomain(zoneName);
+        if (d.authenticated || d.verified) {
+          verifiedDomain = d;
+          break;
+        }
+        if (attempt === BREVO_VERIFY_POLL_DELAYS_MS.length) break;
+        await sleepMs(BREVO_VERIFY_POLL_DELAYS_MS[attempt]);
+        attempt += 1;
+      }
+      if (!verifiedDomain) {
+        return {
+          status: "error",
+          errorKey: "setup.errors.brevo_verify_timeout",
+        };
+      }
+      brevoState = { ...brevoState, domain: verifiedDomain, verified: true };
+      await patchBrevoState(admin, row.id, {
+        status: "brevo_verified",
+        brevoState,
+        step: STEP.brevoVerify,
+      });
+      runStatus = "brevo_verified";
+    }
+
+    // Step 4: finalize.
+    if (runStatus === "brevo_verified") {
+      await patchBrevoState(admin, row.id, {
+        status: "brevo_done",
+        brevoState,
+        step: STEP.brevoFinalize,
+      });
+      runStatus = "brevo_done";
+    }
+
+    return {
+      status: "ok",
+      runId: row.id,
+      runStatus: runStatus as BrevoOk["runStatus"],
+    };
+  } catch (e) {
+    await failRun(admin, row.id, STEP.brevoCreateSender, errMsg(e));
+    return mapBrevoError(e);
+  }
+}
+
+async function patchBrevoState(
+  admin: Awaited<ReturnType<typeof createServiceClient>>,
+  runId: string,
+  input: {
+    status: string;
+    brevoState: Record<string, unknown>;
+    step: Step;
+  },
+) {
+  const { data } = await admin
+    .from("setup_runs")
+    .select("cf_state")
+    .eq("id", runId)
+    .maybeSingle();
+  const current = (data?.cf_state as object) ?? {};
+  const nextState = {
+    ...current,
+    last_step: input.step,
+    brevo: input.brevoState,
+  };
+  await admin
+    .from("setup_runs")
+    .update({ status: input.status, cf_state: nextState })
+    .eq("id", runId);
+}
+
+function sleepMs(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
