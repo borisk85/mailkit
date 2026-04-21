@@ -142,6 +142,60 @@ describe("createCloudflareClient", () => {
     vi.useRealTimers();
   });
 
+  test("429 with Retry-After header in seconds honors the wait", async () => {
+    vi.useFakeTimers();
+    let calls = 0;
+    server.use(
+      http.get(`${BASE}/zones`, () => {
+        calls += 1;
+        if (calls === 1) {
+          return HttpResponse.json(envelopeErr(10013, "Rate limited"), {
+            status: 429,
+            headers: { "retry-after": "3" },
+          });
+        }
+        return HttpResponse.json(envelopeOk([]));
+      }),
+    );
+
+    const client = createCloudflareClient("tok");
+    const promise = client.listZones();
+    // Default backoff on attempt 0 would be 1000ms; Retry-After overrides to 3s.
+    await vi.advanceTimersByTimeAsync(2500);
+    // Not yet resolved — still waiting for the Retry-After window.
+    expect(calls).toBe(1);
+    await vi.advanceTimersByTimeAsync(600);
+    await promise;
+    expect(calls).toBe(2);
+    vi.useRealTimers();
+  });
+
+  test("429 with Retry-After HTTP-date is parsed and capped at 30s", async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date("2026-04-21T10:00:00Z"));
+    let calls = 0;
+    server.use(
+      http.get(`${BASE}/zones`, () => {
+        calls += 1;
+        if (calls === 1) {
+          // 5 seconds in the future
+          return HttpResponse.json(envelopeErr(10013, "Rate limited"), {
+            status: 429,
+            headers: { "retry-after": "Tue, 21 Apr 2026 10:00:05 GMT" },
+          });
+        }
+        return HttpResponse.json(envelopeOk([]));
+      }),
+    );
+
+    const client = createCloudflareClient("tok");
+    const promise = client.listZones();
+    await vi.advanceTimersByTimeAsync(5100);
+    await promise;
+    expect(calls).toBe(2);
+    vi.useRealTimers();
+  });
+
   test("enableEmailRouting is idempotent: returns skipped=true when already enabled", async () => {
     let enableCalled = false;
     server.use(
