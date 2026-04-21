@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import {
+  continueBrevoSetup,
   resumeDestinationVerify,
   startSetupRun,
   verifyCloudflareToken,
@@ -40,7 +41,34 @@ type WizardState =
       errorKey?: string;
     }
   | {
-      kind: "done";
+      kind: "cf_done_pending_brevo";
+      runId: string;
+      cfToken: string;
+      zoneName: string;
+      mailboxLocal: string;
+      destinationEmail: string;
+      errorKey?: string;
+    }
+  | {
+      kind: "brevo_running";
+      runId: string;
+      cfToken: string;
+      zoneName: string;
+      mailboxLocal: string;
+      destinationEmail: string;
+      reached: "sender" | "dns" | "verify" | "done";
+    }
+  | {
+      kind: "brevo_awaiting_retry";
+      runId: string;
+      cfToken: string;
+      zoneName: string;
+      mailboxLocal: string;
+      destinationEmail: string;
+      errorKey?: string;
+    }
+  | {
+      kind: "brevo_done";
       zoneName: string;
       mailboxLocal: string;
       destinationEmail: string;
@@ -97,7 +125,46 @@ function mockInitialState(mock: MockKey): WizardState {
       };
     case "done":
       return {
-        kind: "done",
+        kind: "cf_done_pending_brevo",
+        runId: "11111111-2222-4333-8444-555555555555",
+        cfToken: "mock_token",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+      };
+    case "brevo_sender_created":
+      return {
+        kind: "brevo_running",
+        runId: "11111111-2222-4333-8444-555555555555",
+        cfToken: "mock_token",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+        reached: "sender",
+      };
+    case "brevo_dns_written":
+      return {
+        kind: "brevo_awaiting_retry",
+        runId: "11111111-2222-4333-8444-555555555555",
+        cfToken: "mock_token",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+        errorKey: "setup.errors.brevo_verify_timeout",
+      };
+    case "brevo_verified":
+      return {
+        kind: "brevo_running",
+        runId: "11111111-2222-4333-8444-555555555555",
+        cfToken: "mock_token",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+        reached: "verify",
+      };
+    case "brevo_done":
+      return {
+        kind: "brevo_done",
         zoneName: "example.com",
         mailboxLocal: "hello",
         destinationEmail: "owner@gmail.com",
@@ -118,6 +185,7 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
   const tErr = useTranslations("setup.errors");
   const tState = useTranslations("setup.step3.state");
   const tSteps = useTranslations("setup.step3.steps");
+  const tBrevo = useTranslations("setup.brevoSteps");
   const locale = useLocale();
 
   const [state, setState] = useState<WizardState>(() =>
@@ -225,7 +293,9 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
                 return;
               }
               setState({
-                kind: "done",
+                kind: "cf_done_pending_brevo",
+                runId: result.runId,
+                cfToken: state.token,
                 zoneName: chosen.name,
                 mailboxLocal,
                 destinationEmail: result.destinationEmail,
@@ -271,7 +341,9 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
               }
               if (result.runStatus === "cf_done") {
                 setState({
-                  kind: "done",
+                  kind: "cf_done_pending_brevo",
+                  runId: state.runId,
+                  cfToken: state.token,
                   zoneName: state.zoneName,
                   mailboxLocal: state.mailboxLocal,
                   destinationEmail: result.destinationEmail,
@@ -282,8 +354,77 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
         />
       ) : null}
 
-      {state.kind === "done" ? (
-        <DoneStep state={state} t={t} tState={tState} tSteps={tSteps} />
+      {state.kind === "cf_done_pending_brevo" ? (
+        <CfDonePendingBrevoStep
+          state={state}
+          isPending={isPending}
+          t={t}
+          tState={tState}
+          tSteps={tSteps}
+          translateErr={translateErr}
+          onContinue={() => {
+            const snapshot = state;
+            setState({
+              kind: "brevo_running",
+              runId: snapshot.runId,
+              cfToken: snapshot.cfToken,
+              zoneName: snapshot.zoneName,
+              mailboxLocal: snapshot.mailboxLocal,
+              destinationEmail: snapshot.destinationEmail,
+              reached: "sender",
+            });
+            startTransition(async () => {
+              const result = await continueBrevoSetup({
+                runId: snapshot.runId,
+                cfToken: snapshot.cfToken,
+              });
+              handleBrevoResult(result, snapshot, setState);
+            });
+          }}
+        />
+      ) : null}
+
+      {state.kind === "brevo_running" ? (
+        <BrevoRunningStep
+          state={state}
+          t={t}
+          tState={tState}
+          tSteps={tSteps}
+          tBrevo={tBrevo}
+        />
+      ) : null}
+
+      {state.kind === "brevo_awaiting_retry" ? (
+        <BrevoAwaitingRetryStep
+          state={state}
+          isPending={isPending}
+          t={t}
+          tState={tState}
+          tSteps={tSteps}
+          tBrevo={tBrevo}
+          translateErr={translateErr}
+          onRetry={() => {
+            const snapshot = state;
+            startTransition(async () => {
+              const result = await continueBrevoSetup({
+                runId: snapshot.runId,
+                cfToken: snapshot.cfToken,
+              });
+              handleBrevoResult(result, snapshot, setState);
+            });
+          }}
+        />
+      ) : null}
+
+      {state.kind === "brevo_done" ? (
+        <BrevoDoneStep
+          state={state}
+          locale={locale}
+          t={t}
+          tState={tState}
+          tSteps={tSteps}
+          tBrevo={tBrevo}
+        />
       ) : null}
 
       {state.kind === "failed" ? (
@@ -548,32 +689,105 @@ function AwaitingVerifyStep({
   );
 }
 
-function DoneStep({
-  state,
-  t,
+type BrevoReached = "sender" | "dns" | "verify" | "done";
+const BREVO_PROGRESS_ORDER: BrevoReached[] = [
+  "sender",
+  "dns",
+  "verify",
+  "done",
+];
+
+function brevoStatusOf(
+  step: BrevoReached,
+  overall: "running" | "awaiting" | "done",
+  reached: BrevoReached,
+): "pending" | "running" | "ok" | "error" {
+  if (overall === "done") return "ok";
+  const idxStep = BREVO_PROGRESS_ORDER.indexOf(step);
+  const idxReached = BREVO_PROGRESS_ORDER.indexOf(reached);
+  if (idxReached > idxStep) return "ok";
+  if (idxReached === idxStep) {
+    if (overall === "awaiting" && step === "verify") return "running";
+    if (overall === "running") return "running";
+    return "pending";
+  }
+  return "pending";
+}
+
+function CfDoneBlock({
+  zoneName,
   tState,
   tSteps,
 }: {
-  state: Extract<WizardState, { kind: "done" }>;
+  zoneName: string;
+  tState: (key: string) => string;
+  tSteps: (key: string) => string;
+}) {
+  return (
+    <ol className="space-y-2">
+      {PROGRESS_ORDER.map((step) => (
+        <ProgressRow
+          key={`cf-${step}-${zoneName}`}
+          label={tSteps(step)}
+          status="ok"
+          stateLabel={tState("ok")}
+        />
+      ))}
+    </ol>
+  );
+}
+
+function BrevoProgressList({
+  overall,
+  reached,
+  tState,
+  tBrevo,
+}: {
+  overall: "running" | "awaiting" | "done";
+  reached: BrevoReached;
+  tState: (key: string) => string;
+  tBrevo: (key: string) => string;
+}) {
+  return (
+    <ol className="space-y-2">
+      {BREVO_PROGRESS_ORDER.map((step) => {
+        const s = brevoStatusOf(step, overall, reached);
+        return (
+          <ProgressRow
+            key={`brevo-${step}`}
+            label={tBrevo(step)}
+            status={s}
+            stateLabel={tState(s)}
+          />
+        );
+      })}
+    </ol>
+  );
+}
+
+function CfDonePendingBrevoStep({
+  state,
+  isPending,
+  t,
+  tState,
+  tSteps,
+  translateErr,
+  onContinue,
+}: {
+  state: Extract<WizardState, { kind: "cf_done_pending_brevo" }>;
+  isPending: boolean;
   t: (key: string, values?: Record<string, string>) => string;
   tState: (key: string) => string;
   tSteps: (key: string) => string;
+  translateErr: (key: string, details?: string) => string;
+  onContinue: () => void;
 }) {
   return (
     <section className="space-y-4 rounded-lg border border-emerald-200 p-6 dark:border-emerald-900">
       <h2 className="text-lg font-semibold">
         {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
       </h2>
-      <ol className="space-y-2">
-        {PROGRESS_ORDER.map((step) => (
-          <ProgressRow
-            key={step}
-            label={tSteps(step)}
-            status="ok"
-            stateLabel={tState("ok")}
-          />
-        ))}
-      </ol>
+      <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
       <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-900 dark:bg-emerald-950">
         <div className="flex items-center gap-2 font-medium text-emerald-900 dark:text-emerald-100">
           <CheckCircle2 className="size-5" aria-hidden />
@@ -585,12 +799,212 @@ function DoneStep({
             domain: state.zoneName,
           })}
         </p>
-        <Button className="mt-3" disabled variant="outline">
-          {t("step3.done.continueCta")}
+        <Button className="mt-3" onClick={onContinue} disabled={isPending}>
+          {isPending ? t("brevo.continueCtaLoading") : t("brevo.continueCta")}
         </Button>
+      </div>
+      {state.errorKey ? (
+        <InlineError message={translateErr(state.errorKey)} />
+      ) : null}
+    </section>
+  );
+}
+
+function BrevoRunningStep({
+  state,
+  t: _t,
+  tState,
+  tSteps,
+  tBrevo,
+}: {
+  state: Extract<WizardState, { kind: "brevo_running" }>;
+  t: (key: string, values?: Record<string, string>) => string;
+  tState: (key: string) => string;
+  tSteps: (key: string) => string;
+  tBrevo: (key: string) => string;
+}) {
+  void _t;
+  return (
+    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+      <h2 className="text-lg font-semibold">
+        {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
+      </h2>
+      <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
+      <BrevoProgressList
+        overall="running"
+        reached={state.reached}
+        tState={tState}
+        tBrevo={tBrevo}
+      />
+    </section>
+  );
+}
+
+function BrevoAwaitingRetryStep({
+  state,
+  isPending,
+  t,
+  tState,
+  tSteps,
+  tBrevo,
+  translateErr,
+  onRetry,
+}: {
+  state: Extract<WizardState, { kind: "brevo_awaiting_retry" }>;
+  isPending: boolean;
+  t: (key: string, values?: Record<string, string>) => string;
+  tState: (key: string) => string;
+  tSteps: (key: string) => string;
+  tBrevo: (key: string) => string;
+  translateErr: (key: string, details?: string) => string;
+  onRetry: () => void;
+}) {
+  return (
+    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+      <h2 className="text-lg font-semibold">
+        {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
+      </h2>
+      <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
+      <BrevoProgressList
+        overall="awaiting"
+        reached="verify"
+        tState={tState}
+        tBrevo={tBrevo}
+      />
+      <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-900 dark:bg-amber-950">
+        <div className="font-medium text-amber-900 dark:text-amber-100">
+          {t("brevo.recheck.title")}
+        </div>
+        <p className="mt-1 text-amber-900 dark:text-amber-100">
+          {t("brevo.recheck.body")}
+        </p>
+        <Button
+          className="mt-3"
+          onClick={onRetry}
+          disabled={isPending}
+          variant="outline"
+        >
+          {isPending ? t("brevo.recheck.ctaLoading") : t("brevo.recheck.cta")}
+        </Button>
+        {state.errorKey ? (
+          <div className="mt-3">
+            <InlineError message={translateErr(state.errorKey)} />
+          </div>
+        ) : null}
       </div>
     </section>
   );
+}
+
+function BrevoDoneStep({
+  state,
+  locale,
+  t,
+  tState,
+  tSteps,
+  tBrevo,
+}: {
+  state: Extract<WizardState, { kind: "brevo_done" }>;
+  locale: string;
+  t: (key: string, values?: Record<string, string>) => string;
+  tState: (key: string) => string;
+  tSteps: (key: string) => string;
+  tBrevo: (key: string) => string;
+}) {
+  return (
+    <section className="space-y-4 rounded-lg border border-emerald-200 p-6 dark:border-emerald-900">
+      <h2 className="text-lg font-semibold">
+        {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
+      </h2>
+      <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
+      <BrevoProgressList
+        overall="done"
+        reached="done"
+        tState={tState}
+        tBrevo={tBrevo}
+      />
+      <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-900 dark:bg-emerald-950">
+        <div className="flex items-center gap-2 font-medium text-emerald-900 dark:text-emerald-100">
+          <CheckCircle2 className="size-5" aria-hidden />
+          {t("brevo.terminal.title")}
+        </div>
+        <p className="mt-1 text-emerald-900 dark:text-emerald-100">
+          {t("brevo.terminal.body", {
+            mailbox: state.mailboxLocal,
+            domain: state.zoneName,
+          })}
+        </p>
+        <a
+          href={`/${locale}/app/setup/gmail-step`}
+          className="mt-3 inline-flex"
+        >
+          <Button variant="outline">{t("brevo.terminal.gmailCta")}</Button>
+        </a>
+      </div>
+    </section>
+  );
+}
+
+function handleBrevoResult(
+  result: Awaited<ReturnType<typeof continueBrevoSetup>>,
+  snapshot: Extract<
+    WizardState,
+    { kind: "cf_done_pending_brevo" | "brevo_awaiting_retry" }
+  >,
+  setState: (s: WizardState) => void,
+) {
+  if (result.status === "error") {
+    if (result.errorKey === "setup.errors.brevo_verify_timeout") {
+      setState({
+        kind: "brevo_awaiting_retry",
+        runId: snapshot.runId,
+        cfToken: snapshot.cfToken,
+        zoneName: snapshot.zoneName,
+        mailboxLocal: snapshot.mailboxLocal,
+        destinationEmail: snapshot.destinationEmail,
+        errorKey: result.errorKey,
+      });
+      return;
+    }
+    // Other errors land in the central failed state.
+    setState({
+      kind: "failed",
+      errorKey: result.errorKey,
+      errorDetails:
+        typeof result.details === "string" ? result.details : undefined,
+    });
+    return;
+  }
+  if (result.runStatus === "brevo_done") {
+    setState({
+      kind: "brevo_done",
+      zoneName: snapshot.zoneName,
+      mailboxLocal: snapshot.mailboxLocal,
+      destinationEmail: snapshot.destinationEmail,
+    });
+    return;
+  }
+  // Intermediate statuses (sender_created / dns_written / verified) without
+  // reaching brevo_done mean the user got a partial response — stay in
+  // running state at the reported reached step so the progress list reflects
+  // the actual backend state.
+  const reached: BrevoReached =
+    result.runStatus === "brevo_sender_created"
+      ? "sender"
+      : result.runStatus === "brevo_dns_written"
+        ? "dns"
+        : result.runStatus === "brevo_verified"
+          ? "verify"
+          : "done";
+  setState({
+    kind: "brevo_running",
+    runId: snapshot.runId,
+    cfToken: snapshot.cfToken,
+    zoneName: snapshot.zoneName,
+    mailboxLocal: snapshot.mailboxLocal,
+    destinationEmail: snapshot.destinationEmail,
+    reached,
+  });
 }
 
 function FailedStep({

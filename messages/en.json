@@ -118,7 +118,27 @@
       "sender": "Brevo sender domain claimed",
       "dns": "Brevo DNS records written (DKIM, brevo-code, SPF merged, DMARC)",
       "verify": "Brevo verified the domain",
-      "done": "SMTP ready — sending as {mailbox}@{domain}"
+      "done": "SMTP ready for your mailbox"
+    },
+    "brevo": {
+      "continueCta": "Continue to Brevo setup",
+      "continueCtaLoading": "Starting Brevo…",
+      "recheck": {
+        "title": "Waiting for Brevo to verify DNS",
+        "body": "DNS records are in place. Brevo hasn't confirmed them yet — propagation usually takes a few minutes.",
+        "cta": "Re-check verification",
+        "ctaLoading": "Checking…"
+      },
+      "terminal": {
+        "title": "Email infrastructure ready",
+        "body": "Brevo now handles outbound mail for {mailbox}@{domain}. One step left — Gmail Send-As.",
+        "gmailCta": "Continue to Gmail Send-As →"
+      }
+    },
+    "gmailStep": {
+      "title": "Gmail Send-As — coming soon",
+      "body": "This step is Ticket #6. Your Cloudflare routing and Brevo SMTP are already live — you'll plug Gmail in as the last link once the UI lands.",
+      "back": "Back to setup"
     }
   },
   "footer": {

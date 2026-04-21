@@ -118,7 +118,27 @@
       "sender": "Sender-домен Brevo создан",
       "dns": "DNS Brevo прописаны (DKIM, brevo-code, SPF с мержем, DMARC)",
       "verify": "Brevo верифицировал домен",
-      "done": "SMTP готов — отправка от {mailbox}@{domain}"
+      "done": "SMTP готов для твоего ящика"
+    },
+    "brevo": {
+      "continueCta": "Продолжить настройку Brevo",
+      "continueCtaLoading": "Запускаем Brevo…",
+      "recheck": {
+        "title": "Ждем подтверждение от Brevo",
+        "body": "DNS записи прописаны. Brevo пока не подтвердил их — пропагация обычно занимает пару минут.",
+        "cta": "Проверить подтверждение",
+        "ctaLoading": "Проверяем…"
+      },
+      "terminal": {
+        "title": "Email-инфраструктура готова",
+        "body": "Brevo теперь ведет исходящую почту для {mailbox}@{domain}. Остался один шаг — Gmail Send-As.",
+        "gmailCta": "Перейти к Gmail Send-As →"
+      }
+    },
+    "gmailStep": {
+      "title": "Gmail Send-As — скоро",
+      "body": "Этот шаг — Ticket #6. Cloudflare роутинг и Brevo SMTP уже работают, Gmail подключишь последним, когда UI будет готов.",
+      "back": "Назад к настройке"
     }
   },
   "footer": {
