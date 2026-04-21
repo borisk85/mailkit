@@ -38,6 +38,76 @@
     "friendFallback": "friend",
     "redirecting": "Redirecting..."
   },
+  "setup": {
+    "title": "Connect your domain",
+    "subtitle": "Three steps: paste your Cloudflare token, pick the zone, watch us wire it up.",
+    "step1": {
+      "title": "Step 1 — Paste your Cloudflare API token",
+      "tokenLabel": "Cloudflare API token",
+      "tokenPlaceholder": "Paste the token here",
+      "cta": "Validate token",
+      "ctaLoading": "Validating…",
+      "tokenHelp": "Create at https://dash.cloudflare.com/profile/api-tokens — template Custom token, scopes: Zone:DNS:Edit, Zone:Zone:Edit, Zone:Zone Settings:Edit, Account:Email Routing Addresses:Edit, Account:Email Routing Rules:Edit. Bind to the specific zone, not all zones.",
+      "tokenHelpLink": "Open Cloudflare API Tokens"
+    },
+    "step2": {
+      "title": "Step 2 — Pick the zone and mailbox",
+      "zoneLabel": "Domain (Cloudflare zone)",
+      "zonePlaceholder": "Select a zone",
+      "mailboxLabel": "Mailbox name",
+      "mailboxHint": "This becomes {local}@your-domain — lowercase letters, digits, dot, dash, underscore.",
+      "cta": "Start setup",
+      "ctaLoading": "Starting…"
+    },
+    "step3": {
+      "title": "Step 3 — Cloudflare pipeline",
+      "steps": {
+        "routing": "Email Routing enabled",
+        "dns": "DNS records written (MX, SPF, DMARC)",
+        "destination": "Destination verified in Gmail",
+        "rule": "Routing rule created"
+      },
+      "state": {
+        "pending": "Pending",
+        "running": "In progress…",
+        "ok": "Done",
+        "error": "Failed",
+        "skipped": "Already set"
+      },
+      "awaitingVerify": {
+        "title": "Check your Gmail inbox",
+        "body": "Cloudflare sent a verification link to {email}. Click it, then retry.",
+        "cta": "I clicked the link, retry",
+        "ctaLoading": "Checking…"
+      },
+      "done": {
+        "title": "Cloudflare is ready",
+        "body": "Your domain now routes {mailbox}@{domain} to Gmail. Next up: Brevo SMTP — coming in Ticket #4b.",
+        "continueCta": "Continue (disabled until #4b)"
+      },
+      "failed": {
+        "title": "Setup failed",
+        "body": "We couldn't finish the Cloudflare step. Fix the issue below and restart from Step 1.",
+        "restartCta": "Restart from Step 1"
+      }
+    },
+    "errors": {
+      "invalid_token": "The API token is invalid or missing required permissions.",
+      "zone_not_found": "Zone not found in your Cloudflare account.",
+      "dns_rejected": "Cloudflare rejected a DNS record. Details: {details}",
+      "rate_limited": "Too many requests. Try again in a minute.",
+      "cloudflare_error": "Cloudflare returned an unexpected error.",
+      "cloudflare_unavailable": "Cloudflare is temporarily unavailable. Try again in a few minutes.",
+      "invalid_input": "Invalid input.",
+      "no_primary_email": "Your Google account email is missing — sign out and sign back in.",
+      "not_authenticated": "You are not signed in.",
+      "run_not_found": "Setup run not found.",
+      "run_wrong_state": "This setup run is not in the awaiting-verification state.",
+      "run_corrupt": "Setup run is missing required data; start a new one.",
+      "db_insert_failed": "Could not record the setup run. Try again.",
+      "unexpected": "Something unexpected happened."
+    }
+  },
   "footer": {
     "tagline": "Email setup without the DNS nightmare.",
     "copyright": "© 2026 MailKit. All rights reserved."
