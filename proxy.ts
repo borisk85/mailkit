@@ -12,11 +12,31 @@ function isProtectedAppRoute(pathname: string): boolean {
   );
 }
 
+function isMockPreviewAllowed(request: NextRequest): boolean {
+  // Non-prod only: hard-disable in VERCEL_ENV=production (prod alias + custom
+  // domain) and also in standalone NODE_ENV=production without VERCEL_ENV.
+  const isVercelProd = process.env.VERCEL_ENV === "production";
+  const isBareProd =
+    process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV;
+  if (isVercelProd || isBareProd) return false;
+  return request.nextUrl.searchParams.has("mock");
+}
+
 export default async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!isProtectedAppRoute(pathname)) {
     return intlMiddleware(request);
+  }
+
+  // Wizard mock-state preview bypass — non-prod only. Downstream layout reads
+  // the x-mailkit-mock header and renders a stub user instead of calling
+  // Supabase auth.getUser() / redirect.
+  if (isMockPreviewAllowed(request)) {
+    const bypass = NextResponse.next({ request });
+    bypass.headers.set("x-mailkit-mock", "1");
+    request.headers.set("x-mailkit-mock", "1");
+    return bypass;
   }
 
   // Refresh session cookies on the response and enforce auth for /{locale}/app/*.

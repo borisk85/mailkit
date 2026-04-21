@@ -38,6 +38,76 @@
     "friendFallback": "друг",
     "redirecting": "Перенаправляем..."
   },
+  "setup": {
+    "title": "Подключи свой домен",
+    "subtitle": "Три шага: вставь токен Cloudflare, выбери зону, смотри как мы все настроим.",
+    "step1": {
+      "title": "Шаг 1 — Вставь API токен Cloudflare",
+      "tokenLabel": "API токен Cloudflare",
+      "tokenPlaceholder": "Вставь токен сюда",
+      "cta": "Проверить токен",
+      "ctaLoading": "Проверяем…",
+      "tokenHelp": "Создай на https://dash.cloudflare.com/profile/api-tokens — шаблон Custom token, scopes: Zone:DNS:Edit, Zone:Zone:Edit, Zone:Zone Settings:Edit, Account:Email Routing Addresses:Edit, Account:Email Routing Rules:Edit. Привяжи к конкретной зоне, не ко всем.",
+      "tokenHelpLink": "Открыть Cloudflare API Tokens"
+    },
+    "step2": {
+      "title": "Шаг 2 — Выбери зону и mailbox",
+      "zoneLabel": "Домен (зона Cloudflare)",
+      "zonePlaceholder": "Выбери зону",
+      "mailboxLabel": "Имя mailbox",
+      "mailboxHint": "Станет {local}@твой-домен — строчные буквы, цифры, точка, дефис, подчеркивание.",
+      "cta": "Начать настройку",
+      "ctaLoading": "Запускаем…"
+    },
+    "step3": {
+      "title": "Шаг 3 — Cloudflare pipeline",
+      "steps": {
+        "routing": "Email Routing включен",
+        "dns": "DNS записи прописаны (MX, SPF, DMARC)",
+        "destination": "Gmail подтвержден как получатель",
+        "rule": "Правило маршрутизации создано"
+      },
+      "state": {
+        "pending": "В ожидании",
+        "running": "В процессе…",
+        "ok": "Готово",
+        "error": "Ошибка",
+        "skipped": "Уже настроено"
+      },
+      "awaitingVerify": {
+        "title": "Проверь свой Gmail",
+        "body": "Cloudflare отправил ссылку подтверждения на {email}. Кликни ее и нажми ниже.",
+        "cta": "Я кликнул, проверить снова",
+        "ctaLoading": "Проверяем…"
+      },
+      "done": {
+        "title": "Cloudflare готов",
+        "body": "Твой домен теперь форвардит {mailbox}@{domain} в Gmail. Дальше: Brevo SMTP — будет в Ticket #4b.",
+        "continueCta": "Продолжить (отключено до #4b)"
+      },
+      "failed": {
+        "title": "Настройка не завершена",
+        "body": "Не получилось завершить шаг Cloudflare. Исправь причину ниже и запусти заново с шага 1.",
+        "restartCta": "Начать заново с шага 1"
+      }
+    },
+    "errors": {
+      "invalid_token": "API токен невалидный или не хватает прав.",
+      "zone_not_found": "Зона не найдена в твоем Cloudflare аккаунте.",
+      "dns_rejected": "Cloudflare отклонил DNS-запись. Детали: {details}",
+      "rate_limited": "Слишком много запросов. Подожди минуту.",
+      "cloudflare_error": "Cloudflare вернул непредвиденную ошибку.",
+      "cloudflare_unavailable": "Cloudflare временно недоступен. Попробуй через пару минут.",
+      "invalid_input": "Некорректный ввод.",
+      "no_primary_email": "Не найден email Google-аккаунта — выйди и войди заново.",
+      "not_authenticated": "Ты не авторизован.",
+      "run_not_found": "Запуск настройки не найден.",
+      "run_wrong_state": "Этот запуск не в состоянии ожидания верификации.",
+      "run_corrupt": "В запуске отсутствуют нужные данные, начни новый.",
+      "db_insert_failed": "Не удалось записать запуск в БД. Попробуй еще раз.",
+      "unexpected": "Что-то пошло не так."
+    }
+  },
   "footer": {
     "tagline": "Настройка почты без возни с DNS.",
     "copyright": "© 2026 MailKit. Все права защищены."
