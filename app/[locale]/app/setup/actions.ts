@@ -678,14 +678,32 @@ function mapBrevoError(e: unknown): ActionError {
   if (e instanceof BrevoError) {
     const http = e.httpStatus;
     const code = String(e.code).toLowerCase();
+    // TEMP diagnostic: surface raw Brevo payload in details so UI shows it
+    // even when Vercel runtime logs are not reachable. Remove once smoke green.
+    const dbgDetails = `http=${http} code=${code} msg=${e.message}`;
+    console.error(
+      `[mapBrevoError] http=${http} code=${code} msg=${e.message} details=${JSON.stringify(e.details)?.slice(0, 300)}`,
+    );
     if (http === 401 || http === 403 || code === "unauthorized") {
-      return { status: "error", errorKey: "setup.errors.brevo_invalid_token" };
+      return {
+        status: "error",
+        errorKey: "setup.errors.brevo_invalid_token",
+        details: dbgDetails,
+      };
     }
     if (http === 429) {
-      return { status: "error", errorKey: "setup.errors.brevo_rate_limited" };
+      return {
+        status: "error",
+        errorKey: "setup.errors.brevo_rate_limited",
+        details: dbgDetails,
+      };
     }
     if (http >= 500) {
-      return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
+      return {
+        status: "error",
+        errorKey: "setup.errors.brevo_unavailable",
+        details: dbgDetails,
+      };
     }
     if (
       http === 400 &&
@@ -693,9 +711,17 @@ function mapBrevoError(e: unknown): ActionError {
         code === "duplicate" ||
         /already exists|already registered/i.test(e.message))
     ) {
-      return { status: "error", errorKey: "setup.errors.brevo_domain_taken" };
+      return {
+        status: "error",
+        errorKey: "setup.errors.brevo_domain_taken",
+        details: dbgDetails,
+      };
     }
-    return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
+    return {
+      status: "error",
+      errorKey: "setup.errors.brevo_unavailable",
+      details: dbgDetails,
+    };
   }
   if (e instanceof CloudflareError) {
     return mapCfError(e);
