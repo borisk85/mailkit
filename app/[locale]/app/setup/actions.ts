@@ -705,11 +705,13 @@ function mapBrevoError(e: unknown): ActionError {
         details: dbgDetails,
       };
     }
+    // Brevo returns HTTP 404 on some duplicate scenarios (observed during
+    // live smoke 2026-04-22) — the code string is a more reliable signal
+    // than status. Match regardless of http.
     if (
-      http === 400 &&
-      (code === "duplicate_parameter" ||
-        code === "duplicate" ||
-        /already exists|already registered/i.test(e.message))
+      code === "duplicate_parameter" ||
+      code === "duplicate" ||
+      /already exists|already registered/i.test(e.message)
     ) {
       return {
         status: "error",

@@ -187,15 +187,32 @@ export function createBrevoClient(apiKey: string) {
       return { domain: normalize(raw), created: true };
     } catch (e) {
       if (isDuplicateDomain(e)) {
-        const list = await listSenderDomains();
+        // Path A: list + case-insensitive find.
+        let list: SenderDomain[] = [];
+        try {
+          list = await listSenderDomains();
+        } catch (listErr) {
+          console.error(
+            `[brevo] listSenderDomains failed during duplicate-resolve for "${name}":`,
+            listErr,
+          );
+        }
         const target = name.toLowerCase();
-        const existing = list.find(
+        const viaList = list.find(
           (d) => (d.domain_name ?? "").toLowerCase() === target,
         );
-        if (existing) return { domain: existing, created: false };
-        console.error(
-          `[brevo] createSenderDomain duplicate for "${name}" but list did not contain it. list_size=${list.length} names=${JSON.stringify(list.slice(0, 20).map((d) => d.domain_name))} raw_err=${JSON.stringify({ code: (e as BrevoError).code, http: (e as BrevoError).httpStatus, details: (e as BrevoError).details })}`,
-        );
+        if (viaList) return { domain: viaList, created: false };
+
+        // Path B: direct get — domain may have been partially created by a
+        // prior failed attempt and not be surfaced in list pagination.
+        try {
+          const direct = await getSenderDomain(name);
+          return { domain: direct, created: false };
+        } catch (getErr) {
+          console.error(
+            `[brevo] createSenderDomain duplicate for "${name}" unresolvable. list_size=${list.length} names=${JSON.stringify(list.slice(0, 20).map((d) => d.domain_name))} get_err=${getErr instanceof Error ? getErr.message : String(getErr)} raw_err=${JSON.stringify({ code: (e as BrevoError).code, http: (e as BrevoError).httpStatus, details: (e as BrevoError).details })}`,
+          );
+        }
       }
       throw e;
     }
@@ -229,7 +246,8 @@ function coerceRecord(
 
 function isDuplicateDomain(e: unknown): boolean {
   if (!(e instanceof BrevoError)) return false;
-  if (e.httpStatus !== 400) return false;
+  // Brevo returned HTTP 404 in live smoke on duplicate (not the documented
+  // 400) — trust the code string over the status.
   const code = String(e.code).toLowerCase();
   if (code === "duplicate_parameter" || code === "duplicate") return true;
   return /already exists|already registered/i.test(e.message);
