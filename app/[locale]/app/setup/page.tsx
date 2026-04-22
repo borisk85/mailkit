@@ -10,6 +10,13 @@ const MOCK_STATES = [
   "awaiting_verify",
   "done",
   "failed",
+  // Brevo-pipeline states. UI rendering lands in etap 3 — these are
+  // allowlisted now so the gate is ready and URLs resolve to the
+  // wizard default (token_entry) without 307-ing to /{locale}.
+  "brevo_sender_created",
+  "brevo_dns_written",
+  "brevo_verified",
+  "brevo_done",
 ] as const;
 type MockState = (typeof MOCK_STATES)[number];
 

@@ -47,7 +47,7 @@
       "tokenPlaceholder": "Вставь токен сюда",
       "cta": "Проверить токен",
       "ctaLoading": "Проверяем…",
-      "tokenHelp": "Создай на https://dash.cloudflare.com/profile/api-tokens — шаблон Custom token, scopes: Zone:DNS:Edit, Zone:Zone:Edit, Zone:Zone Settings:Edit, Account:Email Routing Addresses:Edit, Account:Email Routing Rules:Edit. Привяжи к конкретной зоне, не ко всем.",
+      "tokenHelp": "Создай на https://dash.cloudflare.com/profile/api-tokens — шаблон Custom token, scopes: Zone:Zone:Read, Zone:DNS:Edit, Zone:Zone Settings:Edit, Zone:Email Routing Rules:Edit (все четыре zone-scoped; Zone Resource — конкретная зона) + Account:Email Routing Addresses:Edit (account-scoped).",
       "tokenHelpLink": "Открыть Cloudflare API Tokens"
     },
     "step2": {
@@ -88,6 +88,7 @@
       "failed": {
         "title": "Настройка не завершена",
         "body": "Не получилось завершить шаг Cloudflare. Исправь причину ниже и запусти заново с шага 1.",
+        "bodyBrevo": "Не получилось завершить шаг Brevo. Исправь причину ниже и запусти заново с шага 1.",
         "restartCta": "Начать заново с шага 1"
       }
     },
@@ -102,10 +103,44 @@
       "no_primary_email": "Не найден email Google-аккаунта — выйди и войди заново.",
       "not_authenticated": "Ты не авторизован.",
       "run_not_found": "Запуск настройки не найден.",
-      "run_wrong_state": "Этот запуск не в состоянии ожидания верификации.",
+      "run_wrong_state": "Этот запуск не в подходящем состоянии для этого действия.",
       "run_corrupt": "В запуске отсутствуют нужные данные, начни новый.",
       "db_insert_failed": "Не удалось записать запуск в БД. Попробуй еще раз.",
-      "unexpected": "Что-то пошло не так."
+      "unexpected": "Что-то пошло не так.",
+      "brevo_invalid_token": "Brevo не принял наш API ключ. Подожди, мы его ротируем — от тебя ничего не надо.",
+      "brevo_domain_taken": "Brevo уже знает этот домен с прошлой настройки — используем существующий sender.",
+      "brevo_rate_limited": "Brevo ограничил наши запросы. Повторим через минуту.",
+      "brevo_unavailable": "Brevo временно недоступен. Попробуй через пару минут.",
+      "brevo_verify_timeout": "Brevo пока не может верифицировать домен. DNS распространяется несколько минут — повтори.",
+      "brevo_state_unrecoverable": "Brevo знает этот домен, но не вернул DKIM-записи, нужные для DNS. Существующая запись в Brevo в частичном состоянии — напиши в поддержку.",
+      "spf_conflict": "Твоя SPF запись заканчивается на -all (строгая политика). Смягчи до ~all чтобы Brevo мог отправлять от твоего имени, и повтори.",
+      "dns_write_failed": "Не удалось записать DNS корректно. Детали: {details}"
+    },
+    "brevoSteps": {
+      "sender": "Sender-домен Brevo создан",
+      "dns": "DNS Brevo прописаны (DKIM, brevo-code, SPF с мержем, DMARC)",
+      "verify": "Brevo верифицировал домен",
+      "done": "SMTP готов для твоего ящика"
+    },
+    "brevo": {
+      "continueCta": "Продолжить настройку Brevo",
+      "continueCtaLoading": "Запускаем Brevo…",
+      "recheck": {
+        "title": "Ждем подтверждение от Brevo",
+        "body": "DNS записи прописаны. Brevo пока не подтвердил их — пропагация обычно занимает пару минут.",
+        "cta": "Проверить подтверждение",
+        "ctaLoading": "Проверяем…"
+      },
+      "terminal": {
+        "title": "Email-инфраструктура готова",
+        "body": "Brevo теперь ведет исходящую почту для {mailbox}@{domain}. Остался один шаг — Gmail Send-As.",
+        "gmailCta": "Перейти к Gmail Send-As →"
+      }
+    },
+    "gmailStep": {
+      "title": "Gmail Send-As — скоро",
+      "body": "Этот шаг — Ticket #6. Cloudflare роутинг и Brevo SMTP уже работают, Gmail подключишь последним, когда UI будет готов.",
+      "back": "Назад к настройке"
     }
   },
   "footer": {
