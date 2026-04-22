@@ -1,0 +1,22 @@
+# Lighthouse desktop simulate, /app/setup?mock=token_entry, median of n=3
+
+           main preview (pre-#4b)       feat/4b preview (post-#4b)
+           SHA aa6ccce                  SHA c49f289
+EN Perf    66  (66 / 66 / 66)           66  (62 / 66 / 68)
+EN LCP     3081 ms                      3149 ms
+EN FCP     3062 ms                      2990 ms
+EN TBT     29 ms                        56 ms
+RU Perf    66  (65 / 66 / 67)           54  (50 / 54 / 64)
+RU LCP     3157 ms                      3393 ms
+RU FCP     2992 ms                      3223 ms
+RU TBT     38 ms                        260 ms  (spread 326 -> 260 -> 21 run-over-run)
+
+Methodology:
+- 8 warm curls per locale per URL before any LH run
+- --form-factor=desktop --throttling-method=simulate
+- --screenEmulation.width=1350 --screenEmulation.deviceScaleFactor=1
+- Chrome headless=new, single worker, same host, no other traffic
+
+Stored prod baseline (from prior rounds, on mailkit-ten.vercel.app prod alias):
+EN Perf 75 (stable re-measure 2026-04-21)
+RU Perf 70 (stable re-measure 2026-04-21)

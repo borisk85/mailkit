@@ -140,6 +140,33 @@ Playwright+Lighthouse integration.
 Если PR ломает метрики — НЕ мержим. Либо фикс в том же PR, либо явное
 решение архитектора принять регрессию.
 
+### Preview vs prod Lighthouse — что gating, что нет
+
+Установлено 2026-04-22 (investigation 4a/4b):
+Preview-deploy Lighthouse — **non-gating** signal. Preview lambdas имеют
+cold-start variance до ×15 на TBT run-over-run на идентичном URL
+(реальный замер: TBT 326→260→21 ms, три runs подряд). Использовать
+preview LH для грубого smoke «не сломали ли порядок величин», не для
+merge-gate с дельтами <20 points.
+
+Prod Lighthouse — **gating**, но только при корректной методологии:
+
+- ≥60 минут warm на prod alias до первого измерения (CDN + lambda pool)
+- n≥10 TTFB curl samples для baseline stability check (trim min/max
+  перед median — outlier 1.29s в одном из 10 сдвигает median на ~100ms
+  и создает false regression signal)
+- n≥5 LH runs per locale, median (не single run)
+- Сравнение с сохраненными prod baselines, не с preview
+- Сохраняй raw JSON runs — future comparisons должны быть
+  apples-to-apples, same methodology
+
+Current stored prod baselines (mailkit-ten.vercel.app, landing):
+- Pre-#4a: EN 87 / RU 87
+- Post-#4a stable warm: EN 77 / RU 74
+- Post-#4b (TBD): собрать в течение 60 мин после merge #11
+
+Full investigation и SOP: [docs/investigation-2026-04-22/FINDINGS.md](docs/investigation-2026-04-22/FINDINGS.md)
+
 ## Issues policy — solo vibe-coding mode
 
 Проект ведется в solo режиме (владелец + Claude Code). GitHub Issues

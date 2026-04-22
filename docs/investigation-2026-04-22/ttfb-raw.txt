@@ -1,0 +1,18 @@
+# TTFB x10 /en — 2026-04-22, after 4 warm curls per URL
+
+PRE  (mailkit-i8s0x9uko-... @ 5ef5157, pre-#4a):
+0.416351 0.536685 0.406830 0.386605 0.362688 0.398443 0.439485 0.683993 0.410490 0.380053
+sorted: 0.363 0.381 0.387 0.399 0.407 0.411 0.416 0.439 0.537 0.684
+median: 0.409s   trimmed-mean (drop min+max): 0.409s
+
+POST (mailkit-ten.vercel.app @ 626ed14, post-#4a):
+0.478902 0.745563 0.535391 0.482192 0.434220 0.532589 0.411971 0.388431 0.398031 0.443832
+sorted: 0.388 0.398 0.412 0.434 0.444 0.479 0.482 0.533 0.535 0.746
+median: 0.462s   trimmed-mean (drop min+max): 0.463s
+
+Delta: +53ms median, +54ms trimmed mean.
+
+# Earlier sample from /tmp/investigation-ttfb.txt (pre-compaction, same URLs):
+PRE:  0.51 0.43 0.42 0.48 0.41 0.68 0.44 0.48 0.40 0.42 (median ~0.43)
+POST: 1.29 0.53 0.74 0.41 0.69 0.57 0.46 0.69 0.48 0.54 (median ~0.55)
+Reported delta was +120ms — partially driven by the 1.29 outlier.
