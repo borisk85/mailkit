@@ -47,7 +47,7 @@
       "tokenPlaceholder": "Paste the token here",
       "cta": "Validate token",
       "ctaLoading": "Validating…",
-      "tokenHelp": "Create at https://dash.cloudflare.com/profile/api-tokens — template Custom token, scopes: Zone:DNS:Edit, Zone:Zone:Edit, Zone:Zone Settings:Edit, Account:Email Routing Addresses:Edit, Account:Email Routing Rules:Edit. Bind to the specific zone, not all zones.",
+      "tokenHelp": "Create at https://dash.cloudflare.com/profile/api-tokens — template Custom token, scopes: Zone:Zone:Read, Zone:DNS:Edit, Zone:Email Routing:Edit, Zone:Email Routing Rules:Edit (all four zone-scoped) + Account:Email Routing Addresses:Edit (account-scoped). Bind the zone scope to the specific zone, not all zones.",
       "tokenHelpLink": "Open Cloudflare API Tokens"
     },
     "step2": {

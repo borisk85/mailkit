@@ -47,7 +47,7 @@
       "tokenPlaceholder": "Вставь токен сюда",
       "cta": "Проверить токен",
       "ctaLoading": "Проверяем…",
-      "tokenHelp": "Создай на https://dash.cloudflare.com/profile/api-tokens — шаблон Custom token, scopes: Zone:DNS:Edit, Zone:Zone:Edit, Zone:Zone Settings:Edit, Account:Email Routing Addresses:Edit, Account:Email Routing Rules:Edit. Привяжи к конкретной зоне, не ко всем.",
+      "tokenHelp": "Создай на https://dash.cloudflare.com/profile/api-tokens — шаблон Custom token, scopes: Zone:Zone:Read, Zone:DNS:Edit, Zone:Email Routing:Edit, Zone:Email Routing Rules:Edit (все четыре zone-scoped) + Account:Email Routing Addresses:Edit (account-scoped). Привяжи zone scope к конкретной зоне, не ко всем.",
       "tokenHelpLink": "Открыть Cloudflare API Tokens"
     },
     "step2": {
