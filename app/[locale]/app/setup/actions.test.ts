@@ -1056,6 +1056,110 @@ describe("continueBrevoSetup — failure paths", () => {
     expect(brevoStub.verifyDomain).toHaveBeenCalledTimes(4);
     vi.useRealTimers();
   });
+
+  test("already-authenticated domain short-circuits to brevo_done without DNS or verify", async () => {
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const admin = makeAdminStub([cfDoneRow()]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    const cf = makeCfForBrevo();
+    vi.mocked(cfModule.createCloudflareClient).mockReturnValue(
+      cf as unknown as ReturnType<typeof cfModule.createCloudflareClient>,
+    );
+    // Brevo returns an authenticated existing domain without DKIM records —
+    // observed behavior on GET /senders/domains/{name} for authenticated
+    // domains (DNS already written + verified, Brevo drops the records from
+    // the response).
+    const authenticatedDomain = {
+      id: 77,
+      domain_name: "ex.com",
+      authenticated: true,
+      verified: true,
+    };
+    const brevoStub = {
+      createSenderDomain: vi
+        .fn()
+        .mockResolvedValue({ domain: authenticatedDomain, created: false }),
+      getSenderDomain: vi.fn(),
+      listSenderDomains: vi.fn(),
+      verifyDomain: vi.fn(),
+    };
+    vi.mocked(brevoModule.createBrevoClient).mockReturnValue(
+      brevoStub as unknown as ReturnType<typeof brevoModule.createBrevoClient>,
+    );
+
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+
+    expect(result.status).toBe("ok");
+    if (result.status === "ok") expect(result.runStatus).toBe("brevo_done");
+    // DNS and verify MUST be skipped entirely.
+    expect(cf.createDnsRecord).not.toHaveBeenCalled();
+    expect(cf.updateDnsRecord).not.toHaveBeenCalled();
+    expect(brevoStub.verifyDomain).not.toHaveBeenCalled();
+    // Status jumps straight to brevo_done, flag recorded for observability.
+    expect(admin.rows[0].status).toBe("brevo_done");
+    const brevoState = admin.rows[0].cf_state.brevo as Record<string, unknown>;
+    expect(brevoState.already_authenticated).toBe(true);
+    expect(brevoState.sender_id).toBe(77);
+  });
+
+  test("pending domain without DKIM records → brevo_state_unrecoverable errorKey", async () => {
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const admin = makeAdminStub([cfDoneRow()]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+    const cf = makeCfForBrevo();
+    vi.mocked(cfModule.createCloudflareClient).mockReturnValue(
+      cf as unknown as ReturnType<typeof cfModule.createCloudflareClient>,
+    );
+    // Defensive edge: domain is NOT authenticated yet but Brevo also did not
+    // return DKIM — the sender entry is in a corrupted partial state.
+    const pendingDomainNoRecords = {
+      id: 78,
+      domain_name: "ex.com",
+      authenticated: false,
+    };
+    const brevoStub = {
+      createSenderDomain: vi
+        .fn()
+        .mockResolvedValue({ domain: pendingDomainNoRecords, created: false }),
+      getSenderDomain: vi.fn(),
+      listSenderDomains: vi.fn(),
+      verifyDomain: vi.fn(),
+    };
+    vi.mocked(brevoModule.createBrevoClient).mockReturnValue(
+      brevoStub as unknown as ReturnType<typeof brevoModule.createBrevoClient>,
+    );
+
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+
+    expect(result.status).toBe("error");
+    if (result.status === "error") {
+      expect(result.errorKey).toBe("setup.errors.brevo_state_unrecoverable");
+    }
+    expect(admin.rows[0].status).toBe("failed");
+    expect(admin.rows[0].error_msg).toContain("missing_records");
+  });
 });
 
 // Silence unused-import false-positive on BrevoError import (kept for types

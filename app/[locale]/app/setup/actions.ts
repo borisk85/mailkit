@@ -719,6 +719,13 @@ function mapBrevoError(e: unknown): ActionError {
         details: dbgDetails,
       };
     }
+    if (code === "missing_records") {
+      return {
+        status: "error",
+        errorKey: "setup.errors.brevo_state_unrecoverable",
+        details: dbgDetails,
+      };
+    }
     return {
       status: "error",
       errorKey: "setup.errors.brevo_unavailable",
@@ -793,6 +800,32 @@ export async function continueBrevoSetup(input: {
       const { domain: created, created: wasCreated } =
         await brevo.createSenderDomain(zoneName);
       domain = created;
+
+      // Short-circuit: if the Brevo sender domain is already authenticated
+      // (prior setup on the same shared account + domain), Brevo does not
+      // return DKIM / brevo-code records in the GET response — they're
+      // already written in DNS and the domain is verified. Skip DNS write
+      // and verify steps entirely and mark the run brevo_done.
+      if (created.authenticated) {
+        brevoState = {
+          ...brevoState,
+          domain: created,
+          sender_id: created.id,
+          sender_created: wasCreated,
+          already_authenticated: true,
+        };
+        await patchBrevoState(admin, row.id, {
+          status: "brevo_done",
+          brevoState,
+          step: STEP.brevoFinalize,
+        });
+        return {
+          status: "ok",
+          runId: row.id,
+          runStatus: "brevo_done",
+        };
+      }
+
       brevoState = {
         ...brevoState,
         domain: created,

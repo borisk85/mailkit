@@ -112,6 +112,7 @@
       "brevo_rate_limited": "Brevo throttled our requests. Retrying shortly. [{details}]",
       "brevo_unavailable": "Brevo is temporarily unavailable. Try again in a few minutes. [{details}]",
       "brevo_verify_timeout": "Brevo could not verify your domain yet. DNS propagation can take a few minutes — retry soon.",
+      "brevo_state_unrecoverable": "Brevo knows this domain but did not return the DKIM records we need to configure DNS. The existing Brevo entry is in a partial state — please ping support. [{details}]",
       "spf_conflict": "Your SPF record ends in -all (strict policy). Soften it to ~all so Brevo can send on your behalf, then retry.",
       "dns_write_failed": "We could not write a DNS record cleanly. Details: {details}"
     },

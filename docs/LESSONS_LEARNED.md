@@ -162,3 +162,89 @@ measurement noise ±15 points** от стабильного значения (к
 
 Только если все три показывают реальную разницу — открывать
 fix-forward PR. Иначе: документировать noise, continue.
+
+## 2026-04-22 — Brevo authenticated domain: GET дропает DKIM
+
+### Симптом
+Live smoke Ticket #4b на `mailkit-test.ru`. CF pipeline зеленый, click
+"Continue to Brevo setup" → через ~5 сек `brevo_unavailable` в UI.
+После инструментации (commit `9762958` с `{details}` в brevo_* keys)
+payload surfaced: `http=404 code=duplicate_parameter msg="Domain with
+same name already exists"`. Fix ветки (`3b9dd1b`): ослабил
+`duplicate_parameter` mapping до любого HTTP status + добавил
+`getSenderDomain` direct-lookup в resolve-path. Следующий retry —
+новый error `http=0 code=missing_records msg="Brevo response missing
+DKIM or brevo-code record"`. Это наш internal error из brevo.ts:791.
+
+Boris проверил Brevo Dashboard: `mailkit-test.ru` в статусе
+**Authenticated**.
+
+### Причина
+Brevo `GET /v3/senders/domains/{name}` для **authenticated** domain
+возвращает `{id, domain_name, authenticated: true, verified: true}`
+без `dkim_record` / `brevo_code_record` / `dmarc_record`. Поля
+возвращаются только в POST response (момент создания) и в GET для
+pending/unverified domains. Семантика: records уже в DNS,
+Brevo их больше не surface'ит — для дальнейшего flow не нужны.
+
+Наш pipeline при resolve existing domain (после `duplicate_parameter`)
+ожидал DKIM в ответе, чтобы upsert'ить DNS, и throws `missing_records`
+на authenticated domain. Это idempotency gap: на shared Brevo account
+если customer domain уже был authenticated (предыдущий setup, ручной
+add в Brevo UI, testing на том же домене) — pipeline не мог
+завершиться.
+
+### Фикс
+`continueBrevoSetup` short-circuit'ит на `domain.authenticated === true`:
+- Skip DNS write (records уже в DNS)
+- Skip verify poll (уже verified)
+- Mark run status directly `brevo_done`
+- Flag `brevoState.already_authenticated = true` для observability
+
+Plus defensive: если `authenticated === false` но DKIM все равно
+отсутствует (pending-но-corrupted edge case) → errorKey
+`brevo_state_unrecoverable` с явным сообщением «напиши в поддержку».
+
+Tests: 2 новых в `actions.test.ts` для authenticated short-circuit и
+missing_records defensive branch. 79/79 green.
+
+### Правило
+Для third-party API, которые возвращают разные response shapes для
+разных resource states:
+1. Не предполагай что GET idempotent-возвращает всё то же самое что POST.
+2. Always check state field (`authenticated`, `status`, `verified`) до
+   того как вытаскивать downstream fields из response.
+3. State transitions map'ай явно: для каждого state → какой flow path.
+   В нашем случае: `authenticated=true → skip-to-done`, `false + DKIM
+   present → DNS + verify`, `false + DKIM missing → unrecoverable`.
+
+Design follow-up (в backlog, не решать сейчас): на shared Brevo
+account ownership/boundary semantics когда customer domain уже
+authenticated "нами" от другого customer — reuse OK или deny? Это
+абуз-vector в prod, не только smoke corner case.
+
+### Другое из того же смоука — CF API permission matrix
+В том же smoke upstream hit CF `10000: Authentication error` на
+`POST /zones/{id}/email/routing/enable`. Наш `tokenHelp` в
+`messages/{en,ru}.json` просил `Zone:Zone:Edit` + `Zone:Zone
+Settings:Edit` + `Account:Email Routing Rules:Edit`. Первые два — false
+positives (не нужны для нашего flow), третий — **wrong scope level**
+(account vs zone).
+
+Реальный minimal-и-достаточный permission set для `cloudflare.ts`:
+- `Zone:Zone:Read` (zone-scoped) — `listZones`
+- `Zone:DNS:Edit` (zone-scoped) — DNS upserts
+- `Zone:Zone Settings:Edit` (zone-scoped) — **enable email routing**
+  (не отдельный `Email Routing:Edit`, такого permission в CF UI нет
+  — это галлюцинация intermediate fix'а, коррект — именно Zone
+  Settings)
+- `Zone:Email Routing Rules:Edit` (zone-scoped) — create routing rule
+- `Account:Email Routing Addresses:Edit` (account-scoped) — create
+  destination
+
+Правило: перед тем как писать required permissions в tokenHelp
+копируй: (1) API endpoint используемый в коде, (2) CF docs ссылку на
+required permission для endpoint, (3) verbatim permission name из
+CF Dashboard dropdown (не угадывай по логике). Для missing permission
+идти в [CF API docs permissions reference](https://developers.cloudflare.com/fundamentals/api/reference/permissions/)
+или directly в [API method endpoint docs](https://developers.cloudflare.com/api/).
