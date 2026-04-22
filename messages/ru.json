@@ -47,7 +47,7 @@
       "tokenPlaceholder": "Вставь токен сюда",
       "cta": "Проверить токен",
       "ctaLoading": "Проверяем…",
-      "tokenHelp": "Создай на https://dash.cloudflare.com/profile/api-tokens — шаблон Custom token, scopes: Zone:Zone:Read, Zone:DNS:Edit, Zone:Email Routing:Edit, Zone:Email Routing Rules:Edit (все четыре zone-scoped) + Account:Email Routing Addresses:Edit (account-scoped). Привяжи zone scope к конкретной зоне, не ко всем.",
+      "tokenHelp": "Создай на https://dash.cloudflare.com/profile/api-tokens — шаблон Custom token, scopes: Zone:Zone:Read, Zone:DNS:Edit, Zone:Zone Settings:Edit, Zone:Email Routing Rules:Edit (все четыре zone-scoped; Zone Resource — конкретная зона) + Account:Email Routing Addresses:Edit (account-scoped).",
       "tokenHelpLink": "Открыть Cloudflare API Tokens"
     },
     "step2": {
@@ -107,12 +107,12 @@
       "run_corrupt": "В запуске отсутствуют нужные данные, начни новый.",
       "db_insert_failed": "Не удалось записать запуск в БД. Попробуй еще раз.",
       "unexpected": "Что-то пошло не так.",
-      "brevo_invalid_token": "Brevo не принял наш API ключ. Подожди, мы его ротируем — от тебя ничего не надо. [{details}]",
-      "brevo_domain_taken": "Brevo уже знает этот домен с прошлой настройки — используем существующий sender. [{details}]",
-      "brevo_rate_limited": "Brevo ограничил наши запросы. Повторим через минуту. [{details}]",
-      "brevo_unavailable": "Brevo временно недоступен. Попробуй через пару минут. [{details}]",
+      "brevo_invalid_token": "Brevo не принял наш API ключ. Подожди, мы его ротируем — от тебя ничего не надо.",
+      "brevo_domain_taken": "Brevo уже знает этот домен с прошлой настройки — используем существующий sender.",
+      "brevo_rate_limited": "Brevo ограничил наши запросы. Повторим через минуту.",
+      "brevo_unavailable": "Brevo временно недоступен. Попробуй через пару минут.",
       "brevo_verify_timeout": "Brevo пока не может верифицировать домен. DNS распространяется несколько минут — повтори.",
-      "brevo_state_unrecoverable": "Brevo знает этот домен, но не вернул DKIM-записи, нужные для DNS. Существующая запись в Brevo в частичном состоянии — напиши в поддержку. [{details}]",
+      "brevo_state_unrecoverable": "Brevo знает этот домен, но не вернул DKIM-записи, нужные для DNS. Существующая запись в Brevo в частичном состоянии — напиши в поддержку.",
       "spf_conflict": "Твоя SPF запись заканчивается на -all (строгая политика). Смягчи до ~all чтобы Brevo мог отправлять от твоего имени, и повтори.",
       "dns_write_failed": "Не удалось записать DNS корректно. Детали: {details}"
     },

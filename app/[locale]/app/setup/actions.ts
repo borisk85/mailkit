@@ -678,32 +678,14 @@ function mapBrevoError(e: unknown): ActionError {
   if (e instanceof BrevoError) {
     const http = e.httpStatus;
     const code = String(e.code).toLowerCase();
-    // TEMP diagnostic: surface raw Brevo payload in details so UI shows it
-    // even when Vercel runtime logs are not reachable. Remove once smoke green.
-    const dbgDetails = `http=${http} code=${code} msg=${e.message}`;
-    console.error(
-      `[mapBrevoError] http=${http} code=${code} msg=${e.message} details=${JSON.stringify(e.details)?.slice(0, 300)}`,
-    );
     if (http === 401 || http === 403 || code === "unauthorized") {
-      return {
-        status: "error",
-        errorKey: "setup.errors.brevo_invalid_token",
-        details: dbgDetails,
-      };
+      return { status: "error", errorKey: "setup.errors.brevo_invalid_token" };
     }
     if (http === 429) {
-      return {
-        status: "error",
-        errorKey: "setup.errors.brevo_rate_limited",
-        details: dbgDetails,
-      };
+      return { status: "error", errorKey: "setup.errors.brevo_rate_limited" };
     }
     if (http >= 500) {
-      return {
-        status: "error",
-        errorKey: "setup.errors.brevo_unavailable",
-        details: dbgDetails,
-      };
+      return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
     }
     // Brevo returns HTTP 404 on some duplicate scenarios (observed during
     // live smoke 2026-04-22) — the code string is a more reliable signal
@@ -713,24 +695,15 @@ function mapBrevoError(e: unknown): ActionError {
       code === "duplicate" ||
       /already exists|already registered/i.test(e.message)
     ) {
-      return {
-        status: "error",
-        errorKey: "setup.errors.brevo_domain_taken",
-        details: dbgDetails,
-      };
+      return { status: "error", errorKey: "setup.errors.brevo_domain_taken" };
     }
     if (code === "missing_records") {
       return {
         status: "error",
         errorKey: "setup.errors.brevo_state_unrecoverable",
-        details: dbgDetails,
       };
     }
-    return {
-      status: "error",
-      errorKey: "setup.errors.brevo_unavailable",
-      details: dbgDetails,
-    };
+    return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
   }
   if (e instanceof CloudflareError) {
     return mapCfError(e);
