@@ -77,6 +77,7 @@ type WizardState =
       kind: "failed";
       errorKey: string;
       errorDetails?: string;
+      source?: "cf" | "brevo";
     };
 
 const MOCK_ZONES: Zone[] = [
@@ -273,6 +274,7 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
               if (result.status === "error") {
                 setState({
                   kind: "failed",
+                  source: "cf",
                   errorKey: result.errorKey,
                   errorDetails:
                     typeof result.details === "string"
@@ -969,6 +971,7 @@ function handleBrevoResult(
     // Other errors land in the central failed state.
     setState({
       kind: "failed",
+      source: "brevo",
       errorKey: result.errorKey,
       errorDetails:
         typeof result.details === "string" ? result.details : undefined,
@@ -1024,7 +1027,11 @@ function FailedStep({
         {t("step3.failed.title")}
       </h2>
       <p className="text-sm text-red-900 dark:text-red-100">
-        {t("step3.failed.body")}
+        {t(
+          state.source === "brevo"
+            ? "step3.failed.bodyBrevo"
+            : "step3.failed.body",
+        )}
       </p>
       <InlineError message={translateErr(state.errorKey, state.errorDetails)} />
       <Button onClick={onRestart} variant="outline">

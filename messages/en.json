@@ -88,6 +88,7 @@
       "failed": {
         "title": "Setup failed",
         "body": "We couldn't finish the Cloudflare step. Fix the issue below and restart from Step 1.",
+        "bodyBrevo": "We couldn't finish the Brevo step. Fix the issue below and restart from Step 1.",
         "restartCta": "Restart from Step 1"
       }
     },

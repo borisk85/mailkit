@@ -677,7 +677,7 @@ function mapBrevoError(e: unknown): ActionError {
   }
   if (e instanceof BrevoError) {
     const http = e.httpStatus;
-    const code = String(e.code);
+    const code = String(e.code).toLowerCase();
     if (http === 401 || http === 403 || code === "unauthorized") {
       return { status: "error", errorKey: "setup.errors.brevo_invalid_token" };
     }
@@ -686,6 +686,14 @@ function mapBrevoError(e: unknown): ActionError {
     }
     if (http >= 500) {
       return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
+    }
+    if (
+      http === 400 &&
+      (code === "duplicate_parameter" ||
+        code === "duplicate" ||
+        /already exists|already registered/i.test(e.message))
+    ) {
+      return { status: "error", errorKey: "setup.errors.brevo_domain_taken" };
     }
     return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
   }
@@ -714,6 +722,9 @@ export async function continueBrevoSetup(input: {
   }
 
   const brevoKey = process.env.BREVO_API_KEY;
+  console.log(
+    `[continueBrevoSetup] runId=${parsed.data.runId} user=${user.id} BREVO_API_KEY_len=${brevoKey?.length ?? "undefined"} prefix=${brevoKey ? brevoKey.slice(0, 8) : "n/a"}`,
+  );
   if (!brevoKey) {
     return { status: "error", errorKey: "setup.errors.brevo_invalid_token" };
   }

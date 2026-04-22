@@ -188,8 +188,14 @@ export function createBrevoClient(apiKey: string) {
     } catch (e) {
       if (isDuplicateDomain(e)) {
         const list = await listSenderDomains();
-        const existing = list.find((d) => d.domain_name === name);
+        const target = name.toLowerCase();
+        const existing = list.find(
+          (d) => (d.domain_name ?? "").toLowerCase() === target,
+        );
         if (existing) return { domain: existing, created: false };
+        console.error(
+          `[brevo] createSenderDomain duplicate for "${name}" but list did not contain it. list_size=${list.length} names=${JSON.stringify(list.slice(0, 20).map((d) => d.domain_name))} raw_err=${JSON.stringify({ code: (e as BrevoError).code, http: (e as BrevoError).httpStatus, details: (e as BrevoError).details })}`,
+        );
       }
       throw e;
     }
