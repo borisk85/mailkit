@@ -36,6 +36,22 @@
 - #15 Multi-domain dashboard
 
 ## 🧹 Tech debt
+- Auto-verification Gmail Send-As via Brevo SMTP test-send + inbox poll.
+  Trigger: первая жалоба пользователя «настроил, но не отправляет», либо
+  при наборе >100 paying users — тогда оправдана оптимизация funnel
+  completion rate. В MVP (#6) принимаем user-asserted confirmation
+  (checkbox + server action), verification на честное слово. Техническая
+  развилка при реализации: `nodemailer` dep + через Brevo SMTP послать
+  тестовое письмо на `target_email`, ждать receipt в Gmail inbox через
+  `gmail.readonly` scope + polling. Обе side-effect'а — новые зависимости,
+  доп. OAuth consent-screen trust ("зачем им читать мою почту?"). Если
+  landing этого фичера снизит conversion — откатывать.
+- Brevo SMTP shared-credential abuse mitigations (см. [docs/SECURITY.md](SECURITY.md)):
+  rate limit per `setup_run` через `/v3/smtp/statistics/events` polling
+  + UI block on breach; SMTP key rotation UX (re-paste banner когда
+  `BREVO_SMTP_KEY_VERSION` в env > `gmail_state.smtp_config_version` в
+  run). Оба — post-launch, триггер "первая abuse incident либо плановая
+  90-day rotation".
 - [GH #6](https://github.com/borisk85/mailkit/issues/6) Tighten waitlist insert via anon key + RLS INSERT policy (switch off service_role for public form)
 - Проверить Vercel Framework Preset = Next.js при каждом мажорном
   merge в main (автоматизировать через GitHub Action в будущем)

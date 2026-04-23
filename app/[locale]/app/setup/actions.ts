@@ -18,6 +18,11 @@ import {
   createBrevoClient,
   type SenderDomain,
 } from "@/lib/integrations/brevo";
+import {
+  BrevoSmtpConfigError,
+  loadSmtpDisplay,
+  type SmtpDisplay,
+} from "@/lib/integrations/brevo-smtp";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 /**
@@ -45,6 +50,8 @@ const STEP = {
   brevoSpfMerge: "brevo_spf_merge",
   brevoVerify: "brevo_verify",
   brevoFinalize: "brevo_finalize",
+  gmailPrepare: "gmail_prepare",
+  gmailConfirm: "gmail_confirm",
 } as const;
 type Step = (typeof STEP)[keyof typeof STEP];
 
@@ -969,4 +976,179 @@ async function patchBrevoState(
 
 function sleepMs(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/* ------------------------------------------------------------------ *
+ * Ticket #6 — Gmail Send-As guided step
+ * ------------------------------------------------------------------ */
+
+// prepareGmailStep resumes from brevo_done (first call) or from
+// gmail_instructions_shown (user re-opened the wizard) — both return the
+// same display object so the UI is stateless. confirmGmailSendAs accepts
+// the full downstream range so a double-click can't transition a run
+// out of "done".
+const GMAIL_PREPARE_RESUMABLE = new Set([
+  "brevo_done",
+  "gmail_instructions_shown",
+]);
+const GMAIL_CONFIRM_RESUMABLE = new Set([
+  "gmail_instructions_shown",
+  "gmail_send_as_verified",
+  "done",
+]);
+
+type GmailPrepareOk = {
+  status: "ok";
+  runId: string;
+  runStatus: "gmail_instructions_shown";
+  targetEmail: string;
+  displayName: string;
+  smtp: SmtpDisplay;
+};
+
+type GmailConfirmOk = {
+  status: "ok";
+  runId: string;
+  runStatus: "done";
+};
+
+const gmailRunSchema = z.object({ runId: z.string().uuid() });
+
+function titleCaseLocal(mailboxLocal: string): string {
+  const cleaned = mailboxLocal.replace(/[._-]+/g, " ").trim();
+  if (!cleaned) return mailboxLocal;
+  return cleaned
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(" ");
+}
+
+function mapSmtpConfigError(e: unknown): ActionError {
+  if (e instanceof BrevoSmtpConfigError) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.brevo_smtp_misconfigured",
+      details: { reason: e.message },
+    };
+  }
+  return { status: "error", errorKey: "setup.errors.unexpected" };
+}
+
+export async function prepareGmailStep(input: {
+  runId: string;
+}): Promise<GmailPrepareOk | ActionError> {
+  const parsed = gmailRunSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.invalid_input",
+      details: parsed.error.flatten(),
+    };
+  }
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return { status: "error", errorKey: "setup.errors.not_authenticated" };
+  }
+
+  let smtp: SmtpDisplay;
+  try {
+    smtp = loadSmtpDisplay();
+  } catch (e) {
+    return mapSmtpConfigError(e);
+  }
+
+  const admin = createServiceClient();
+  const { data: row } = await admin
+    .from("setup_runs")
+    .select("id, user_id, domain, mailbox_local, status, gmail_state")
+    .eq("id", parsed.data.runId)
+    .maybeSingle();
+
+  if (!row || row.user_id !== user.id) {
+    return { status: "error", errorKey: "setup.errors.run_not_found" };
+  }
+  if (!GMAIL_PREPARE_RESUMABLE.has(row.status)) {
+    return { status: "error", errorKey: "setup.errors.run_wrong_state" };
+  }
+
+  const targetEmail = `${row.mailbox_local}@${row.domain}`;
+  const displayName = titleCaseLocal(row.mailbox_local);
+  const existingGmailState =
+    (row.gmail_state as Record<string, unknown> | null) ?? {};
+  const nextGmailState = {
+    ...existingGmailState,
+    target_email: targetEmail,
+    display_name: displayName,
+    smtp_config_version: smtp.keyVersion,
+    last_step: STEP.gmailPrepare,
+  };
+
+  await admin
+    .from("setup_runs")
+    .update({ status: "gmail_instructions_shown", gmail_state: nextGmailState })
+    .eq("id", row.id);
+
+  return {
+    status: "ok",
+    runId: row.id,
+    runStatus: "gmail_instructions_shown",
+    targetEmail,
+    displayName,
+    smtp,
+  };
+}
+
+export async function confirmGmailSendAs(input: {
+  runId: string;
+}): Promise<GmailConfirmOk | ActionError> {
+  const parsed = gmailRunSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.invalid_input",
+      details: parsed.error.flatten(),
+    };
+  }
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return { status: "error", errorKey: "setup.errors.not_authenticated" };
+  }
+
+  const admin = createServiceClient();
+  const { data: row } = await admin
+    .from("setup_runs")
+    .select("id, user_id, status, gmail_state")
+    .eq("id", parsed.data.runId)
+    .maybeSingle();
+
+  if (!row || row.user_id !== user.id) {
+    return { status: "error", errorKey: "setup.errors.run_not_found" };
+  }
+  if (!GMAIL_CONFIRM_RESUMABLE.has(row.status)) {
+    return { status: "error", errorKey: "setup.errors.run_wrong_state" };
+  }
+
+  if (row.status === "done") {
+    return { status: "ok", runId: row.id, runStatus: "done" };
+  }
+
+  const existingGmailState =
+    (row.gmail_state as Record<string, unknown> | null) ?? {};
+  const nextGmailState = {
+    ...existingGmailState,
+    confirmed_at: new Date().toISOString(),
+    last_step: STEP.gmailConfirm,
+  };
+
+  // MVP single-shot: transition directly to "done". The intermediate
+  // "gmail_send_as_verified" status exists in the CHECK constraint for a
+  // future ping-verify flow (see TICKETS_BACKLOG "Auto-verification") so
+  // that the DB schema does not need re-migration when it lands.
+  await admin
+    .from("setup_runs")
+    .update({ status: "done", gmail_state: nextGmailState })
+    .eq("id", row.id);
+
+  return { status: "ok", runId: row.id, runStatus: "done" };
 }

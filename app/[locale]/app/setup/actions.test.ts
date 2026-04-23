@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, test, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, test, vi } from "vitest";
 
 // Mock CF client + supabase server helpers before importing the action.
 vi.mock("@/lib/integrations/cloudflare", async () => {
@@ -28,7 +28,9 @@ import * as cfModule from "@/lib/integrations/cloudflare";
 import * as brevoModule from "@/lib/integrations/brevo";
 import * as sbModule from "@/lib/supabase/server";
 import {
+  confirmGmailSendAs,
   continueBrevoSetup,
+  prepareGmailStep,
   resumeDestinationVerify,
   startSetupRun,
   verifyCloudflareToken,
@@ -42,6 +44,7 @@ type MockRow = {
   status: string;
   cf_zone_id: string | null;
   cf_state: Record<string, unknown>;
+  gmail_state?: Record<string, unknown>;
   error_msg: string | null;
   created_at: string;
 };
@@ -1165,3 +1168,314 @@ describe("continueBrevoSetup — failure paths", () => {
 // Silence unused-import false-positive on BrevoError import (kept for types
 // in error-mapping assertions added later).
 void BrevoError;
+
+/* ------------------------------------------------------------------ *
+ * Ticket #6 — Gmail Send-As actions
+ * ------------------------------------------------------------------ */
+
+describe("prepareGmailStep + confirmGmailSendAs", () => {
+  const GMAIL_RUN_ID = "00000000-0000-4000-8000-000000000006";
+
+  const SMTP_ENV: Record<string, string> = {
+    BREVO_SMTP_HOST: "smtp-relay.brevo.com",
+    BREVO_SMTP_PORT: "587",
+    BREVO_SMTP_LOGIN: "owner@brevo.com",
+    BREVO_SMTP_KEY: "xsmtpsib-abcdef0123456789",
+    BREVO_SMTP_KEY_VERSION: "2",
+  };
+
+  function stubSmtpEnv(overrides: Record<string, string> = {}) {
+    for (const [k, v] of Object.entries({ ...SMTP_ENV, ...overrides })) {
+      vi.stubEnv(k, v);
+    }
+  }
+  function unstubSmtpEnv() {
+    vi.unstubAllEnvs();
+  }
+
+  function brevoDoneRow(overrides: Partial<MockRow> = {}): MockRow {
+    return {
+      id: GMAIL_RUN_ID,
+      user_id: "u1",
+      domain: "ex.com",
+      mailbox_local: "hello",
+      status: "brevo_done",
+      cf_zone_id: "z1",
+      cf_state: {},
+      gmail_state: {},
+      error_msg: null,
+      created_at: new Date().toISOString(),
+      ...overrides,
+    };
+  }
+
+  function mockUser(
+    user: { id: string; email: string | null } | null = {
+      id: "u1",
+      email: "me@g.com",
+    },
+  ) {
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser(user) as unknown as Awaited<
+        ReturnType<typeof sbModule.createClient>
+      >,
+    );
+  }
+
+  describe("prepareGmailStep", () => {
+    beforeEach(() => {
+      stubSmtpEnv();
+    });
+    afterEach(() => {
+      unstubSmtpEnv();
+    });
+
+    test("brevo_done → gmail_instructions_shown + returns display object", async () => {
+      const admin = makeAdminStub([brevoDoneRow()]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+
+      const result = await prepareGmailStep({ runId: GMAIL_RUN_ID });
+
+      expect(result.status).toBe("ok");
+      if (result.status === "ok") {
+        expect(result.runStatus).toBe("gmail_instructions_shown");
+        expect(result.targetEmail).toBe("hello@ex.com");
+        expect(result.displayName).toBe("Hello");
+        expect(result.smtp).toEqual({
+          host: "smtp-relay.brevo.com",
+          port: 587,
+          username: "owner@brevo.com",
+          password: "xsmtpsib-abcdef0123456789",
+          securityMode: "starttls",
+          keyVersion: 2,
+        });
+      }
+      expect(admin.rows[0].status).toBe("gmail_instructions_shown");
+      expect(admin.rows[0].gmail_state).toMatchObject({
+        target_email: "hello@ex.com",
+        display_name: "Hello",
+        smtp_config_version: 2,
+      });
+    });
+
+    test("idempotent re-entry from gmail_instructions_shown", async () => {
+      const admin = makeAdminStub([
+        brevoDoneRow({
+          status: "gmail_instructions_shown",
+          gmail_state: {
+            target_email: "hello@ex.com",
+            display_name: "Hello",
+            smtp_config_version: 1,
+          },
+        }),
+      ]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+
+      const result = await prepareGmailStep({ runId: GMAIL_RUN_ID });
+      expect(result.status).toBe("ok");
+      if (result.status === "ok") {
+        expect(result.runStatus).toBe("gmail_instructions_shown");
+        expect(result.smtp.keyVersion).toBe(2); // env-fresh value
+      }
+      // gmail_state should reflect the current env version, not the old
+      expect(admin.rows[0].gmail_state).toMatchObject({
+        smtp_config_version: 2,
+      });
+    });
+
+    test("status != brevo_done | gmail_instructions_shown → run_wrong_state", async () => {
+      const admin = makeAdminStub([brevoDoneRow({ status: "cf_done" })]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+      const result = await prepareGmailStep({ runId: GMAIL_RUN_ID });
+      expect(result.status).toBe("error");
+      if (result.status === "error") {
+        expect(result.errorKey).toBe("setup.errors.run_wrong_state");
+      }
+      // No write on rejected precondition
+      expect(admin.rows[0].status).toBe("cf_done");
+    });
+
+    test("run not owned by caller → run_not_found", async () => {
+      const admin = makeAdminStub([brevoDoneRow({ user_id: "someone_else" })]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+      const result = await prepareGmailStep({ runId: GMAIL_RUN_ID });
+      expect(result.status).toBe("error");
+      if (result.status === "error") {
+        expect(result.errorKey).toBe("setup.errors.run_not_found");
+      }
+    });
+
+    test("env missing → brevo_smtp_misconfigured (no DB write)", async () => {
+      unstubSmtpEnv();
+      stubSmtpEnv({ BREVO_SMTP_LOGIN: "" });
+      const admin = makeAdminStub([brevoDoneRow()]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+      const result = await prepareGmailStep({ runId: GMAIL_RUN_ID });
+      expect(result.status).toBe("error");
+      if (result.status === "error") {
+        expect(result.errorKey).toBe("setup.errors.brevo_smtp_misconfigured");
+      }
+      expect(admin.rows[0].status).toBe("brevo_done");
+    });
+
+    test("unauthenticated → not_authenticated", async () => {
+      const admin = makeAdminStub([brevoDoneRow()]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser(null);
+      const result = await prepareGmailStep({ runId: GMAIL_RUN_ID });
+      expect(result.status).toBe("error");
+      if (result.status === "error") {
+        expect(result.errorKey).toBe("setup.errors.not_authenticated");
+      }
+    });
+
+    test("invalid runId format → invalid_input", async () => {
+      mockUser();
+      const result = await prepareGmailStep({ runId: "not-a-uuid" });
+      expect(result.status).toBe("error");
+      if (result.status === "error") {
+        expect(result.errorKey).toBe("setup.errors.invalid_input");
+      }
+    });
+
+    test("title-cases snake_case mailbox_local for display name", async () => {
+      const admin = makeAdminStub([
+        brevoDoneRow({ mailbox_local: "support_team" }),
+      ]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+      const result = await prepareGmailStep({ runId: GMAIL_RUN_ID });
+      if (result.status === "ok") {
+        expect(result.displayName).toBe("Support Team");
+        expect(result.targetEmail).toBe("support_team@ex.com");
+      }
+    });
+  });
+
+  describe("confirmGmailSendAs", () => {
+    test("gmail_instructions_shown → done + confirmed_at set", async () => {
+      const admin = makeAdminStub([
+        brevoDoneRow({
+          status: "gmail_instructions_shown",
+          gmail_state: {
+            target_email: "hello@ex.com",
+            display_name: "Hello",
+            smtp_config_version: 1,
+          },
+        }),
+      ]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+
+      const before = Date.now();
+      const result = await confirmGmailSendAs({ runId: GMAIL_RUN_ID });
+      const after = Date.now();
+
+      expect(result.status).toBe("ok");
+      if (result.status === "ok") {
+        expect(result.runStatus).toBe("done");
+      }
+      expect(admin.rows[0].status).toBe("done");
+      const confirmedAt = (admin.rows[0].gmail_state as Record<string, unknown>)
+        ?.confirmed_at;
+      expect(typeof confirmedAt).toBe("string");
+      const t = new Date(confirmedAt as string).getTime();
+      expect(t).toBeGreaterThanOrEqual(before);
+      expect(t).toBeLessThanOrEqual(after);
+      // Prior gmail_state fields preserved
+      expect(admin.rows[0].gmail_state).toMatchObject({
+        target_email: "hello@ex.com",
+      });
+    });
+
+    test("idempotent on already-done run — returns ok, no write", async () => {
+      const admin = makeAdminStub([
+        brevoDoneRow({
+          status: "done",
+          gmail_state: { confirmed_at: "2026-04-22T10:00:00Z" },
+        }),
+      ]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+      const result = await confirmGmailSendAs({ runId: GMAIL_RUN_ID });
+      expect(result.status).toBe("ok");
+      if (result.status === "ok") {
+        expect(result.runStatus).toBe("done");
+      }
+      // confirmed_at should be preserved as-is (no re-write)
+      expect(admin.updateCalls).toHaveLength(0);
+      expect(
+        (admin.rows[0].gmail_state as Record<string, unknown>)?.confirmed_at,
+      ).toBe("2026-04-22T10:00:00Z");
+    });
+
+    test("status = cf_done → run_wrong_state", async () => {
+      const admin = makeAdminStub([brevoDoneRow({ status: "cf_done" })]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+      const result = await confirmGmailSendAs({ runId: GMAIL_RUN_ID });
+      expect(result.status).toBe("error");
+      if (result.status === "error") {
+        expect(result.errorKey).toBe("setup.errors.run_wrong_state");
+      }
+    });
+
+    test("run not owned by caller → run_not_found", async () => {
+      const admin = makeAdminStub([
+        brevoDoneRow({
+          user_id: "other",
+          status: "gmail_instructions_shown",
+        }),
+      ]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser();
+      const result = await confirmGmailSendAs({ runId: GMAIL_RUN_ID });
+      expect(result.status).toBe("error");
+      if (result.status === "error") {
+        expect(result.errorKey).toBe("setup.errors.run_not_found");
+      }
+    });
+
+    test("unauthenticated → not_authenticated", async () => {
+      const admin = makeAdminStub([
+        brevoDoneRow({ status: "gmail_instructions_shown" }),
+      ]);
+      vi.mocked(sbModule.createServiceClient).mockReturnValue(
+        admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+      );
+      mockUser(null);
+      const result = await confirmGmailSendAs({ runId: GMAIL_RUN_ID });
+      expect(result.status).toBe("error");
+      if (result.status === "error") {
+        expect(result.errorKey).toBe("setup.errors.not_authenticated");
+      }
+    });
+  });
+});
