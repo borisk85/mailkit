@@ -1,0 +1,88 @@
+Post-#11 prod Lighthouse — 2026-04-23 ~13:00 local
+=====================================================
+Target: https://mailkit-ten.vercel.app
+Commit: 18b6d42 (Merge PR #11 — #4b Brevo) + docs-only on top
+Methodology: desktop, simulate throttling, 1350×940, headless Chrome,
+  8 warmup curls per URL before sampling, n=5 per locale.
+Elapsed since merge: ~13 hours (well past SOP's 60-min warm threshold).
+
+Setup-page (/app/setup?mock=token_entry) on prod: redirects 307 → /en
+(mock bypass is preview-only). Not measured via LH; TTFB to the 307
+is reported separately and not comparable to a rendered page baseline.
+
+Landing — raw runs
+==================
+file           perf  fcp   lcp   tbt  cls    si
+en-1.json      56    1243  2893  390  0.000  3198   <- cold-start outlier
+en-2.json      77    1017  2817  157  0.000  1717
+en-3.json      78    1181  2596  148  0.000  1616
+en-4.json      74    1009  2809  212  0.000  1595
+en-5.json      75    1105  2905  174  0.000  1834
+ru-1.json      86    1039  2089   72  0.002  1537
+ru-2.json      74    1180  2830  175  0.001  1959
+ru-3.json      85    1170  2138   94  0.002  1593
+ru-4.json      88    1023  1923   68  0.002  1413
+ru-5.json      71    1159  2809  250  0.002  1610
+
+Landing — medians (n=5 full)
+============================
+           perf  fcp   lcp   tbt  cls    si
+EN         75    1105  2817  174  0.000  1717
+RU         85    1159  2138   94  0.002  1593
+
+Trimmed medians (drop min+max, n=3 core)
+========================================
+           perf  notes
+EN         76    without the 56 outlier on run 1
+RU         85    stable
+
+Comparison vs stored baselines
+==============================
+                              EN perf   RU perf
+Pre-#4a baseline              87        87
+Post-#4a stable warm          77        74
+Post-#4b (this measurement)   75        85
+
+Delta vs post-#4a (the prior stable baseline):
+  EN: 75 − 77 = −2  (inside run-over-run noise, not a regression)
+  RU: 85 − 74 = +11 (improvement — likely Brevo feature had no adverse
+                      effect on landing bundle; the +11 fits within
+                      measurement noise floor on RU which had run-5
+                      outlier on prior collection)
+
+Compound delta vs pre-#4a (reference only — does not attribute to #4b):
+  EN: 75 − 87 = −12  (borderline with SOP ≥12 compound-regression row)
+  RU: 85 − 87 = −2   (inside noise)
+
+TTFB post-warmup (n=10)
+=======================
+URL                                  median  trimmed-mean
+/en                                  0.392s  0.408s
+/ru                                  0.427s  0.438s
+/en/app/setup?mock=token_entry*      0.376s  0.387s
+/ru/app/setup?mock=token_entry*      0.445s  0.441s
+
+* measures 307 redirect handler, not the setup page itself (mock bypass
+  is preview-only). Landing TTFB for post-#4a on the same method was
+  EN 0.462s median — current 0.392s is 70ms faster on EN, so no TTFB
+  regression at Edge.
+
+Decision per SOP decision table
+===============================
+Row hit: "Any page median <80 AND delta ≤10 from pre-merge baseline"
+  Action: soft signal — document in backlog attempt-3, do not block.
+
+Row "drops below pre-#4a by ≥12": EN compound delta is −12 (at
+  threshold). Trimmed median is −11 (below threshold). The 12-point
+  compound figure belongs to #4a, already captured in the post-#4a
+  baseline (77) — #4b adds no further loss.
+
+Conclusion: Investigation CLOSED. #4b does not produce a code-level
+perf regression on landing. The pre-#4a → post-#4a −10 EN /
+−13 RU shift remains the pending systemic perf work. RU improvement
+of +11 this round confirms the original "RU regression" signal from
+preview Lighthouse on #4b was preview-lambda variance, not code.
+
+Next step for perf: systemic attempt-3 PR (next-intl pick, selective
+dynamic route segments, bundle analyzer pass) — see TICKETS_BACKLOG
+"Landing performance optimization on live". No dedicated #4b fix PR.

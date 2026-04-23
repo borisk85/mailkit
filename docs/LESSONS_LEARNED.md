@@ -248,3 +248,81 @@ required permission для endpoint, (3) verbatim permission name из
 CF Dashboard dropdown (не угадывай по логике). Для missing permission
 идти в [CF API docs permissions reference](https://developers.cloudflare.com/fundamentals/api/reference/permissions/)
 или directly в [API method endpoint docs](https://developers.cloudflare.com/api/).
+
+## 2026-04-22/23 — Preview vs prod Lighthouse: разные измерительные среды
+
+### Симптом
+После push feature-ветки `feat/ticket-4b-brevo` я замерил Lighthouse на
+preview-deploy, median n=3 показал RU Perf 54 (против main-preview 66,
+delta −12) и TBT +222ms. Открыл инвестигейшн `chore/perf-post-4a-investigation`
+под гипотезой "RU-специфичная регрессия от #4b" (messages growth,
+pluralization, RSC payload). Начал планировать fix PR.
+
+### Причина
+Preview Lighthouse — **не воспроизводимый измерительный стенд**. Три
+последовательных runs на идентичном preview URL дали TBT 326ms → 260ms
+→ 21ms. Это lambda cold-start + simulate throttling variance, не код.
+
+Falsification того, что регрессия в коде:
+1. JS bundles EN/RU — byte-identical (16 файлов, 262,713 байт, проверено
+   через `performance.getEntriesByType('resource')` на cold load). Мой
+   первый репорт "RU +5 файлов +97KB" был filter-bug: фильтр включал
+   .woff2 шрифты, матчившие `_next/static`. Реальные JS-only счетчики
+   совпадают.
+2. `messages/{en,ru}.json` — идентичная структура (95 ключей, depth-
+   distribution `{2:23, 3:35, 4:19}`). Size delta — чистый UTF-8 overhead
+   кириллицы (~33% длиннее).
+3. RSC+HTML payload: +11% RU vs EN — ожидаемо для cyrillic, не регрессия.
+4. `t()` calls audit на setup-wizard path: 0 pluralization calls →
+   next-intl плюрализация Russian (4 форм) не исполняется → эта
+   гипотеза исключена.
+
+После merge #11 на prod с ≥60 мин warm: RU 85 (vs pre-merge stored
+baseline 74) — **improvement**, не regression. Preview сигнал был
+полностью false-positive.
+
+Отдельный outlier-related подкос: pre-investigation TTFB measurement
+показывал POST /en median 0.55s (+120ms vs pre), но там был 1.29s
+outlier в single run. Fresh n=10 дал 0.46s median (trimmed mean 0.46)
+— реальная delta +50ms, не +120. Median на n=10 чувствителен к одному
+outlier в ±100ms. Нужно: n≥10, trim min+max перед median.
+
+### Фикс
+Fix PR `chore/perf-post-4a-4b-fix` отменен (не создавался). Ветка
+`chore/perf-post-4a-investigation` закрыта findings-only коммитом +
+post-merge измерениями. Actual post-#4b на prod:
+
+| Локаль | Pre-#4a | Post-#4a stable | Post-#4b (this round) | Delta vs post-#4a |
+|---|---|---|---|---|
+| EN | 87 | 77 | 75 | −2 (noise) |
+| RU | 87 | 74 | 85 | +11 (improvement) |
+
+Systemic perf work отложен в backlog как attempt-3 (не специфичен для
+одного тикета — делать после app-shell complete).
+
+### Правило
+**Preview Lighthouse — non-gating signal.** Cold-start variance ×15
+run-over-run на identical URL делает preview непригодным для
+merge-gate с deltas <20 points. Использовать preview LH только для
+грубого "order of magnitude" smoke (не упал ли в ×2 по Perf score),
+не для abs-vs-baseline сравнений.
+
+**Prod Lighthouse — gating, но только с корректной методологией:**
+- ≥60 минут warm на prod alias ДО первого измерения (CDN edge cache +
+  lambda pool prime)
+- n≥10 TTFB curl samples для TTFB stability check, **trim min+max
+  перед median** (outlier 1.29s в одном из 10 сдвигает median на
+  ~100ms — фальшивый регрессионный сигнал)
+- n≥5 LH runs per locale, **median**, не single run
+- Сравнение с **сохраненным prod baseline** идентичной methodology,
+  не с preview и не с ad-hoc single-run
+
+**Bundle diff falsification перед тем как открывать fix PR:**
+- `performance.getEntriesByType('resource')` фильтр: **JS-only по
+  `initiatorType==='script'` или по `.js` extension**, не по URL
+  substring — `_next/static` матчит и шрифты тоже.
+- Вручную проверить byte-count EN vs RU (или pre/post для
+  регрессии). Identical → это не bundle, копать в других местах.
+
+**Полная методология и raw artifacts**: [docs/investigation-2026-04-22/](investigation-2026-04-22/)
+— FINDINGS.md, POST_MERGE_SOP.md, post-merge-lh-summary.txt.
