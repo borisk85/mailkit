@@ -10,13 +10,15 @@ const MOCK_STATES = [
   "awaiting_verify",
   "done",
   "failed",
-  // Brevo-pipeline states. UI rendering lands in etap 3 — these are
-  // allowlisted now so the gate is ready and URLs resolve to the
-  // wizard default (token_entry) without 307-ing to /{locale}.
   "brevo_sender_created",
   "brevo_dns_written",
   "brevo_verified",
   "brevo_done",
+  // Ticket #6 etap 2 — Gmail wizard states.
+  "gmail_instructions_shown",
+  "gmail_smtp_ready",
+  "gmail_send_as_verified",
+  "gmail_done",
 ] as const;
 type MockState = (typeof MOCK_STATES)[number];
 

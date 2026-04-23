@@ -2,17 +2,38 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { AlertCircle, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  AlertCircle,
+  Check,
+  CheckCircle2,
+  Circle,
+  Copy,
+  Eye,
+  EyeOff,
+  Loader2,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
 
 import {
+  confirmGmailSendAs,
   continueBrevoSetup,
+  prepareGmailStep,
   resumeDestinationVerify,
   startSetupRun,
   verifyCloudflareToken,
 } from "./actions";
+
+type SmtpDisplay = {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  securityMode: "starttls" | "ssl";
+  keyVersion: number;
+};
 
 type Zone = { id: string; name: string; accountId: string };
 
@@ -69,15 +90,42 @@ type WizardState =
     }
   | {
       kind: "brevo_done";
+      runId: string;
+      zoneName: string;
+      mailboxLocal: string;
+      destinationEmail: string;
+      errorKey?: string;
+    }
+  | {
+      kind: "gmail_instructions_shown";
+      runId: string;
       zoneName: string;
       mailboxLocal: string;
       destinationEmail: string;
     }
   | {
+      kind: "gmail_smtp_ready";
+      runId: string;
+      zoneName: string;
+      mailboxLocal: string;
+      destinationEmail: string;
+      targetEmail: string;
+      displayName: string;
+      smtp: SmtpDisplay;
+      errorKey?: string;
+    }
+  | {
+      kind: "gmail_done";
+      zoneName: string;
+      mailboxLocal: string;
+      destinationEmail: string;
+      targetEmail: string;
+    }
+  | {
       kind: "failed";
       errorKey: string;
       errorDetails?: string;
-      source?: "cf" | "brevo";
+      source?: "cf" | "brevo" | "gmail";
     };
 
 const MOCK_ZONES: Zone[] = [
@@ -97,7 +145,20 @@ type MockKey =
   | "brevo_dns_written"
   | "brevo_verified"
   | "brevo_done"
+  | "gmail_instructions_shown"
+  | "gmail_smtp_ready"
+  | "gmail_send_as_verified"
+  | "gmail_done"
   | null;
+
+const MOCK_SMTP: SmtpDisplay = {
+  host: "smtp-relay.brevo.com",
+  port: 587,
+  username: "owner@brevo.com",
+  password: "xsmtpsib-mock-9f2c8b1a4d6e7f0a",
+  securityMode: "starttls",
+  keyVersion: 1,
+};
 
 function mockInitialState(mock: MockKey): WizardState {
   switch (mock) {
@@ -166,9 +227,38 @@ function mockInitialState(mock: MockKey): WizardState {
     case "brevo_done":
       return {
         kind: "brevo_done",
+        runId: "11111111-2222-4333-8444-555555555555",
         zoneName: "example.com",
         mailboxLocal: "hello",
         destinationEmail: "owner@gmail.com",
+      };
+    case "gmail_instructions_shown":
+      return {
+        kind: "gmail_instructions_shown",
+        runId: "11111111-2222-4333-8444-555555555555",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+      };
+    case "gmail_smtp_ready":
+      return {
+        kind: "gmail_smtp_ready",
+        runId: "11111111-2222-4333-8444-555555555555",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+        targetEmail: "hello@example.com",
+        displayName: "Hello",
+        smtp: MOCK_SMTP,
+      };
+    case "gmail_send_as_verified":
+    case "gmail_done":
+      return {
+        kind: "gmail_done",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+        targetEmail: "hello@example.com",
       };
     case "failed":
       return {
@@ -421,12 +511,83 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
       {state.kind === "brevo_done" ? (
         <BrevoDoneStep
           state={state}
-          locale={locale}
+          isPending={isPending}
           t={t}
           tState={tState}
           tSteps={tSteps}
           tBrevo={tBrevo}
+          translateErr={translateErr}
+          onContinue={() => {
+            const snapshot = state;
+            setState({
+              kind: "gmail_instructions_shown",
+              runId: snapshot.runId,
+              zoneName: snapshot.zoneName,
+              mailboxLocal: snapshot.mailboxLocal,
+              destinationEmail: snapshot.destinationEmail,
+            });
+            startTransition(async () => {
+              const result = await prepareGmailStep({ runId: snapshot.runId });
+              if (result.status === "error") {
+                setState({
+                  kind: "brevo_done",
+                  runId: snapshot.runId,
+                  zoneName: snapshot.zoneName,
+                  mailboxLocal: snapshot.mailboxLocal,
+                  destinationEmail: snapshot.destinationEmail,
+                  errorKey: result.errorKey,
+                });
+                return;
+              }
+              setState({
+                kind: "gmail_smtp_ready",
+                runId: snapshot.runId,
+                zoneName: snapshot.zoneName,
+                mailboxLocal: snapshot.mailboxLocal,
+                destinationEmail: snapshot.destinationEmail,
+                targetEmail: result.targetEmail,
+                displayName: result.displayName,
+                smtp: result.smtp,
+              });
+            });
+          }}
         />
+      ) : null}
+
+      {state.kind === "gmail_instructions_shown" ? (
+        <GmailLoadingStep state={state} t={t} />
+      ) : null}
+
+      {state.kind === "gmail_smtp_ready" ? (
+        <GmailWizard
+          state={state}
+          isPending={isPending}
+          t={t}
+          translateErr={translateErr}
+          onComplete={() => {
+            const snapshot = state;
+            startTransition(async () => {
+              const result = await confirmGmailSendAs({
+                runId: snapshot.runId,
+              });
+              if (result.status === "error") {
+                setState({ ...snapshot, errorKey: result.errorKey });
+                return;
+              }
+              setState({
+                kind: "gmail_done",
+                zoneName: snapshot.zoneName,
+                mailboxLocal: snapshot.mailboxLocal,
+                destinationEmail: snapshot.destinationEmail,
+                targetEmail: snapshot.targetEmail,
+              });
+            });
+          }}
+        />
+      ) : null}
+
+      {state.kind === "gmail_done" ? (
+        <GmailDoneStep state={state} locale={locale} t={t} />
       ) : null}
 
       {state.kind === "failed" ? (
@@ -900,18 +1061,22 @@ function BrevoAwaitingRetryStep({
 
 function BrevoDoneStep({
   state,
-  locale,
+  isPending,
   t,
   tState,
   tSteps,
   tBrevo,
+  translateErr,
+  onContinue,
 }: {
   state: Extract<WizardState, { kind: "brevo_done" }>;
-  locale: string;
+  isPending: boolean;
   t: (key: string, values?: Record<string, string>) => string;
   tState: (key: string) => string;
   tSteps: (key: string) => string;
   tBrevo: (key: string) => string;
+  translateErr: (key: string, details?: string) => string;
+  onContinue: () => void;
 }) {
   return (
     <section className="space-y-4 rounded-lg border border-emerald-200 p-6 dark:border-emerald-900">
@@ -936,13 +1101,15 @@ function BrevoDoneStep({
             domain: state.zoneName,
           })}
         </p>
-        <a
-          href={`/${locale}/app/setup/gmail-step`}
-          className="mt-3 inline-flex"
-        >
-          <Button variant="outline">{t("brevo.terminal.gmailCta")}</Button>
-        </a>
+        <Button className="mt-3" onClick={onContinue} disabled={isPending}>
+          {isPending
+            ? t("gmail.intro.startCtaLoading")
+            : t("brevo.terminal.gmailCta")}
+        </Button>
       </div>
+      {state.errorKey ? (
+        <InlineError message={translateErr(state.errorKey)} />
+      ) : null}
     </section>
   );
 }
@@ -981,6 +1148,7 @@ function handleBrevoResult(
   if (result.runStatus === "brevo_done") {
     setState({
       kind: "brevo_done",
+      runId: snapshot.runId,
       zoneName: snapshot.zoneName,
       mailboxLocal: snapshot.mailboxLocal,
       destinationEmail: snapshot.destinationEmail,
@@ -1037,6 +1205,549 @@ function FailedStep({
       <Button onClick={onRestart} variant="outline">
         {t("step3.failed.restartCta")}
       </Button>
+    </section>
+  );
+}
+
+/* ------------------------------------------------------------------ *
+ * Ticket #6 etap 2 — Gmail Send-As wizard
+ * ------------------------------------------------------------------ */
+
+function GmailLoadingStep({
+  state,
+  t,
+}: {
+  state: Extract<WizardState, { kind: "gmail_instructions_shown" }>;
+  t: (key: string, values?: Record<string, string>) => string;
+}) {
+  const targetEmail = `${state.mailboxLocal}@${state.zoneName}`;
+  return (
+    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+      <h2 className="text-lg font-semibold">{t("gmail.intro.title")}</h2>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        {t("gmail.intro.subtitle", { target: targetEmail })}
+      </p>
+      <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <Loader2 className="size-4 animate-spin" aria-hidden />
+        {t("gmail.intro.startCtaLoading")}
+      </div>
+    </section>
+  );
+}
+
+const GMAIL_STEP_IDS = [
+  "openSettings",
+  "senderInfo",
+  "smtpSettings",
+  "verificationEmail",
+  "confirm",
+  "done",
+] as const;
+type GmailStepId = (typeof GMAIL_STEP_IDS)[number];
+
+function GmailWizard({
+  state,
+  isPending,
+  t,
+  translateErr,
+  onComplete,
+}: {
+  state: Extract<WizardState, { kind: "gmail_smtp_ready" }>;
+  isPending: boolean;
+  t: (key: string, values?: Record<string, string>) => string;
+  translateErr: (key: string, details?: string) => string;
+  onComplete: () => void;
+}) {
+  const [currentIdx, setCurrentIdx] = useState(0);
+  const [confirmed, setConfirmed] = useState(false);
+  const [checkboxError, setCheckboxError] = useState(false);
+  const total = GMAIL_STEP_IDS.length;
+
+  function advance() {
+    setCurrentIdx((i) => Math.min(i + 1, total - 1));
+  }
+
+  return (
+    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <h2 className="text-lg font-semibold">{t("gmail.intro.title")}</h2>
+        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          {t("gmail.progress", {
+            current: String(currentIdx + 1),
+            total: String(total),
+          })}
+        </span>
+      </div>
+      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+        {t("gmail.intro.subtitle", { target: state.targetEmail })}
+      </p>
+
+      <ol className="space-y-3">
+        {GMAIL_STEP_IDS.map((id, idx) => {
+          const status: "done" | "active" | "pending" =
+            idx < currentIdx
+              ? "done"
+              : idx === currentIdx
+                ? "active"
+                : "pending";
+          return (
+            <GmailStepCard
+              key={id}
+              id={id}
+              idx={idx}
+              total={total}
+              status={status}
+              t={t}
+              state={state}
+              isPending={isPending}
+              confirmed={confirmed}
+              setConfirmed={(v) => {
+                setConfirmed(v);
+                if (v) setCheckboxError(false);
+              }}
+              checkboxError={checkboxError}
+              onExpand={() => setCurrentIdx(idx)}
+              onNext={advance}
+              onSubmit={() => {
+                if (!confirmed) {
+                  setCheckboxError(true);
+                  return;
+                }
+                onComplete();
+              }}
+            />
+          );
+        })}
+      </ol>
+
+      {state.errorKey ? (
+        <InlineError message={translateErr(state.errorKey)} />
+      ) : null}
+    </section>
+  );
+}
+
+function GmailStepCard({
+  id,
+  idx,
+  total,
+  status,
+  t,
+  state,
+  isPending,
+  confirmed,
+  setConfirmed,
+  checkboxError,
+  onExpand,
+  onNext,
+  onSubmit,
+}: {
+  id: GmailStepId;
+  idx: number;
+  total: number;
+  status: "done" | "active" | "pending";
+  t: (key: string, values?: Record<string, string>) => string;
+  state: Extract<WizardState, { kind: "gmail_smtp_ready" }>;
+  isPending: boolean;
+  confirmed: boolean;
+  setConfirmed: (v: boolean) => void;
+  checkboxError: boolean;
+  onExpand: () => void;
+  onNext: () => void;
+  onSubmit: () => void;
+}) {
+  const borderClass =
+    status === "active"
+      ? "border-emerald-400 dark:border-emerald-700"
+      : "border-zinc-200 dark:border-zinc-800";
+  const icon =
+    status === "done" ? (
+      <CheckCircle2 className="size-5 text-emerald-600" aria-hidden />
+    ) : status === "active" ? (
+      <Circle className="size-5 text-emerald-600" aria-hidden />
+    ) : (
+      <Circle className="size-5 text-zinc-400 dark:text-zinc-600" aria-hidden />
+    );
+
+  const title = t(`gmail.steps.${id}.title`);
+
+  return (
+    <li
+      className={cn(
+        "rounded-md border p-4 transition-colors",
+        borderClass,
+        status === "active" && "bg-emerald-50/40 dark:bg-emerald-950/20",
+      )}
+    >
+      <button
+        type="button"
+        onClick={onExpand}
+        className="flex w-full items-center justify-between gap-3 text-left"
+        aria-expanded={status === "active"}
+      >
+        <span className="flex items-center gap-3">
+          {icon}
+          <span>
+            <span className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+              {t("gmail.progress", {
+                current: String(idx + 1),
+                total: String(total),
+              })}
+            </span>
+            <span className="block text-sm font-semibold">{title}</span>
+          </span>
+        </span>
+        {status === "done" ? (
+          <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+            {t("step3.state.ok")}
+          </span>
+        ) : null}
+      </button>
+
+      {status === "active" ? (
+        <div className="mt-4 space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+          <GmailStepBody
+            id={id}
+            t={t}
+            state={state}
+            isPending={isPending}
+            confirmed={confirmed}
+            setConfirmed={setConfirmed}
+            checkboxError={checkboxError}
+            onNext={onNext}
+            onSubmit={onSubmit}
+          />
+        </div>
+      ) : null}
+    </li>
+  );
+}
+
+function GmailStepBody({
+  id,
+  t,
+  state,
+  isPending,
+  confirmed,
+  setConfirmed,
+  checkboxError,
+  onNext,
+  onSubmit,
+}: {
+  id: GmailStepId;
+  t: (key: string, values?: Record<string, string>) => string;
+  state: Extract<WizardState, { kind: "gmail_smtp_ready" }>;
+  isPending: boolean;
+  confirmed: boolean;
+  setConfirmed: (v: boolean) => void;
+  checkboxError: boolean;
+  onNext: () => void;
+  onSubmit: () => void;
+}) {
+  if (id === "openSettings") {
+    return (
+      <>
+        <p className="text-sm">{t("gmail.steps.openSettings.body")}</p>
+        <div className="flex flex-wrap gap-2">
+          <a
+            href="https://mail.google.com/mail/u/0/#settings/accounts"
+            target="_blank"
+            rel="noreferrer"
+            className="inline-flex"
+          >
+            <Button variant="outline" size="sm">
+              Open Gmail Settings ↗
+            </Button>
+          </a>
+          <Button onClick={onNext} size="sm">
+            {t("gmail.steps.openSettings.nextCta")}
+          </Button>
+        </div>
+      </>
+    );
+  }
+  if (id === "senderInfo") {
+    return (
+      <>
+        <p className="text-sm">{t("gmail.steps.senderInfo.body")}</p>
+        <FieldRow
+          label={t("gmail.fields.displayName")}
+          value={state.displayName}
+          t={t}
+        />
+        <FieldRow
+          label={t("gmail.fields.targetEmail")}
+          value={state.targetEmail}
+          t={t}
+          mono
+        />
+        <Button onClick={onNext} size="sm">
+          {t("gmail.steps.senderInfo.nextCta")}
+        </Button>
+      </>
+    );
+  }
+  if (id === "smtpSettings") {
+    return (
+      <>
+        <p className="text-sm">{t("gmail.steps.smtpSettings.body")}</p>
+        <FieldRow
+          label={t("gmail.fields.smtpHost")}
+          value={state.smtp.host}
+          t={t}
+          mono
+        />
+        <FieldRow
+          label={t("gmail.fields.smtpPort")}
+          value={String(state.smtp.port)}
+          t={t}
+          mono
+        />
+        <FieldRow
+          label={t("gmail.fields.smtpUsername")}
+          value={state.smtp.username}
+          t={t}
+          mono
+        />
+        <PasswordRow
+          label={t("gmail.fields.smtpPassword")}
+          value={state.smtp.password}
+          t={t}
+        />
+        <div className="rounded-md bg-amber-50 p-3 text-xs text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+          {t("gmail.steps.smtpSettings.passwordWarning")}
+        </div>
+        <div className="space-y-1 text-sm">
+          <span className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            {t("gmail.fields.smtpSecurity")}
+          </span>
+          <label className="flex items-center gap-2">
+            <input
+              type="radio"
+              name="smtp-security"
+              defaultChecked={state.smtp.securityMode === "starttls"}
+              readOnly
+            />
+            {t("gmail.steps.smtpSettings.securityStarttls")}
+          </label>
+          <label className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+            <input
+              type="radio"
+              name="smtp-security"
+              defaultChecked={state.smtp.securityMode === "ssl"}
+              readOnly
+            />
+            {t("gmail.steps.smtpSettings.securitySsl")}
+          </label>
+        </div>
+        <Button onClick={onNext} size="sm">
+          {t("gmail.steps.smtpSettings.nextCta")}
+        </Button>
+      </>
+    );
+  }
+  if (id === "verificationEmail") {
+    return (
+      <>
+        <p className="text-sm">
+          {t("gmail.steps.verificationEmail.body", {
+            target: state.targetEmail,
+          })}
+        </p>
+        <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+          <Loader2 className="size-4 animate-spin" aria-hidden />
+          Waiting for verification email…
+        </div>
+        <Button onClick={onNext} size="sm">
+          {t("gmail.steps.verificationEmail.nextCta")}
+        </Button>
+      </>
+    );
+  }
+  if (id === "confirm") {
+    return (
+      <>
+        <p className="text-sm">
+          {t("gmail.steps.confirm.body", { target: state.targetEmail })}
+        </p>
+        <label className="flex items-start gap-2 text-sm">
+          <input
+            type="checkbox"
+            className="mt-1 size-4"
+            checked={confirmed}
+            onChange={(e) => setConfirmed(e.target.checked)}
+          />
+          <span>{t("gmail.steps.confirm.checkbox")}</span>
+        </label>
+        {checkboxError ? (
+          <InlineError message={t("gmail.errors.checkboxRequired")} />
+        ) : null}
+        <Button onClick={onSubmit} size="sm" disabled={isPending}>
+          {isPending
+            ? t("gmail.steps.confirm.submitCtaLoading")
+            : t("gmail.steps.confirm.submitCta")}
+        </Button>
+      </>
+    );
+  }
+  if (id === "done") {
+    return (
+      <>
+        <p className="text-sm">
+          {t("gmail.steps.done.body", { target: state.targetEmail })}
+        </p>
+      </>
+    );
+  }
+  return null;
+}
+
+function FieldRow({
+  label,
+  value,
+  t,
+  mono = false,
+}: {
+  label: string;
+  value: string;
+  t: (key: string) => string;
+  mono?: boolean;
+}) {
+  return (
+    <div className="space-y-1">
+      <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+        {label}
+      </label>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Input
+          readOnly
+          value={value}
+          className={cn("flex-1", mono && "font-mono text-sm")}
+        />
+        <CopyButton value={value} t={t} />
+      </div>
+    </div>
+  );
+}
+
+function PasswordRow({
+  label,
+  value,
+  t,
+}: {
+  label: string;
+  value: string;
+  t: (key: string) => string;
+}) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <div className="space-y-1">
+      <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+        {label}
+      </label>
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+        <Input
+          readOnly
+          value={value}
+          type={visible ? "text" : "password"}
+          className="flex-1 font-mono text-sm"
+        />
+        <div className="flex gap-2">
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => setVisible((v) => !v)}
+            aria-label={
+              visible
+                ? t("gmail.common.hidePassword")
+                : t("gmail.common.showPassword")
+            }
+            className="size-11 sm:size-10"
+          >
+            {visible ? (
+              <EyeOff className="size-4" aria-hidden />
+            ) : (
+              <Eye className="size-4" aria-hidden />
+            )}
+          </Button>
+          <CopyButton value={value} t={t} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CopyButton({
+  value,
+  t,
+}: {
+  value: string;
+  t: (key: string) => string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState(false);
+  async function onCopy() {
+    setError(false);
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setError(true);
+      setTimeout(() => setError(false), 2500);
+    }
+  }
+  return (
+    <Button
+      type="button"
+      variant="outline"
+      size="sm"
+      onClick={onCopy}
+      aria-label={copied ? t("gmail.common.copied") : t("gmail.common.copy")}
+      className={cn("min-h-11 sm:min-h-10", error && "border-red-400")}
+    >
+      {copied ? (
+        <Check className="size-4" aria-hidden />
+      ) : (
+        <Copy className="size-4" aria-hidden />
+      )}
+      <span className="ml-1.5 text-xs">
+        {error
+          ? t("gmail.errors.copyFailed")
+          : copied
+            ? t("gmail.common.copied")
+            : t("gmail.common.copy")}
+      </span>
+    </Button>
+  );
+}
+
+function GmailDoneStep({
+  state,
+  locale,
+  t,
+}: {
+  state: Extract<WizardState, { kind: "gmail_done" }>;
+  locale: string;
+  t: (key: string, values?: Record<string, string>) => string;
+}) {
+  return (
+    <section className="space-y-4 rounded-lg border border-emerald-200 p-6 dark:border-emerald-900">
+      <div className="flex items-center gap-2">
+        <CheckCircle2 className="size-6 text-emerald-600" aria-hidden />
+        <h2 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
+          {t("gmail.steps.done.title")}
+        </h2>
+      </div>
+      <p className="text-sm text-emerald-900 dark:text-emerald-100">
+        {t("gmail.steps.done.body", { target: state.targetEmail })}
+      </p>
+      <a href={`/${locale}/app`} className="inline-flex">
+        <Button variant="outline">
+          {t("gmail.steps.done.backToDashboard")}
+        </Button>
+      </a>
     </section>
   );
 }
