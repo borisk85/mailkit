@@ -1,12 +1,13 @@
-import Link from "next/link";
-import { getTranslations, setRequestLocale } from "next-intl/server";
-
-import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
 
 /**
- * Gmail Send-As placeholder. Ticket #6 will flesh out the wizard; for
- * now we land users here from the Brevo terminal CTA so they see an
- * explicit "next step in progress" signal rather than a 404.
+ * Pre-etap-2 placeholder route that shipped as a stub. In etap 2 the
+ * Gmail Send-As wizard moved inline into setup-wizard.tsx — the CTA on
+ * the brevo_done panel calls prepareGmailStep and mounts the wizard in
+ * the same page, so this standalone route has no reason to render.
+ *
+ * Anyone who hits it directly (old bookmark, cached link, typed URL)
+ * bounces back to /app/setup where the wizard picks up their state.
  */
 export default async function GmailStepPage({
   params,
@@ -14,18 +15,5 @@ export default async function GmailStepPage({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  setRequestLocale(locale);
-  const t = await getTranslations({ locale, namespace: "setup.gmailStep" });
-
-  return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <h1 className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
-        {t("title")}
-      </h1>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">{t("body")}</p>
-      <Link href={`/${locale}/app/setup`}>
-        <Button variant="outline">{t("back")}</Button>
-      </Link>
-    </div>
-  );
+  redirect(`/${locale}/app/setup`);
 }

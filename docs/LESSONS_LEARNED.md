@@ -249,6 +249,146 @@ CF Dashboard dropdown (не угадывай по логике). Для missing 
 идти в [CF API docs permissions reference](https://developers.cloudflare.com/fundamentals/api/reference/permissions/)
 или directly в [API method endpoint docs](https://developers.cloudflare.com/api/).
 
+## 2026-04-23 — Integration research: начинать с reference/spike/, не с public docs
+
+### Симптом
+Ticket #6 pre-flight research по Brevo SMTP credentials — 20 минут ушло
+на developers.brevo.com + help.brevo.com + context7 + web search пока
+я пытался найти programmatic endpoint для SMTP key management. Docs не
+ответили на ключевой вопрос (per-sender vs shared account-level), только
+косвенные сигналы. В итоге открыл `reference/spike/modules/brevo.py` —
+там на строке 172 прямым текстом: *«Brevo не отдает SMTP key через
+API — только через UI»* + working solution с env-vars fallback. 5 минут
+максимум вместо 20.
+
+### Причина
+Public docs написаны маркетологами, покрывают happy path, замалчивают
+отсутствующие возможности (особенно если это "gap in API surface" —
+компании не любят это документировать). Spike-код — результат
+живого trial-and-error: dev уже ударился головой обо все граничные
+случаи, обошел их, задокументировал (коммит + inline комменты с
+контекстом). Особенно для edge cases типа "а есть ли в этом API X",
+spike авторитетнее маркетинговых docs.
+
+У нас в `reference/spike/` лежат модули CF, Brevo, Gmail — покрывают
+все три наших внешних integration'а и все прошли end-to-end smoke на
+реальных доменах. Каждый раз когда возникает новый вопрос по integration
+(«есть ли такой endpoint», «что возвращает это поле в edge case»,
+«как хорошо это работает на shared account») — spike уже знает.
+
+### Правило
+**Research integration'ов (CF, Brevo, Gmail, любые будущие) начинаем с
+`reference/spike/`, потом docs.** Workflow:
+
+1. Открой соответствующий `reference/spike/modules/<integration>.py`.
+   Прочитай docstring + inline comments — там уже расписаны gotchas.
+2. Если spike отвечает на вопрос → используй это как source of truth,
+   проверь только что docs не поменяли behavior с момента спайка
+   (если спайку >6 месяцев).
+3. Если spike не покрывает твой вопрос → public docs + API reference.
+4. Если docs тоже не ответили → prototype на test-домене (у нас есть
+   `mailkit-test.ru`). В этом случае добавь findings в
+   `docs/SPIKE_FINDINGS.md` — для следующего dev'а.
+
+Это не отменяет docs lookup совсем — spike старше docs, API contracts
+меняются — но spike существенно сокращает deer-path-ing через
+сотни страниц docs.
+
+## 2026-04-23 — Shared Brevo SMTP credentials: design-ограничение зафиксировано
+
+### Симптом
+Архитекторский kickoff #6 предполагал API развилку "per-sender vs shared
+SMTP credentials" как open question; research показал что развилки нет —
+Brevo тупо не предоставляет API для SMTP key management, все shared
+account-level. Итоговый scope #6 упростился (не нужен
+`createSmtpCredential` / `getSmtpCredential` API client), но архитектурная
+посадка теперь навсегда shared: один SMTP key на всех customer'ов нашего
+Brevo account.
+
+### Причина
+Brevo архитектурно не разделяет outbound authentication от sender identity.
+Authentication (SMTP key) — account-level; sender identity
+(From-address) — domain-level через DKIM + brevo-code DNS records.
+Design этот не менять — Brevo нам не подконтролен.
+
+### Правило
+**Этот trade-off зафиксирован в [docs/SECURITY.md](SECURITY.md) раздел
+«Shared Brevo SMTP model».** Не переспрашивать «а почему per-sender не
+сделано» — не сделано потому что Brevo не дает такого API. Документ
+описывает:
+
+- Abuse vectors (shared surface, rotation cascade, IP reputation)
+- Compensating controls (rate limits, rotation plumbing, monitoring) —
+  все в backlog как tech debt, не блокеры для MVP
+- Non-persistence of SMTP password — password рендерится один раз в
+  UI через RSC, не пишется в DB
+
+Если когда-то в будущем Brevo добавит per-sender SMTP API либо мы решим
+уйти от shared-account модели — это будет архитектурный рефакторинг всей
+Brevo integration (cost уровня entire Ticket #4b). До этого shared —
+наш контракт.
+
+## 2026-04-23 — Brevo SMTP login ≠ account email (wrong directive during #6 env setup)
+
+### Симптом
+Ticket #6 live smoke на `mailkit-test.ru`. Boris дошел до Gmail Step 3
+(SMTP config), вставил host/port/username/password в Gmail Send-As диалог,
+Gmail отклонил с `535 Authentication failed`. Причина всплыла через
+~30 минут: `BREVO_SMTP_LOGIN` в Vercel env был заполнен account email
+(`bkomarov85@...`), а не auto-generated SMTP login.
+
+### Причина
+Во время pre-etap-1 research я сверился с Python spike и передал
+owner'у директиву заполнить `BREVO_SMTP_LOGIN` как «account email from
+`GET /v3/account.email`». Spike fallback в
+[reference/spike/modules/brevo.py:169-199](../reference/spike/modules/brevo.py)
+действительно делал так — исторически (до 2024) Brevo SMTP relay
+принимал account email + API key как master credential. На момент #6
+(2026-04) Brevo уже требует **dedicated SMTP login** формата
+`<accountID>@smtp-brevo.com`, который генерится отдельно и живет в
+`app.brevo.com → SMTP & API → SMTP tab → "Login" field`. Account email
+с этого эндпоинта — это логин юзера в Dashboard, не SMTP identity.
+
+Два значения выглядят одинаково (оба email-формата), но валидны в
+разных местах:
+- Account email — для Brevo Dashboard login
+- SMTP login `<accountID>@smtp-brevo.com` — для SMTP relay auth
+
+### Фикс
+- Owner пересоздал значение `BREVO_SMTP_LOGIN` в Vercel env на реальный
+  SMTP login из Dashboard → SMTP tab → Login field. Preview redeploy
+  для cold-start env pickup → `prepareGmailStep` return payload →
+  wizard Step 3 корректный.
+- [.env.example](../.env.example) обновлен: коммент на
+  `BREVO_SMTP_LOGIN` теперь явно говорит «auto-generated
+  `<accountID>@smtp-brevo.com`, NOT account email; value from SMTP Login
+  field in Dashboard».
+- [docs/SPIKE_FINDINGS.md](SPIKE_FINDINGS.md) раздел «Brevo SMTP
+  credentials — API НЕ СУЩЕСТВУЕТ» расширен ⚠️ gotcha про fallback
+  option (b) — spike fallback больше не работает, только env vars из
+  реального SMTP Login field.
+
+### Правило
+**Prior-art в spike != evergreen.** Python spike прогнан 2026-04-20; то
+что работало там, не обязательно работает на момент разработки feature
+ticket'а через 3+ дня. Особенно для third-party APIs с моделью «legacy
+compatibility window → breaking change». Перед тем как передавать
+owner'у env-setup директиву:
+
+1. Сверься не только со spike, но и с **актуальной** Dashboard UI
+   (руками открой соответствующий tab, сверь какое именно поле под
+   какую переменную мапится). Spike 3+ дня старше актуального
+   third-party UX — принимать за evergreen нельзя.
+2. Если директива про external integration setup — добавляй шаг
+   verification: «owner пишет обратно `echo $BREVO_SMTP_LOGIN | head -c
+   25` — должно начинаться с цифр аккаунта, не буквы». Дешёвый sanity
+   check что mapped правильное поле из Dashboard.
+3. Gotchas в `docs/SPIKE_FINDINGS.md` обновляем live в день инцидента,
+   не копим на ревизию — follow-up dev должен найти актуальное guidance
+   сразу, а не через conflict с устаревшим текстом.
+
+Костяк применим к CF / Brevo / Gmail и любым future integrations.
+
 ## 2026-04-22/23 — Preview vs prod Lighthouse: разные измерительные среды
 
 ### Симптом

@@ -1,0 +1,113 @@
+Preview Lighthouse — /app/setup?mock=gmail_smtp_ready — 2026-04-23 ~17:50 local
+================================================================================
+Target: https://mailkit-ix6oxvga6-bkomarov85-2187s-projects.vercel.app
+Commit: f9cd50f (feat/ticket-6-gmail-wizard)
+Methodology: desktop, simulate throttling, 1350×940, headless Chrome,
+  8 warmup curls per URL before sampling, n=3 per locale.
+
+Raw runs
+========
+file           perf  fcp   lcp   tbt  cls    si
+en-1.json      64    1219  2812  306  0.000  2332
+en-2.json      78    1108  2162  204  0.000  1774
+en-3.json      65    1148  2732  337  0.000  1949
+ru-1.json      78    1188  2663  123  0.000  1960
+ru-2.json      69    1211  2819  247  0.000  2108
+ru-3.json      64    1190  2767  340  0.000  2019
+
+Medians (n=3)
+=============
+           perf  fcp   lcp   tbt  cls   si
+EN         65    1148  2732  306  0.000 1949
+RU         69    1190  2767  247  0.000 2019
+
+Comparison context
+==================
+Post-#4b landing baseline (prod, warm, n=5): EN 75 / RU 85.
+/app/setup has no stored prod baseline — mock=* bypass is preview-only
+and authenticated /app/setup cannot be exercised by headless Lighthouse
+against prod without the OAuth session.
+
+This measurement is therefore smoke-level, not a regression comparator.
+
+Per-locale run-over-run spread: EN 64-78 (Δ14), RU 64-78 (Δ14) — both
+wider than our anti-regression 5-point threshold, confirming this is
+preview-lambda variance at the same level previously documented for
+landing in docs/investigation-2026-04-22/FINDINGS.md.
+
+Absolute thresholds (CLAUDE.md Performance quality gate):
+  Performance ≥90  — not met (medians 65/69; typical for JS-heavy
+                     authenticated pages + mock rehydration path)
+  LCP <2.5s        — not met (2.73s / 2.77s)
+  TBT <200ms       — not met (306 / 247 ms)
+  FCP <1.8s        — met (1.15s / 1.19s)
+  CLS <0.1         — met (0.000 / 0.000)
+
+Reasonable given:
+- /app/setup mounts the full wizard client component (many icons, multiple
+  state branches, useTransition)
+- preview lambdas + simulate throttling inflate TBT run-over-run
+- mock bypass path renders the wizard from RSC with full state seeded,
+  which is unlike real user flow (where state arrives incrementally)
+
+Decision
+========
+NOT merging on LH alone. Per docs/LESSONS_LEARNED.md "Preview vs prod
+Lighthouse: разные измерительные среды", preview LH is non-gating with
+cold-start variance up to ×15 run-over-run. The 14-point spread we see
+above is exactly that pattern.
+
+No dedicated perf fix PR for etap 2. Systemic perf work stays in the
+backlog as attempt-3 (next-intl pick, selective dynamic route segments,
+bundle analyzer) — covers /app/setup along with landing.
+
+If post-merge prod /app/setup instrumentation (auth'd flow, e.g. once we
+ship analytics) reveals the median below usable thresholds in real-user
+data, re-open as a dedicated investigation.
+
+=============================================================================
+
+Final state Lighthouse — /app/setup?mock=gmail_done — 2026-04-23 ~17:20 local
+=============================================================================
+Target: https://mailkit-aauknlfwz-bkomarov85-2187s-projects.vercel.app
+Commit: 3bd4f5e (feat/ticket-6-gmail-wizard with env-check debug log)
+Same methodology as the gmail_smtp_ready block above.
+
+Raw runs
+========
+file           perf  fcp   lcp   tbt  cls    si
+en-1.json      80    1161  2511   66  0.000  2093
+en-2.json      92    1043  1343   69  0.000  1574
+en-3.json      91    1095  1545   27  0.000  1547
+ru-1.json      86    1090  1990   31  0.000  1727
+ru-2.json      76    1112  3212   44  0.000  2179
+ru-3.json      86    1125  2025   30  0.000  1804
+
+Medians (n=3)
+=============
+           perf  fcp   lcp   tbt  cls   si
+EN         91    1095  1545   66  0.000 1574
+RU         86    1112  2025   31  0.000 1804
+
+Comparison to gmail_smtp_ready (above):
+  EN 91 (done) vs 65 (wizard) — +26 as expected; done state is a simple
+                                terminal panel, wizard has 6-step collapse,
+                                icons, password toggle, copy helpers.
+  RU 86 (done) vs 69 (wizard) — +17 same reasoning.
+
+Variance EN d12, RU d10 — preview-lambda noise floor; acceptable.
+
+Absolute thresholds on gmail_done:
+  EN: Perf 91 ✓, LCP 1545ms ✓, TBT 66ms ✓, FCP 1095ms ✓, CLS 0 ✓ — all green
+  RU: Perf 86 (−4 vs ≥90 target, within noise), other metrics green
+
+Post-etap-2 regression check (per architect "не уронить ниже baseline"):
+No pre-etap-2 baseline exists for /app/setup (mock bypass is preview-
+only), so absolute comparison is the only available signal. The numbers
+above are acceptable — the rest of the authenticated flow (CF wizard,
+Brevo running panel, brevo_done, gmail_done) is all simpler than the
+6-step Gmail wizard, which is the peak JS load of the ticket.
+
+Conclusion: no dedicated perf fix in this PR. Systemic attempt-3
+(next-intl pick, selective dynamic route segments, bundle analyzer)
+stays in backlog and will lift both /app/setup states + landing together.

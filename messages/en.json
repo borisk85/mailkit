@@ -114,7 +114,8 @@
       "brevo_verify_timeout": "Brevo could not verify your domain yet. DNS propagation can take a few minutes — retry soon.",
       "brevo_state_unrecoverable": "Brevo knows this domain but did not return the DKIM records we need to configure DNS. The existing Brevo entry is in a partial state — please ping support.",
       "spf_conflict": "Your SPF record ends in -all (strict policy). Soften it to ~all so Brevo can send on your behalf, then retry.",
-      "dns_write_failed": "We could not write a DNS record cleanly. Details: {details}"
+      "dns_write_failed": "We could not write a DNS record cleanly. Details: {details}",
+      "brevo_smtp_misconfigured": "Our SMTP relay is not configured yet. This is on us — nothing to fix on your side; ping support if you see this for more than a minute."
     },
     "brevoSteps": {
       "sender": "Brevo sender domain claimed",
@@ -141,6 +142,72 @@
       "title": "Gmail Send-As — coming soon",
       "body": "This step is Ticket #6. Your Cloudflare routing and Brevo SMTP are already live — you'll plug Gmail in as the last link once the UI lands.",
       "back": "Back to setup"
+    },
+    "gmail": {
+      "intro": {
+        "title": "Last step — Gmail Send-As",
+        "subtitle": "About 3 minutes of copy-paste. You'll add {target} to Gmail so you can send from it like a regular address.",
+        "startCta": "Start Gmail setup",
+        "startCtaLoading": "Loading credentials…"
+      },
+      "progress": "Step {current} of {total}",
+      "common": {
+        "copy": "Copy",
+        "copied": "Copied",
+        "showPassword": "Show password",
+        "hidePassword": "Hide password"
+      },
+      "fields": {
+        "targetEmail": "Email address",
+        "displayName": "Name (what recipients see)",
+        "replyTo": "Reply-to address",
+        "smtpHost": "SMTP server",
+        "smtpPort": "Port",
+        "smtpUsername": "Username",
+        "smtpPassword": "Password (SMTP key)",
+        "smtpSecurity": "Secured connection"
+      },
+      "steps": {
+        "openSettings": {
+          "title": "Open Gmail → Settings",
+          "body": "In Gmail, click the ⚙ gear (top-right) → See all settings → Accounts and Import → Send mail as → Add another email address.",
+          "nextCta": "I opened the dialog"
+        },
+        "senderInfo": {
+          "title": "Fill in sender info",
+          "body": "Paste these into the first Gmail dialog. Leave \"Treat as an alias\" checked.",
+          "nextCta": "Next: SMTP settings"
+        },
+        "smtpSettings": {
+          "title": "SMTP settings",
+          "body": "Gmail asks for an SMTP server next. Paste these four values. The password is your only chance to copy it — keep it safe.",
+          "securityStarttls": "TLS (STARTTLS)",
+          "securitySsl": "SSL",
+          "passwordWarning": "We don't store this password for you. Copy it now; if you lose it, ping support and we'll help.",
+          "nextCta": "Next: verify"
+        },
+        "verificationEmail": {
+          "title": "Gmail will email a confirmation code",
+          "body": "Gmail sends a 9-digit code to {target}. Because Cloudflare forwards {target} to your inbox, it will arrive in the same Gmail you're using. Open the email, click the link OR paste the code back into the Gmail dialog.",
+          "nextCta": "I verified it"
+        },
+        "confirm": {
+          "title": "Confirm it works",
+          "body": "Open Gmail → Compose → the From field should now let you pick {target}. Send a quick test email to yourself to be sure.",
+          "checkbox": "I added the address and verified it in Gmail",
+          "submitCta": "Finish setup",
+          "submitCtaLoading": "Finishing…"
+        },
+        "done": {
+          "title": "Done — you're sending from your domain",
+          "body": "Compose in Gmail, switch From to {target}, send. Receipts land in your inbox as usual.",
+          "backToDashboard": "Back to dashboard"
+        }
+      },
+      "errors": {
+        "copyFailed": "Your browser blocked clipboard access. Select the value and copy it by hand.",
+        "checkboxRequired": "Please confirm you've added and verified the address in Gmail."
+      }
     }
   },
   "footer": {
