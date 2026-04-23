@@ -1038,6 +1038,22 @@ function mapSmtpConfigError(e: unknown): ActionError {
 export async function prepareGmailStep(input: {
   runId: string;
 }): Promise<GmailPrepareOk | ActionError> {
+  // TEMP (Ticket #6 etap 3 pre-check): verify env accessibility at
+  // runtime on Vercel Preview. Will be removed in cleanup commit once
+  // Boris confirms smoke completed.
+  console.log(
+    "[prepareGmailStep] smtp_login_set:",
+    !!process.env.BREVO_SMTP_LOGIN,
+    "smtp_key_len:",
+    process.env.BREVO_SMTP_KEY?.length ?? 0,
+    "smtp_host:",
+    process.env.BREVO_SMTP_HOST ?? "undefined",
+    "smtp_port:",
+    process.env.BREVO_SMTP_PORT ?? "undefined",
+    "smtp_key_version:",
+    process.env.BREVO_SMTP_KEY_VERSION ?? "undefined",
+  );
+
   const parsed = gmailRunSchema.safeParse(input);
   if (!parsed.success) {
     return {
