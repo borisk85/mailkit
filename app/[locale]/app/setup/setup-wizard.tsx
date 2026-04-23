@@ -384,11 +384,55 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
                 });
                 return;
               }
+              // Resume path: existing run may already be past Brevo or
+              // deep into the Gmail wizard. Route the UI to the matching
+              // kind instead of always dropping onto the "Continue to
+              // Brevo" CTA.
+              const zoneName = chosen.name;
+              if (
+                result.runStatus === "brevo_done" ||
+                result.runStatus === "gmail_instructions_shown" ||
+                result.runStatus === "gmail_smtp_ready" ||
+                result.runStatus === "gmail_send_as_verified" ||
+                result.runStatus === "done"
+              ) {
+                setState({
+                  kind: "brevo_done",
+                  runId: result.runId,
+                  zoneName,
+                  mailboxLocal,
+                  destinationEmail: result.destinationEmail,
+                });
+                return;
+              }
+              if (
+                result.runStatus === "brevo_sender_created" ||
+                result.runStatus === "brevo_dns_written" ||
+                result.runStatus === "brevo_verified"
+              ) {
+                const reached: "sender" | "dns" | "verify" =
+                  result.runStatus === "brevo_sender_created"
+                    ? "sender"
+                    : result.runStatus === "brevo_dns_written"
+                      ? "dns"
+                      : "verify";
+                setState({
+                  kind: "brevo_awaiting_retry",
+                  runId: result.runId,
+                  cfToken: state.token,
+                  zoneName,
+                  mailboxLocal,
+                  destinationEmail: result.destinationEmail,
+                  errorKey: "setup.errors.brevo_verify_timeout",
+                });
+                void reached;
+                return;
+              }
               setState({
                 kind: "cf_done_pending_brevo",
                 runId: result.runId,
                 cfToken: state.token,
-                zoneName: chosen.name,
+                zoneName,
                 mailboxLocal,
                 destinationEmail: result.destinationEmail,
               });

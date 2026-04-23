@@ -69,11 +69,23 @@ type VerifyOk = {
 type StartSetupOk = {
   status: "ok";
   runId: string;
+  // Any valid status the run might already be in. The anti-double-click
+  // resume path returns the existing row as-is so the UI can route to
+  // the right stage without forcing the user back through earlier steps.
   runStatus:
-    | "cf_done"
-    | "cf_awaiting_destination_verify"
+    | "cf_routing_enabled"
     | "cf_dns_written"
-    | "cf_routing_enabled";
+    | "cf_awaiting_destination_verify"
+    | "cf_rule_created"
+    | "cf_done"
+    | "brevo_sender_created"
+    | "brevo_dns_written"
+    | "brevo_verified"
+    | "brevo_done"
+    | "gmail_instructions_shown"
+    | "gmail_smtp_ready"
+    | "gmail_send_as_verified"
+    | "done";
   destinationEmail: string;
 };
 
@@ -649,6 +661,17 @@ const BREVO_RESUMABLE = new Set([
   "brevo_verified",
 ]);
 
+// Statuses past brevo_done — Brevo already finished, continueBrevoSetup
+// is a no-op idempotent "already done" response so a stale click from
+// the CTA does not reject with run_wrong_state.
+const BREVO_ALREADY_DONE = new Set([
+  "brevo_done",
+  "gmail_instructions_shown",
+  "gmail_smtp_ready",
+  "gmail_send_as_verified",
+  "done",
+]);
+
 const BREVO_VERIFY_POLL_DELAYS_MS = [2000, 4000, 8000] as const;
 const BREVO_SPF_INCLUDE_HOST = "spf.brevo.com";
 
@@ -754,6 +777,18 @@ export async function continueBrevoSetup(input: {
   if (!row || row.user_id !== user.id) {
     return { status: "error", errorKey: "setup.errors.run_not_found" };
   }
+
+  // Idempotency: if Brevo already done (or caller is deep into Gmail),
+  // report success with the actual runStatus so the UI lands on the
+  // matching kind instead of forcing the user through Brevo again.
+  if (BREVO_ALREADY_DONE.has(row.status)) {
+    return {
+      status: "ok",
+      runId: row.id,
+      runStatus: "brevo_done",
+    };
+  }
+
   if (!BREVO_RESUMABLE.has(row.status)) {
     return { status: "error", errorKey: "setup.errors.run_wrong_state" };
   }
