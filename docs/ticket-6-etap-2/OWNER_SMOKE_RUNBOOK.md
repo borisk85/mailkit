@@ -5,7 +5,8 @@
 
 ## Pre-requisites (dev закрыл до передачи Boris)
 
-- [ ] Preview URL доступен: `https://mailkit-git-feat-ticket-6-gmail-wizard-bkomarov85-2187s-projects.vercel.app/en/app/setup` отвечает 200 + Google OAuth redirect работает (Supabase `uri_allow_list` wildcard с #4b покрывает preview автоматом).
+- [ ] Preview URL для Boris: **`https://mailkit-git-feat-ticket-6-gmai-bf023c-bkomarov85-2187s-projects.vercel.app/en/app/setup`** (truncated branch alias — Vercel хеширует длинные branch names; full-name URL `mailkit-git-feat-ticket-6-gmail-wizard-*` **не резолвится** из-за длины). Альтернатива: берем SHA-URL текущего top deploy из Vercel Dashboard → Deployments. Отвечает 200 + Google OAuth redirect работает (Supabase `uri_allow_list` wildcard с #4b покрывает preview автоматом).
+- [ ] Direct hit на `/app/setup/gmail-step` теперь redirect'ит на `/app/setup` (commit `9111744`) — старый placeholder "Gmail Send-As — coming soon" больше не рендерится, бросает обратно в inline wizard.
 - [ ] Env-check debug log committed (commit `3bd4f5e`). Первый вызов `prepareGmailStep` пишет в Vercel logs: `smtp_login_set:true smtp_key_len:<N> smtp_host:smtp-relay.brevo.com smtp_port:587 smtp_key_version:<N>`. Если `smtp_login_set:false` или `smtp_key_len:0` — Boris re-save в Vercel env vars, rebuild, retry.
 - [ ] 20 Playwright screenshots + lh-preview.txt коммитнуты (см. PR #12).
 - [ ] Second inbox для доставки теста — **внешний** (не `bkomarov85@gmail.com`). Предлагаю: Yandex / Outlook / любой ящик Boris на другом провайдере. В runbook ниже обозначаю как `<external@>`.
