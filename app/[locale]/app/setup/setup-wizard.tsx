@@ -1357,6 +1357,12 @@ function GmailWizard({
                   setCheckboxError(true);
                   return;
                 }
+                // Auto-advance past the last card so all six show as done
+                // before the terminal panel replaces the wizard. Keeps
+                // the visual continuity even if confirmGmailSendAs is
+                // instant — user sees 6/6 checkmarks, not a mid-flight
+                // "step 5 active" snapshot.
+                setCurrentIdx(total);
                 onComplete();
               }}
             />

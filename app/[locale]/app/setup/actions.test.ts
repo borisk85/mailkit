@@ -1060,7 +1060,7 @@ describe("continueBrevoSetup — failure paths", () => {
     vi.useRealTimers();
   });
 
-  test("already-authenticated domain short-circuits to brevo_done without DNS or verify", async () => {
+  test("already-authenticated domain — SPF merged + DMARC upserted, DKIM/brevo-code preserved, no verify polling", async () => {
     process.env.BREVO_API_KEY = "brevo-test-key";
     const admin = makeAdminStub([cfDoneRow()]);
     vi.mocked(sbModule.createServiceClient).mockReturnValue(
@@ -1105,15 +1105,141 @@ describe("continueBrevoSetup — failure paths", () => {
 
     expect(result.status).toBe("ok");
     if (result.status === "ok") expect(result.runStatus).toBe("brevo_done");
-    // DNS and verify MUST be skipped entirely.
-    expect(cf.createDnsRecord).not.toHaveBeenCalled();
-    expect(cf.updateDnsRecord).not.toHaveBeenCalled();
+
+    // DKIM + brevo-code writes MUST be skipped — Brevo didn't emit them
+    // (authenticated domain short-circuits the create-sender response).
+    const dkimCreateCalls = cf.createDnsRecord.mock.calls.filter((c) => {
+      const rec = c[1] as { content?: string };
+      return (
+        rec.content?.startsWith("v=DKIM") ||
+        rec.content?.includes("brevo-code:")
+      );
+    });
+    const dkimUpdateCalls = cf.updateDnsRecord.mock.calls.filter((c) => {
+      const rec = c[2] as { content?: string };
+      return (
+        rec.content?.startsWith("v=DKIM") ||
+        rec.content?.includes("brevo-code:")
+      );
+    });
+    expect(dkimCreateCalls).toHaveLength(0);
+    expect(dkimUpdateCalls).toHaveLength(0);
+
+    // SPF merge ran — existing v=spf1 include:_spf.mx.cloudflare.net got
+    // include:spf.brevo.com appended via updateDnsRecord.
+    const spfUpdate = cf.updateDnsRecord.mock.calls.find((c) => {
+      const rec = c[2] as { content?: string };
+      return rec.content?.includes("include:spf.brevo.com");
+    });
+    expect(spfUpdate).toBeDefined();
+
+    // DMARC upsert ran — _dmarc.ex.com didn't exist in the stub, so
+    // createDnsRecord was invoked with v=DMARC1 payload.
+    const dmarcCreate = cf.createDnsRecord.mock.calls.find((c) => {
+      const rec = c[1] as { content?: string; name?: string };
+      return (
+        rec.name === "_dmarc.ex.com" && rec.content?.startsWith("v=DMARC1")
+      );
+    });
+    expect(dmarcCreate).toBeDefined();
+
+    // Brevo's verify poll MUST NOT run — domain is already authenticated,
+    // we fast-path through brevo_verified to brevo_done.
     expect(brevoStub.verifyDomain).not.toHaveBeenCalled();
-    // Status jumps straight to brevo_done, flag recorded for observability.
+
+    // Terminal status with the already_authenticated flag for observability.
     expect(admin.rows[0].status).toBe("brevo_done");
     const brevoState = admin.rows[0].cf_state.brevo as Record<string, unknown>;
     expect(brevoState.already_authenticated).toBe(true);
     expect(brevoState.sender_id).toBe(77);
+    const dns = brevoState.dns as Record<string, { action: string }>;
+    expect(dns.spf).toBeDefined();
+    expect(dns.dmarc).toBeDefined();
+    expect(dns.dkim).toBeUndefined();
+    expect(dns.brevo_code).toBeUndefined();
+  });
+
+  test("already-authenticated + existing Brevo SPF → SPF upsert skipped (idempotent)", async () => {
+    process.env.BREVO_API_KEY = "brevo-test-key";
+    const admin = makeAdminStub([cfDoneRow()]);
+    vi.mocked(sbModule.createServiceClient).mockReturnValue(
+      admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
+    );
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAnonStubWithUser({
+        id: "u1",
+        email: "me@g.com",
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
+
+    // CF stub variant: SPF already contains the Brevo include plus a
+    // matching DMARC record, so addSpfInclude noops and upsertDnsByPattern
+    // sees exact content match on both.
+    const cf = makeCfForBrevo();
+    cf.listDnsRecords = vi.fn(
+      async (_z: string, filter?: { type?: string; name?: string }) => {
+        if (filter?.type === "TXT" && filter.name === "ex.com") {
+          return [
+            {
+              id: "spf-existing",
+              type: "TXT",
+              name: "ex.com",
+              content:
+                "v=spf1 include:_spf.mx.cloudflare.net include:spf.brevo.com ~all",
+              ttl: 1,
+            },
+          ];
+        }
+        if (filter?.type === "TXT" && filter.name === "_dmarc.ex.com") {
+          return [
+            {
+              id: "dmarc-existing",
+              type: "TXT",
+              name: "_dmarc.ex.com",
+              content: "v=DMARC1; p=none; rua=mailto:postmaster@ex.com",
+              ttl: 1,
+            },
+          ];
+        }
+        return [];
+      },
+    );
+    vi.mocked(cfModule.createCloudflareClient).mockReturnValue(
+      cf as unknown as ReturnType<typeof cfModule.createCloudflareClient>,
+    );
+
+    const brevoStub = {
+      createSenderDomain: vi.fn().mockResolvedValue({
+        domain: {
+          id: 77,
+          domain_name: "ex.com",
+          authenticated: true,
+          verified: true,
+        },
+        created: false,
+      }),
+      getSenderDomain: vi.fn(),
+      listSenderDomains: vi.fn(),
+      verifyDomain: vi.fn(),
+    };
+    vi.mocked(brevoModule.createBrevoClient).mockReturnValue(
+      brevoStub as unknown as ReturnType<typeof brevoModule.createBrevoClient>,
+    );
+
+    const result = await continueBrevoSetup({
+      runId: BREVO_RUN_ID,
+      cfToken: "cf_token_longer_than_20_chars",
+    });
+
+    expect(result.status).toBe("ok");
+    if (result.status === "ok") expect(result.runStatus).toBe("brevo_done");
+
+    // Exact-content matches → no DNS writes at all. upsertDnsByPattern
+    // returns action:"skipped" for both SPF and DMARC.
+    expect(cf.createDnsRecord).not.toHaveBeenCalled();
+    expect(cf.updateDnsRecord).not.toHaveBeenCalled();
+
+    expect(admin.rows[0].status).toBe("brevo_done");
   });
 
   test("pending domain without DKIM records → brevo_state_unrecoverable errorKey", async () => {

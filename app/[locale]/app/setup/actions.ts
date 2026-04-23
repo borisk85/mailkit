@@ -760,9 +760,6 @@ export async function continueBrevoSetup(input: {
   }
 
   const brevoKey = process.env.BREVO_API_KEY;
-  console.log(
-    `[continueBrevoSetup] runId=${parsed.data.runId} user=${user.id} BREVO_API_KEY_len=${brevoKey?.length ?? "undefined"} prefix=${brevoKey ? brevoKey.slice(0, 8) : "n/a"}`,
-  );
   if (!brevoKey) {
     return { status: "error", errorKey: "setup.errors.brevo_invalid_token" };
   }
@@ -815,37 +812,12 @@ export async function continueBrevoSetup(input: {
       const { domain: created, created: wasCreated } =
         await brevo.createSenderDomain(zoneName);
       domain = created;
-
-      // Short-circuit: if the Brevo sender domain is already authenticated
-      // (prior setup on the same shared account + domain), Brevo does not
-      // return DKIM / brevo-code records in the GET response — they're
-      // already written in DNS and the domain is verified. Skip DNS write
-      // and verify steps entirely and mark the run brevo_done.
-      if (created.authenticated) {
-        brevoState = {
-          ...brevoState,
-          domain: created,
-          sender_id: created.id,
-          sender_created: wasCreated,
-          already_authenticated: true,
-        };
-        await patchBrevoState(admin, row.id, {
-          status: "brevo_done",
-          brevoState,
-          step: STEP.brevoFinalize,
-        });
-        return {
-          status: "ok",
-          runId: row.id,
-          runStatus: "brevo_done",
-        };
-      }
-
       brevoState = {
         ...brevoState,
         domain: created,
         sender_id: created.id,
         sender_created: wasCreated,
+        ...(created.authenticated ? { already_authenticated: true } : {}),
       };
       await patchBrevoState(admin, row.id, {
         status: "brevo_sender_created",
@@ -856,75 +828,71 @@ export async function continueBrevoSetup(input: {
     } else if (!domain) {
       // Resuming at brevo_sender_created+ without cached domain → refetch.
       domain = await brevo.getSenderDomain(zoneName);
-      brevoState = { ...brevoState, domain, sender_id: domain.id };
-    }
-
-    // Step 2: DNS upsert (DKIM + brevo-code + DMARC + SPF merge).
-    if (runStatus === "brevo_sender_created") {
-      const dkim = domain.dkim_record;
-      const brevoCode = domain.brevo_code_record;
-      if (!dkim || !brevoCode) {
-        throw new BrevoError({
-          message: "Brevo response missing DKIM or brevo-code record",
-          code: "missing_records",
-          httpStatus: 0,
-        });
-      }
-      const dkimRes = await upsertDnsByPattern(cf, zoneId, {
-        pattern: "v=dkim1",
-        record: {
-          type: "TXT",
-          name: dkim.hostname,
-          content: dkim.value,
-          ttl: 1,
-        },
-      });
-      const brevoCodeRes = await upsertDnsByPattern(cf, zoneId, {
-        pattern: "brevo-code:",
-        record: {
-          type: "TXT",
-          name: brevoCode.hostname,
-          content: brevoCode.value,
-          ttl: 1,
-        },
-      });
-      const dmarcRes = await upsertDnsByPattern(cf, zoneId, {
-        pattern: "v=dmarc1",
-        record: {
-          type: "TXT",
-          name: `_dmarc.${zoneName}`,
-          content:
-            domain.dmarc_record?.value ??
-            `v=DMARC1; p=none; rua=mailto:postmaster@${zoneName}`,
-          ttl: 1,
-        },
-      });
-      // SPF merge: if an SPF exists on @, merge include:spf.brevo.com;
-      // otherwise create a minimal record.
-      const existingTxt = await cf.listDnsRecords(zoneId, {
-        type: "TXT",
-        name: zoneName,
-      });
-      const existingSpf = existingTxt.find((r) =>
-        r.content.toLowerCase().startsWith("v=spf1"),
-      );
-      const spfContent = existingSpf
-        ? addSpfInclude(existingSpf.content, BREVO_SPF_INCLUDE_HOST)
-        : `v=spf1 include:${BREVO_SPF_INCLUDE_HOST} ~all`;
-      const spfRes = await upsertDnsByPattern(cf, zoneId, {
-        pattern: "v=spf1",
-        record: { type: "TXT", name: zoneName, content: spfContent, ttl: 1 },
-      });
-
       brevoState = {
         ...brevoState,
-        dns: {
-          dkim: { id: dkimRes.id, action: dkimRes.action },
-          brevo_code: { id: brevoCodeRes.id, action: brevoCodeRes.action },
-          dmarc: { id: dmarcRes.id, action: dmarcRes.action },
-          spf: { id: spfRes.id, action: spfRes.action },
-        },
+        domain,
+        sender_id: domain.id,
+        ...(domain.authenticated ? { already_authenticated: true } : {}),
       };
+    }
+
+    // Once the sender exists, its authenticated state decides which DNS
+    // work is needed. DKIM + brevo_code are emitted by Brevo only on
+    // the non-authenticated path (first-time setup). SPF + DMARC are
+    // sender-side and must be ensured on every call — addSpfInclude and
+    // upsertDnsByPattern are both idempotent, so replaying on an
+    // already-correct zone is a no-op.
+    const alreadyAuthenticated = !!domain?.authenticated;
+
+    // Step 2: DNS upsert.
+    if (runStatus === "brevo_sender_created") {
+      const dnsActions: Record<string, { id: string; action: string }> = {};
+
+      if (!alreadyAuthenticated) {
+        const dkim = domain!.dkim_record;
+        const brevoCode = domain!.brevo_code_record;
+        if (!dkim || !brevoCode) {
+          throw new BrevoError({
+            message: "Brevo response missing DKIM or brevo-code record",
+            code: "missing_records",
+            httpStatus: 0,
+          });
+        }
+        const dkimRes = await upsertDnsByPattern(cf, zoneId, {
+          pattern: "v=dkim1",
+          record: {
+            type: "TXT",
+            name: dkim.hostname,
+            content: dkim.value,
+            ttl: 1,
+          },
+        });
+        const brevoCodeRes = await upsertDnsByPattern(cf, zoneId, {
+          pattern: "brevo-code:",
+          record: {
+            type: "TXT",
+            name: brevoCode.hostname,
+            content: brevoCode.value,
+            ttl: 1,
+          },
+        });
+        dnsActions.dkim = { id: dkimRes.id, action: dkimRes.action };
+        dnsActions.brevo_code = {
+          id: brevoCodeRes.id,
+          action: brevoCodeRes.action,
+        };
+      }
+
+      const { spf: spfRes, dmarc: dmarcRes } = await ensureBrevoDnsAuthRecords({
+        cf,
+        zoneId,
+        zoneName,
+        dmarcFromBrevo: domain?.dmarc_record?.value,
+      });
+      dnsActions.dmarc = { id: dmarcRes.id, action: dmarcRes.action };
+      dnsActions.spf = { id: spfRes.id, action: spfRes.action };
+
+      brevoState = { ...brevoState, dns: dnsActions };
       await patchBrevoState(admin, row.id, {
         status: "brevo_dns_written",
         brevoState,
@@ -933,33 +901,45 @@ export async function continueBrevoSetup(input: {
       runStatus = "brevo_dns_written";
     }
 
-    // Step 3: Brevo verify with polling.
+    // Step 3: Brevo verify. On already-authenticated domains, Brevo has
+    // nothing to poll — fast-path to verified. Non-authenticated path
+    // keeps the poll loop for fresh setups.
     if (runStatus === "brevo_dns_written") {
-      let verifiedDomain: SenderDomain | null = null;
-      let attempt = 0;
-      while (attempt <= BREVO_VERIFY_POLL_DELAYS_MS.length) {
-        const d = await brevo.verifyDomain(zoneName);
-        if (d.authenticated || d.verified) {
-          verifiedDomain = d;
-          break;
+      if (alreadyAuthenticated) {
+        brevoState = { ...brevoState, verified: true };
+        await patchBrevoState(admin, row.id, {
+          status: "brevo_verified",
+          brevoState,
+          step: STEP.brevoVerify,
+        });
+        runStatus = "brevo_verified";
+      } else {
+        let verifiedDomain: SenderDomain | null = null;
+        let attempt = 0;
+        while (attempt <= BREVO_VERIFY_POLL_DELAYS_MS.length) {
+          const d = await brevo.verifyDomain(zoneName);
+          if (d.authenticated || d.verified) {
+            verifiedDomain = d;
+            break;
+          }
+          if (attempt === BREVO_VERIFY_POLL_DELAYS_MS.length) break;
+          await sleepMs(BREVO_VERIFY_POLL_DELAYS_MS[attempt]);
+          attempt += 1;
         }
-        if (attempt === BREVO_VERIFY_POLL_DELAYS_MS.length) break;
-        await sleepMs(BREVO_VERIFY_POLL_DELAYS_MS[attempt]);
-        attempt += 1;
+        if (!verifiedDomain) {
+          return {
+            status: "error",
+            errorKey: "setup.errors.brevo_verify_timeout",
+          };
+        }
+        brevoState = { ...brevoState, domain: verifiedDomain, verified: true };
+        await patchBrevoState(admin, row.id, {
+          status: "brevo_verified",
+          brevoState,
+          step: STEP.brevoVerify,
+        });
+        runStatus = "brevo_verified";
       }
-      if (!verifiedDomain) {
-        return {
-          status: "error",
-          errorKey: "setup.errors.brevo_verify_timeout",
-        };
-      }
-      brevoState = { ...brevoState, domain: verifiedDomain, verified: true };
-      await patchBrevoState(admin, row.id, {
-        status: "brevo_verified",
-        brevoState,
-        step: STEP.brevoVerify,
-      });
-      runStatus = "brevo_verified";
     }
 
     // Step 4: finalize.
@@ -981,6 +961,58 @@ export async function continueBrevoSetup(input: {
     await failRun(admin, row.id, STEP.brevoCreateSender, errMsg(e));
     return mapBrevoError(e);
   }
+}
+
+/**
+ * Always-run sender-side DNS: SPF merge + DMARC upsert. Split out of
+ * the gated DKIM+brevo_code block so that Brevo domains re-encountered
+ * in the already-authenticated short-circuit still get their SPF/DMARC
+ * ensured. Both helpers are idempotent: addSpfInclude returns the same
+ * record when the Brevo include is already present, and
+ * upsertDnsByPattern matches content before writing.
+ */
+async function ensureBrevoDnsAuthRecords(args: {
+  cf: CloudflareClient;
+  zoneId: string;
+  zoneName: string;
+  dmarcFromBrevo?: string | null;
+}): Promise<{
+  spf: { id: string; action: string };
+  dmarc: { id: string; action: string };
+}> {
+  const { cf, zoneId, zoneName, dmarcFromBrevo } = args;
+
+  const existingTxt = await cf.listDnsRecords(zoneId, {
+    type: "TXT",
+    name: zoneName,
+  });
+  const existingSpf = existingTxt.find((r) =>
+    r.content.toLowerCase().startsWith("v=spf1"),
+  );
+  const spfContent = existingSpf
+    ? addSpfInclude(existingSpf.content, BREVO_SPF_INCLUDE_HOST)
+    : `v=spf1 include:${BREVO_SPF_INCLUDE_HOST} ~all`;
+  const spfRes = await upsertDnsByPattern(cf, zoneId, {
+    pattern: "v=spf1",
+    record: { type: "TXT", name: zoneName, content: spfContent, ttl: 1 },
+  });
+
+  const dmarcContent =
+    dmarcFromBrevo ?? `v=DMARC1; p=none; rua=mailto:postmaster@${zoneName}`;
+  const dmarcRes = await upsertDnsByPattern(cf, zoneId, {
+    pattern: "v=dmarc1",
+    record: {
+      type: "TXT",
+      name: `_dmarc.${zoneName}`,
+      content: dmarcContent,
+      ttl: 1,
+    },
+  });
+
+  return {
+    spf: { id: spfRes.id, action: spfRes.action },
+    dmarc: { id: dmarcRes.id, action: dmarcRes.action },
+  };
 }
 
 async function patchBrevoState(
@@ -1073,22 +1105,6 @@ function mapSmtpConfigError(e: unknown): ActionError {
 export async function prepareGmailStep(input: {
   runId: string;
 }): Promise<GmailPrepareOk | ActionError> {
-  // TEMP (Ticket #6 etap 3 pre-check): verify env accessibility at
-  // runtime on Vercel Preview. Will be removed in cleanup commit once
-  // Boris confirms smoke completed.
-  console.log(
-    "[prepareGmailStep] smtp_login_set:",
-    !!process.env.BREVO_SMTP_LOGIN,
-    "smtp_key_len:",
-    process.env.BREVO_SMTP_KEY?.length ?? 0,
-    "smtp_host:",
-    process.env.BREVO_SMTP_HOST ?? "undefined",
-    "smtp_port:",
-    process.env.BREVO_SMTP_PORT ?? "undefined",
-    "smtp_key_version:",
-    process.env.BREVO_SMTP_KEY_VERSION ?? "undefined",
-  );
-
   const parsed = gmailRunSchema.safeParse(input);
   if (!parsed.success) {
     return {
