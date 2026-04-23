@@ -62,6 +62,18 @@ UI»*. Два источника SMTP credentials там: (a) env-vars
 /v3/account.email` + API key как password (исторический "master SMTP
 password = API key" pattern).
 
+**⚠️ Gotcha на fallback (2026-04-23 live smoke Ticket #6):** fallback
+option (b) в spike'е больше не работает. `GET /v3/account.email`
+возвращает адрес логина в Brevo Dashboard (e.g. `bkomarov85@gmail.com`),
+а SMTP relay требует **auto-generated SMTP login** формата
+`<accountID>@smtp-brevo.com`. Эти два значения разные и не
+взаимозаменяемы. Боевой SMTP login находится в `app.brevo.com → SMTP
+& API → SMTP tab → "Login" field` — только оттуда берем. Использование
+account email даёт `535 Authentication failed` на первом же SMTP
+connect'е от Gmail. В prod flow не используем fallback вообще — только
+env vars `BREVO_SMTP_LOGIN` (заполненный из SMTP Login field) +
+`BREVO_SMTP_KEY`.
+
 **Production решение (#6):** env-only, без fallback. Owner один раз
 генерит SMTP key в Brevo UI, кладет в Vercel env
 (`BREVO_SMTP_HOST=smtp-relay.brevo.com`, `BREVO_SMTP_PORT=587`,

@@ -328,6 +328,67 @@ Design этот не менять — Brevo нам не подконтролен
 Brevo integration (cost уровня entire Ticket #4b). До этого shared —
 наш контракт.
 
+## 2026-04-23 — Brevo SMTP login ≠ account email (wrong directive during #6 env setup)
+
+### Симптом
+Ticket #6 live smoke на `mailkit-test.ru`. Boris дошел до Gmail Step 3
+(SMTP config), вставил host/port/username/password в Gmail Send-As диалог,
+Gmail отклонил с `535 Authentication failed`. Причина всплыла через
+~30 минут: `BREVO_SMTP_LOGIN` в Vercel env был заполнен account email
+(`bkomarov85@...`), а не auto-generated SMTP login.
+
+### Причина
+Во время pre-etap-1 research я сверился с Python spike и передал
+owner'у директиву заполнить `BREVO_SMTP_LOGIN` как «account email from
+`GET /v3/account.email`». Spike fallback в
+[reference/spike/modules/brevo.py:169-199](../reference/spike/modules/brevo.py)
+действительно делал так — исторически (до 2024) Brevo SMTP relay
+принимал account email + API key как master credential. На момент #6
+(2026-04) Brevo уже требует **dedicated SMTP login** формата
+`<accountID>@smtp-brevo.com`, который генерится отдельно и живет в
+`app.brevo.com → SMTP & API → SMTP tab → "Login" field`. Account email
+с этого эндпоинта — это логин юзера в Dashboard, не SMTP identity.
+
+Два значения выглядят одинаково (оба email-формата), но валидны в
+разных местах:
+- Account email — для Brevo Dashboard login
+- SMTP login `<accountID>@smtp-brevo.com` — для SMTP relay auth
+
+### Фикс
+- Owner пересоздал значение `BREVO_SMTP_LOGIN` в Vercel env на реальный
+  SMTP login из Dashboard → SMTP tab → Login field. Preview redeploy
+  для cold-start env pickup → `prepareGmailStep` return payload →
+  wizard Step 3 корректный.
+- [.env.example](../.env.example) обновлен: коммент на
+  `BREVO_SMTP_LOGIN` теперь явно говорит «auto-generated
+  `<accountID>@smtp-brevo.com`, NOT account email; value from SMTP Login
+  field in Dashboard».
+- [docs/SPIKE_FINDINGS.md](SPIKE_FINDINGS.md) раздел «Brevo SMTP
+  credentials — API НЕ СУЩЕСТВУЕТ» расширен ⚠️ gotcha про fallback
+  option (b) — spike fallback больше не работает, только env vars из
+  реального SMTP Login field.
+
+### Правило
+**Prior-art в spike != evergreen.** Python spike прогнан 2026-04-20; то
+что работало там, не обязательно работает на момент разработки feature
+ticket'а через 3+ дня. Особенно для third-party APIs с моделью «legacy
+compatibility window → breaking change». Перед тем как передавать
+owner'у env-setup директиву:
+
+1. Сверься не только со spike, но и с **актуальной** Dashboard UI
+   (руками открой соответствующий tab, сверь какое именно поле под
+   какую переменную мапится). Spike 3+ дня старше актуального
+   third-party UX — принимать за evergreen нельзя.
+2. Если директива про external integration setup — добавляй шаг
+   verification: «owner пишет обратно `echo $BREVO_SMTP_LOGIN | head -c
+   25` — должно начинаться с цифр аккаунта, не буквы». Дешёвый sanity
+   check что mapped правильное поле из Dashboard.
+3. Gotchas в `docs/SPIKE_FINDINGS.md` обновляем live в день инцидента,
+   не копим на ревизию — follow-up dev должен найти актуальное guidance
+   сразу, а не через conflict с устаревшим текстом.
+
+Костяк применим к CF / Brevo / Gmail и любым future integrations.
+
 ## 2026-04-22/23 — Preview vs prod Lighthouse: разные измерительные среды
 
 ### Симптом
