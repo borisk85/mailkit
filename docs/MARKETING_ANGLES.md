@@ -74,6 +74,26 @@ SPF/DKIM. MailKit реально все настраивает.
 - Hook: "No DNS knowledge required. We handle the technical part."
 - Channels: SMB blogs, Product Hunt
 
+**Quaternary — SMB owners (shops, services, consultants):**
+- Pain: "хочу info@mybiz.com для профессионализма в переписке с клиентами,
+  но Google Workspace $6/мес на человека — лишние деньги"
+- Hook: "Professional email on your domain for $5 one-time. Without the
+  monthly Workspace subscription."
+- Channels: SMB Facebook groups, LinkedIn, Reddit r/smallbusiness, RU —
+  VK groups, Telegram каналы для предпринимателей
+- Важно: для них нужны **реальные Gmail screenshots** на 6-шагов wizard
+  (не только schematic diagrams) — они боятся запутаться в Gmail UI.
+  Tech debt в TICKETS_BACKLOG.md.
+
+**Quinary — Non-English entrepreneurs (RU и другие):**
+- Pain: "RU SMB — Google Workspace overkill по цене, но хочу domain email"
+- Hook: "Почта на домене за 5 минут. Гарантия возврата денег."
+- Channels: VK, Telegram, RU entrepreneur communities
+- Важно: tone of voice на русском — не переведенный EN маркетинг, а
+  native-copy с учетом локальных expectation'ов. Русский SMB больше
+  нуждается в "мы держим тебя за руку" tone'е, меньше — в indie-hacker
+  шорткат-vibe'е.
+
 ## Objection handling (готовые ответы)
 
 | Возражение | Ответ |
@@ -83,6 +103,8 @@ SPF/DKIM. MailKit реально все настраивает.
 | "Почему не Zoho / Google Workspace?" | "Они ЗАМЕНЯЮТ Gmail. Мы его ДОПОЛНЯЕМ. Ты остаешься в привычном инбоксе." |
 | "3-минутный Gmail-шаг — это не полная автоматизация" | "Честно: 70% шагов авто, 100% технической сложности авто. Ты не путаешься в SPF/DKIM — делаешь 3 клика copy-paste под guide." |
 | "Что если сломается потом?" | "Monitoring $3/мес: мониторим ежедневно, алертим если что." |
+| "А если у вас автоматика не сработает?" | "Автоматический refund в 24 часа, без запроса. Мы видим сбой, возвращаем деньги сами. См. /guarantee." |
+| "А если через неделю перестанет работать?" | "30-дневная функциональная гарантия. Напиши в support — починим или вернем деньги полностью." |
 
 ## Tagline candidates (для A/B на лендинге)
 

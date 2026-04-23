@@ -24,7 +24,70 @@
 - #5 Onboarding UI wizard
 - #6 Gmail Send-As guided step UI
 - #7 Lemon Squeezy payment ($5 single SKU)
+  - **Включить в scope #7 (обязательно до launch):**
+    - Webhook handler для `order.paid` / `order.refunded` events от Lemon
+      Squeezy → обновление `purchases` table + `refunds` audit log.
+    - Auto-refund trigger при `setup_runs.status → failed` где
+      `failed_step ∈ {cf_*, brevo_*}` → вызов Lemon Squeezy `POST /refunds`
+      API + email уведомление юзеру. Если `failed_step` = `gmail_*` —
+      user-side issue, refund только через 30-day canal (не auto).
+    - `refunds` table в Supabase (см. migration в #16 ниже) + RLS.
+    - Full guarantee policy в [docs/GUARANTEE_POLICY.md](GUARANTEE_POLICY.md).
 - #11 Landing copy polish + demo video
+  - **Включить в scope #11:**
+    - Обновить tagline/hero с новой guarantee формулировкой (option A —
+      `Guaranteed*` с fine-print ссылкой на `/guarantee`) по текстам из
+      [docs/GUARANTEE_POLICY.md](GUARANTEE_POLICY.md) → "Customer-facing
+      wording" → "Landing hero" + "Trust block".
+    - FAQ секция добавить Q&A про guarantee — EN + RU копии из policy doc.
+    - **Real Gmail UI screenshots** для 6-шагов wizard'а (заменяют SVG
+      mini-diagrams). EN + RU Gmail интерфейсы (есть различия). Placement:
+      `/public/screenshots/gmail-step-{1..6}.{en,ru}.webp`. Critical для
+      SMB / non-tech audience segment — они запутываются в text-only
+      инструкциях. Варианты получения: (a) Playwright automated capture
+      на реальном Gmail test-аккаунте, (b) вручную захватить + оптимизовать
+      через `sharp`. Оценка: (a) 2-3 часа работы dev, (b) 1-2 часа owner.
+      Рекомендую (a) если Playwright справится с OAuth + Gmail UI state,
+      иначе (b). В #6 UI сейчас schematic diagrams — они out-of-scope-style
+      как placeholder, заменяются real screenshots в #11.
+
+## 📄 Guarantee infrastructure (MUST fix before launch)
+- #16 `refunds` table migration + RLS
+  - Columns: `id uuid pk`, `run_id fk setup_runs`, `purchase_id fk purchases`,
+    `amount numeric`, `currency text`, `reason enum(automation_failure,
+    functional_30day_request, fraud_dispute, manual_support_discretion)`,
+    `triggered_by enum(system, support, user_dispute)`, `lemon_squeezy_refund_id text`,
+    `created_at timestamptz`, `notes text`.
+  - RLS: SELECT only through service_role (audit-only table).
+- #17 `/guarantee` static page
+  - Route: `/[locale]/guarantee/page.tsx` server component, статическая
+    страница с EN/RU текстом из
+    [docs/GUARANTEE_POLICY.md](GUARANTEE_POLICY.md) → "Formal policy" →
+    "EN (canonical)" для `/en/guarantee`, "RU (canonical перевод)" для
+    `/ru/guarantee`. Без интерактивности, SSG. Linked из footer лендинга,
+    из Trust block, из FAQ, из receipt email'а.
+  - Acceptance: Lighthouse ≥95 Perf на обе локали (страница text-only,
+    no-brainer).
+- #18 Lemon Squeezy refund webhook + automation trigger
+  - Входит в scope #7 (см. выше), выделяю отдельным тикетом для ясности
+    блокера до launch.
+  - Webhook endpoint `/api/webhooks/lemon-squeezy` — обработка
+    `order.refunded` → log в `refunds` + email уведомление.
+  - Internal trigger — cron / event listener на `setup_runs.status → failed`
+    с `failed_step ∈ {cf_*, brevo_*}` → вызов Lemon Squeezy refund API →
+    log + email. Idempotent (один refund на run, не дублировать).
+- #19 ToS page + обновить existing footer links
+  - Если ToS страница уже существует — обновить section "Refunds" текстом
+    из `GUARANTEE_POLICY.md` → "Formal policy" → "EN (canonical)". Если нет
+    — создать `/legal/terms` с полным ToS включая refund policy. Вне
+    scope этого бэклога детально расписывать всю ToS (другие секции —
+    privacy, liability, etc. — owner с юристом по-хорошему когда будет
+    время / revenue).
+- #20 Support email template для functional refund requests
+  - Готовый шаблон в `docs/` (новая папка `docs/support-templates/`?) для
+    support-оператора: как ответить на refund request, что проверить в
+    Supabase (user_id → setup_runs → status = done, purchase_id),
+    decision tree "помогать чинить vs refund сразу".
 
 ## 🚫 Post-validation (do NOT build until ≥100 paying users or explicit architect approval)
 - #8 Self-serve diagnostics & re-setup flow

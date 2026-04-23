@@ -20,14 +20,34 @@ multi-domain, etc.) до явного разрешения после валид
 ## Quick context
 Hybrid MVP SaaS: automates Cloudflare Email Routing + Brevo SMTP setup on the
 user's domain, then guides the user through the Gmail Send-As final step via a
-3-minute copy-paste wizard. Target: **$5 per mailbox** setup for indie hackers
-with personal Gmail accounts.
+3-minute copy-paste wizard. **$5 per mailbox** setup.
 
-Marketing angles and objection handling: see [docs/MARKETING_ANGLES.md](docs/MARKETING_ANGLES.md)
+### Target audience (MVP)
 
-Post-launch support: 30-day guarantee + self-serve diagnostics + $3 re-setup
-or $3/mo monitoring subscription. See [docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md)
-"Post-launch Support Model".
+Широкая аудитория, не только indie hackers. Расширено 2026-04-23:
+
+1. **Indie hackers / solo developers** — хотят `hello@myproduct.com` вместо
+   личного Gmail. Технически грамотные, ценят шорткат.
+2. **SMB owners / малые предприниматели** — магазины, сервисы, консалтинг.
+   Хотят `info@mybiz.com` для профессионализма. Технически **не** грамотны
+   — наш wizard для них часто единственный способ.
+3. **Freelancers / consultants / coaches** — `hello@myname.com` для
+   client communication. Средний tech-level, время дороже технарства.
+4. **Small agencies (2-10 человек)** — настраивают custom email для
+   клиентов. Power-user потенциал через 3-mailbox bundle SKU (#10 в
+   backlog, post-validation).
+5. **Non-English entrepreneurs (RU, другие)** — SMB сегмент где Google
+   Workspace за $6/user/mo — дороговато, а domain email нужен для
+   доверия клиентов. EN/RU локализация first-class.
+
+Marketing angles и objection handling per сегменту: see
+[docs/MARKETING_ANGLES.md](docs/MARKETING_ANGLES.md)
+
+Post-launch support: 30-day functional guarantee + automation-failure
+auto-refund + self-serve diagnostics + $3 re-setup or $3/mo monitoring
+subscription. Full guarantee policy:
+[docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md). Support model details:
+[docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md) "Post-launch Support Model".
 
 Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
 (owner responsibility, not in code scope).
@@ -62,7 +82,11 @@ Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
   simple copy-paste actions."
 - **Never** say: "0 clicks", "full auto", "90% automation", "zero setup" — it's
   a stretch and breaks trust on first run.
-- Money-back guarantee if >5 minutes.
+- Guarantee: two-tier. Automation-failure auto-refund (if our CF/Brevo
+  setup fails on backend) + 30-day functional guarantee (if you can't
+  actually send/receive email via configured setup). NOT tied to user
+  pace on Gmail wizard step. Full policy:
+  [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md).
 
 ## Known constraints
 - Gmail `sendAs.create` blocked on personal @gmail (requires Workspace DWD)
@@ -70,7 +94,9 @@ Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
 - Chrome Extension planned for v2 to reduce Gmail step to ~20 sec (legal
   research + Chrome Store ToS review required BEFORE dev)
 - Brevo ops: single shared account handles all customer sender domains
-- Honest positioning: "5 min, guaranteed" — no "0 clicks" claims
+- Honest positioning: "5 min, guaranteed" — backed by two-tier policy in
+  [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md), not a loose
+  marketing claim
 - Vercel Framework Preset фиксируется при первом подключении repo.
   Если подключил до scaffold merge — руками поправить в Settings
   после merge. См. [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)

@@ -220,7 +220,12 @@ OAuth с scopes `gmail.settings.sharing` (на Workspace будет работа
 social proofs, не reviews-за-деньги.
 
 ### Money-back guarantee
-Не уложились в 5 минут — вернули деньги. Дешево, подчеркивает бренд-обещание.
+Two-tier policy: automation-failure auto-refund (our backend setup fails
+→ full refund автоматически в 24 часа, без запроса юзера) + 30-day
+functional guarantee (email не работает после setup → full refund по
+запросу в support). НЕ завязано на user pace в Gmail wizard step. Полный
+текст и customer-facing формулировки в
+[docs/GUARANTEE_POLICY.md](GUARANTEE_POLICY.md).
 
 ### Markets
 - **EN:** Product Hunt cold launch + Indie Hackers + X/Twitter build-in-public
@@ -263,7 +268,9 @@ social proofs, не reviews-за-деньги.
 - **Говорим о времени:** 5 минут — верхняя граница реального user-journey, никакого «0 minutes» или «0 clicks»
 - **Говорим о процессе:** «guided Gmail setup» а не «Gmail automation» — мы не
   автоматизируем, мы направляем
-- **Guarantee:** деньги назад если дольше 5 минут — подтверждает обещание делом
+- **Guarantee:** two-tier — automation-failure auto-refund + 30-day
+  functional guarantee. НЕ про user pace в Gmail шаге. Full policy:
+  [GUARANTEE_POLICY.md](GUARANTEE_POLICY.md)
 
 ---
 
