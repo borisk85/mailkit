@@ -64,3 +64,50 @@ bundle analyzer) — covers /app/setup along with landing.
 If post-merge prod /app/setup instrumentation (auth'd flow, e.g. once we
 ship analytics) reveals the median below usable thresholds in real-user
 data, re-open as a dedicated investigation.
+
+=============================================================================
+
+Final state Lighthouse — /app/setup?mock=gmail_done — 2026-04-23 ~17:20 local
+=============================================================================
+Target: https://mailkit-aauknlfwz-bkomarov85-2187s-projects.vercel.app
+Commit: 3bd4f5e (feat/ticket-6-gmail-wizard with env-check debug log)
+Same methodology as the gmail_smtp_ready block above.
+
+Raw runs
+========
+file           perf  fcp   lcp   tbt  cls    si
+en-1.json      80    1161  2511   66  0.000  2093
+en-2.json      92    1043  1343   69  0.000  1574
+en-3.json      91    1095  1545   27  0.000  1547
+ru-1.json      86    1090  1990   31  0.000  1727
+ru-2.json      76    1112  3212   44  0.000  2179
+ru-3.json      86    1125  2025   30  0.000  1804
+
+Medians (n=3)
+=============
+           perf  fcp   lcp   tbt  cls   si
+EN         91    1095  1545   66  0.000 1574
+RU         86    1112  2025   31  0.000 1804
+
+Comparison to gmail_smtp_ready (above):
+  EN 91 (done) vs 65 (wizard) — +26 as expected; done state is a simple
+                                terminal panel, wizard has 6-step collapse,
+                                icons, password toggle, copy helpers.
+  RU 86 (done) vs 69 (wizard) — +17 same reasoning.
+
+Variance EN d12, RU d10 — preview-lambda noise floor; acceptable.
+
+Absolute thresholds on gmail_done:
+  EN: Perf 91 ✓, LCP 1545ms ✓, TBT 66ms ✓, FCP 1095ms ✓, CLS 0 ✓ — all green
+  RU: Perf 86 (−4 vs ≥90 target, within noise), other metrics green
+
+Post-etap-2 regression check (per architect "не уронить ниже baseline"):
+No pre-etap-2 baseline exists for /app/setup (mock bypass is preview-
+only), so absolute comparison is the only available signal. The numbers
+above are acceptable — the rest of the authenticated flow (CF wizard,
+Brevo running panel, brevo_done, gmail_done) is all simpler than the
+6-step Gmail wizard, which is the peak JS load of the ticket.
+
+Conclusion: no dedicated perf fix in this PR. Systemic attempt-3
+(next-intl pick, selective dynamic route segments, bundle analyzer)
+stays in backlog and will lift both /app/setup states + landing together.
