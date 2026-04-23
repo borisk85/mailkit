@@ -249,6 +249,85 @@ CF Dashboard dropdown (не угадывай по логике). Для missing 
 идти в [CF API docs permissions reference](https://developers.cloudflare.com/fundamentals/api/reference/permissions/)
 или directly в [API method endpoint docs](https://developers.cloudflare.com/api/).
 
+## 2026-04-23 — Integration research: начинать с reference/spike/, не с public docs
+
+### Симптом
+Ticket #6 pre-flight research по Brevo SMTP credentials — 20 минут ушло
+на developers.brevo.com + help.brevo.com + context7 + web search пока
+я пытался найти programmatic endpoint для SMTP key management. Docs не
+ответили на ключевой вопрос (per-sender vs shared account-level), только
+косвенные сигналы. В итоге открыл `reference/spike/modules/brevo.py` —
+там на строке 172 прямым текстом: *«Brevo не отдает SMTP key через
+API — только через UI»* + working solution с env-vars fallback. 5 минут
+максимум вместо 20.
+
+### Причина
+Public docs написаны маркетологами, покрывают happy path, замалчивают
+отсутствующие возможности (особенно если это "gap in API surface" —
+компании не любят это документировать). Spike-код — результат
+живого trial-and-error: dev уже ударился головой обо все граничные
+случаи, обошел их, задокументировал (коммит + inline комменты с
+контекстом). Особенно для edge cases типа "а есть ли в этом API X",
+spike авторитетнее маркетинговых docs.
+
+У нас в `reference/spike/` лежат модули CF, Brevo, Gmail — покрывают
+все три наших внешних integration'а и все прошли end-to-end smoke на
+реальных доменах. Каждый раз когда возникает новый вопрос по integration
+(«есть ли такой endpoint», «что возвращает это поле в edge case»,
+«как хорошо это работает на shared account») — spike уже знает.
+
+### Правило
+**Research integration'ов (CF, Brevo, Gmail, любые будущие) начинаем с
+`reference/spike/`, потом docs.** Workflow:
+
+1. Открой соответствующий `reference/spike/modules/<integration>.py`.
+   Прочитай docstring + inline comments — там уже расписаны gotchas.
+2. Если spike отвечает на вопрос → используй это как source of truth,
+   проверь только что docs не поменяли behavior с момента спайка
+   (если спайку >6 месяцев).
+3. Если spike не покрывает твой вопрос → public docs + API reference.
+4. Если docs тоже не ответили → prototype на test-домене (у нас есть
+   `mailkit-test.ru`). В этом случае добавь findings в
+   `docs/SPIKE_FINDINGS.md` — для следующего dev'а.
+
+Это не отменяет docs lookup совсем — spike старше docs, API contracts
+меняются — но spike существенно сокращает deer-path-ing через
+сотни страниц docs.
+
+## 2026-04-23 — Shared Brevo SMTP credentials: design-ограничение зафиксировано
+
+### Симптом
+Архитекторский kickoff #6 предполагал API развилку "per-sender vs shared
+SMTP credentials" как open question; research показал что развилки нет —
+Brevo тупо не предоставляет API для SMTP key management, все shared
+account-level. Итоговый scope #6 упростился (не нужен
+`createSmtpCredential` / `getSmtpCredential` API client), но архитектурная
+посадка теперь навсегда shared: один SMTP key на всех customer'ов нашего
+Brevo account.
+
+### Причина
+Brevo архитектурно не разделяет outbound authentication от sender identity.
+Authentication (SMTP key) — account-level; sender identity
+(From-address) — domain-level через DKIM + brevo-code DNS records.
+Design этот не менять — Brevo нам не подконтролен.
+
+### Правило
+**Этот trade-off зафиксирован в [docs/SECURITY.md](SECURITY.md) раздел
+«Shared Brevo SMTP model».** Не переспрашивать «а почему per-sender не
+сделано» — не сделано потому что Brevo не дает такого API. Документ
+описывает:
+
+- Abuse vectors (shared surface, rotation cascade, IP reputation)
+- Compensating controls (rate limits, rotation plumbing, monitoring) —
+  все в backlog как tech debt, не блокеры для MVP
+- Non-persistence of SMTP password — password рендерится один раз в
+  UI через RSC, не пишется в DB
+
+Если когда-то в будущем Brevo добавит per-sender SMTP API либо мы решим
+уйти от shared-account модели — это будет архитектурный рефакторинг всей
+Brevo integration (cost уровня entire Ticket #4b). До этого shared —
+наш контракт.
+
 ## 2026-04-22/23 — Preview vs prod Lighthouse: разные измерительные среды
 
 ### Симптом

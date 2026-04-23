@@ -44,6 +44,47 @@
 **Результат:** `verified=true` достигается на первой итерации polling'а после
 того как DNS-записи прописаны через Cloudflare API.
 
+### Brevo SMTP credentials — API НЕ СУЩЕСТВУЕТ (Ticket #6 pre-flight)
+
+Нужно для Ticket #6 (Gmail Send-As wizard раздает SMTP login/key юзеру
+чтобы он вбил в Gmail Settings). Я проверил developers.brevo.com +
+help.brevo.com + OpenAPI spec + прогнал query в context7 по всей базе
+документации — endpoint'а для programmatic create/list/rotate SMTP keys
+**нет**. Управление SMTP keys полностью UI-only:
+`app.brevo.com/settings/keys/smtp` → SMTP tab → "Generate a new SMTP
+key". Можно сгенерировать несколько key'ев per account, но все они
+account-level (не scoped к sender/domain).
+
+Spike это уже знал. В [reference/spike/modules/brevo.py:169-199](../reference/spike/modules/brevo.py)
+явный комментарий: *«Brevo не отдает SMTP key через API — только через
+UI»*. Два источника SMTP credentials там: (a) env-vars
+`BREVO_SMTP_LOGIN` + `BREVO_SMTP_KEY`, (b) fallback через `GET
+/v3/account.email` + API key как password (исторический "master SMTP
+password = API key" pattern).
+
+**Production решение (#6):** env-only, без fallback. Owner один раз
+генерит SMTP key в Brevo UI, кладет в Vercel env
+(`BREVO_SMTP_HOST=smtp-relay.brevo.com`, `BREVO_SMTP_PORT=587`,
+`BREVO_SMTP_LOGIN`, `BREVO_SMTP_KEY`, опциональный
+`BREVO_SMTP_KEY_VERSION=1`). Модуль [lib/integrations/brevo-smtp.ts](../lib/integrations/brevo-smtp.ts)
+читает env, возвращает display-object для UI. Shared account-level
+credentials раздаются всем customer'ам — ограничения и abuse mitigations
+в [docs/SECURITY.md](SECURITY.md) раздел "Shared Brevo SMTP model".
+
+**From-address gate:** Brevo пропускает `sender.email` через domain-level
+DKIM + brevo-code records, не через per-sender registration. Нашему
+#4b pipeline'у достаточно `PUT /senders/domains/{d}/authenticate` +
+polling до `authenticated=true`. Отдельно делать `POST /senders` (для
+single-email sender verification через OTP) не требуется — это
+альтернативный flow для юзеров без DNS-контроля, к нашему кейсу не
+применим.
+
+**Предупреждение следующему dev'у:** если выпрыгнет задача «давайте
+генерить SMTP key per customer через API» — не трать время на поиск
+endpoint'а, его нет. Либо multi-account architecture (один Brevo account
+на customer, дорого и не scale'ится), либо принимаем shared model и
+строим rate-limit + monitoring compensating controls.
+
 ---
 
 ## Что НЕ работает через API
