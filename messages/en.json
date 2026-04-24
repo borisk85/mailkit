@@ -23,6 +23,18 @@
       "dismiss": "Dismiss banner"
     },
     "header": {
+      "logo": "MailKit",
+      "nav": {
+        "pricing": "Pricing",
+        "howItWorks": "How it works",
+        "faq": "FAQ"
+      },
+      "signIn": "Sign in",
+      "languageSwitcher": {
+        "label": "Language",
+        "en": "English",
+        "ru": "Русский"
+      },
       "themeToggle": {
         "switchToLight": "Switch to light mode",
         "switchToDark": "Switch to dark mode"

@@ -23,6 +23,18 @@
       "dismiss": "Закрыть баннер"
     },
     "header": {
+      "logo": "MailKit",
+      "nav": {
+        "pricing": "Цены",
+        "howItWorks": "Как это работает",
+        "faq": "Вопросы"
+      },
+      "signIn": "Войти",
+      "languageSwitcher": {
+        "label": "Язык",
+        "en": "English",
+        "ru": "Русский"
+      },
       "themeToggle": {
         "switchToLight": "Переключить на светлую тему",
         "switchToDark": "Переключить на темную тему"
