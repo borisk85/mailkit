@@ -1,5 +1,6 @@
 import "server-only";
 
+import { sendAutoRefundEmail } from "@/lib/integrations/brevo-transactional";
 import {
   LemonSqueezyError,
   createLemonSqueezyClient,
@@ -70,7 +71,7 @@ export async function triggerAutoRefund(
     // expectation.
     const { data: purchases } = await admin
       .from("purchases")
-      .select("id, ls_order_id, amount_cents, currency, status")
+      .select("id, ls_order_id, amount_cents, currency, status, user_email")
       .eq("user_id", run.user_id)
       .eq("status", "paid")
       .order("created_at", { ascending: false })
@@ -114,6 +115,29 @@ export async function triggerAutoRefund(
       console.info(
         `[auto-refund] refunded purchase ${purchase.id} (LS order ${purchase.ls_order_id}) for run ${runId}, step ${step}`,
       );
+
+      // Notify the buyer. Email failure must not cascade: the refund
+      // has already landed on LS + in our DB; a missed email is a
+      // support issue, not a refund-pipeline failure. Swallow + log
+      // so `triggerAutoRefund` stays side-effect-safe.
+      if (purchase.user_email) {
+        try {
+          await sendAutoRefundEmail({
+            toEmail: purchase.user_email,
+            failedStep: step,
+          });
+        } catch (emailErr) {
+          const emsg =
+            emailErr instanceof Error ? emailErr.message : String(emailErr);
+          console.error(
+            `[auto-refund] refund email failed for purchase ${purchase.id} run ${runId}: ${emsg}`,
+          );
+        }
+      } else {
+        console.warn(
+          `[auto-refund] purchase ${purchase.id} has no user_email; skipping notification`,
+        );
+      }
     } catch (lsErr) {
       const lsMessage =
         lsErr instanceof LemonSqueezyError
