@@ -189,9 +189,12 @@ Prod Lighthouse — **gating**, но только при корректной м
 Current stored prod baselines (mailkit-ten.vercel.app, landing):
 - Pre-#4a: EN 87 / RU 87
 - Post-#4a stable warm: EN 77 / RU 74
-- Post-#4b (TBD): собрать в течение 60 мин после merge #11
+- Post-#4b stable warm: EN 75 / RU 85 (2026-04-23, landing)
+- Post-#6 stable warm: EN 73 / RU 70 (2026-04-24, 12h post-merge, n=5 each)
 
-Full investigation и SOP: [docs/investigation-2026-04-22/FINDINGS.md](docs/investigation-2026-04-22/FINDINGS.md)
+EN on a gentle downslope across features (87 → 77 → 75 → 73 — each −2 is in noise range). RU swings wider (87 → 74 → 85 → 70) — historically variance-prone at prod. Both locales still clear the ≥70 acceptance threshold post-#6. Systemic perf attempt-3 (next-intl `pick`, selective dynamic route segments, bundle analyzer) is the path back into the 80s+, in `docs/TICKETS_BACKLOG.md`.
+
+Full investigation и SOP: [docs/investigation-2026-04-22/FINDINGS.md](docs/investigation-2026-04-22/FINDINGS.md) + [docs/ticket-6-post-merge/summary.md](docs/ticket-6-post-merge/summary.md)
 
 ## Issues policy — solo vibe-coding mode
 
