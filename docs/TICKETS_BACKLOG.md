@@ -99,19 +99,25 @@
 - #15 Multi-domain dashboard
 
 ## 🧹 Tech debt
-- LS checkout store migration (post-launch, after first 20-30 sales).
+- LS checkout store migration — **pre-launch BLOCKER**, owner contacting LS support.
   - Current: product в velabot store (owner's другой project), checkout
     URL показывает `velabot.lemonsqueezy.com/checkout/buy/<uuid>` в
     address bar — чужой бренд в URL перед покупкой MailKit.
   - Причина: LS требует contact-support для создания second store на
-    одном аккаунте, блокирует MVP momentum. Appropriated velabot store
-    под MailKit product для launch'а.
-  - Target options: либо separate MailKit LS store (requires LS support
-    contact, сейчас заблокировано), либо custom checkout domain
-    `checkout.getmailkit.com` mapped к velabot store (cleaner, no store
-    migration, LS supports custom domains на Pro plan).
-  - Trigger: first customer complaint о "wrong-looking checkout URL"
-    либо plan scale past $500 MRR — whichever первое.
+    одном аккаунте. Appropriated velabot store под MailKit product
+    временно, чтобы разблокировать #11 landing development.
+  - Target options (любое рабочее решение принимается):
+    - Separate MailKit LS store — pending LS support ответа
+    - Custom checkout domain `checkout.getmailkit.com` mapped к velabot
+      store — LS supports это на Pro plan, не требует миграции продукта
+    - Второй LS account под MailKit brand — fallback если support
+      отказывает и Pro plan не вариант
+  - Trigger: owner relays new URL from LS → dev swaps constant в
+    [lib/constants/lemon-squeezy.ts](../lib/constants/lemon-squeezy.ts)
+    → redeploy preview → verify в browser. 30-секундная правка.
+  - Timeline: 1-2 дня, зависит от LS support response time.
+  - НЕ блокер для #11 landing code — hardcoded constant, swap одной
+    строки при получении нового URL.
 - Auto-verification Gmail Send-As via Brevo SMTP test-send + inbox poll.
   Trigger: первая жалоба пользователя «настроил, но не отправляет», либо
   при наборе >100 paying users — тогда оправдана оптимизация funnel
