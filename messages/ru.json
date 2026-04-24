@@ -54,6 +54,9 @@
       "visualStep1Time": "15 сек",
       "visualStep2Time": "60 сек",
       "visualStep3Time": "3 мин"
+    },
+    "integrations": {
+      "label": "Интеграции"
     }
   },
   "hero": {
