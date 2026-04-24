@@ -39,6 +39,21 @@
         "switchToLight": "Switch to light mode",
         "switchToDark": "Switch to dark mode"
       }
+    },
+    "hero": {
+      "headline": "Email on your domain in 5 minutes.",
+      "guaranteeSuffix": "Guaranteed.",
+      "guaranteeLink": "see policy",
+      "body": "Skip 90 minutes of DNS hell, Brevo configuration gotchas, and Gmail Send-As setup. We automate the technical parts — you do three copy-paste clicks in Gmail. That's it.",
+      "primaryCta": "Get your email — $5",
+      "secondaryCta": "How it works",
+      "visualAlt": "Three-step setup flow: Cloudflare, Brevo, Gmail",
+      "visualStep1": "Cloudflare",
+      "visualStep2": "Brevo",
+      "visualStep3": "Gmail",
+      "visualStep1Time": "15s",
+      "visualStep2Time": "60s",
+      "visualStep3Time": "3min"
     }
   },
   "hero": {

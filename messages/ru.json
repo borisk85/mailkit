@@ -39,6 +39,21 @@
         "switchToLight": "Переключить на светлую тему",
         "switchToDark": "Переключить на темную тему"
       }
+    },
+    "hero": {
+      "headline": "Почта на домене за 5 минут.",
+      "guaranteeSuffix": "С гарантией.",
+      "guaranteeLink": "условия",
+      "body": "Забудь про час возни с DNS, про грабли Brevo и танцы с настройкой Gmail Send-As. Мы автоматизируем техническую часть — ты делаешь три copy-paste действия в Gmail. И все.",
+      "primaryCta": "Настроить почту — $5",
+      "secondaryCta": "Как это работает",
+      "visualAlt": "Три шага настройки: Cloudflare, Brevo, Gmail",
+      "visualStep1": "Cloudflare",
+      "visualStep2": "Brevo",
+      "visualStep3": "Gmail",
+      "visualStep1Time": "15 сек",
+      "visualStep2Time": "60 сек",
+      "visualStep3Time": "3 мин"
     }
   },
   "hero": {
