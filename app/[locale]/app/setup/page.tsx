@@ -1,5 +1,8 @@
 import { setRequestLocale } from "next-intl/server";
 
+import { linkOrphanPurchase } from "@/lib/checkout-link";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
+
 import { SetupWizard } from "./setup-wizard";
 
 const MOCK_STATES = [
@@ -49,5 +52,36 @@ export default async function SetupPage({
   const sp = await searchParams;
   const mock = parseMockState(sp.mock);
 
+  // Thank-you linking: LS redirects post-payment to
+  // /app/setup?paid=1&order_id=<identifier>. The buyer is auth'd
+  // (layout gate) but their purchase row may still have user_id=NULL
+  // if they paid from the landing CTA (unauth first-buy). Stamp the
+  // link now so subsequent queries (auto-refund lookup, /app
+  // dashboard) find it. Best-effort — errors don't block the wizard.
+  if (readParam(sp.paid) === "1") {
+    try {
+      const supabase = await createClient();
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      if (user?.email) {
+        const admin = createServiceClient();
+        await linkOrphanPurchase({
+          admin,
+          userId: user.id,
+          userEmail: user.email,
+          lsOrderIdentifier: readParam(sp.order_id) ?? null,
+        });
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(`[setup-page] thank-you link attempt failed: ${msg}`);
+    }
+  }
+
   return <SetupWizard initialMock={mock} />;
+}
+
+function readParam(v: string | string[] | undefined): string | undefined {
+  return Array.isArray(v) ? v[0] : v;
 }
