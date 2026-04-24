@@ -16,6 +16,14 @@
       "ru": "Russian"
     }
   },
+  "landing": {
+    "header": {
+      "themeToggle": {
+        "switchToLight": "Switch to light mode",
+        "switchToDark": "Switch to dark mode"
+      }
+    }
+  },
   "hero": {
     "badge": "Launching soon — join the waitlist",
     "title": "Email on your domain in 5 minutes",
