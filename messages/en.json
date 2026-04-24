@@ -17,6 +17,11 @@
     }
   },
   "landing": {
+    "announcementBanner": {
+      "message": "First 100 customers — free setup.",
+      "cta": "Claim yours →",
+      "dismiss": "Dismiss banner"
+    },
     "header": {
       "themeToggle": {
         "switchToLight": "Switch to light mode",

@@ -17,6 +17,11 @@
     }
   },
   "landing": {
+    "announcementBanner": {
+      "message": "Первые 100 клиентов — настройка бесплатно.",
+      "cta": "Забрать свою →",
+      "dismiss": "Закрыть баннер"
+    },
     "header": {
       "themeToggle": {
         "switchToLight": "Переключить на светлую тему",
