@@ -6,6 +6,7 @@ import { Header } from "@/components/landing/header";
 import { Hero } from "@/components/landing/hero";
 import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { IntegrationsBar } from "@/components/landing/integrations-bar";
+import { PricingSection } from "@/components/landing/pricing-section";
 import { ProblemSection } from "@/components/landing/problem-section";
 
 export default async function LandingPage({
@@ -25,6 +26,7 @@ export default async function LandingPage({
         <IntegrationsBar />
         <ProblemSection />
         <HowItWorksSection />
+        <PricingSection />
       </main>
       <Footer />
     </>

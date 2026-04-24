@@ -58,6 +58,27 @@
     "integrations": {
       "label": "Интеграции"
     },
+    "pricing": {
+      "heading": "Простая цена",
+      "price": "$5",
+      "priceNote": "разовый платеж за ящик",
+      "noRecurring": "Без подписок",
+      "inclusionsHeading": "Что входит",
+      "inclusions": [
+        "Настройка Cloudflare Email Routing (MX, пересылка)",
+        "Аутентификация Brevo SMTP (DKIM, SPF, DMARC)",
+        "Пошаговая настройка Gmail Send-As",
+        "Бесконечные бесплатные алиасы на твоем домене",
+        "30-дневная гарантия возврата денег",
+        "Автоматический возврат при сбое автоматики"
+      ],
+      "noSubscription": "Без скрытых платежей. Без Google Workspace.",
+      "bundleHint": "Нужно 3 ящика на одном домене?",
+      "bundleLinkText": "3-mailbox bundle — $12 (после launch'а)",
+      "monitoringHint": "Хочешь мониторинг доставляемости?",
+      "monitoringLinkText": "Мониторинг — $3/мес (опционально)",
+      "cta": "Настроить — $5"
+    },
     "howItWorks": {
       "heading": "Как работает MailKit",
       "subheading": "3 шага — 2 автоматических, 1 пошаговый. Итого 5 минут.",

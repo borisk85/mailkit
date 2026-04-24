@@ -58,6 +58,27 @@
     "integrations": {
       "label": "Integrates with"
     },
+    "pricing": {
+      "heading": "Simple pricing",
+      "price": "$5",
+      "priceNote": "one-time per mailbox",
+      "noRecurring": "No recurring charges",
+      "inclusionsHeading": "What's included",
+      "inclusions": [
+        "Cloudflare Email Routing setup (MX, forwarding)",
+        "Brevo SMTP authentication (DKIM, SPF, DMARC)",
+        "Guided Gmail Send-As configuration",
+        "Unlimited free aliases on your domain",
+        "30-day money-back guarantee",
+        "Automation-failure auto-refund"
+      ],
+      "noSubscription": "No hidden fees. No Workspace subscription required.",
+      "bundleHint": "Need 3 mailboxes on the same domain?",
+      "bundleLinkText": "3-mailbox bundle — $12 (coming post-launch)",
+      "monitoringHint": "Want continuous deliverability monitoring?",
+      "monitoringLinkText": "Add monitoring — $3/mo (optional upgrade)",
+      "cta": "Start setup — $5"
+    },
     "howItWorks": {
       "heading": "How MailKit works",
       "subheading": "3 steps — 2 automated, 1 guided. 5 minutes total.",
