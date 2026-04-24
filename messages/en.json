@@ -58,6 +58,32 @@
     "integrations": {
       "label": "Integrates with"
     },
+    "howItWorks": {
+      "heading": "How MailKit works",
+      "subheading": "3 steps — 2 automated, 1 guided. 5 minutes total.",
+      "step1": {
+        "service": "Cloudflare",
+        "time": "~15 sec",
+        "title": "Cloudflare Email Routing (automated)",
+        "body": "We enable Email Routing on your domain, write MX records, and set up forwarding from hello@yourdomain.com to your Gmail inbox.",
+        "note": "We use your Cloudflare API token — you keep control."
+      },
+      "step2": {
+        "service": "Brevo",
+        "time": "~60 sec",
+        "title": "Brevo SMTP setup (automated)",
+        "body": "We claim your domain in Brevo, write DKIM + SPF + DMARC records, and verify authentication.",
+        "note": "Brevo handles outbound mail under the hood — you don't manage a Brevo account."
+      },
+      "step3": {
+        "service": "Gmail",
+        "time": "~3 min",
+        "title": "Gmail Send-As (guided, 3 clicks)",
+        "body": "We show you exactly what to paste into Gmail — SMTP server, credentials, your new email address. You confirm in Gmail.",
+        "note": "The wizard walks you through each click."
+      },
+      "closer": "After these three steps, hello@yourdomain.com works in your Gmail like any other address — compose, reply, forward. No new inbox to check. No Workspace subscription."
+    },
     "problem": {
       "heading": "Email on your own domain — it should be simple. It isn't.",
       "without": {

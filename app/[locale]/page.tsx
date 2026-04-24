@@ -4,6 +4,7 @@ import { AnnouncementBanner } from "@/components/landing/announcement-banner";
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
 import { Hero } from "@/components/landing/hero";
+import { HowItWorksSection } from "@/components/landing/how-it-works-section";
 import { IntegrationsBar } from "@/components/landing/integrations-bar";
 import { ProblemSection } from "@/components/landing/problem-section";
 
@@ -23,6 +24,7 @@ export default async function LandingPage({
         <Hero />
         <IntegrationsBar />
         <ProblemSection />
+        <HowItWorksSection />
       </main>
       <Footer />
     </>
