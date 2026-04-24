@@ -99,6 +99,19 @@
 - #15 Multi-domain dashboard
 
 ## 🧹 Tech debt
+- LS checkout store migration (post-launch, after first 20-30 sales).
+  - Current: product в velabot store (owner's другой project), checkout
+    URL показывает `velabot.lemonsqueezy.com/checkout/buy/<uuid>` в
+    address bar — чужой бренд в URL перед покупкой MailKit.
+  - Причина: LS требует contact-support для создания second store на
+    одном аккаунте, блокирует MVP momentum. Appropriated velabot store
+    под MailKit product для launch'а.
+  - Target options: либо separate MailKit LS store (requires LS support
+    contact, сейчас заблокировано), либо custom checkout domain
+    `checkout.getmailkit.com` mapped к velabot store (cleaner, no store
+    migration, LS supports custom domains на Pro plan).
+  - Trigger: first customer complaint о "wrong-looking checkout URL"
+    либо plan scale past $500 MRR — whichever первое.
 - Auto-verification Gmail Send-As via Brevo SMTP test-send + inbox poll.
   Trigger: первая жалоба пользователя «настроил, но не отправляет», либо
   при наборе >100 paying users — тогда оправдана оптимизация funnel
