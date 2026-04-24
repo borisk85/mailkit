@@ -4,7 +4,7 @@
     "description": "Пропусти час возни с DNS. Автоматическая настройка Cloudflare + Brevo и пошаговый Gmail Send-As. $5 за ящик."
   },
   "header": {
-    "logo": "MailKit",
+    "logo": "Mailkit",
     "nav": {
       "features": "Возможности",
       "pricing": "Цены",

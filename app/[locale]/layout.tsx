@@ -36,6 +36,24 @@ export async function generateMetadata({
   return {
     title: t("title"),
     description: t("description"),
+    icons: {
+      icon: [
+        { url: "/favicon/favicon-16.png", sizes: "16x16", type: "image/png" },
+        { url: "/favicon/favicon-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/favicon/favicon-64.png", sizes: "64x64", type: "image/png" },
+        {
+          url: "/favicon/favicon-192.png",
+          sizes: "192x192",
+          type: "image/png",
+        },
+        {
+          url: "/favicon/favicon-512.png",
+          sizes: "512x512",
+          type: "image/png",
+        },
+      ],
+      apple: "/favicon/apple-touch-icon.png",
+    },
   };
 }
 
