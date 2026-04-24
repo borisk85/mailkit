@@ -57,6 +57,31 @@
     },
     "integrations": {
       "label": "Integrates with"
+    },
+    "problem": {
+      "heading": "Email on your own domain — it should be simple. It isn't.",
+      "without": {
+        "title": "Without MailKit",
+        "steps": [
+          "Research Cloudflare Email Routing vs ImprovMX vs others",
+          "Read Brevo SMTP docs, get confused by \"API key vs SMTP key\"",
+          "Write DNS records by hand: MX, SPF, DKIM, DMARC, brevo-code",
+          "Test, discover a typo in SPF, rewrite",
+          "Configure Gmail Send-As, wonder why SMTP auth fails",
+          "Finally, maybe, it works. Maybe. Maybe not."
+        ],
+        "total": "60–90 minutes for someone who knows what they're doing. 3+ hours for everyone else."
+      },
+      "with": {
+        "title": "With MailKit",
+        "steps": [
+          "Paste a Cloudflare API token",
+          "Pick your domain",
+          "Copy-paste 4 values into Gmail (we guide you)",
+          "Done. hello@yourdomain.com works in your Gmail."
+        ],
+        "total": "5 minutes. Money back if it fails on our end."
+      }
     }
   },
   "hero": {

@@ -5,6 +5,7 @@ import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
 import { Hero } from "@/components/landing/hero";
 import { IntegrationsBar } from "@/components/landing/integrations-bar";
+import { ProblemSection } from "@/components/landing/problem-section";
 
 export default async function LandingPage({
   params,
@@ -21,6 +22,7 @@ export default async function LandingPage({
       <main className="flex flex-1 flex-col">
         <Hero />
         <IntegrationsBar />
+        <ProblemSection />
       </main>
       <Footer />
     </>
