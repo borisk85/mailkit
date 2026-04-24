@@ -4,7 +4,7 @@
     "description": "Skip 30 minutes of DNS hell. Automated Cloudflare + Brevo setup with guided Gmail Send-As. $5 per mailbox."
   },
   "header": {
-    "logo": "MailKit",
+    "logo": "Mailkit",
     "nav": {
       "features": "Features",
       "pricing": "Pricing",
