@@ -23,6 +23,7 @@ import {
   loadSmtpDisplay,
   type SmtpDisplay,
 } from "@/lib/integrations/brevo-smtp";
+import { triggerAutoRefund } from "@/lib/auto-refund";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 /**
@@ -211,6 +212,13 @@ async function failRun(
       cf_state: nextState,
     })
     .eq("id", runId);
+
+  // Auto-refund on the subset of steps where the failure is clearly
+  // our infra's fault (cf_* + brevo_* per lib/refund-policy.ts).
+  // Policy-gated inside triggerAutoRefund; noop for gmail_* / start /
+  // list_zones steps. Errors are swallowed inside the trigger — failing
+  // the refund must not cascade into the failing action's caller.
+  await triggerAutoRefund(admin, runId, step);
 }
 
 export async function startSetupRun(input: {
