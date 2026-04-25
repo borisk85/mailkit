@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import type { User } from "@supabase/supabase-js";
 
+import { AppFooter } from "@/components/app/app-footer";
 import { AppHeader } from "@/components/app/app-header";
 import { createClient } from "@/lib/supabase/server";
 
@@ -36,6 +37,7 @@ export default async function AppLayout({
       <>
         <AppHeader user={MOCK_USER} locale={locale} />
         <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
+        <AppFooter />
       </>
     );
   }
@@ -53,6 +55,7 @@ export default async function AppLayout({
     <>
       <AppHeader user={user} locale={locale} />
       <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
+      <AppFooter />
     </>
   );
 }
