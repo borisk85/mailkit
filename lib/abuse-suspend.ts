@@ -1,0 +1,275 @@
+import "server-only";
+
+import {
+  sendDeliverabilitySuspendEmail,
+  sendDeliverabilityWarnEmail,
+  sendSendLimitBlockEmail,
+} from "@/lib/integrations/brevo-transactional";
+import {
+  type DeliverabilityEvaluation,
+  formatRateForStorage,
+} from "@/lib/deliverability";
+import {
+  periodLabel,
+  type SendLimitEvaluation,
+  type WindowType,
+} from "@/lib/send-limits";
+import type { createServiceClient } from "@/lib/supabase/server";
+
+type AdminClient = ReturnType<typeof createServiceClient>;
+
+/**
+ * Anti-abuse action helpers — DB writes + audit row + customer email
+ * for a domain that crossed a Layer 1 (rate-limit) or Layer 2
+ * (deliverability) threshold.
+ *
+ * What this file does NOT do:
+ *
+ *   1. Hard-suspend the domain in Brevo. Brevo doesn't expose a
+ *      "pause-without-delete" endpoint; the available paths are
+ *      DELETE /v3/senders/domains/{name} (destructive — wipes the
+ *      authentication and forces a full re-setup) or removing DKIM
+ *      records via Cloudflare (also destructive). Hard-suspend is
+ *      deferred to #26 (SMTP-adapter abstraction) where the SES
+ *      adapter gets a clean pause primitive and we route Brevo
+ *      through that primitive.
+ *
+ *      For MVP the DB flag (purchases.suspended_at) is the source of
+ *      truth. If a suspended customer keeps sending despite the
+ *      email, Brevo's own complaint-rate threshold (0.3-0.5%) takes
+ *      over before we'd reach a true incident.
+ *
+ *   2. Throw on email failure. The pause / audit row must land even
+ *      if Brevo transactional is down, so customer can't use a
+ *      transient mail outage to skip the suspension trail.
+ *
+ * Both helpers are idempotent on `purchases.suspended_at IS NULL` —
+ * a domain already suspended is left alone, but the abuse_events
+ * audit row is still appended (so repeat-offender tracking works).
+ */
+
+type PurchaseLite = {
+  id: string;
+  user_email: string;
+  custom_data: Record<string, unknown>;
+};
+
+async function findActivePurchaseForDomain(
+  admin: AdminClient,
+  domain: string,
+): Promise<PurchaseLite | null> {
+  // custom_data.domain is the source of truth for which purchase
+  // covers which sender domain (set when the LS checkout custom
+  // params or the post-payment linking writes it). We fall back to
+  // the most-recent paid purchase if that's empty so old rows that
+  // predated the custom_data convention still resolve.
+  const { data } = await admin
+    .from("purchases")
+    .select("id, user_email, custom_data, created_at, status, suspended_at")
+    .contains("custom_data", { domain })
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  const row = (data ?? [])[0];
+  if (!row) return null;
+  return {
+    id: row.id,
+    user_email: row.user_email ?? "",
+    custom_data: (row.custom_data ?? {}) as Record<string, unknown>,
+  };
+}
+
+async function flagSuspended(
+  admin: AdminClient,
+  purchaseId: string,
+  reason: string,
+): Promise<void> {
+  // Idempotent: only set if not already suspended. We don't overwrite
+  // the original suspension reason on a second trip — the first
+  // signal wins, audit row records the second one separately.
+  await admin
+    .from("purchases")
+    .update({
+      suspended_at: new Date().toISOString(),
+      suspension_reason: reason,
+    })
+    .eq("id", purchaseId)
+    .is("suspended_at", null);
+}
+
+async function insertAbuseEvent(
+  admin: AdminClient,
+  args: {
+    domain: string;
+    eventType: string;
+    actionTaken: string;
+    thresholdValue?: number;
+    observedValue?: number;
+    purchaseId?: string;
+    snapshotId?: string;
+    notes?: string;
+  },
+): Promise<void> {
+  await admin.from("abuse_events").insert({
+    domain: args.domain,
+    event_type: args.eventType,
+    action_taken: args.actionTaken,
+    threshold_value: args.thresholdValue ?? null,
+    observed_value: args.observedValue ?? null,
+    purchase_id: args.purchaseId ?? null,
+    snapshot_id: args.snapshotId ?? null,
+    notes: args.notes ?? null,
+  });
+}
+
+function nextResumeHint(window: WindowType): string {
+  if (window === "minute") return "in the next minute";
+  if (window === "hour") return "in the next hour";
+  return "when the day counter resets at 00:00 UTC";
+}
+
+/**
+ * Layer 1 action — domain hit the per-domain rate limit. Sends are
+ * paused, customer is emailed, audit row written.
+ */
+export async function suspendForRateLimit(
+  admin: AdminClient,
+  args: {
+    domain: string;
+    evaluation: SendLimitEvaluation;
+  },
+): Promise<{ suspended: boolean; emailed: boolean }> {
+  const { domain, evaluation } = args;
+  if (!evaluation.overLimit) return { suspended: false, emailed: false };
+
+  // Pick the most-restrictive window that tripped (minute > hour > day)
+  // — that's the one with the shortest resume time, which is what the
+  // customer most needs to hear about.
+  const order: WindowType[] = ["minute", "hour", "day"];
+  const tripped = order.find((w) => evaluation.exceeded.includes(w));
+  if (!tripped) return { suspended: false, emailed: false };
+  const window = evaluation.windows[tripped];
+
+  const purchase = await findActivePurchaseForDomain(admin, domain);
+
+  if (purchase) {
+    await flagSuspended(admin, purchase.id, "rate_limit");
+  }
+
+  await insertAbuseEvent(admin, {
+    domain,
+    eventType: "rate_limit_block",
+    actionTaken: "suspended",
+    thresholdValue: window.limit,
+    observedValue: window.count,
+    purchaseId: purchase?.id,
+    notes: `window=${tripped}, count=${window.count}, limit=${window.limit}`,
+  });
+
+  let emailed = false;
+  if (purchase?.user_email) {
+    try {
+      await sendSendLimitBlockEmail({
+        toEmail: purchase.user_email,
+        domain,
+        period: periodLabel(tripped),
+        observed: window.count,
+        limit: window.limit,
+        resumeHint: nextResumeHint(tripped),
+      });
+      emailed = true;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(
+        `[abuse] rate-limit email failed for ${domain} (${purchase.id}): ${msg}`,
+      );
+    }
+  }
+
+  return { suspended: !!purchase, emailed };
+}
+
+/**
+ * Layer 2 action — domain crossed the deliverability threshold.
+ * `action='suspended'` flips the DB flag; `action='warned'` only
+ * records the audit + warning email (no DB flag flip — customer keeps
+ * sending). `evaluation.action===null` is a no-op.
+ */
+export async function actOnDeliverability(
+  admin: AdminClient,
+  args: {
+    domain: string;
+    evaluation: DeliverabilityEvaluation;
+    snapshotId?: string;
+  },
+): Promise<{ acted: boolean; emailed: boolean }> {
+  const { domain, evaluation, snapshotId } = args;
+  if (!evaluation.action || !evaluation.reason) {
+    return { acted: false, emailed: false };
+  }
+
+  const purchase = await findActivePurchaseForDomain(admin, domain);
+
+  if (evaluation.action === "suspended" && purchase) {
+    await flagSuspended(admin, purchase.id, evaluation.reason);
+  }
+
+  // Pick the rate that drove the decision so the audit row + email
+  // reflect the true trigger, not whichever was most extreme.
+  const drivingRate =
+    evaluation.reason === "complaint_threshold"
+      ? evaluation.rates.complaint
+      : evaluation.reason === "bounce_threshold"
+        ? evaluation.rates.bounce
+        : evaluation.rates.unsubscribe;
+  const drivingThreshold =
+    evaluation.reason === "complaint_threshold"
+      ? evaluation.thresholds.complaint
+      : evaluation.reason === "bounce_threshold"
+        ? evaluation.thresholds.bounce
+        : evaluation.thresholds.unsubscribe;
+
+  await insertAbuseEvent(admin, {
+    domain,
+    eventType: evaluation.reason,
+    actionTaken: evaluation.action,
+    thresholdValue: formatRateForStorage(drivingThreshold),
+    observedValue: formatRateForStorage(drivingRate),
+    purchaseId: purchase?.id,
+    snapshotId,
+    notes: `requests=${evaluation.counts.requests}, bounced=${evaluation.counts.bounced}, complained=${evaluation.counts.complained}, unsubscribed=${evaluation.counts.unsubscribed}`,
+  });
+
+  let emailed = false;
+  if (purchase?.user_email) {
+    try {
+      if (evaluation.action === "suspended") {
+        await sendDeliverabilitySuspendEmail({
+          toEmail: purchase.user_email,
+          domain,
+          kind:
+            evaluation.reason === "complaint_threshold"
+              ? "complaint"
+              : "bounce",
+          observedRate: drivingRate,
+          thresholdRate: drivingThreshold,
+        });
+      } else {
+        await sendDeliverabilityWarnEmail({
+          toEmail: purchase.user_email,
+          domain,
+          observedRate: drivingRate,
+          thresholdRate: drivingThreshold,
+        });
+      }
+      emailed = true;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.error(
+        `[abuse] deliverability ${evaluation.action} email failed for ${domain}: ${msg}`,
+      );
+    }
+  }
+
+  return { acted: true, emailed };
+}
