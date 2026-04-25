@@ -212,6 +212,8 @@
   },
   "footer": {
     "tagline": "Email setup without the DNS nightmare.",
-    "copyright": "© 2026 MailKit. All rights reserved."
+    "copyright": "© 2026 MailKit. All rights reserved.",
+    "terms": "Terms",
+    "privacy": "Privacy"
   }
 }
