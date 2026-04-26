@@ -12,6 +12,8 @@ import { getDashboardData, type DashboardData } from "@/lib/dashboard-data";
 import { createClient } from "@/lib/supabase/server";
 import { mockDashboardForFixture } from "@/lib/dashboard-mock";
 
+import { deleteAccount } from "./account-actions";
+
 /**
  * /app dashboard. Server component — all reads happen here, sections
  * render server-side, only the delete-confirm modal escapes to a
@@ -86,13 +88,16 @@ export default async function AppHome({
 
   const isEmpty = data.setups.length === 0 && data.purchases.length === 0;
 
-  // Step 3 wires the real server action; for step 2 the modal calls a
-  // resolved-noop so the UI is exercisable in Playwright snapshots
-  // without yet performing the destructive DB write.
-  const deleteAccountStub = async () => {
-    "use server";
-    return;
-  };
+  // In mock-preview the destructive action is a server-side no-op so
+  // the modal flow is exercisable in Playwright snapshots without
+  // tearing down a real auth.users row. Real /app traffic always
+  // calls deleteAccount which deletes through service-role.
+  const deleteAccountAction = isMockPreview
+    ? async () => {
+        "use server";
+        return;
+      }
+    : deleteAccount;
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
@@ -123,7 +128,7 @@ export default async function AppHome({
         email={displayEmail}
         fullName={fullName}
         locale={locale}
-        deleteAction={deleteAccountStub}
+        deleteAction={deleteAccountAction}
       />
 
       <ResourcesSection locale={locale} />
