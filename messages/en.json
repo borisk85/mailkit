@@ -215,5 +215,17 @@
     "copyright": "© 2026 MailKit. All rights reserved.",
     "terms": "Terms",
     "privacy": "Privacy"
+  },
+  "error": {
+    "title": "Something broke on our end",
+    "body": "An unexpected error happened. We've logged it and we're looking into it. You can try refreshing the page or heading back home.",
+    "retryCta": "Try again",
+    "homeCta": "Back to home",
+    "errorIdLabel": "Error ID"
+  },
+  "cookieConsent": {
+    "body": "We use only the cookies needed to sign you in via Google and remember your locale. No marketing trackers, no ad pixels.",
+    "details": "Read our privacy policy",
+    "accept": "Got it"
   }
 }
