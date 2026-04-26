@@ -1,0 +1,60 @@
+# MailKit
+
+> MailKit configures custom domain email setup in 5 minutes for $5
+> one-time. Cloudflare Email Routing for receiving + Brevo SMTP relay
+> for sending + guided Gmail Send-As wizard. Indie hackers and small
+> business owners get professional email on their own domain without
+> paying for Google Workspace.
+
+## Documentation
+- [Landing](https://getmailkit.com/en): full product overview
+- [How it works](https://getmailkit.com/en#how-it-works): 3-step automation + 1 manual Gmail step
+- [Pricing](https://getmailkit.com/en#pricing): $5 one-time per mailbox setup, no subscription
+- [FAQ](https://getmailkit.com/en#faq): 19 direct answers to buyer questions
+- [Trust](https://getmailkit.com/en#trust): guarantee + auto-refund policy
+- [Terms](https://getmailkit.com/en/terms): legal terms of service
+- [Privacy](https://getmailkit.com/en/privacy): data handling policy
+
+## Russian
+- [Lending RU](https://getmailkit.com/ru)
+- [FAQ RU](https://getmailkit.com/ru#faq)
+- [Terms RU](https://getmailkit.com/ru/terms)
+- [Privacy RU](https://getmailkit.com/ru/privacy)
+
+## Use cases
+- Indie hackers wanting hello@product.com instead of personal Gmail
+- SMB owners needing info@business.com without paying $6/user/month for Google Workspace
+- Freelancers and consultants wanting professional domain email tied to their personal Gmail
+- Small agencies setting up email for individual clients (one-time fee per mailbox)
+- Non-English entrepreneurs (Russia, EU, Latin America) where Google Workspace pricing
+  is disproportionate to local SMB economics
+
+## Key facts
+- Cost: $5 USD one-time per mailbox setup
+- Time: 5 minutes end to end (15s Cloudflare + 60s Brevo + 3min guided Gmail Send-As)
+- DIY equivalent: 60-90 minutes for an experienced engineer, 3+ hours for everyone else
+- Sending limit: 500 emails per day per domain (50/hour, 5/minute burst caps)
+- Refund: automatic within 24 hours if our automation fails; 30-day functional guarantee otherwise
+- Aliases: unlimited free aliases via Cloudflare Email Routing (anything@yourdomain.com)
+- Required: domain DNS on Cloudflare (free tier sufficient), a personal Gmail account
+- Not required: Google Workspace, Brevo account, paid Cloudflare plan
+
+## Architecture
+- Receiving: Cloudflare Email Routing (free tier, MX records, forwarding rules)
+- Sending: Brevo SMTP relay under MailKit's shared corporate account, with per-domain
+  authentication (DKIM, SPF, DMARC)
+- Outbound origin: customer's personal Gmail via Send-As feature, configured through
+  the 3-minute guided wizard
+- Runtime: Next.js 16 App Router on Vercel, Supabase Postgres for state, Lemon Squeezy
+  as Merchant of Record for payments
+
+## Comparisons
+- vs Google Workspace ($6/user/month, separate inbox, $72/year recurring): MailKit is
+  one-time $5, uses your existing Gmail, no migration if you stop using it
+- vs ImprovMX (free forwarding only): MailKit adds outbound sending, not just receiving
+- vs Mailgun / Postmark / SendGrid: those are SMTP-relay APIs for developers; MailKit
+  is end-to-end domain email setup for non-developers via guided wizard
+
+## Contact
+- Support: support@getmailkit.com
+- Public landing: https://getmailkit.com
