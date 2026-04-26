@@ -38,6 +38,92 @@
     "friendFallback": "friend",
     "redirecting": "Redirecting..."
   },
+  "dashboard": {
+    "title": "Welcome back, {name}",
+    "subtitle": "Your domain setups, purchases, and account at a glance.",
+    "emptyState": {
+      "title": "Set up your first domain",
+      "body": "You haven't started a setup yet. It takes about 5 minutes — paste a Cloudflare token, pick your zone, follow the Gmail wizard.",
+      "cta": "Start setup"
+    },
+    "setups": {
+      "title": "Domain setups",
+      "domainLabel": "Domain",
+      "mailboxLabel": "Mailbox",
+      "createdLabel": "Started",
+      "lastUpdatedLabel": "Last update",
+      "errorLabel": "Error",
+      "status": {
+        "in_progress": "In progress",
+        "awaiting_verification": "Awaiting your action",
+        "done": "Setup complete",
+        "failed": "Failed"
+      },
+      "actions": {
+        "continue": "Continue setup",
+        "open": "Open",
+        "reSetup": "Re-setup this domain"
+      }
+    },
+    "purchases": {
+      "title": "Purchases",
+      "empty": "No purchases yet.",
+      "tableHeaders": {
+        "date": "Date",
+        "amount": "Amount",
+        "status": "Status",
+        "orderId": "Order ID",
+        "domain": "Domain"
+      },
+      "status": {
+        "paid": "Paid",
+        "refunded": "Refunded",
+        "partially_refunded": "Partially refunded",
+        "fraudulent": "Disputed"
+      },
+      "testModeBadge": "Test"
+    },
+    "refunds": {
+      "title": "Refund history",
+      "tableHeaders": {
+        "date": "Date",
+        "amount": "Amount",
+        "reason": "Reason",
+        "triggeredBy": "Triggered by"
+      },
+      "reason": {
+        "automation_failure": "Automation failure",
+        "functional_30day_request": "30-day functional",
+        "fraud_dispute": "Disputed",
+        "manual_support_discretion": "Support refund"
+      },
+      "triggeredBy": {
+        "system": "Auto",
+        "support": "Support",
+        "user_dispute": "User dispute"
+      }
+    },
+    "account": {
+      "title": "Account",
+      "emailLabel": "Email",
+      "nameLabel": "Name",
+      "deleteCta": "Delete my account",
+      "deleteConfirm": {
+        "title": "Delete your MailKit account?",
+        "body": "This removes your profile, setup runs, and purchase records from MailKit. Your domain's DNS records and Gmail Send-As config stay where they are — those live in Cloudflare and Gmail. This can't be undone.",
+        "confirmCta": "Yes, delete my account",
+        "cancel": "Cancel"
+      }
+    },
+    "resources": {
+      "title": "Resources",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "guarantee": "Refund guarantee",
+      "support": "Email support",
+      "supportAddress": "support@getmailkit.com"
+    }
+  },
   "setup": {
     "title": "Connect your domain",
     "subtitle": "Three steps: paste your Cloudflare token, pick the zone, watch us wire it up.",
