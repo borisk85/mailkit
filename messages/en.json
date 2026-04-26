@@ -129,6 +129,133 @@
         ],
         "total": "5 minutes. Money back if it fails on our end."
       }
+    },
+    "trust": {
+      "heading": "Backed by a real guarantee",
+      "subheading": "Two ways to get your money back. No fine print.",
+      "items": [
+        {
+          "title": "Auto-refund if our setup fails",
+          "body": "If our Cloudflare or Brevo automation fails on our end, we refund you within 24 hours — automatically. You don't email anyone. The dashboard tells you what happened."
+        },
+        {
+          "title": "30-day functional guarantee",
+          "body": "If you can't actually send or receive email after setup is complete and our support can't fix it within 7 days, full refund on request. Up to 30 days from purchase."
+        },
+        {
+          "title": "Honest about deliverability",
+          "body": "We set up technically correct SPF/DKIM/DMARC. Whether email lands in someone's inbox depends on sender reputation, content, and the recipient's policies — outside our control. Warm up the domain gradually: 10–20 emails per day in week one."
+        }
+      ],
+      "policyLinkLabel": "Read the full guarantee"
+    },
+    "faq": {
+      "heading": "Frequently asked questions",
+      "subheading": "Direct answers to the questions buyers ask before clicking buy.",
+      "items": [
+        {
+          "id": "cost",
+          "q": "How much does MailKit cost?",
+          "a": "MailKit costs $5 once per mailbox. No subscription, no recurring charges. That covers the full automated setup: Cloudflare Email Routing for receiving, Brevo SMTP for sending, and the guided Gmail Send-As wizard. Compared to Google Workspace at $6/user/month ($72/year per mailbox), MailKit is a one-time fee."
+        },
+        {
+          "id": "duration",
+          "q": "How long does setup actually take?",
+          "a": "About 5 minutes end to end. The Cloudflare phase takes ~15 seconds, the Brevo phase ~60 seconds, the Gmail Send-As wizard ~3 minutes (you copy-paste 4 values). Doing this by hand without MailKit takes 60–90 minutes for an experienced engineer, 3+ hours for everyone else."
+        },
+        {
+          "id": "vs-workspace",
+          "q": "How is this different from Google Workspace?",
+          "a": "Google Workspace gives you a separate inbox at $6/user/month forever — a new mailbox to check, a separate password, full migration if you stop paying. MailKit configures your existing Gmail to send and receive from your domain via Send-As. Same Gmail inbox, no migration, no monthly fee. The trade-off: with MailKit your domain email lives inside your personal Gmail, not in a Workspace tenant."
+        },
+        {
+          "id": "registrar",
+          "q": "Does it work with my domain registered at Namecheap, GoDaddy, or other registrars?",
+          "a": "Yes. The only requirement is that the domain's DNS is on Cloudflare. If it isn't yet, the one-time step is moving the nameservers to Cloudflare (free, takes 5 minutes at your registrar's panel) — Cloudflare's docs walk you through it. After that, MailKit handles the rest through the Cloudflare API."
+        },
+        {
+          "id": "cf-free",
+          "q": "Do I need a paid Cloudflare account?",
+          "a": "No. Cloudflare Free is enough. Email Routing is included in the free tier, no upgrade needed."
+        },
+        {
+          "id": "improvmx",
+          "q": "What if I already use ImprovMX or another forwarding service?",
+          "a": "MailKit will replace ImprovMX with Cloudflare Email Routing. You'll need to remove the existing MX records on your domain before setup; our wizard detects conflicts and tells you exactly which records block the run. Once switched, you'll have both receiving (Cloudflare) and outbound sending (Brevo SMTP via Gmail) — ImprovMX free tier doesn't do outbound."
+        },
+        {
+          "id": "outbound",
+          "q": "Can I actually send from hello@mydomain.com using my normal Gmail?",
+          "a": "Yes — that's the whole point. After the wizard, your Gmail Send-As list shows hello@yourdomain.com. You compose in Gmail, switch the From dropdown to your domain address, send. Replies arrive at the same Gmail inbox via Cloudflare forwarding. No separate mailbox."
+        },
+        {
+          "id": "manual-step",
+          "q": "Why do I have to do the Gmail step manually instead of you fully automating it?",
+          "a": "The Gmail API method that adds Send-As entries (gmail.settings.sendAs.create) is blocked on personal @gmail.com accounts — it requires Google Workspace with domain-wide delegation. We made that part a 3-minute guided wizard with copy-paste values instead. The other technical parts (Cloudflare + Brevo + DNS) are fully automated."
+        },
+        {
+          "id": "fail",
+          "q": "What happens if setup fails?",
+          "a": "If our Cloudflare or Brevo automation fails, we issue an automatic full refund within 24 hours. The dashboard shows you which step failed and why. If you'd like to retry once we've fixed our side, we'll let you know — no extra charge if we fixed something on our end."
+        },
+        {
+          "id": "spam",
+          "q": "Why might my emails go to spam?",
+          "a": "MailKit configures technically correct SPF/DKIM/DMARC authentication. Whether email lands in a specific recipient's inbox depends on sender reputation, content, sending practices, and the recipient's policies — all outside MailKit's control. Domain warmup, recipient list hygiene, and consent compliance are the sender's job. Practical advice: send 10–20 emails per day in the first week from a fresh domain, then ramp up gradually."
+        },
+        {
+          "id": "limits",
+          "q": "Is there a sending limit?",
+          "a": "Yes — 500 emails per day per domain on the standard $5 setup, with a 50/hour and 5/minute burst cap. The limits protect every MailKit customer on the shared Brevo infrastructure. If you have a legitimate higher-volume use case (transactional, double-opt-in newsletter), email support@getmailkit.com — we typically raise the cap within 24 hours."
+        },
+        {
+          "id": "multi-mailbox",
+          "q": "Can I configure multiple mailboxes on the same domain?",
+          "a": "At launch you can re-run setup per mailbox at $5 each. A 3-mailbox bundle at $12 is planned post-launch. Free aliases are unlimited via Cloudflare Email Routing — anything@yourdomain.com forwards to your Gmail by default."
+        },
+        {
+          "id": "token-safety",
+          "q": "Is my Cloudflare API token safe with you?",
+          "a": "We use the token only during the active setup session and discard it from memory afterwards. We do not persist it in our database. The token can be scoped to the minimum permissions our wizard documents (Zone:DNS:Edit + Email Routing edits on the specific zone) and can be revoked from your Cloudflare dashboard at any time."
+        },
+        {
+          "id": "outlook",
+          "q": "Does this work with Outlook or Apple Mail instead of Gmail?",
+          "a": "Not in the MVP. The wizard's outbound configuration is Gmail-specific. The Cloudflare receiving setup is mail-client-agnostic, so receiving on any client works, but outbound through MailKit's flow requires Gmail today. Outlook support is on the roadmap if there's enough demand."
+        },
+        {
+          "id": "delete",
+          "q": "What happens if I delete my MailKit account?",
+          "a": "Your MailKit profile and setup logs are deleted from our database. Your domain's DNS records, Cloudflare Email Routing, and Gmail Send-As config stay where they are — those live in Cloudflare and Gmail, not in MailKit. Your purchase records are kept (with the user_id removed) for our financial audit trail."
+        },
+        {
+          "id": "gdpr",
+          "q": "Are you GDPR compliant?",
+          "a": "Yes. We collect minimal personal data (email + name from Google OAuth, domain you set up). We do not sell or share your data. You can request deletion at any time via the dashboard or by emailing support@getmailkit.com. Full details: /privacy."
+        },
+        {
+          "id": "brevo-frozen",
+          "q": "What if Brevo blocks my domain or freezes the underlying account?",
+          "a": "If Brevo flags your specific domain for high bounce or complaint rate, we email you with the reason and pause sending. If Brevo were to freeze the entire MailKit relay (operational risk we plan for), our migration runbook switches outbound to a backup SMTP provider. Either way, your Cloudflare receiving setup is unaffected — incoming email keeps working."
+        },
+        {
+          "id": "switch-smtp",
+          "q": "Can I switch to my own SMTP provider later?",
+          "a": "Yes. Your domain's DNS is yours to control via Cloudflare. To switch outbound, you replace the Brevo SPF/DKIM records with your new provider's records and update Gmail Send-As to point at the new SMTP. The Cloudflare receiving side keeps working. We don't lock you in."
+        },
+        {
+          "id": "refund-process",
+          "q": "How do I get a refund if I want one?",
+          "a": "Two paths. (1) If automation failed on our end, the refund is automatic within 24 hours — you don't have to ask. (2) For a 30-day functional refund, email support@getmailkit.com explaining what's not working. We respond within 1 business day and refund within 7 days if support can't resolve it."
+        }
+      ]
+    },
+    "finalCta": {
+      "heading": "Ready when you are",
+      "body": "5 minutes from now your domain email is live. $5 once. Money back if the automation fails on our end.",
+      "primaryCta": "Get your email — $5",
+      "secondaryCta": "See how it works",
+      "reassurance": "First 100 customers — free setup with code FIRST100."
     }
   },
   "hero": {
