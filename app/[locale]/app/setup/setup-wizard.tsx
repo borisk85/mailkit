@@ -1793,6 +1793,9 @@ function GmailDoneStep({
       <p className="text-sm text-emerald-900 dark:text-emerald-100">
         {t("gmail.steps.done.body", { target: state.targetEmail })}
       </p>
+      <p className="rounded-md border border-emerald-200/60 bg-emerald-50/40 px-3 py-2 text-xs leading-5 text-emerald-900/80 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-100/80">
+        {t("gmail.steps.done.warmupTip")}
+      </p>
       <a href={`/${locale}/app`} className="inline-flex">
         <Button variant="outline">
           {t("gmail.steps.done.backToDashboard")}
