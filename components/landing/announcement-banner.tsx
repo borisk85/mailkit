@@ -4,7 +4,10 @@ import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 
-import { LEMON_SQUEEZY_CHECKOUT_URL } from "@/lib/constants/lemon-squeezy";
+import {
+  LEMON_SQUEEZY_CHECKOUT_URL,
+  withFirst100Discount,
+} from "@/lib/constants/lemon-squeezy";
 
 /**
  * Launch-week tactic from docs/GO_TO_MARKET.md — "First 100 customers
@@ -58,7 +61,7 @@ export function AnnouncementBanner() {
       <div className="mx-auto flex max-w-6xl items-center justify-center gap-3 px-4 py-2 text-sm sm:gap-4">
         <span className="font-medium">{t("message")}</span>
         <a
-          href={LEMON_SQUEEZY_CHECKOUT_URL}
+          href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
           target="_blank"
           rel="noreferrer"
           className="font-semibold underline-offset-2 hover:underline"
