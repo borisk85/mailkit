@@ -2,12 +2,9 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 /**
- * Section: links to legal pages + support email. The architect spec
- * lists /terms, /privacy, /guarantee, support — /guarantee doesn't
- * exist as a page yet (#17 in the guarantee-infrastructure section),
- * so the link points to the same /terms page and we'll re-route on
- * the day /guarantee ships. The visible label is still "Refund
- * guarantee" because the user shouldn't care which file backs it.
+ * Section: links to legal pages + support email. /terms, /privacy
+ * and /guarantee are the three SSG legal surfaces — all three
+ * routes are live.
  */
 export function ResourcesSection({ locale }: { locale: string }) {
   const t = useTranslations("dashboard.resources");
@@ -38,7 +35,7 @@ export function ResourcesSection({ locale }: { locale: string }) {
         </li>
         <li>
           <Link
-            href={`/${locale}/terms#section-3`}
+            href={`/${locale}/guarantee`}
             className="text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-300"
           >
             {t("guarantee")}
