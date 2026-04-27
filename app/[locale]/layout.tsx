@@ -5,20 +5,29 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { CookieConsent } from "@/components/cookie-consent";
+import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
 import "../globals.css";
 
+// "latin" + "cyrillic" pre-downloads the glyphs for both EN and RU so
+// the EN→RU locale switch renders Cyrillic text in Geist on first
+// paint — without the cyrillic subset, Cyrillic glyphs fall back to
+// the system sans-serif, and the fallback swap creates a visible
+// flash of unstyled content the moment a user toggles to /ru. The
+// FOUT was pre-existing but invisible at the old hero's 4xl-5xl
+// sizing; etap 1's display-grade 72-80px typography made the metric
+// mismatch impossible to miss.
 const geistSans = Geist({
   variable: "--font-geist-sans",
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   display: "swap",
   preload: true,
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
-  subsets: ["latin"],
+  subsets: ["latin", "cyrillic"],
   display: "swap",
   preload: true,
 });
@@ -74,14 +83,22 @@ export default async function LocaleLayout({
   return (
     <html
       lang={locale}
+      suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider>
-          {children}
-          <CookieConsent />
-        </NextIntlClientProvider>
-        <Toaster />
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <NextIntlClientProvider>
+            {children}
+            <CookieConsent />
+          </NextIntlClientProvider>
+          <Toaster />
+        </ThemeProvider>
       </body>
     </html>
   );
