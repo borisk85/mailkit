@@ -1,4 +1,4 @@
-import { setRequestLocale } from "next-intl/server";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { AnnouncementBanner } from "@/components/landing/announcement-banner";
 import { FaqSection } from "@/components/landing/faq-section";
@@ -11,6 +11,8 @@ import { IntegrationsBar } from "@/components/landing/integrations-bar";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { ProblemSection } from "@/components/landing/problem-section";
 import { TrustSection } from "@/components/landing/trust-section";
+import { StructuredData } from "@/components/seo/structured-data";
+import { landingGraph, type FaqItem } from "@/lib/seo/structured-data";
 
 export default async function LandingPage({
   params,
@@ -20,8 +22,17 @@ export default async function LandingPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
+  // Pull the FAQ items the SSR renders into FaqSection so the schema
+  // mainEntity matches the visible Q/A pairs verbatim — the whole
+  // point of FAQPage schema is one source of truth between visible
+  // copy and structured data.
+  const t = await getTranslations({ locale, namespace: "landing.faq" });
+  const faqItems = t.raw("items") as FaqItem[];
+  const schemaLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
+
   return (
     <>
+      <StructuredData data={landingGraph(schemaLocale, faqItems)} />
       <AnnouncementBanner />
       <Header />
       <main className="flex flex-1 flex-col">
