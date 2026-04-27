@@ -1,7 +1,10 @@
 import { useTranslations } from "next-intl";
 import { CheckCircle2 } from "lucide-react";
 
-import { LEMON_SQUEEZY_CHECKOUT_URL } from "@/lib/constants/lemon-squeezy";
+import {
+  LEMON_SQUEEZY_CHECKOUT_URL,
+  withFirst100Discount,
+} from "@/lib/constants/lemon-squeezy";
 
 /**
  * Pricing — Linear single-card simplicity per LANDING_SPEC_V1.md
@@ -74,7 +77,7 @@ export function PricingSection() {
             </p>
 
             <a
-              href={LEMON_SQUEEZY_CHECKOUT_URL}
+              href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
               target="_blank"
               rel="noreferrer"
               className="inline-flex h-13 items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-7 text-base font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-indigo-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-offset-neutral-950"
