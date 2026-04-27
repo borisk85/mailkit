@@ -38,6 +38,92 @@
     "friendFallback": "друг",
     "redirecting": "Перенаправляем..."
   },
+  "dashboard": {
+    "title": "С возвращением, {name}",
+    "subtitle": "Настройки доменов, покупки и аккаунт — всё в одном месте.",
+    "emptyState": {
+      "title": "Настрой свой первый домен",
+      "body": "У тебя пока нет настроек. Это занимает около 5 минут — вставь токен Cloudflare, выбери зону, пройди мастер Gmail.",
+      "cta": "Начать настройку"
+    },
+    "setups": {
+      "title": "Настройки доменов",
+      "domainLabel": "Домен",
+      "mailboxLabel": "Ящик",
+      "createdLabel": "Начато",
+      "lastUpdatedLabel": "Последнее обновление",
+      "errorLabel": "Ошибка",
+      "status": {
+        "in_progress": "В процессе",
+        "awaiting_verification": "Ждём твоего действия",
+        "done": "Настройка завершена",
+        "failed": "Не удалось"
+      },
+      "actions": {
+        "continue": "Продолжить настройку",
+        "open": "Открыть",
+        "reSetup": "Перенастроить домен"
+      }
+    },
+    "purchases": {
+      "title": "Покупки",
+      "empty": "Пока нет покупок.",
+      "tableHeaders": {
+        "date": "Дата",
+        "amount": "Сумма",
+        "status": "Статус",
+        "orderId": "ID заказа",
+        "domain": "Домен"
+      },
+      "status": {
+        "paid": "Оплачено",
+        "refunded": "Возврат",
+        "partially_refunded": "Частичный возврат",
+        "fraudulent": "Спор"
+      },
+      "testModeBadge": "Тест"
+    },
+    "refunds": {
+      "title": "История возвратов",
+      "tableHeaders": {
+        "date": "Дата",
+        "amount": "Сумма",
+        "reason": "Причина",
+        "triggeredBy": "Кем"
+      },
+      "reason": {
+        "automation_failure": "Сбой автоматизации",
+        "functional_30day_request": "30-дневная гарантия",
+        "fraud_dispute": "Спор",
+        "manual_support_discretion": "Возврат поддержки"
+      },
+      "triggeredBy": {
+        "system": "Авто",
+        "support": "Поддержка",
+        "user_dispute": "Спор от юзера"
+      }
+    },
+    "account": {
+      "title": "Аккаунт",
+      "emailLabel": "Email",
+      "nameLabel": "Имя",
+      "deleteCta": "Удалить аккаунт",
+      "deleteConfirm": {
+        "title": "Удалить аккаунт MailKit?",
+        "body": "Это удалит твой профиль, журнал настройки и записи о покупках из MailKit. DNS-записи домена и настройки Gmail Send-As останутся как есть — они живут в Cloudflare и Gmail. Действие необратимо.",
+        "confirmCta": "Да, удалить аккаунт",
+        "cancel": "Отмена"
+      }
+    },
+    "resources": {
+      "title": "Ресурсы",
+      "terms": "Условия пользования",
+      "privacy": "Политика конфиденциальности",
+      "guarantee": "Гарантия возврата",
+      "support": "Написать в поддержку",
+      "supportAddress": "support@getmailkit.com"
+    }
+  },
   "setup": {
     "title": "Подключи свой домен",
     "subtitle": "Три шага: вставь токен Cloudflare, выбери зону, смотри как мы все настроим.",
