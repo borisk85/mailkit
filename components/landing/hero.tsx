@@ -34,7 +34,7 @@ export function Hero() {
         }}
       />
 
-      <div className="mx-auto grid max-w-6xl items-center gap-16 px-4 py-20 sm:px-6 sm:py-30 lg:grid-cols-12 lg:gap-12 lg:py-32">
+      <div className="mx-auto grid max-w-6xl items-start gap-16 px-4 py-20 sm:px-6 sm:py-30 lg:grid-cols-12 lg:gap-12 lg:py-32">
         <div className="flex flex-col gap-6 lg:col-span-7">
           <h1
             id="hero-heading"
