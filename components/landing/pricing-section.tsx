@@ -7,12 +7,20 @@ import {
 } from "@/lib/constants/lemon-squeezy";
 
 /**
- * Pricing — premium-pass refresh per UI_REVIEW_BRIEF §2.7. Centered
- * eyebrow + Display-2 headline + Body-large subhead, then a single
- * pricing card with a stronger border (no gradient text on the price)
- * and a competitor-comparison row underneath. The bundle / monitoring
- * upsell links from the previous version were dropped — architect's
- * call: keep the page focused on the $5 setup primary path.
+ * Pricing — Design V2 §4.7 polish on top of the V1 single-card layout.
+ * Three deltas:
+ *
+ *  - Card surface lifted to `bg-surface-elevated-2` (V2 §1.1) so it
+ *    reads as the climax of the page rather than blending with the
+ *    surrounding cards.
+ *  - The competitor compare line is now an inline 3-column micro-grid
+ *    inside the card (Workspace · ImprovMX · Mailkit). The plain
+ *    fallback line still sits below the card as reinforcement.
+ *  - A "Have questions before paying?" link to the FAQ anchor below
+ *    the card — gives skeptics a one-tap exit before checkout.
+ *
+ * Inclusions copy and labels follow the §4.13.6 plain-language sweep
+ * (no `алиасы`, no English `wizard` inside RU prose).
  */
 export function PricingSection() {
   const t = useTranslations("landing.pricing");
@@ -20,7 +28,7 @@ export function PricingSection() {
 
   return (
     <section id="pricing" className="w-full" aria-labelledby="pricing-heading">
-      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-30 lg:py-32">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
           <h2
@@ -35,7 +43,7 @@ export function PricingSection() {
         </div>
 
         <div className="mx-auto mt-16 max-w-[480px]">
-          <article className="flex flex-col gap-6 rounded-[20px] border-2 border-mk-border-strong bg-surface-elevated p-10 mk-card-shadow">
+          <article className="flex flex-col gap-6 rounded-[20px] border-2 border-mk-border-strong bg-surface-elevated-2 p-10 mk-card-shadow-strong">
             <span className="mk-eyebrow text-mk-text-tertiary">
               {t("badge")}
             </span>
@@ -65,6 +73,32 @@ export function PricingSection() {
               ))}
             </ul>
 
+            <div className="rounded-lg border border-mk-border-subtle bg-surface-base/40 p-3">
+              <p className="mk-caption mb-2 text-mk-text-tertiary">
+                {t("compareLabel")}
+              </p>
+              <ul className="grid grid-cols-3 gap-3 text-center">
+                <li>
+                  <p className="font-mono text-sm text-mk-text-secondary">
+                    $6/mo
+                  </p>
+                  <p className="text-[11px] text-mk-text-tertiary">Workspace</p>
+                </li>
+                <li>
+                  <p className="font-mono text-sm text-mk-text-secondary">
+                    $9/mo
+                  </p>
+                  <p className="text-[11px] text-mk-text-tertiary">ImprovMX</p>
+                </li>
+                <li>
+                  <p className="font-mono text-sm font-semibold text-mk-accent">
+                    $5 once
+                  </p>
+                  <p className="text-[11px] text-mk-accent">Mailkit</p>
+                </li>
+              </ul>
+            </div>
+
             <a
               href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
               target="_blank"
@@ -79,8 +113,17 @@ export function PricingSection() {
             </p>
           </article>
 
-          <p className="mk-caption mt-8 text-center text-mk-text-tertiary">
+          <p className="mk-caption mt-6 text-center text-mk-text-tertiary">
             {t("compare")}
+          </p>
+
+          <p className="mk-caption mt-3 text-center text-mk-text-tertiary">
+            <a
+              href="#faq"
+              className="underline-offset-4 hover:text-mk-text-secondary hover:underline"
+            >
+              {t("faqLink")}
+            </a>
           </p>
         </div>
       </div>

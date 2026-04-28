@@ -188,7 +188,9 @@ describe("sendAutoRefundEmail", () => {
       failedStep: "brevo_verify",
     });
 
-    expect(seen.subject).toBe("MailKit setup failed — full refund issued");
+    expect(seen.subject).toBe(
+      "Mailkit · Refund issued — $5 setup couldn't complete",
+    );
     expect(seen.to).toEqual([{ email: "buyer@example.com", name: "Boris" }]);
     expect(seen.textContent).toContain(
       "Our automated setup for your domain couldn't complete",

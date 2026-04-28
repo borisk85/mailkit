@@ -46,15 +46,16 @@ const FAVICON_DIR = "public/favicon";
 const ACCENT = "#7C5CFF";
 
 /**
- * Pixel-art envelope at 16×16 — hand-drawn silhouette without the
- * inner flap line. Drawn as inline SVG so it renders sharp when
- * rasterised at 16×16. Indigo body, white outline matches the
- * Ideogram source visually but stays legible in the tab strip.
+ * Pixel-art envelope at 16×16 — hand-drawn silhouette designed per
+ * Design V2 §2.4. Solid `#7C5CFF` rounded rectangle (14×11 with 1px
+ * side padding, 2px top/bottom), white diagonal flap-line on the
+ * upper triangle only, no internal detail. Hard pixel edges
+ * (`shape-rendering="crispEdges"`) so the mark stays a recognisable
+ * envelope — not a fuzzy purple square — in browser tab strips.
  */
 const PIXEL_ENVELOPE_SVG = `<svg viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-  <rect width="16" height="16" rx="3" fill="${ACCENT}"/>
-  <rect x="2" y="4" width="12" height="9" fill="white"/>
-  <polygon points="2,4 14,4 8,9" fill="${ACCENT}"/>
+  <rect x="1" y="2" width="14" height="11" rx="2" fill="${ACCENT}"/>
+  <path d="M2 4 L8 8 L14 4" stroke="#FFFFFF" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
 </svg>`;
 
 const ALPHA_THRESHOLD = 24;

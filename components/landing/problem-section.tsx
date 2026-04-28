@@ -21,7 +21,7 @@ export function ProblemSection() {
 
   return (
     <section id="problem" className="w-full" aria-labelledby="problem-heading">
-      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-30 lg:py-32">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
           <h2
@@ -35,8 +35,8 @@ export function ProblemSection() {
           </p>
         </div>
 
-        <div className="mt-16 grid gap-6 lg:grid-cols-2 lg:gap-8">
-          <article className="flex flex-col gap-6 rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
+        <div className="mt-16 grid items-stretch gap-6 lg:grid-cols-2 lg:gap-8">
+          <article className="flex h-full flex-col gap-6 rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
             <header className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2.5">
                 <Clock className="size-5 text-mk-text-tertiary" aria-hidden />
@@ -67,7 +67,7 @@ export function ProblemSection() {
             </ul>
           </article>
 
-          <article className="flex flex-col gap-6 rounded-2xl border-2 border-mk-accent bg-surface-elevated p-8 mk-card-shadow">
+          <article className="flex h-full flex-col gap-6 rounded-2xl border-2 border-mk-accent bg-surface-elevated p-8 mk-card-shadow">
             <header className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2.5">
                 <Zap className="size-5 text-mk-accent" aria-hidden />

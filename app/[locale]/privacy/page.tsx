@@ -50,7 +50,11 @@ export default async function PrivacyPage({
   const title =
     locale === "ru" ? "Политика конфиденциальности" : "Privacy Policy";
   const lastUpdated =
-    locale === "ru" ? "Обновлено 2026-04-25" : "Last updated 2026-04-25";
+    locale === "ru" ? "Обновлено 25.04.2026" : "Updated 2026-04-25";
+  const lede =
+    locale === "ru"
+      ? "Mailkit собирает минимум: твой email и имя из Google OAuth, домен который настраиваешь, оплату через Lemon Squeezy. Никаких маркетинговых трекеров, никаких рекламных пикселей. Никаких продаж данных третьим лицам. Полный текст — для регуляторов и любителей деталей — ниже."
+      : "Mailkit collects the minimum: your email and name from Google OAuth, the domain you set up, and your Lemon Squeezy purchase record. No marketing trackers, no ad pixels, no data sold to third parties. The formal text below — for regulators and detail-readers — covers everything else.";
 
   return (
     <>
@@ -58,6 +62,7 @@ export default async function PrivacyPage({
       <LegalDocLayout
         title={title}
         lastUpdatedLabel={lastUpdated}
+        lede={lede}
         body={text}
       />
       <Footer />

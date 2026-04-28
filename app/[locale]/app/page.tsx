@@ -101,11 +101,14 @@ export default async function AppHome({
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
-      <header className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
+      <header className="space-y-3">
+        <p className="mk-eyebrow text-mk-accent">{t("eyebrow")}</p>
+        <h1 className="mk-heading-1 text-mk-text-primary">
           {t("title", { name: displayName })}
         </h1>
-        <p className="text-sm text-mk-text-tertiary">{t("subtitle")}</p>
+        <p className="mk-body max-w-prose text-mk-text-secondary">
+          {t("subtitle")}
+        </p>
       </header>
 
       {isEmpty ? (

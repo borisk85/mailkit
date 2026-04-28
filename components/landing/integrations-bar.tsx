@@ -19,7 +19,7 @@ export function IntegrationsBar() {
       aria-label={t("label")}
       className="w-full border-t border-mk-border-subtle"
     >
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 py-20 sm:px-6">
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 py-20 sm:px-6 lg:py-32">
         <span className="mk-eyebrow text-mk-text-tertiary">{t("label")}</span>
         <ul className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 sm:gap-x-16">
           <LogoItem name="Cloudflare">
@@ -54,7 +54,7 @@ function LogoItem({
     <li>
       <span
         aria-label={name}
-        className="group inline-flex h-8 items-center gap-2 text-mk-text-tertiary opacity-70 transition-all hover:-translate-y-0.5 hover:opacity-100 hover:text-mk-text-secondary"
+        className="group inline-flex h-8 items-center gap-2 text-mk-text-secondary transition-all hover:-translate-y-0.5 hover:text-mk-text-primary"
       >
         {children}
         <span className="text-base font-semibold tracking-tight">{name}</span>

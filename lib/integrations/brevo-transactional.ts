@@ -146,7 +146,7 @@ export async function sendAutoRefundEmail(args: {
 }): Promise<void> {
   const { toEmail, toName, failedStep } = args;
 
-  const subject = "MailKit setup failed — full refund issued";
+  const subject = "Mailkit · Refund issued — $5 setup couldn't complete";
 
   const humanReason = humanizeFailedStep(failedStep);
 
@@ -189,7 +189,7 @@ export async function sendSendLimitBlockEmail(args: {
 }): Promise<void> {
   const { toEmail, toName, domain, period, observed, limit, resumeHint } = args;
 
-  const subject = `Sending from ${domain} temporarily paused`;
+  const subject = `Mailkit · Sending from ${domain} temporarily paused`;
 
   const textContent = [
     "Hi,",
@@ -236,7 +236,7 @@ export async function sendDeliverabilitySuspendEmail(args: {
 }): Promise<void> {
   const { toEmail, toName, domain, kind, observedRate, thresholdRate } = args;
 
-  const subject = `Deliverability issue on ${domain}`;
+  const subject = `Mailkit · Deliverability issue on ${domain}`;
 
   const headline =
     kind === "complaint"
@@ -292,7 +292,7 @@ export async function sendDeliverabilityWarnEmail(args: {
 }): Promise<void> {
   const { toEmail, toName, domain, observedRate, thresholdRate } = args;
 
-  const subject = `Heads up: high unsubscribe rate on ${domain}`;
+  const subject = `Mailkit · Heads up — high unsubscribe rate on ${domain}`;
 
   const textContent = [
     "Hi,",

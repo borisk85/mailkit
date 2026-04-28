@@ -1,21 +1,21 @@
-import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
+import { MailkitIcon } from "@/components/brand/mailkit-icon";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 import { LanguageSwitcher } from "./language-switcher";
 import { SignInLink } from "./sign-in-link";
 
 /**
- * Landing header — premium-pass refresh per UI_REVIEW_BRIEF §2.2 + §7.5.
- * 64px tall, monochrome surface tokens, sticky with subtle backdrop-blur.
+ * Landing header — premium-pass refresh per UI_REVIEW_BRIEF §2.2 + §7.5,
+ * with Design V2 §4.2 polish (sign-in icon affordance, inline-SVG mark,
+ * `Mailkit` casing).
  *
- * Brand lockup: 24×24 envelope icon (Ideogram Variant 2) + "Mailkit"
- * wordmark @ 18px / weight 600 / -0.02em tracking. Per the §7.5
- * revision the trailing accent dot was removed — it wasn't in the
- * Ideogram source and read as a second accent next to the icon.
- * Icon size dropped from 28→24 so the wordmark stays the visual lead.
+ * Brand lockup: 24×24 inline-SVG envelope (matches the Ideogram
+ * source, but scales without raster blur on retina) + `Mailkit`
+ * wordmark @ 18 px / weight 600 / -0.02em tracking. No trailing
+ * accent dot.
  */
 export function Header() {
   const t = useTranslations("landing.header");
@@ -23,7 +23,7 @@ export function Header() {
   const landingHref = `/${locale}`;
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-mk-border-subtle bg-surface-base/80 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/70">
+    <header className="sticky top-0 z-40 w-full border-b border-mk-border-subtle bg-surface-base/80 shadow-[0_1px_0_rgba(0,0,0,0.4)] backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/70">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
         <Link
           href={landingHref}
@@ -35,14 +35,7 @@ export function Header() {
           }}
           aria-label={t("logo")}
         >
-          <Image
-            src="/brand/mailkit-icon.png"
-            alt=""
-            width={24}
-            height={24}
-            priority
-            className="size-6 shrink-0"
-          />
+          <MailkitIcon className="size-6 shrink-0" />
           <span>{t("logo")}</span>
         </Link>
 

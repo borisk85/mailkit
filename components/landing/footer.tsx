@@ -1,15 +1,20 @@
-import Image from "next/image";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
+import { MailkitIcon } from "@/components/brand/mailkit-icon";
+
 /**
- * Landing footer — premium-pass refresh per UI_REVIEW_BRIEF §2.11.
- * 5-column grid on desktop (brand / Product / Legal / Resources /
- * Contact), stacked on mobile. Resources column carries forward-
- * dated links (status, changelog, help) — they 404 today, the
- * architect's call is to render the structure now and fill the pages
- * post-launch instead of churning footer markup later.
+ * Landing footer — Design V2 §4.11 trim of the V1 5-column grid.
+ * The Resources column (forward-dated /help, /status, /changelog
+ * placeholders) is gone until those pages exist; current layout is
+ * Brand × 2 + Product + Legal + Contact = 4 effective columns.
+ *
+ * The Contact column carries a `Built in public — GitHub →` link so
+ * skeptics can verify the codebase — concrete trust signal that
+ * reinforces the indie-founder positioning in the tagline.
  */
+const GITHUB_URL = "https://github.com/borisk85/mailkit";
+
 export function Footer() {
   const t = useTranslations("footer");
   const locale = useLocale();
@@ -29,14 +34,8 @@ export function Footer() {
                 letterSpacing: "-0.02em",
               }}
             >
-              <Image
-                src="/brand/mailkit-icon.png"
-                alt=""
-                width={28}
-                height={28}
-                className="size-7 shrink-0"
-              />
-              <span>MailKit</span>
+              <MailkitIcon className="size-7 shrink-0" />
+              <span>Mailkit</span>
             </Link>
             <p className="mk-body-small mt-4 max-w-xs text-mk-text-tertiary">
               {t("tagline")}
@@ -71,15 +70,12 @@ export function Footer() {
             </FooterLink>
           </FooterColumn>
 
-          <FooterColumn heading={t("resourcesHeading")}>
-            <FooterPending>{t("links.help")}</FooterPending>
-            <FooterPending>{t("links.status")}</FooterPending>
-            <FooterPending>{t("links.changelog")}</FooterPending>
-          </FooterColumn>
-
           <FooterColumn heading={t("contactHeading")}>
             <FooterLink href="mailto:support@getmailkit.com" external>
               {t("links.supportEmail")}
+            </FooterLink>
+            <FooterLink href={GITHUB_URL} external>
+              {t("links.builtInPublic")}
             </FooterLink>
           </FooterColumn>
         </div>
@@ -101,10 +97,6 @@ function FooterColumn({
       <ul className="flex flex-col gap-2.5">{children}</ul>
     </div>
   );
-}
-
-function FooterPending({ children }: { children: React.ReactNode }) {
-  return <li className="mk-body-small text-mk-text-tertiary/60">{children}</li>;
 }
 
 function FooterLink({

@@ -17,7 +17,7 @@ export function TrustSection() {
 
   return (
     <section id="trust" className="w-full" aria-labelledby="trust-heading">
-      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-30 lg:py-32">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
           <h2
@@ -29,6 +29,13 @@ export function TrustSection() {
           <p className="mk-body-large max-w-xl text-balance text-mk-text-secondary">
             {t("subhead")}
           </p>
+          <Link
+            href={`/${locale}/guarantee`}
+            className="mk-caption inline-flex items-center gap-2 rounded-full border border-mk-border-strong bg-surface-elevated/60 px-3 py-1 text-mk-text-secondary transition-colors hover:bg-surface-elevated hover:text-mk-text-primary"
+          >
+            <Shield className="size-3" aria-hidden />
+            {t("policyPill")}
+          </Link>
         </div>
 
         <div className="mt-16 grid gap-6 lg:grid-cols-2 lg:gap-8">
@@ -75,7 +82,7 @@ function GuaranteeBlock({
   badgeKind: "success" | "info";
 }) {
   return (
-    <article className="flex flex-col gap-5 rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
+    <article className="flex flex-col gap-5 rounded-2xl border border-mk-border-subtle bg-surface-elevated-2 p-8 mk-card-shadow-strong">
       <div className="flex items-center justify-between gap-4">
         {icon}
         <span

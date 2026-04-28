@@ -1,6 +1,7 @@
 "use client";
 
 import { useLocale, useTranslations } from "next-intl";
+import { LogIn } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
 
@@ -54,8 +55,9 @@ export function SignInLink() {
     <button
       type="button"
       onClick={handleSignIn}
-      className="group inline-flex items-center gap-1 text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary focus:outline-none focus-visible:underline focus-visible:underline-offset-4"
+      className="group inline-flex items-center gap-1.5 text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary focus:outline-none focus-visible:underline focus-visible:underline-offset-4"
     >
+      <LogIn className="size-3.5 opacity-60" aria-hidden />
       {t("signIn")}
     </button>
   );
