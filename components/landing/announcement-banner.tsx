@@ -18,7 +18,7 @@ import {
  * Dismissal persists in localStorage under `mailkit.announcement.v1`.
  * Bump suffix to `.v2` when copy rotates to re-prompt all users.
  */
-const STORAGE_KEY = "mailkit.announcement.v1";
+const STORAGE_KEY = "mailkit.announcement.v2";
 
 export function AnnouncementBanner() {
   const t = useTranslations("landing.announcementBanner");
@@ -49,20 +49,15 @@ export function AnnouncementBanner() {
   }
 
   return (
-    <div
-      className="relative w-full border-b border-mk-border-subtle"
-      style={{ backgroundColor: "rgba(124, 92, 255, 0.08)" }}
-    >
-      <div className="mx-auto flex h-9 max-w-6xl items-center justify-center gap-2 px-4 sm:gap-3">
-        <Sparkle className="size-3.5 text-mk-accent opacity-70" aria-hidden />
-        <span className="mk-body-small font-medium text-mk-text-secondary">
-          {t("message")}
-        </span>
+    <div className="relative w-full bg-mk-accent text-white">
+      <div className="mx-auto flex min-h-10 max-w-6xl items-center justify-center gap-2 px-10 py-2 text-center sm:gap-3">
+        <Sparkle className="size-4 shrink-0" aria-hidden />
+        <span className="mk-body-small font-semibold">{t("message")}</span>
         <a
           href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
           target="_blank"
           rel="noreferrer"
-          className="mk-body-small font-medium text-mk-text-primary underline-offset-4 hover:underline"
+          className="mk-body-small font-semibold underline underline-offset-4 hover:opacity-90"
         >
           {t("cta")}
         </a>
@@ -71,7 +66,7 @@ export function AnnouncementBanner() {
         type="button"
         onClick={onDismiss}
         aria-label={t("dismiss")}
-        className="absolute right-2 top-1/2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-mk-text-tertiary opacity-50 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
+        className="absolute right-2 top-1/2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-white opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
       >
         <X className="size-3.5" aria-hidden />
       </button>

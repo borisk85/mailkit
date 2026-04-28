@@ -5,8 +5,8 @@
   },
   "landing": {
     "announcementBanner": {
-      "message": "Launch week — first 100 setups free with promo FIRST100",
-      "cta": "How it works →",
+      "message": "First 100 setups — free with code FIRST100.",
+      "cta": "Claim →",
       "dismiss": "Dismiss banner"
     },
     "header": {
@@ -28,31 +28,27 @@
       }
     },
     "hero": {
-      "eyebrow": "Email setup for small teams, founders, and freelancers",
       "headlineLine1": "Your email.",
       "headlineLine2": "Your domain.",
       "headlineLine3": "Five minutes.",
       "subhead": "We configure Cloudflare Email Routing, Brevo SMTP, and the DNS records that prove your email is real. You copy-paste four lines into Gmail. That's the whole product.",
-      "primaryCta": "Get your email — $5",
+      "primaryCta": "Set up my email",
       "secondaryCta": "See how it works",
+      "priceNote": "Free with code FIRST100 · $5 one-time after",
       "trustNote": "30-day money-back guarantee. Automatic refund if our setup fails.",
       "mockup": {
-        "alt": "Gmail Compose window showing your custom domain email as the From address",
-        "inboxLabel": "Inbox · Compose",
-        "draftSavedLabel": "Draft saved",
-        "windowTitle": "New message",
-        "fromLabel": "From",
-        "fromDefault": "john.doe@gmail.com",
-        "fromDefaultBadge": "Default",
-        "fromCustom1": "hello@yourdomain.com",
-        "fromCustom2": "hi@yourdomain.com",
-        "fromCustomBadge": "Mailkit",
-        "toLabel": "To",
-        "toPlaceholder": "team@startup.com",
-        "subjectLabel": "Subject",
-        "subjectPlaceholder": "Quick update on the Q2 launch",
-        "bodyPlaceholder": "Hey team,",
-        "sendButton": "Send"
+        "alt": "Gmail message view with the From address on your custom domain",
+        "backToInbox": "Inbox",
+        "date": "10:42 AM",
+        "subject": "Q2 proposal — pricing and timeline",
+        "fromName": "Boris Komarov",
+        "fromEmail": "boris@acmestudio.com",
+        "fromBadge": "via Mailkit",
+        "to": "to sarah@northwind.co",
+        "bodyP1": "Hi Sarah,",
+        "bodyP2": "Thanks for the call this morning. Sending the proposal we discussed — pricing on page 2, timeline on page 3.",
+        "bodyP3": "Happy to walk through anything on Thursday.",
+        "signature": "— Boris"
       }
     },
     "integrations": {
@@ -109,11 +105,11 @@
     },
     "problem": {
       "eyebrow": "The problem",
-      "heading": "Setting up email on your own domain is a 90-minute headache.",
-      "subhead": "Five tabs open. Three documentation portals. One typo in SPF and you start over.",
+      "heading": "Setting up email on your own domain takes about an hour.",
+      "subhead": "Two services to configure, five DNS records to enter by hand, and one wrong character means starting over.",
       "without": {
         "title": "Manual setup",
-        "duration": "60–90 min",
+        "duration": "~1 hour",
         "steps": [
           "Research routing services",
           "Read Brevo SMTP docs (twice)",
@@ -519,7 +515,7 @@
     "supportCta": "Email support"
   },
   "cookieConsent": {
-    "body": "Sign-in and language cookies only — no tracking.",
+    "body": "Cookies — sign-in and language only. No tracking.",
     "details": "Privacy",
     "accept": "Got it"
   }

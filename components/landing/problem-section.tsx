@@ -55,7 +55,7 @@ export function ProblemSection() {
               {withoutSteps.map((step) => (
                 <li
                   key={step}
-                  className="flex items-start gap-3 rounded-md px-2 py-1.5 text-mk-text-tertiary transition-colors hover:bg-mk-danger/[0.08]"
+                  className="flex items-start gap-3 px-2 py-1.5 text-mk-text-tertiary"
                 >
                   <span
                     className="mt-2 size-1 shrink-0 rounded-full bg-mk-text-tertiary"
