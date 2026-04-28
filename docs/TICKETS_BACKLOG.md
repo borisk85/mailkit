@@ -98,6 +98,12 @@
 - #14 White-label for agencies
 - #15 Multi-domain dashboard
 
+## 🎨 Design v2 follow-up cosmetics (post-launch, низкий приоритет)
+Две косметические правки выявленные на V2-approve визуальной ревизии 2026-04-28. Не блокеры запуска — собрать в один мини-PR когда вернёмся к UI/UX iterations.
+
+- MAILKIT pill в hero Gmail-mockup использует uppercase, тогда как фактический wordmark в navbar — `Mailkit` с capital M. Привести pill к согласованному casing'у `Mailkit` для brand consistency.
+- Cookie consent banner на 768px viewport (tablet portrait) — sentinel-порог появления баннера сейчас 100vh, в момент scroll на этом разрешении баннер перекрывает subhead в hero. Поднять порог до ~130vh чтобы баннер появлялся после первого экрана.
+
 ## 🧹 Tech debt
 - LS checkout store migration — **pre-launch BLOCKER**, owner contacting LS support.
   - Current: product в velabot store (owner's другой project), checkout
