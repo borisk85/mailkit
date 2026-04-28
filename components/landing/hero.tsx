@@ -44,7 +44,9 @@ export function Hero() {
             <span className="mk-display-fade block">{t("headlineLine2")}</span>
           </h1>
 
-          <p className="mk-body-large text-mk-text-secondary">{t("subhead")}</p>
+          <p className="text-[17px] leading-relaxed text-mk-text-secondary">
+            {t("subhead")}
+          </p>
 
           <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3">
             <a
