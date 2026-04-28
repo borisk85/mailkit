@@ -28,9 +28,8 @@
       }
     },
     "hero": {
-      "headlineLine1": "Email on your domain.",
-      "headlineLine2": "Without the DNS hell.",
-      "headlineLine3": "Five minutes.",
+      "headlineLine1": "Email on your domain",
+      "headlineLine2": "in five minutes.",
       "subhead": "Our automation runs Cloudflare, Brevo, and DNS in 90 seconds. Last step: paste four lines into Gmail Send-As — and email from your domain works.",
       "primaryCta": "Set up my email",
       "secondaryCta": "See how it works",
