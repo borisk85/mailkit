@@ -41,7 +41,7 @@ export function Hero() {
             className="mk-display-1 text-balance text-mk-text-primary"
           >
             <span className="block">{t("headlineLine1")}</span>
-            <span className="mk-display-fade block">{t("headlineLine2")}</span>
+            <span className="block text-mk-accent">{t("headlineLine2")}</span>
           </h1>
 
           <p className="text-[17px] leading-relaxed text-mk-text-secondary">
