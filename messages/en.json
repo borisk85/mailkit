@@ -43,7 +43,7 @@
         "fromCustom2": "hi@yourdomain.com",
         "fromCustomBadge": "Mailkit",
         "toLabel": "To",
-        "toPlaceholder": "client@example.com",
+        "toPlaceholder": "sarah@northwind.co",
         "subjectLabel": "Subject",
         "subjectPlaceholder": "Q2 proposal — pricing and timeline",
         "bodyPlaceholder": "Compose your message…",

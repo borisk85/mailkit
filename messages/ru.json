@@ -43,7 +43,7 @@
         "fromCustom2": "hi@мойдомен.ru",
         "fromCustomBadge": "Mailkit",
         "toLabel": "Кому",
-        "toPlaceholder": "client@example.com",
+        "toPlaceholder": "sarah@northwind.co",
         "subjectLabel": "Тема",
         "subjectPlaceholder": "КП на Q2 — цены и сроки",
         "bodyPlaceholder": "Текст сообщения…",
