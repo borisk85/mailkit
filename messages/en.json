@@ -46,7 +46,6 @@
         "toPlaceholder": "sarah@northwind.co",
         "subjectLabel": "Subject",
         "subjectPlaceholder": "Quick question",
-        "bodyPlaceholder": "Hi Sarah!",
         "sendButton": "Send"
       }
     },

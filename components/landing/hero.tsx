@@ -146,10 +146,13 @@ function GmailComposeMockup() {
           />
         </div>
 
-        <div className="mt-3 min-h-[60px] rounded-md bg-surface-base/50 p-3">
-          <span className="text-xs text-mk-text-secondary">
-            {t("bodyPlaceholder")}
-          </span>
+        <div
+          aria-hidden
+          className="mt-3 flex min-h-[60px] flex-col gap-2 rounded-md bg-surface-base/50 p-3"
+        >
+          <span className="block h-2 w-3/5 rounded-full bg-mk-text-tertiary/20" />
+          <span className="block h-2 w-4/5 rounded-full bg-mk-text-tertiary/20" />
+          <span className="block h-2 w-2/5 rounded-full bg-mk-text-tertiary/20" />
         </div>
 
         <div className="mt-4">
@@ -157,7 +160,7 @@ function GmailComposeMockup() {
             type="button"
             tabIndex={-1}
             aria-hidden
-            className="pointer-events-none inline-flex h-8 items-center rounded-md border border-mk-border-strong bg-surface-base px-4 text-xs font-semibold text-mk-text-secondary"
+            className="pointer-events-none inline-flex h-8 items-center rounded-md bg-[#1A73E8] px-4 text-xs font-semibold text-white"
           >
             {t("sendButton")}
           </button>

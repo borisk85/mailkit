@@ -46,7 +46,6 @@
         "toPlaceholder": "sarah@northwind.co",
         "subjectLabel": "Тема",
         "subjectPlaceholder": "Быстрый вопрос",
-        "bodyPlaceholder": "Привет, Сара!",
         "sendButton": "Отправить"
       }
     },
