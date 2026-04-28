@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Sparkle, X } from "lucide-react";
+import { X } from "lucide-react";
 
 import {
   LEMON_SQUEEZY_CHECKOUT_URL,
@@ -51,7 +51,6 @@ export function AnnouncementBanner() {
   return (
     <div className="relative w-full bg-mk-accent text-white">
       <div className="mx-auto flex min-h-10 max-w-6xl items-center justify-center gap-2 px-10 py-2 text-center sm:gap-3">
-        <Sparkle className="size-4 shrink-0" aria-hidden />
         <span className="mk-body-small font-semibold">{t("message")}</span>
         <a
           href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
