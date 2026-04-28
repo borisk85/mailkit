@@ -41,7 +41,9 @@ export function Hero() {
             className="mk-display-1 text-balance text-mk-text-primary"
           >
             <span className="block">{t("headlineLine1")}</span>
-            <span className="block text-mk-accent">{t("headlineLine2")}</span>
+            <span className="block bg-gradient-to-br from-violet-300 via-fuchsia-400 to-mk-accent bg-clip-text text-transparent">
+              {t("headlineLine2")}
+            </span>
           </h1>
 
           <p className="mk-body-large text-mk-text-secondary">{t("subhead")}</p>
