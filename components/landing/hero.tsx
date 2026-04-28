@@ -44,9 +44,7 @@ export function Hero() {
             <span className="block text-mk-accent">{t("headlineLine2")}</span>
           </h1>
 
-          <p className="text-[17px] leading-relaxed text-mk-text-secondary">
-            {t("subhead")}
-          </p>
+          <p className="mk-body-large text-mk-text-secondary">{t("subhead")}</p>
 
           <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3">
             <a
