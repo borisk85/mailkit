@@ -49,7 +49,7 @@ export function AnnouncementBanner() {
   }
 
   return (
-    <div className="relative w-full bg-mk-accent text-white">
+    <div className="relative w-full bg-amber-400 text-stone-900">
       <div className="mx-auto flex min-h-10 max-w-6xl items-center justify-center gap-2 px-10 py-2 text-center sm:gap-3">
         <span className="mk-body-small font-semibold">{t("message")}</span>
         <a
@@ -65,7 +65,7 @@ export function AnnouncementBanner() {
         type="button"
         onClick={onDismiss}
         aria-label={t("dismiss")}
-        className="absolute right-2 top-1/2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-white opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+        className="absolute right-2 top-1/2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-stone-900 opacity-70 transition-opacity hover:opacity-100 focus:outline-none focus-visible:ring-2 focus-visible:ring-stone-900/40"
       >
         <X className="size-3.5" aria-hidden />
       </button>
