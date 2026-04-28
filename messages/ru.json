@@ -41,7 +41,7 @@
         "fromDefaultBadge": "Сейчас",
         "fromCustom1": "hello@вашдомен.ru",
         "fromCustom2": "hi@вашдомен.ru",
-        "fromCustomBadge": "через Mailkit",
+        "fromCustomBadge": "с Mailkit",
         "toLabel": "Кому",
         "toPlaceholder": "sarah@northwind.co",
         "subjectLabel": "Тема",
