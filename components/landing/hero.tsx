@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 
 import {
   LEMON_SQUEEZY_CHECKOUT_URL,
@@ -9,11 +9,12 @@ import {
 /**
  * Landing hero — asymmetric 7/5 grid (left content / right mockup).
  *
- * The mockup is an opened-email view, not a Compose window. The visual
- * punchline is the From-row: a custom-domain address with a "via
- * Mailkit" badge — i.e. exactly what recipients see in their inbox
- * after onboarding. Subject + body are realistic SMB/freelance copy so
- * the mockup reads as a real message, not a placeholder.
+ * The mockup shows a Gmail Compose window with the From-row stack as
+ * the visual punchline: the user's old @gmail address (struck-through)
+ * + two custom-domain addresses (highlighted with the Mailkit badge).
+ * In one glance: "switch your From from gmail.com to yourdomain.com".
+ * Decorative chrome (Inbox label, draft-saved indicator, dot menus) is
+ * removed so the From rows are the only thing competing for attention.
  */
 export function Hero() {
   const t = useTranslations("landing.hero");
@@ -48,35 +49,32 @@ export function Hero() {
             {t("subhead")}
           </p>
 
-          <div className="mt-2 flex flex-col gap-3">
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
-              <a
-                href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
-                target="_blank"
-                rel="noreferrer"
-                className="mk-cta-shadow group inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-all hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
-                style={{ minHeight: 52 }}
-              >
-                {t("primaryCta")}
-                <ArrowRight
-                  className="size-4 transition-transform group-hover:translate-x-0.5"
-                  aria-hidden
-                />
-              </a>
-              <a
-                href="#how-it-works"
-                className="group inline-flex items-center gap-1.5 text-base font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
-              >
-                <span className="underline-offset-4 group-hover:underline">
-                  {t("secondaryCta")}
-                </span>
-                <ArrowRight
-                  className="size-4 transition-transform group-hover:translate-x-0.5"
-                  aria-hidden
-                />
-              </a>
-            </div>
-            <p className="mk-caption text-mk-text-tertiary">{t("priceNote")}</p>
+          <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+            <a
+              href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
+              target="_blank"
+              rel="noreferrer"
+              className="mk-cta-shadow group inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-all hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+              style={{ minHeight: 52 }}
+            >
+              {t("primaryCta")}
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </a>
+            <a
+              href="#how-it-works"
+              className="group inline-flex items-center gap-1.5 text-base font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
+            >
+              <span className="underline-offset-4 group-hover:underline">
+                {t("secondaryCta")}
+              </span>
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
+            </a>
           </div>
 
           <p className="mk-caption mt-2 text-mk-text-tertiary">
@@ -85,7 +83,7 @@ export function Hero() {
         </div>
 
         <div className="lg:col-span-5">
-          <InboxMessageMockup />
+          <GmailComposeMockup />
         </div>
       </div>
 
@@ -94,9 +92,8 @@ export function Hero() {
   );
 }
 
-function InboxMessageMockup() {
+function GmailComposeMockup() {
   const t = useTranslations("landing.hero.mockup");
-  const initial = t("fromName").charAt(0).toUpperCase();
 
   return (
     <div
@@ -117,52 +114,106 @@ function InboxMessageMockup() {
         aria-label={t("alt")}
         className="mk-mockup-tilt rounded-2xl border border-mk-border-strong bg-surface-elevated-2 p-5 mk-card-shadow-strong"
       >
-        <div className="mb-4 flex items-center gap-2 border-b border-mk-border-subtle pb-3 text-[11px] text-mk-text-tertiary">
-          <ArrowLeft className="size-3.5" aria-hidden />
-          <span className="font-medium">{t("backToInbox")}</span>
+        <div className="mb-4 border-b border-mk-border-subtle pb-3">
+          <span className="text-xs font-semibold text-mk-text-secondary">
+            {t("windowTitle")}
+          </span>
         </div>
 
-        <h3 className="mb-4 text-base font-semibold leading-snug text-mk-text-primary">
-          {t("subject")}
-        </h3>
+        <div className="space-y-2">
+          <FromRow
+            value={t("fromDefault")}
+            badge={t("fromDefaultBadge")}
+            muted
+          />
+          <FromRow
+            value={t("fromCustom1")}
+            badge={t("fromCustomBadge")}
+            highlighted
+          />
+          <FromRow
+            value={t("fromCustom2")}
+            badge={t("fromCustomBadge")}
+            highlighted
+          />
+        </div>
 
-        <div className="mb-4 flex items-start gap-3">
-          <div
+        <div className="mt-3 space-y-2 border-t border-mk-border-subtle pt-3">
+          <CompactRow label={t("toLabel")} value={t("toPlaceholder")} />
+          <CompactRow
+            label={t("subjectLabel")}
+            value={t("subjectPlaceholder")}
+          />
+        </div>
+
+        <div className="mt-3 min-h-[60px] rounded-md bg-surface-base/50 p-3">
+          <span className="text-xs italic text-mk-text-tertiary">
+            {t("bodyPlaceholder")}
+          </span>
+        </div>
+
+        <div className="mt-4">
+          <button
+            type="button"
+            tabIndex={-1}
             aria-hidden
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-mk-accent/15 text-sm font-semibold text-mk-accent"
+            className="pointer-events-none inline-flex h-8 items-center rounded-md bg-mk-accent px-4 text-xs font-semibold text-white"
           >
-            {initial}
-          </div>
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center justify-between gap-2">
-              <span className="truncate text-sm font-semibold text-mk-text-primary">
-                {t("fromName")}
-              </span>
-              <span className="shrink-0 text-[11px] text-mk-text-tertiary">
-                {t("date")}
-              </span>
-            </div>
-            <div className="mt-0.5 flex flex-wrap items-center gap-x-2 gap-y-1">
-              <span className="inline-flex items-center gap-1 rounded-md border border-mk-accent/40 bg-mk-accent/[0.08] px-2 py-0.5 font-mono text-[11px] font-medium text-mk-text-primary ring-1 ring-mk-accent/20">
-                {t("fromEmail")}
-              </span>
-              <span className="rounded-full bg-mk-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mk-accent">
-                {t("fromBadge")}
-              </span>
-            </div>
-            <span className="mt-1 block text-[11px] text-mk-text-tertiary">
-              {t("to")}
-            </span>
-          </div>
-        </div>
-
-        <div className="space-y-2.5 border-t border-mk-border-subtle pt-4 text-sm leading-relaxed text-mk-text-secondary">
-          <p>{t("bodyP1")}</p>
-          <p>{t("bodyP2")}</p>
-          <p>{t("bodyP3")}</p>
-          <p className="text-mk-text-primary">{t("signature")}</p>
+            {t("sendButton")}
+          </button>
         </div>
       </div>
+    </div>
+  );
+}
+
+function FromRow({
+  value,
+  badge,
+  highlighted = false,
+  muted = false,
+}: {
+  value: string;
+  badge: string;
+  highlighted?: boolean;
+  muted?: boolean;
+}) {
+  if (highlighted) {
+    return (
+      <div className="flex items-center justify-between rounded-md border border-mk-accent/40 bg-mk-accent/[0.06] px-3 py-2 ring-1 ring-mk-accent/20">
+        <span className="font-mono text-xs font-medium text-mk-text-primary">
+          {value}
+        </span>
+        <span className="rounded-full bg-mk-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mk-accent">
+          {badge}
+        </span>
+      </div>
+    );
+  }
+  return (
+    <div className="flex items-center justify-between rounded-md px-3 py-2">
+      <span
+        className={
+          muted
+            ? "font-mono text-xs text-mk-text-tertiary line-through"
+            : "font-mono text-xs text-mk-text-secondary"
+        }
+      >
+        {value}
+      </span>
+      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-mk-text-tertiary">
+        <Check className="size-3" aria-hidden />
+        {badge}
+      </span>
+    </div>
+  );
+}
+
+function CompactRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex items-center gap-2 px-3 text-xs">
+      <span className="font-medium text-mk-text-tertiary">{label}</span>
+      <span className="text-mk-text-secondary">{value}</span>
     </div>
   );
 }
