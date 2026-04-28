@@ -37,7 +37,7 @@
       "mockup": {
         "alt": "Gmail Compose window — the From dropdown shows your custom-domain addresses instead of @gmail.com",
         "windowTitle": "New message",
-        "fromDefault": "user@gmail.com",
+        "fromDefault": "alex.morgan@gmail.com",
         "fromDefaultBadge": "Now",
         "fromCustom1": "hello@yourdomain.com",
         "fromCustom2": "hi@yourdomain.com",
