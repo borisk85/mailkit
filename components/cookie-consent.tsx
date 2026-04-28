@@ -66,21 +66,19 @@ export function CookieConsent() {
     <div
       role="region"
       aria-label="Cookie consent"
-      className="fixed inset-x-0 bottom-0 z-50 border-t border-zinc-200 bg-white/95 px-4 py-4 shadow-lg backdrop-blur-md sm:px-6 dark:border-zinc-800 dark:bg-zinc-950/95"
+      className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-[520px] flex-col gap-3 rounded-2xl border border-mk-border-strong bg-surface-elevated/95 p-6 backdrop-blur-md mk-card-shadow sm:left-auto sm:right-6 sm:bottom-6 sm:mx-0"
     >
-      <div className="mx-auto flex max-w-4xl flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <p className="text-xs leading-5 text-zinc-700 sm:text-sm sm:leading-6 dark:text-zinc-300">
-          {t("body")}{" "}
-          <Link
-            href={`/${locale}/privacy`}
-            className="font-medium text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400"
-          >
-            {t("details")}
-          </Link>
-        </p>
+      <p className="mk-body-small text-mk-text-secondary">{t("body")}</p>
+      <div className="flex items-center gap-3">
         <Button onClick={handleAccept} size="sm" className="shrink-0">
           {t("accept")}
         </Button>
+        <Link
+          href={`/${locale}/privacy`}
+          className="mk-body-small font-medium text-mk-text-secondary underline-offset-4 hover:text-mk-text-primary hover:underline"
+        >
+          {t("details")}
+        </Link>
       </div>
     </div>
   );

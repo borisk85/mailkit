@@ -1,25 +1,36 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { Sparkles } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
 /**
- * First-visit empty state. Shown when the user has zero setups AND
- * zero purchases — i.e. brand-new account that landed on /app
- * before paying. The CTA points at /app/setup which itself enforces
- * the purchase gate (#7) once that ships in production.
+ * First-visit empty state — premium-pass refresh per UI_REVIEW_BRIEF
+ * §3.1 + §6.4. Wraps the title with a soft ambient circle behind a
+ * Sparkles glyph so the empty card has a visual focal point instead
+ * of plain text-on-card. The CTA still points at /app/setup which
+ * enforces the purchase gate.
  */
 export function DashboardEmptyState({ locale }: { locale: string }) {
   const t = useTranslations("dashboard.emptyState");
   return (
-    <div className="rounded-lg border border-dashed border-zinc-300 bg-zinc-50 p-8 text-center dark:border-zinc-700 dark:bg-zinc-900/40">
-      <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
-        {t("title")}
-      </h2>
-      <p className="mx-auto mt-2 max-w-md text-sm text-zinc-600 dark:text-zinc-400">
+    <div className="relative overflow-hidden rounded-2xl border border-dashed border-mk-border-strong bg-surface-elevated p-12 text-center mk-card-shadow">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute left-1/2 top-0 size-64 -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{
+          background:
+            "radial-gradient(circle, rgba(124, 92, 255, 0.12), transparent 70%)",
+        }}
+      />
+      <div className="relative mx-auto mb-6 inline-flex size-12 items-center justify-center rounded-full bg-mk-accent/10">
+        <Sparkles className="size-6 text-mk-accent" aria-hidden />
+      </div>
+      <h2 className="mk-heading-2 text-mk-text-primary">{t("title")}</h2>
+      <p className="mx-auto mt-3 max-w-md mk-body text-mk-text-secondary">
         {t("body")}
       </p>
-      <Link href={`/${locale}/app/setup`} className="mt-4 inline-flex">
+      <Link href={`/${locale}/app/setup`} className="mt-6 inline-flex">
         <Button>{t("cta")}</Button>
       </Link>
     </div>

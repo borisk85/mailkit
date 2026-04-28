@@ -18,8 +18,8 @@
   },
   "landing": {
     "announcementBanner": {
-      "message": "First 100 customers — free setup.",
-      "cta": "Claim yours →",
+      "message": "Launch week — first 100 setups free with promo FIRST100",
+      "cta": "See how →",
       "dismiss": "Dismiss banner"
     },
     "header": {
@@ -41,117 +41,126 @@
       }
     },
     "hero": {
-      "headline": "Email on your domain in 5 minutes.",
-      "guaranteeSuffix": "Guaranteed.",
-      "guaranteeLink": "see policy",
-      "body": "Skip 90 minutes of DNS hell, Brevo configuration gotchas, and Gmail Send-As setup. We automate the technical parts — you do three copy-paste clicks in Gmail. That's it.",
+      "eyebrow": "Email infrastructure for indie makers and small teams",
+      "headlineLine1": "Your email.",
+      "headlineLine2": "Your domain.",
+      "headlineLine3": "Five minutes.",
+      "subhead": "We configure Cloudflare, Brevo, and DKIM/SPF/DMARC records. You copy-paste four lines into Gmail. That's the whole product.",
       "primaryCta": "Get your email — $5",
-      "secondaryCta": "How it works",
-      "visualAlt": "Three-step setup flow: Cloudflare, Brevo, Gmail",
-      "visualStep1": "Cloudflare",
-      "visualStep2": "Brevo",
-      "visualStep3": "Gmail",
-      "visualStep1Time": "15s",
-      "visualStep2Time": "60s",
-      "visualStep3Time": "3min"
+      "secondaryCta": "See how it works",
+      "trustNote": "30-day money-back. Auto-refund if our setup fails.",
+      "mockup": {
+        "alt": "Gmail Compose window showing your custom domain email as the From address",
+        "windowTitle": "New message",
+        "fromLabel": "From",
+        "fromDefault": "john.doe@gmail.com",
+        "fromDefaultBadge": "Default",
+        "fromCustom1": "hello@yourdomain.com",
+        "fromCustom2": "hi@yourdomain.com",
+        "fromCustomBadge": "Mailkit",
+        "toLabel": "To",
+        "toPlaceholder": "team@startup.com",
+        "subjectLabel": "Subject",
+        "subjectPlaceholder": "Quick update on the Q2 launch",
+        "bodyPlaceholder": "Hey team,",
+        "sendButton": "Send"
+      }
     },
     "integrations": {
-      "label": "Integrates with"
+      "label": "Built on infrastructure trusted by millions"
     },
     "pricing": {
-      "heading": "Simple pricing",
+      "eyebrow": "Pricing",
+      "heading": "Five dollars. One time. Done.",
+      "subhead": "No subscription. No recurring fee. No surprise charges next month.",
+      "badge": "Mailkit setup",
       "price": "$5",
-      "priceNote": "one-time per mailbox",
-      "noRecurring": "No recurring charges",
+      "priceUnit": "one-time",
       "inclusionsHeading": "What's included",
       "inclusions": [
-        "Cloudflare Email Routing setup (MX, forwarding)",
+        "Cloudflare Email Routing setup",
         "Brevo SMTP authentication (DKIM, SPF, DMARC)",
-        "Guided Gmail Send-As configuration",
+        "Guided Gmail Send-As wizard",
         "Unlimited free aliases on your domain",
         "30-day money-back guarantee",
-        "Automation-failure auto-refund"
+        "Auto-refund if our setup fails"
       ],
-      "noSubscription": "No hidden fees. No Workspace subscription required.",
-      "bundleHint": "Need 3 mailboxes on the same domain?",
-      "bundleLinkText": "3-mailbox bundle — $12 (coming post-launch)",
-      "monitoringHint": "Want continuous deliverability monitoring?",
-      "monitoringLinkText": "Add monitoring — $3/mo (optional upgrade)",
-      "cta": "Start setup — $5"
+      "cta": "Get your email — $5",
+      "paymentNote": "Powered by Lemon Squeezy. Stripe, Apple Pay, Google Pay accepted.",
+      "compare": "Compare: Google Workspace $6/user/mo. ImprovMX $9/mo. MailKit $5 once."
     },
     "howItWorks": {
-      "heading": "How MailKit works",
-      "subheading": "3 steps — 2 automated, 1 guided. 5 minutes total.",
+      "eyebrow": "How it works",
+      "heading": "Three automated steps. One you do yourself.",
+      "subheading": "Total time under 5 minutes. Total work on your side: four copy-paste actions.",
+      "automatedBadge": "Automated",
+      "manualBadge": "Your turn",
       "step1": {
-        "service": "Cloudflare",
+        "title": "Cloudflare Email Routing",
         "time": "~15 sec",
-        "title": "Cloudflare Email Routing (automated)",
-        "body": "We enable Email Routing on your domain, write MX records, and set up forwarding from hello@yourdomain.com to your Gmail inbox.",
-        "note": "We use your Cloudflare API token — you keep control."
+        "body": "We enable Email Routing on your domain and write the MX record. You don't see Brevo at all."
       },
       "step2": {
-        "service": "Brevo",
+        "title": "Brevo SMTP setup",
         "time": "~60 sec",
-        "title": "Brevo SMTP setup (automated)",
-        "body": "We claim your domain in Brevo, write DKIM + SPF + DMARC records, and verify authentication.",
-        "note": "Brevo handles outbound mail under the hood — you don't manage a Brevo account."
+        "body": "We claim your domain in our shared Brevo account and write DKIM and brevo-code records."
       },
       "step3": {
-        "service": "Gmail",
-        "time": "~3 min",
-        "title": "Gmail Send-As (guided, 3 clicks)",
-        "body": "We show you exactly what to paste into Gmail — SMTP server, credentials, your new email address. You confirm in Gmail.",
-        "note": "The wizard walks you through each click."
+        "title": "DNS verification",
+        "time": "~30 sec",
+        "body": "We verify SPF passes, DKIM signs correctly, and DMARC alignment is OK before handing off."
       },
-      "closer": "After these three steps, hello@yourdomain.com works in your Gmail like any other address — compose, reply, forward. No new inbox to check. No Workspace subscription."
+      "step4": {
+        "title": "Gmail Send-As",
+        "time": "~3 min",
+        "body": "We hand you four lines: SMTP server, port, login, password. You paste into Gmail Settings."
+      }
     },
     "problem": {
-      "heading": "Email on your own domain — it should be simple. It isn't.",
+      "eyebrow": "The problem",
+      "heading": "Setting up email on your own domain is a 90-minute headache.",
+      "subhead": "Five tabs open. Three documentation portals. One typo in SPF and you start over.",
       "without": {
-        "title": "Without MailKit",
+        "title": "Manual setup",
+        "duration": "60–90 min",
         "steps": [
-          "Research Cloudflare Email Routing vs ImprovMX vs others",
-          "Read Brevo SMTP docs, get confused by \"API key vs SMTP key\"",
-          "Write DNS records by hand: MX, SPF, DKIM, DMARC, brevo-code",
-          "Test, discover a typo in SPF, rewrite",
-          "Configure Gmail Send-As, wonder why SMTP auth fails",
-          "Finally, maybe, it works. Maybe. Maybe not."
-        ],
-        "total": "60–90 minutes for someone who knows what they're doing. 3+ hours for everyone else."
+          "Research routing services",
+          "Read Brevo SMTP docs (twice)",
+          "Hand-write five DNS records",
+          "Debug DKIM verification",
+          "Configure Gmail Send-As manually"
+        ]
       },
       "with": {
-        "title": "With MailKit",
+        "title": "Automated",
+        "duration": "5 min",
         "steps": [
-          "Paste a Cloudflare API token",
-          "Pick your domain",
-          "Copy-paste 4 values into Gmail (we guide you)",
-          "Done. hello@yourdomain.com works in your Gmail."
-        ],
-        "total": "5 minutes. Money back if it fails on our end."
+          "Sign in with Google",
+          "Paste Cloudflare token",
+          "Watch automation run (~90 sec)",
+          "Copy four lines into Gmail"
+        ]
       }
     },
     "trust": {
-      "heading": "Backed by a real guarantee",
-      "subheading": "Two ways to get your money back. No fine print.",
-      "items": [
-        {
-          "title": "Auto-refund if our setup fails",
-          "body": "If our Cloudflare or Brevo automation fails on our end, we refund you within 24 hours — automatically. You don't email anyone. The dashboard tells you what happened."
-        },
-        {
-          "title": "30-day functional guarantee",
-          "body": "If you can't actually send or receive email after setup is complete and our support can't fix it within 7 days, full refund on request. Up to 30 days from purchase."
-        },
-        {
-          "title": "Honest about deliverability",
-          "body": "We set up technically correct SPF/DKIM/DMARC. Whether email lands in someone's inbox depends on sender reputation, content, and the recipient's policies — outside our control. Warm up the domain gradually: 10–20 emails per day in week one."
-        }
-      ],
-      "policyLinkLabel": "Read the full guarantee"
+      "eyebrow": "Guarantees",
+      "heading": "We refund first, ask questions later.",
+      "subhead": "Two-tier guarantee that does the talking, not the marketing.",
+      "automation": {
+        "title": "Automation failure",
+        "body": "If our automated setup fails on our end (Cloudflare or Brevo phase) — full refund within 24 hours. Automatic. No request needed.",
+        "badge": "Auto-refund"
+      },
+      "functional": {
+        "title": "30-day functional",
+        "body": "If within 30 days you can't actually send email through your domain — even after our support — full refund on request. Just email us.",
+        "badge": "30-day"
+      },
+      "policyLinkLabel": "Read full policy →"
     },
     "faq": {
-      "heading": "Frequently asked questions",
-      "subheading": "Direct answers to the questions buyers ask before clicking buy.",
+      "eyebrow": "Common questions",
+      "heading": "Everything you'd ask before paying $5.",
       "items": [
         {
           "id": "cost",
@@ -160,8 +169,8 @@
         },
         {
           "id": "duration",
-          "q": "How long does setup actually take?",
-          "a": "About 5 minutes end to end. The Cloudflare phase takes ~15 seconds, the Brevo phase ~60 seconds, the Gmail Send-As wizard ~3 minutes (you copy-paste 4 values). Doing this by hand without MailKit takes 60–90 minutes for an experienced engineer, 3+ hours for everyone else."
+          "q": "Can I do this myself for free?",
+          "a": "Yes — by hand it takes 60–90 minutes for an experienced engineer and 3+ hours for everyone else, juggling Cloudflare Email Routing, Brevo SMTP, five DNS records (MX, SPF, DKIM, DMARC, brevo-code) and the Gmail Send-As wizard. MailKit collapses that into about 5 minutes for $5: ~15 sec for the Cloudflare phase, ~60 sec for Brevo, ~3 min of copy-paste in Gmail."
         },
         {
           "id": "vs-workspace",
@@ -174,19 +183,9 @@
           "a": "Yes. The only requirement is that the domain's DNS is on Cloudflare. If it isn't yet, the one-time step is moving the nameservers to Cloudflare (free, takes 5 minutes at your registrar's panel) — Cloudflare's docs walk you through it. After that, MailKit handles the rest through the Cloudflare API."
         },
         {
-          "id": "cf-free",
-          "q": "Do I need a paid Cloudflare account?",
-          "a": "No. Cloudflare Free is enough. Email Routing is included in the free tier, no upgrade needed."
-        },
-        {
           "id": "improvmx",
           "q": "What if I already use ImprovMX or another forwarding service?",
           "a": "MailKit will replace ImprovMX with Cloudflare Email Routing. You'll need to remove the existing MX records on your domain before setup; our wizard detects conflicts and tells you exactly which records block the run. Once switched, you'll have both receiving (Cloudflare) and outbound sending (Brevo SMTP via Gmail) — ImprovMX free tier doesn't do outbound."
-        },
-        {
-          "id": "outbound",
-          "q": "Can I actually send from hello@mydomain.com using my normal Gmail?",
-          "a": "Yes — that's the whole point. After the wizard, your Gmail Send-As list shows hello@yourdomain.com. You compose in Gmail, switch the From dropdown to your domain address, send. Replies arrive at the same Gmail inbox via Cloudflare forwarding. No separate mailbox."
         },
         {
           "id": "manual-step",
@@ -204,44 +203,9 @@
           "a": "MailKit configures technically correct SPF/DKIM/DMARC authentication. Whether email lands in a specific recipient's inbox depends on sender reputation, content, sending practices, and the recipient's policies — all outside MailKit's control. Domain warmup, recipient list hygiene, and consent compliance are the sender's job. Practical advice: send 10–20 emails per day in the first week from a fresh domain, then ramp up gradually."
         },
         {
-          "id": "limits",
-          "q": "Is there a sending limit?",
-          "a": "Yes — 500 emails per day per domain on the standard $5 setup, with a 50/hour and 5/minute burst cap. The limits protect every MailKit customer on the shared Brevo infrastructure. If you have a legitimate higher-volume use case (transactional, double-opt-in newsletter), email support@getmailkit.com — we typically raise the cap within 24 hours."
-        },
-        {
-          "id": "multi-mailbox",
-          "q": "Can I configure multiple mailboxes on the same domain?",
-          "a": "At launch you can re-run setup per mailbox at $5 each. A 3-mailbox bundle at $12 is planned post-launch. Free aliases are unlimited via Cloudflare Email Routing — anything@yourdomain.com forwards to your Gmail by default."
-        },
-        {
           "id": "token-safety",
           "q": "Is my Cloudflare API token safe with you?",
           "a": "We use the token only during the active setup session and discard it from memory afterwards. We do not persist it in our database. The token can be scoped to the minimum permissions our wizard documents (Zone:DNS:Edit + Email Routing edits on the specific zone) and can be revoked from your Cloudflare dashboard at any time."
-        },
-        {
-          "id": "outlook",
-          "q": "Does this work with Outlook or Apple Mail instead of Gmail?",
-          "a": "Not in the MVP. The wizard's outbound configuration is Gmail-specific. The Cloudflare receiving setup is mail-client-agnostic, so receiving on any client works, but outbound through MailKit's flow requires Gmail today. Outlook support is on the roadmap if there's enough demand."
-        },
-        {
-          "id": "delete",
-          "q": "What happens if I delete my MailKit account?",
-          "a": "Your MailKit profile and setup logs are deleted from our database. Your domain's DNS records, Cloudflare Email Routing, and Gmail Send-As config stay where they are — those live in Cloudflare and Gmail, not in MailKit. Your purchase records are kept (with the user_id removed) for our financial audit trail."
-        },
-        {
-          "id": "gdpr",
-          "q": "Are you GDPR compliant?",
-          "a": "Yes. We collect minimal personal data (email + name from Google OAuth, domain you set up). We do not sell or share your data. You can request deletion at any time via the dashboard or by emailing support@getmailkit.com. Full details: /privacy."
-        },
-        {
-          "id": "brevo-frozen",
-          "q": "What if Brevo blocks my domain or freezes the underlying account?",
-          "a": "If Brevo flags your specific domain for high bounce or complaint rate, we email you with the reason and pause sending. If Brevo were to freeze the entire MailKit relay (operational risk we plan for), our migration runbook switches outbound to a backup SMTP provider. Either way, your Cloudflare receiving setup is unaffected — incoming email keeps working."
-        },
-        {
-          "id": "switch-smtp",
-          "q": "Can I switch to my own SMTP provider later?",
-          "a": "Yes. Your domain's DNS is yours to control via Cloudflare. To switch outbound, you replace the Brevo SPF/DKIM records with your new provider's records and update Gmail Send-As to point at the new SMTP. The Cloudflare receiving side keeps working. We don't lock you in."
         },
         {
           "id": "refund-process",
@@ -251,11 +215,17 @@
       ]
     },
     "finalCta": {
-      "heading": "Ready when you are",
-      "body": "5 minutes from now your domain email is live. $5 once. Money back if the automation fails on our end.",
+      "eyebrow": "Ready",
+      "heading": "Five minutes from now, you'll have email on your domain.",
+      "subhead": "Or your money back, automatically. No tickets, no calls, no questions.",
       "primaryCta": "Get your email — $5",
-      "secondaryCta": "See how it works",
-      "reassurance": "First 100 customers — free setup with code FIRST100."
+      "secondaryCta": "Read the guarantee first",
+      "trustItems": [
+        "Money-back guarantee",
+        "No subscription",
+        "Setup in minutes",
+        "Cancel anytime"
+      ]
     }
   },
   "hero": {
@@ -540,10 +510,27 @@
     }
   },
   "footer": {
-    "tagline": "Email setup without the DNS nightmare.",
-    "copyright": "© 2026 MailKit. All rights reserved.",
-    "terms": "Terms",
-    "privacy": "Privacy"
+    "tagline": "Email on your domain. In 5 minutes. Guaranteed.",
+    "copyright": "© 2026 MailKit. Built by an indie hacker.",
+    "productHeading": "Product",
+    "legalHeading": "Legal",
+    "resourcesHeading": "Resources",
+    "contactHeading": "Contact",
+    "links": {
+      "howItWorks": "How it works",
+      "pricing": "Pricing",
+      "faq": "FAQ",
+      "signIn": "Sign in",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "guarantee": "Guarantee",
+      "help": "Help",
+      "status": "Status",
+      "changelog": "Changelog",
+      "supportEmail": "support@getmailkit.com",
+      "twitter": "X / Twitter",
+      "telegram": "Telegram"
+    }
   },
   "error": {
     "title": "Something broke on our end",

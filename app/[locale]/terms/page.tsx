@@ -3,6 +3,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
+import { LegalDocLayout } from "@/components/legal/legal-doc-layout";
 import { TERMS_EN, TERMS_RU } from "@/lib/legal/terms";
 
 /**
@@ -48,15 +49,18 @@ export default async function TermsPage({
   setRequestLocale(locale);
 
   const text = locale === "ru" ? TERMS_RU : TERMS_EN;
+  const title = locale === "ru" ? "Условия пользования" : "Terms of Service";
+  const lastUpdated =
+    locale === "ru" ? "Обновлено 2026-04-25" : "Last updated 2026-04-25";
 
   return (
     <>
       <Header />
-      <main className="container mx-auto flex flex-1 flex-col px-6 py-12">
-        <article className="mx-auto w-full max-w-3xl whitespace-pre-wrap font-sans text-sm leading-6 text-zinc-800 dark:text-zinc-200">
-          {text}
-        </article>
-      </main>
+      <LegalDocLayout
+        title={title}
+        lastUpdatedLabel={lastUpdated}
+        body={text}
+      />
       <Footer />
     </>
   );

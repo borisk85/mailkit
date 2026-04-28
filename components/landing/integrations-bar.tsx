@@ -1,65 +1,141 @@
 import { useTranslations } from "next-intl";
+import { Cloud } from "lucide-react";
 
 /**
- * Stripe-style "Integrates with" bar, mounted directly below the hero
- * per LANDING_SPEC_V1.md section 9.2. Trust signal + tech transparency
- * before the user scrolls into the problem / how-it-works detail.
+ * Logos bar — premium-pass refresh per UI_REVIEW_BRIEF §2.4. Five
+ * monochrome wordmarks (Cloudflare, Brevo, Gmail, Google OAuth,
+ * Lemon Squeezy) below the hero. Architect dropped the colored
+ * brand-marks because color collides with the new monochrome surface
+ * — text-tertiary tone with a slight lift on hover.
  *
- * For v1 the three "logos" are wordmarks — brand-neutral rendering
- * with tinted color hints (Cloudflare orange, Brevo teal, Gmail red),
- * zero external asset fetches, zero client JS. If we want pixel-
- * accurate brand marks post-launch they swap into the same three
- * slots.
+ * The marks are all-text plus one outline glyph (Cloudflare cloud,
+ * Brevo monogram, Gmail envelope) — zero brand-asset fetches, no
+ * trademark-rendering risk.
  */
 export function IntegrationsBar() {
   const t = useTranslations("landing.integrations");
   return (
     <section
       aria-label={t("label")}
-      className="w-full border-y border-neutral-200 bg-neutral-100/60 dark:border-neutral-800 dark:bg-neutral-900/40"
+      className="w-full border-t border-mk-border-subtle"
     >
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-5 px-4 py-8 sm:flex-row sm:justify-center sm:gap-10 sm:px-6">
-        <span className="text-xs font-medium uppercase tracking-widest text-neutral-500 dark:text-neutral-400">
-          {t("label")}
-        </span>
-        <ul className="flex flex-wrap items-center justify-center gap-8 sm:gap-12">
-          <li>
-            <IntegrationMark
-              name="Cloudflare"
-              colorClass="text-[#F38020] dark:text-[#F6821F]"
-            />
-          </li>
-          <li>
-            <IntegrationMark
-              name="Brevo"
-              colorClass="text-[#0B996E] dark:text-[#13B17E]"
-            />
-          </li>
-          <li>
-            <IntegrationMark
-              name="Gmail"
-              colorClass="text-[#D93025] dark:text-[#E95D54]"
-            />
-          </li>
+      <div className="mx-auto flex max-w-6xl flex-col items-center gap-8 px-4 py-20 sm:px-6">
+        <span className="mk-eyebrow text-mk-text-tertiary">{t("label")}</span>
+        <ul className="flex flex-wrap items-center justify-center gap-x-12 gap-y-6 sm:gap-x-16">
+          <LogoItem name="Cloudflare">
+            <Cloud className="size-5" aria-hidden strokeWidth={1.75} />
+          </LogoItem>
+          <LogoItem name="Brevo">
+            <BrevoMark />
+          </LogoItem>
+          <LogoItem name="Gmail">
+            <GmailMark />
+          </LogoItem>
+          <LogoItem name="Google OAuth">
+            <GoogleMark />
+          </LogoItem>
+          <LogoItem name="Lemon Squeezy">
+            <LemonMark />
+          </LogoItem>
         </ul>
       </div>
     </section>
   );
 }
 
-function IntegrationMark({
+function LogoItem({
   name,
-  colorClass,
+  children,
 }: {
   name: string;
-  colorClass: string;
+  children: React.ReactNode;
 }) {
   return (
-    <span
-      className={`text-lg font-semibold tracking-tight ${colorClass}`}
-      aria-label={name}
+    <li>
+      <span
+        aria-label={name}
+        className="group inline-flex h-8 items-center gap-2 text-mk-text-tertiary opacity-70 transition-all hover:-translate-y-0.5 hover:opacity-100 hover:text-mk-text-secondary"
+      >
+        {children}
+        <span className="text-base font-semibold tracking-tight">{name}</span>
+      </span>
+    </li>
+  );
+}
+
+function BrevoMark() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      aria-hidden
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
     >
-      {name}
-    </span>
+      <path d="M5 4h9a4 4 0 0 1 0 8H8" />
+      <path d="M5 12h11a4 4 0 0 1 0 8H5z" />
+    </svg>
+  );
+}
+
+function GmailMark() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      aria-hidden
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="m3 7 9 6 9-6" />
+    </svg>
+  );
+}
+
+function GoogleMark() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      aria-hidden
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M12 5a7 7 0 1 0 6.93 8" />
+      <path d="M12 12h7" />
+    </svg>
+  );
+}
+
+function LemonMark() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      width="20"
+      height="20"
+      aria-hidden
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M5 14a7 7 0 0 1 9-9l5 5a7 7 0 0 1-9 9z" />
+      <path d="M5 14 3 16" />
+      <path d="m21 8 2-2" />
+    </svg>
   );
 }

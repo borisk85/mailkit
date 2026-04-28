@@ -8,57 +8,47 @@ import {
 } from "@/components/ui/accordion";
 
 /**
- * FAQ section (#11 etap 3 + #59). 19 questions covering buying
- * objections, technical edge cases, and operational risks. Wording
- * follows docs/AI_SEARCH_STRATEGY.md §4: each question is the
- * literal user phrasing, the first sentence answers directly with
- * concrete numbers, then the supporting paragraph fills in.
+ * FAQ — premium-pass refresh per UI_REVIEW_BRIEF §2.9. Trimmed from
+ * 19 to 10 highest-priority questions per architect — the long tail
+ * read as FAQ-stuffing for SEO. The remaining ten are the questions
+ * a buyer actually asks before paying $5: cost, time-vs-DIY,
+ * vs-Workspace, registrar compatibility, ImprovMX migration, why the
+ * Gmail step is manual, what happens on failure, deliverability
+ * caveat, token safety, and refund process.
  *
- * Why 19 (not the architect's "15-20"): we have 19 distinct buyer
- * questions with non-overlapping answers. Adding a 20th would be a
- * variant of an existing one and makes the list noisier without
- * helping AI crawlers — they cite the most-cited variant anyway.
- *
- * The Accordion component is shadcn-on-base-ui; the trigger toggle
- * is interactive but the content text is in the initial HTML so
- * crawlers (LLM and classic SEO) read every answer regardless of
- * client-side hydration.
+ * shadcn Accordion stays — the open state now carries an accent
+ * left-border (3px) per the brief, achieved via the data-state
+ * selector on AccordionItem in globals.css extension.
  */
 export function FaqSection() {
   const t = useTranslations("landing.faq");
   const items = t.raw("items") as Array<{ id: string; q: string; a: string }>;
 
   return (
-    <section
-      id="faq"
-      className="border-t border-neutral-200 bg-white py-20 dark:border-neutral-800 dark:bg-neutral-950"
-    >
-      <div className="mx-auto max-w-3xl px-4 sm:px-6">
-        <div className="mb-10 max-w-2xl">
-          <p className="mb-3 inline-flex items-center gap-2 text-xs font-medium tracking-wide text-indigo-600 uppercase dark:text-indigo-400">
-            <span
-              aria-hidden
-              className="inline-block size-1.5 rounded-full bg-indigo-500"
-            />
-            {t("subheading")}
-          </p>
-          <h2 className="text-3xl font-bold tracking-tight text-neutral-950 sm:text-4xl dark:text-neutral-50">
+    <section id="faq" className="w-full" aria-labelledby="faq-heading">
+      <div className="mx-auto max-w-3xl px-4 py-24 sm:px-6 sm:py-32">
+        <div className="mx-auto flex flex-col items-center gap-6 text-center">
+          <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
+          <h2
+            id="faq-heading"
+            className="mk-display-2 text-balance text-mk-text-primary"
+          >
             {t("heading")}
           </h2>
         </div>
 
-        <Accordion className="w-full">
+        <Accordion className="mt-16 flex w-full flex-col gap-2">
           {items.map((item) => (
             <AccordionItem
               key={item.id}
               value={item.id}
-              className="border-neutral-200 dark:border-neutral-800"
+              className="mk-faq-item rounded-xl border border-mk-border-subtle bg-surface-elevated px-6 py-1 transition-colors hover:bg-surface-elevated/60"
             >
-              <AccordionTrigger className="text-left text-base font-medium text-neutral-950 hover:text-indigo-700 dark:text-neutral-50 dark:hover:text-indigo-400">
+              <AccordionTrigger className="mk-heading-3 text-left text-mk-text-primary">
                 {item.q}
               </AccordionTrigger>
-              <AccordionContent className="text-sm leading-6 text-neutral-600 dark:text-neutral-400">
-                <p>{item.a}</p>
+              <AccordionContent className="mk-body text-mk-text-secondary">
+                <p className="max-w-[65ch]">{item.a}</p>
               </AccordionContent>
             </AccordionItem>
           ))}

@@ -1,5 +1,5 @@
-import { useLocale, useTranslations } from "next-intl";
-import { ArrowRight } from "lucide-react";
+import { useTranslations } from "next-intl";
+import { ArrowRight, Check } from "lucide-react";
 
 import {
   LEMON_SQUEEZY_CHECKOUT_URL,
@@ -7,20 +7,20 @@ import {
 } from "@/lib/constants/lemon-squeezy";
 
 /**
- * Landing hero — Linear-pattern two-column layout per
- * LANDING_SPEC_V1.md section 9.2. Left 60% headline + subhead + CTA
- * pair, right 40% SVG 3-step schematic flow. Stacks on mobile, visual
- * below the text. Subtle indigo-to-violet gradient at ~5% opacity
- * behind the whole section for depth without distraction.
+ * Landing hero — premium-pass refresh per UI_REVIEW_BRIEF §2.3.
  *
- * Primary CTA opens the Lemon Squeezy checkout in a new tab —
- * impulse-buy path. Secondary CTA scrolls to the how-it-works section
- * (mounts in etap 2); the anchor link is rendered now so the hero
- * behavior stays stable once etap 2 lands.
+ * Asymmetric 7/5 grid (left content / right product mockup) replaces
+ * the prior centered 60/40 layout. Display-1 headline split into three
+ * short lines with the last muted (text-secondary) for visual rhythm.
+ *
+ * Right-side Gmail Compose mockup is the product anchor — three
+ * "From:" addresses (default Gmail + two custom-domain ones highlighted
+ * with accent ring) communicate the actual deliverable in one glance.
+ * Mockup gets a 3D tilt and ambient accent glow on lg+; on mobile it
+ * stacks under the text without perspective or glow for performance.
  */
 export function Hero() {
   const t = useTranslations("landing.hero");
-  const locale = useLocale();
 
   return (
     <section
@@ -28,144 +28,218 @@ export function Hero() {
       className="relative w-full overflow-hidden"
       aria-labelledby="hero-heading"
     >
-      {/* Ambient background gradient — absolute, aria-hidden. */}
       <div
         aria-hidden
-        className="pointer-events-none absolute inset-0 -z-10 bg-gradient-to-br from-indigo-500/5 via-transparent to-violet-500/5"
-      />
-      <div
-        aria-hidden
-        className="pointer-events-none absolute left-1/2 top-0 -z-10 h-[560px] w-[1120px] -translate-x-1/2 rounded-full bg-[radial-gradient(ellipse_at_center,_rgba(99,102,241,0.10),_transparent_70%)] blur-3xl"
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[640px]"
+        style={{
+          background:
+            "radial-gradient(ellipse 800px 400px at 75% 20%, rgba(124,92,255,0.12), transparent 70%)",
+        }}
       />
 
-      <div className="mx-auto grid max-w-6xl gap-12 px-4 py-24 sm:px-6 sm:py-32 lg:grid-cols-5 lg:gap-16 lg:py-40">
-        {/* Left column — text + CTAs, spans 3 of 5 (60%) on lg+. */}
-        <div className="flex flex-col gap-6 lg:col-span-3">
+      <div className="mx-auto grid max-w-6xl items-center gap-16 px-4 py-24 sm:px-6 sm:py-32 lg:grid-cols-12 lg:gap-12 lg:py-40">
+        <div className="flex flex-col gap-6 lg:col-span-7">
+          <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
+
           <h1
             id="hero-heading"
-            className="text-balance text-5xl font-bold leading-[1.05] tracking-tight text-neutral-950 sm:text-6xl lg:text-7xl xl:text-[5rem] dark:text-neutral-50"
+            className="mk-display-1 text-balance text-mk-text-primary"
           >
-            {t("headline")}
+            <span className="block">{t("headlineLine1")}</span>
+            <span className="block">{t("headlineLine2")}</span>
+            <span className="block text-mk-text-secondary">
+              {t("headlineLine3")}
+            </span>
           </h1>
-          <p className="flex flex-wrap items-baseline gap-1.5 text-lg italic text-neutral-500 dark:text-neutral-400">
-            <span>{t("guaranteeSuffix")}</span>
-            <a
-              href={`/${locale}/guarantee`}
-              className="text-base not-italic text-indigo-500 underline underline-offset-4 hover:text-indigo-400 dark:text-indigo-400 dark:hover:text-indigo-300"
-            >
-              ({t("guaranteeLink")})
-            </a>
+
+          <p className="mk-body-large max-w-2xl text-balance text-mk-text-secondary">
+            {t("subhead")}
           </p>
-          <p className="max-w-2xl text-balance text-lg leading-relaxed text-neutral-600 sm:text-xl dark:text-neutral-400">
-            {t("body")}
-          </p>
-          <div className="mt-4 flex flex-wrap items-center gap-4">
+
+          <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3">
             <a
               href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
               target="_blank"
               rel="noreferrer"
-              className="inline-flex h-13 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 px-7 text-base font-semibold text-white shadow-lg shadow-indigo-500/20 transition-all hover:scale-[1.02] hover:shadow-xl hover:shadow-indigo-500/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 focus-visible:ring-offset-neutral-50 dark:focus-visible:ring-offset-neutral-950"
+              className="mk-cta-shadow group inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-all hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
               style={{ minHeight: 52 }}
             >
               {t("primaryCta")}
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
             </a>
             <a
               href="#how-it-works"
-              className="inline-flex h-13 items-center gap-1.5 rounded-xl px-4 text-base font-medium text-neutral-700 transition-colors hover:text-neutral-900 dark:text-neutral-300 dark:hover:text-neutral-50"
-              style={{ minHeight: 52 }}
+              className="group inline-flex items-center gap-1.5 text-base font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
             >
-              {t("secondaryCta")}
-              <ArrowRight className="size-4" aria-hidden />
+              <span className="underline-offset-4 group-hover:underline">
+                {t("secondaryCta")}
+              </span>
+              <ArrowRight
+                className="size-4 transition-transform group-hover:translate-x-0.5"
+                aria-hidden
+              />
             </a>
           </div>
+
+          <p className="mk-caption mt-2 text-mk-text-tertiary">
+            {t("trustNote")}
+          </p>
         </div>
 
-        {/* Right column — SVG 3-step schematic, spans 2 of 5 (40%) on lg+. */}
-        <div className="flex items-center justify-center lg:col-span-2">
-          <HeroVisual
-            alt={t("visualAlt")}
-            step1={t("visualStep1")}
-            step2={t("visualStep2")}
-            step3={t("visualStep3")}
-            time1={t("visualStep1Time")}
-            time2={t("visualStep2Time")}
-            time3={t("visualStep3Time")}
-          />
+        <div className="lg:col-span-5">
+          <GmailComposeMockup />
         </div>
       </div>
     </section>
   );
 }
 
-function HeroVisual({
-  alt,
-  step1,
-  step2,
-  step3,
-  time1,
-  time2,
-  time3,
-}: {
-  alt: string;
-  step1: string;
-  step2: string;
-  step3: string;
-  time1: string;
-  time2: string;
-  time3: string;
-}) {
+function GmailComposeMockup() {
+  const t = useTranslations("landing.hero.mockup");
+
   return (
     <div
-      role="img"
-      aria-label={alt}
-      className="w-full max-w-sm rounded-2xl border border-neutral-200 bg-neutral-50/40 p-6 shadow-sm backdrop-blur-sm dark:border-neutral-800 dark:bg-neutral-900/40"
+      className="relative mx-auto w-full max-w-md lg:max-w-none"
+      style={{ perspective: "1200px" }}
     >
-      <ul className="space-y-3">
-        <HeroVisualStep index={1} name={step1} time={time1} />
-        <HeroVisualArrow />
-        <HeroVisualStep index={2} name={step2} time={time2} />
-        <HeroVisualArrow />
-        <HeroVisualStep index={3} name={step3} time={time3} guided />
-      </ul>
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -inset-8 -z-10 hidden lg:block"
+        style={{
+          background:
+            "radial-gradient(at top right, rgba(124,92,255,0.16), transparent 60%)",
+        }}
+      />
+
+      <div
+        role="img"
+        aria-label={t("alt")}
+        className="mk-mockup-tilt rounded-2xl border border-mk-border-strong bg-surface-elevated p-5 mk-card-shadow"
+      >
+        <div className="mb-4 flex items-center justify-between border-b border-mk-border-subtle pb-3">
+          <span className="text-xs font-semibold text-mk-text-secondary">
+            {t("windowTitle")}
+          </span>
+          <div className="flex items-center gap-1">
+            <span className="size-2 rounded-full bg-mk-text-tertiary/30" />
+            <span className="size-2 rounded-full bg-mk-text-tertiary/30" />
+            <span className="size-2 rounded-full bg-mk-text-tertiary/30" />
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <FromRow
+            label={t("fromLabel")}
+            value={t("fromDefault")}
+            badge={t("fromDefaultBadge")}
+            muted
+          />
+          <FromRow
+            label={t("fromLabel")}
+            value={t("fromCustom1")}
+            badge={t("fromCustomBadge")}
+            highlighted
+          />
+          <FromRow
+            label={t("fromLabel")}
+            value={t("fromCustom2")}
+            badge={t("fromCustomBadge")}
+            highlighted
+          />
+        </div>
+
+        <div className="mt-3 space-y-2 border-t border-mk-border-subtle pt-3">
+          <CompactRow label={t("toLabel")} value={t("toPlaceholder")} />
+          <CompactRow
+            label={t("subjectLabel")}
+            value={t("subjectPlaceholder")}
+          />
+        </div>
+
+        <div className="mt-3 min-h-[60px] rounded-md bg-surface-base/50 p-3">
+          <span className="text-xs text-mk-text-tertiary">
+            {t("bodyPlaceholder")}
+          </span>
+        </div>
+
+        <div className="mt-4 flex items-center justify-between">
+          <button
+            type="button"
+            tabIndex={-1}
+            aria-hidden
+            className="pointer-events-none inline-flex h-8 items-center rounded-md bg-mk-accent px-4 text-xs font-semibold text-white"
+          >
+            {t("sendButton")}
+          </button>
+          <div className="flex items-center gap-2">
+            <span className="size-1.5 rounded-full bg-mk-text-tertiary/40" />
+            <span className="size-1.5 rounded-full bg-mk-text-tertiary/40" />
+            <span className="size-1.5 rounded-full bg-mk-text-tertiary/40" />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
 
-function HeroVisualStep({
-  index,
-  name,
-  time,
-  guided = false,
+function FromRow({
+  label,
+  value,
+  badge,
+  highlighted = false,
+  muted = false,
 }: {
-  index: number;
-  name: string;
-  time: string;
-  guided?: boolean;
+  label: string;
+  value: string;
+  badge: string;
+  highlighted?: boolean;
+  muted?: boolean;
 }) {
-  const accent = guided
-    ? "bg-violet-500/10 text-violet-600 ring-violet-500/30 dark:bg-violet-500/15 dark:text-violet-300 dark:ring-violet-400/40"
-    : "bg-indigo-500/10 text-indigo-600 ring-indigo-500/30 dark:bg-indigo-500/15 dark:text-indigo-300 dark:ring-indigo-400/40";
+  if (highlighted) {
+    return (
+      <div className="flex items-center justify-between rounded-md border border-mk-accent/40 bg-mk-accent/[0.06] px-3 py-2 ring-1 ring-mk-accent/20">
+        <div className="flex items-center gap-2 text-xs">
+          <span className="font-medium text-mk-text-tertiary">{label}</span>
+          <span className="font-mono font-medium text-mk-text-primary">
+            {value}
+          </span>
+        </div>
+        <span className="rounded-full bg-mk-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mk-accent">
+          {badge}
+        </span>
+      </div>
+    );
+  }
   return (
-    <li className="flex items-center gap-4">
-      <span
-        className={`inline-flex size-9 shrink-0 items-center justify-center rounded-lg text-sm font-semibold ring-1 ${accent}`}
-      >
-        {index}
+    <div className="flex items-center justify-between rounded-md px-3 py-2">
+      <div className="flex items-center gap-2 text-xs">
+        <span className="font-medium text-mk-text-tertiary">{label}</span>
+        <span
+          className={
+            muted
+              ? "font-mono text-mk-text-tertiary line-through"
+              : "font-mono text-mk-text-secondary"
+          }
+        >
+          {value}
+        </span>
+      </div>
+      <span className="inline-flex items-center gap-1 text-[10px] font-medium text-mk-text-tertiary">
+        <Check className="size-3" aria-hidden />
+        {badge}
       </span>
-      <span className="flex-1 text-sm font-medium text-neutral-900 dark:text-neutral-100">
-        {name}
-      </span>
-      <span className="text-xs font-mono text-neutral-500 dark:text-neutral-400">
-        {time}
-      </span>
-    </li>
+    </div>
   );
 }
 
-function HeroVisualArrow() {
+function CompactRow({ label, value }: { label: string; value: string }) {
   return (
-    <li className="flex justify-start pl-4" aria-hidden>
-      <span className="block h-5 w-px bg-neutral-300 dark:bg-neutral-700" />
-    </li>
+    <div className="flex items-center gap-2 px-3 text-xs">
+      <span className="font-medium text-mk-text-tertiary">{label}</span>
+      <span className="text-mk-text-secondary">{value}</span>
+    </div>
   );
 }

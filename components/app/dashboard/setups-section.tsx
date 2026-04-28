@@ -49,7 +49,7 @@ export function SetupsSection({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+      <h2 className="text-lg font-semibold text-mk-text-primary">
         {t("title")}
       </h2>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
@@ -61,10 +61,10 @@ export function SetupsSection({
               <CardContent className="space-y-3 p-4">
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <p className="truncate font-medium text-zinc-950 dark:text-zinc-50">
+                    <p className="truncate font-medium text-mk-text-primary">
                       {setup.mailboxLocal}@{setup.domain}
                     </p>
-                    <p className="mt-0.5 text-xs text-zinc-500 dark:text-zinc-400">
+                    <p className="mt-0.5 text-xs text-mk-text-tertiary">
                       {t("createdLabel")}:{" "}
                       <time dateTime={setup.createdAt}>
                         {new Date(setup.createdAt).toLocaleDateString(locale)}
@@ -74,7 +74,13 @@ export function SetupsSection({
                   <StatusBadge tone={tone}>{t(`status.${state}`)}</StatusBadge>
                 </div>
                 {setup.errorMsg ? (
-                  <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-xs text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100">
+                  <p
+                    className="rounded-md px-3 py-2 text-xs"
+                    style={{
+                      backgroundColor: "rgba(239, 68, 68, 0.08)",
+                      color: "var(--mk-danger)",
+                    }}
+                  >
                     <span className="font-medium">{t("errorLabel")}:</span>{" "}
                     {setup.errorMsg}
                   </p>

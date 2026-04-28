@@ -48,7 +48,7 @@ export function PurchasesSection({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+      <h2 className="text-lg font-semibold text-mk-text-primary">
         {t("title")}
       </h2>
 
@@ -122,10 +122,10 @@ export function PurchasesSection({
             >
               <div className="flex items-start justify-between gap-2">
                 <div>
-                  <p className="font-medium text-zinc-950 dark:text-zinc-50">
+                  <p className="font-medium text-mk-text-primary">
                     {formatMoney(p.amountCents, p.currency)}
                   </p>
-                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                  <p className="text-xs text-mk-text-tertiary">
                     <time dateTime={p.createdAt}>
                       {new Date(p.createdAt).toLocaleDateString(locale)}
                     </time>
@@ -143,16 +143,14 @@ export function PurchasesSection({
                 </div>
               </div>
               <dl className="grid grid-cols-[max-content_1fr] gap-x-3 gap-y-1 text-xs">
-                <dt className="text-zinc-500 dark:text-zinc-400">
+                <dt className="text-mk-text-tertiary">
                   {t("tableHeaders.domain")}
                 </dt>
-                <dd className="text-zinc-700 dark:text-zinc-300">
-                  {p.domain ?? "—"}
-                </dd>
-                <dt className="text-zinc-500 dark:text-zinc-400">
+                <dd className="text-mk-text-secondary">{p.domain ?? "—"}</dd>
+                <dt className="text-mk-text-tertiary">
                   {t("tableHeaders.orderId")}
                 </dt>
-                <dd className="font-mono text-zinc-700 dark:text-zinc-300">
+                <dd className="font-mono text-mk-text-secondary">
                   {p.lsOrderId}
                 </dd>
               </dl>

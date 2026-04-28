@@ -31,9 +31,9 @@ export function LanguageSwitcher() {
     <DropdownMenu>
       <DropdownMenuTrigger
         aria-label={t("label")}
-        className="inline-flex h-9 items-center gap-1.5 rounded-md px-2 text-sm font-medium text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-400 dark:text-neutral-400 dark:hover:bg-neutral-800 dark:hover:text-neutral-100 dark:focus-visible:ring-neutral-500"
+        className="inline-flex h-9 items-center gap-1.5 rounded-md px-2 text-sm font-medium text-mk-text-tertiary transition-colors hover:text-mk-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
       >
-        <Globe className="size-4" aria-hidden />
+        <Globe className="size-3.5" aria-hidden />
         <span className="uppercase">{locale}</span>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end" className="min-w-[160px]">
