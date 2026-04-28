@@ -5,7 +5,7 @@
   },
   "landing": {
     "announcementBanner": {
-      "message": "First 100 setups — free with code FIRST100.",
+      "message": "First 100 setups — FREE with code FIRST100.",
       "cta": "Claim →",
       "dismiss": "Dismiss banner"
     },
@@ -29,11 +29,11 @@
     },
     "hero": {
       "headlineLine1": "Email on your domain",
-      "headlineLine2": "in five minutes.",
+      "headlineLine2": "in 5 minutes.",
       "subhead": "Our automation runs Cloudflare, Brevo, and DNS in 90 seconds. Last step: paste four lines into Gmail Send-As — and email from your domain works.",
       "primaryCta": "Set up my email",
       "secondaryCta": "See how it works",
-      "trustNote": "30-day refund · Auto-refund on failure · No subscription",
+      "trustNote": "30-day money-back guarantee · No subscription",
       "mockup": {
         "alt": "Gmail Compose window — the From dropdown shows your custom-domain addresses instead of @gmail.com",
         "windowTitle": "New message",
@@ -51,7 +51,7 @@
       }
     },
     "integrations": {
-      "label": "Built on Cloudflare, Brevo, and Gmail"
+      "label": "Under the hood"
     },
     "pricing": {
       "eyebrow": "Pricing",

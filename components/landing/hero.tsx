@@ -100,15 +100,6 @@ function GmailComposeMockup() {
       style={{ perspective: "1200px" }}
     >
       <div
-        aria-hidden
-        className="pointer-events-none absolute -inset-8 -z-10 hidden lg:block"
-        style={{
-          background:
-            "radial-gradient(at top right, rgba(124,92,255,0.16), transparent 60%)",
-        }}
-      />
-
-      <div
         role="img"
         aria-label={t("alt")}
         className="mk-mockup-tilt rounded-2xl border border-mk-border-strong bg-surface-elevated-2 p-5 mk-card-shadow-strong"
