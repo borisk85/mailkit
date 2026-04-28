@@ -41,7 +41,7 @@ export function Hero() {
             className="mk-display-1 text-balance text-mk-text-primary"
           >
             <span className="block">{t("headlineLine1")}</span>
-            <span className="block bg-gradient-to-br from-violet-300 via-fuchsia-400 to-mk-accent bg-clip-text text-transparent">
+            <span className="block bg-gradient-to-br from-violet-200 via-violet-400 to-mk-accent bg-clip-text text-transparent">
               {t("headlineLine2")}
             </span>
           </h1>
@@ -174,7 +174,7 @@ function GmailComposeMockup() {
             type="button"
             tabIndex={-1}
             aria-hidden
-            className="pointer-events-none inline-flex h-8 items-center rounded-md bg-[#1A73E8] px-4 text-xs font-semibold text-white"
+            className="pointer-events-none inline-flex h-8 items-center rounded-md bg-mk-text-tertiary/30 px-4 text-xs font-semibold text-mk-text-secondary"
           >
             {t("sendButton")}
           </button>
