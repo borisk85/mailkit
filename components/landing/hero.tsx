@@ -157,7 +157,7 @@ function GmailComposeMockup() {
             type="button"
             tabIndex={-1}
             aria-hidden
-            className="pointer-events-none inline-flex h-8 items-center rounded-md bg-[#1A73E8] px-4 text-xs font-semibold text-white"
+            className="pointer-events-none inline-flex h-8 items-center rounded-md border border-mk-border-strong bg-surface-base px-4 text-xs font-semibold text-mk-text-secondary"
           >
             {t("sendButton")}
           </button>
