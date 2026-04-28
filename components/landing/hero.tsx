@@ -212,7 +212,7 @@ function FromRow({
 function CompactRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-center gap-2 px-3 text-xs">
-      <span className="font-medium text-mk-text-tertiary">{label}</span>
+      <span className="font-medium text-mk-text-tertiary">{label}:</span>
       <span className="text-mk-text-secondary">{value}</span>
     </div>
   );

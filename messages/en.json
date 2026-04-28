@@ -41,7 +41,7 @@
         "fromDefaultBadge": "Now",
         "fromCustom1": "hello@yourdomain.com",
         "fromCustom2": "hi@yourdomain.com",
-        "fromCustomBadge": "Mailkit",
+        "fromCustomBadge": "with Mailkit",
         "toLabel": "To",
         "toPlaceholder": "sarah@northwind.co",
         "subjectLabel": "Subject",
