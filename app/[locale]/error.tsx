@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 import * as Sentry from "@sentry/nextjs";
+import { AlertTriangle } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -36,11 +37,10 @@ export default function ErrorBoundary({
   }, [error]);
 
   return (
-    <main className="container mx-auto flex min-h-[60vh] max-w-2xl flex-col items-center justify-center px-6 py-16 text-center">
-      <h1 className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
-        {t("title")}
-      </h1>
-      <p className="mt-4 max-w-md text-sm leading-6 text-zinc-600 dark:text-zinc-400">
+    <main className="container mx-auto flex min-h-[70vh] max-w-2xl flex-col items-center justify-center px-6 py-16 text-center">
+      <AlertTriangle className="mb-6 size-12 text-mk-warning" aria-hidden />
+      <h1 className="mk-heading-1 text-mk-text-primary">{t("title")}</h1>
+      <p className="mt-4 max-w-md mk-body text-mk-text-secondary">
         {t("body")}
       </p>
 
@@ -52,7 +52,7 @@ export default function ErrorBoundary({
       </div>
 
       {error.digest ? (
-        <p className="mt-8 font-mono text-xs text-zinc-400 dark:text-zinc-600">
+        <p className="mt-8 mk-caption font-mono text-mk-text-tertiary">
           {t("errorIdLabel")}: {error.digest}
         </p>
       ) : null}

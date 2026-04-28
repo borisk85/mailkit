@@ -1,70 +1,101 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
+import { Shield, Zap } from "lucide-react";
 
 /**
- * Trust section — between the pricing block and FAQ. Three guarantee
- * cards (auto-refund / 30-day functional / honest deliverability)
- * speak directly to the buying objections we hear: "what if it
- * fails", "what if it doesn't work for me", "is this going to land
- * in spam". Honest deliverability framing comes from #24 + the
- * canonical disclaimer in lib/legal/disclaimer.ts; we keep it on the
- * landing so the customer reads the responsibility-attribution copy
- * BEFORE buying, not as a surprise after.
- *
- * Visual language matches the rest of etap 1+2: indigo accent,
- * neutral typography, soft cards with hairline borders. No icons —
- * keeps the section quiet next to the pricing card above and the
- * FAQ accordion below.
+ * Trust + guarantees — premium-pass refresh per UI_REVIEW_BRIEF §2.8.
+ * Two big side-by-side blocks (automation auto-refund + 30-day
+ * functional) replace the prior 3-card grid. Architect dropped the
+ * "honest about deliverability" card here — its copy now lives in
+ * `lib/legal/disclaimer.ts` and renders inside /terms and /guarantee
+ * where it has room to breathe. The "we handle tech, you do 3 clicks"
+ * marketing line was deleted at the same time per the brief.
  */
 export function TrustSection() {
   const t = useTranslations("landing.trust");
   const locale = useLocale();
-  const items = t.raw("items") as Array<{ title: string; body: string }>;
 
   return (
-    <section
-      id="trust"
-      className="border-t border-neutral-200 bg-neutral-50 py-20 dark:border-neutral-800 dark:bg-neutral-950"
-    >
-      <div className="mx-auto max-w-6xl px-4 sm:px-6">
-        <div className="mb-10 max-w-2xl">
-          <p className="mb-3 inline-flex items-center gap-2 text-xs font-medium tracking-wide text-indigo-600 uppercase dark:text-indigo-400">
-            <span
-              aria-hidden
-              className="inline-block size-1.5 rounded-full bg-indigo-500"
-            />
-            {t("subheading")}
-          </p>
-          <h2 className="text-3xl font-bold tracking-tight text-neutral-950 sm:text-4xl dark:text-neutral-50">
+    <section id="trust" className="w-full" aria-labelledby="trust-heading">
+      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
+        <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+          <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
+          <h2
+            id="trust-heading"
+            className="mk-display-2 text-balance text-mk-text-primary"
+          >
             {t("heading")}
           </h2>
+          <p className="mk-body-large max-w-xl text-balance text-mk-text-secondary">
+            {t("subhead")}
+          </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {items.map((item) => (
-            <article
-              key={item.title}
-              className="rounded-xl border border-neutral-200 bg-white p-6 dark:border-neutral-800 dark:bg-neutral-900"
-            >
-              <h3 className="text-base font-semibold text-neutral-950 dark:text-neutral-50">
-                {item.title}
-              </h3>
-              <p className="mt-3 text-sm leading-6 text-neutral-600 dark:text-neutral-400">
-                {item.body}
-              </p>
-            </article>
-          ))}
+        <div className="mt-16 grid gap-6 lg:grid-cols-2 lg:gap-8">
+          <GuaranteeBlock
+            icon={<Zap className="size-7 text-mk-accent" aria-hidden />}
+            title={t("automation.title")}
+            body={t("automation.body")}
+            badge={t("automation.badge")}
+            badgeKind="success"
+          />
+          <GuaranteeBlock
+            icon={<Shield className="size-7 text-mk-accent" aria-hidden />}
+            title={t("functional.title")}
+            body={t("functional.body")}
+            badge={t("functional.badge")}
+            badgeKind="info"
+          />
         </div>
 
-        <p className="mt-8 text-sm text-neutral-600 dark:text-neutral-400">
+        <p className="mt-10 text-center">
           <Link
-            href={`/${locale}/terms`}
-            className="font-medium text-indigo-600 underline-offset-4 hover:underline dark:text-indigo-400"
+            href={`/${locale}/guarantee`}
+            className="mk-body-small font-medium text-mk-accent underline-offset-4 hover:underline"
           >
             {t("policyLinkLabel")}
           </Link>
         </p>
       </div>
     </section>
+  );
+}
+
+function GuaranteeBlock({
+  icon,
+  title,
+  body,
+  badge,
+  badgeKind,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  body: string;
+  badge: string;
+  badgeKind: "success" | "info";
+}) {
+  return (
+    <article className="flex flex-col gap-5 rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
+      <div className="flex items-center justify-between gap-4">
+        {icon}
+        <span
+          className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold"
+          style={{
+            backgroundColor:
+              badgeKind === "success"
+                ? "rgba(34, 197, 94, 0.12)"
+                : "rgba(124, 92, 255, 0.12)",
+            color:
+              badgeKind === "success"
+                ? "var(--mk-success)"
+                : "var(--mk-accent)",
+          }}
+        >
+          {badge}
+        </span>
+      </div>
+      <h3 className="mk-heading-2 text-mk-text-primary">{title}</h3>
+      <p className="mk-body text-mk-text-secondary">{body}</p>
+    </article>
   );
 }

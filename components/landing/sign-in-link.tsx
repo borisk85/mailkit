@@ -54,7 +54,7 @@ export function SignInLink() {
     <button
       type="button"
       onClick={handleSignIn}
-      className="text-sm font-medium text-neutral-600 transition-colors hover:text-neutral-900 focus:outline-none focus-visible:underline focus-visible:underline-offset-4 dark:text-neutral-400 dark:hover:text-neutral-100"
+      className="group inline-flex items-center gap-1 text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary focus:outline-none focus-visible:underline focus-visible:underline-offset-4"
     >
       {t("signIn")}
     </button>

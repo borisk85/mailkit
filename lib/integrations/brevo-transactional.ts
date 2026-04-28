@@ -1,13 +1,18 @@
 import "server-only";
 
+import { brandedEmailContent } from "./email-wrapper";
+
 /**
  * Brevo transactional email — one-shot sender using the same API key
  * as the sender-domain setup in brevo.ts. Distinct from brevo.ts
  * because the concerns are different: that file manages sender
  * domains; this file emits outbound messages.
  *
- * MVP scope: EN-only plaintext refund notification. RU copy deferred
- * until the first RU paid customer — per architect directive Q2.
+ * Premium-pass §5: each transactional message ships both text and an
+ * HTML wrapper from `email-wrapper.ts` (logo + brand-consistent
+ * styling + footer with /terms /privacy /guarantee). Anti-spam
+ * scanners read the matched plain-text body, humans see the
+ * formatted HTML in their inbox.
  *
  * Endpoint: POST /v3/smtp/email
  * https://developers.brevo.com/reference/sendtransacemail
@@ -31,6 +36,7 @@ type SendInput = {
   to: { email: string; name?: string };
   subject: string;
   textContent: string;
+  htmlContent?: string;
 };
 
 /**
@@ -65,13 +71,14 @@ export async function sendTransactionalEmail(input: SendInput): Promise<void> {
     });
   }
 
-  const body = {
+  const body: Record<string, unknown> = {
     sender: { email: fromEmail, name: fromName },
     to: [input.to],
     subject: input.subject,
     textContent: input.textContent,
     replyTo: { email: fromEmail, name: fromName },
   };
+  if (input.htmlContent) body.htmlContent = input.htmlContent;
 
   const res = await fetch(`${BREVO_API_BASE}/smtp/email`, {
     method: "POST",
@@ -198,10 +205,17 @@ export async function sendSendLimitBlockEmail(args: {
     "— MailKit",
   ].join("\n");
 
+  const branded = brandedEmailContent({
+    title: subject,
+    textContent,
+    preheader: `Sending from ${domain} paused — limit reached`,
+  });
+
   await sendTransactionalEmail({
     to: { email: toEmail, name: toName },
     subject,
-    textContent,
+    textContent: branded.textContent,
+    htmlContent: branded.htmlContent,
   });
 }
 
@@ -250,10 +264,17 @@ export async function sendDeliverabilitySuspendEmail(args: {
     "— MailKit",
   ].join("\n");
 
+  const branded = brandedEmailContent({
+    title: subject,
+    textContent,
+    preheader: `Deliverability pause on ${domain}`,
+  });
+
   await sendTransactionalEmail({
     to: { email: toEmail, name: toName },
     subject,
-    textContent,
+    textContent: branded.textContent,
+    htmlContent: branded.htmlContent,
   });
 }
 
@@ -290,10 +311,17 @@ export async function sendDeliverabilityWarnEmail(args: {
     "— MailKit",
   ].join("\n");
 
+  const branded = brandedEmailContent({
+    title: subject,
+    textContent,
+    preheader: `Unsubscribe rate climbing on ${domain}`,
+  });
+
   await sendTransactionalEmail({
     to: { email: toEmail, name: toName },
     subject,
-    textContent,
+    textContent: branded.textContent,
+    htmlContent: branded.htmlContent,
   });
 }
 

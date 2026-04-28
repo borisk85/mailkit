@@ -13,7 +13,7 @@ export function ResourcesSection({ locale }: { locale: string }) {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+      <h2 className="text-lg font-semibold text-mk-text-primary">
         {t("title")}
       </h2>
       <ul className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">

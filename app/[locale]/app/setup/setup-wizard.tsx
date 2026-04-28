@@ -15,6 +15,7 @@ import {
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { GmailStepSchematic } from "@/components/app/gmail-step-schematic";
 import { cn } from "@/lib/utils";
 
 import {
@@ -298,12 +299,10 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <header>
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+        <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
           {t("title")}
         </h1>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          {t("subtitle")}
-        </p>
+        <p className="mt-2 text-sm text-mk-text-secondary">{t("subtitle")}</p>
       </header>
 
       {state.kind === "token_entry" || state.kind === "token_validating" ? (
@@ -686,7 +685,7 @@ function TokenEntryStep({
             disabled={isPending}
           />
         </label>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+        <p className="text-xs text-mk-text-tertiary">
           {t("step1.tokenHelp")}{" "}
           <a
             href="https://dash.cloudflare.com/profile/api-tokens"
@@ -765,7 +764,7 @@ function ZoneSelectionStep({
             required
           />
         </label>
-        <p className="text-xs text-zinc-500 dark:text-zinc-400">{hint}</p>
+        <p className="text-xs text-mk-text-tertiary">{hint}</p>
         <Button type="submit" disabled={isPending}>
           {isPending ? t("step2.ctaLoading") : t("step2.cta")}
         </Button>
@@ -1268,10 +1267,10 @@ function GmailLoadingStep({
   return (
     <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
       <h2 className="text-lg font-semibold">{t("gmail.intro.title")}</h2>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-sm text-mk-text-secondary">
         {t("gmail.intro.subtitle", { target: targetEmail })}
       </p>
-      <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+      <div className="flex items-center gap-2 text-sm text-mk-text-secondary">
         <Loader2 className="size-4 animate-spin" aria-hidden />
         {t("gmail.intro.startCtaLoading")}
       </div>
@@ -1315,14 +1314,14 @@ function GmailWizard({
     <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">{t("gmail.intro.title")}</h2>
-        <span className="text-xs font-medium text-zinc-500 dark:text-zinc-400">
+        <span className="text-xs font-medium text-mk-text-tertiary">
           {t("gmail.progress", {
             current: String(currentIdx + 1),
             total: String(total),
           })}
         </span>
       </div>
-      <p className="text-sm text-zinc-600 dark:text-zinc-400">
+      <p className="text-sm text-mk-text-secondary">
         {t("gmail.intro.subtitle", { target: state.targetEmail })}
       </p>
 
@@ -1408,15 +1407,17 @@ function GmailStepCard({
 }) {
   const borderClass =
     status === "active"
-      ? "border-emerald-400 dark:border-emerald-700"
-      : "border-zinc-200 dark:border-zinc-800";
+      ? "border-mk-accent"
+      : status === "done"
+        ? "border-mk-success/40"
+        : "border-mk-border-subtle";
   const icon =
     status === "done" ? (
-      <CheckCircle2 className="size-5 text-emerald-600" aria-hidden />
+      <CheckCircle2 className="size-5 text-mk-success" aria-hidden />
     ) : status === "active" ? (
-      <Circle className="size-5 text-emerald-600" aria-hidden />
+      <Loader2 className="size-5 animate-spin text-mk-accent" aria-hidden />
     ) : (
-      <Circle className="size-5 text-zinc-400 dark:text-zinc-600" aria-hidden />
+      <Circle className="size-5 text-mk-text-tertiary" aria-hidden />
     );
 
   const title = t(`gmail.steps.${id}.title`);
@@ -1426,7 +1427,7 @@ function GmailStepCard({
       className={cn(
         "rounded-md border p-4 transition-colors",
         borderClass,
-        status === "active" && "bg-emerald-50/40 dark:bg-emerald-950/20",
+        status === "active" && "bg-mk-accent/[0.04]",
       )}
     >
       <button
@@ -1438,7 +1439,7 @@ function GmailStepCard({
         <span className="flex items-center gap-3">
           {icon}
           <span>
-            <span className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+            <span className="block text-xs font-medium text-mk-text-tertiary">
               {t("gmail.progress", {
                 current: String(idx + 1),
                 total: String(total),
@@ -1448,14 +1449,14 @@ function GmailStepCard({
           </span>
         </span>
         {status === "done" ? (
-          <span className="text-xs font-medium text-emerald-700 dark:text-emerald-300">
+          <span className="text-xs font-medium text-mk-success">
             {t("step3.state.ok")}
           </span>
         ) : null}
       </button>
 
       {status === "active" ? (
-        <div className="mt-4 space-y-3 border-t border-zinc-200 pt-4 dark:border-zinc-800">
+        <div className="mt-4 space-y-3 border-t border-mk-border-subtle pt-4">
           <GmailStepBody
             id={id}
             t={t}
@@ -1497,6 +1498,7 @@ function GmailStepBody({
   if (id === "openSettings") {
     return (
       <>
+        <GmailStepSchematic id="openSettings" />
         <p className="text-sm">{t("gmail.steps.openSettings.body")}</p>
         <div className="flex flex-wrap gap-2">
           <a
@@ -1519,6 +1521,7 @@ function GmailStepBody({
   if (id === "senderInfo") {
     return (
       <>
+        <GmailStepSchematic id="senderInfo" />
         <p className="text-sm">{t("gmail.steps.senderInfo.body")}</p>
         <FieldRow
           label={t("gmail.fields.displayName")}
@@ -1540,6 +1543,7 @@ function GmailStepBody({
   if (id === "smtpSettings") {
     return (
       <>
+        <GmailStepSchematic id="smtpSettings" />
         <p className="text-sm">{t("gmail.steps.smtpSettings.body")}</p>
         <FieldRow
           label={t("gmail.fields.smtpHost")}
@@ -1568,7 +1572,7 @@ function GmailStepBody({
           {t("gmail.steps.smtpSettings.passwordWarning")}
         </div>
         <div className="space-y-1 text-sm">
-          <span className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+          <span className="block text-xs font-medium text-mk-text-tertiary">
             {t("gmail.fields.smtpSecurity")}
           </span>
           <label className="flex items-center gap-2">
@@ -1580,7 +1584,7 @@ function GmailStepBody({
             />
             {t("gmail.steps.smtpSettings.securityStarttls")}
           </label>
-          <label className="flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+          <label className="flex items-center gap-2 text-mk-text-tertiary">
             <input
               type="radio"
               name="smtp-security"
@@ -1599,12 +1603,13 @@ function GmailStepBody({
   if (id === "verificationEmail") {
     return (
       <>
+        <GmailStepSchematic id="verificationEmail" />
         <p className="text-sm">
           {t("gmail.steps.verificationEmail.body", {
             target: state.targetEmail,
           })}
         </p>
-        <div className="flex items-center gap-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <div className="flex items-center gap-2 text-sm text-mk-text-secondary">
           <Loader2 className="size-4 animate-spin" aria-hidden />
           Waiting for verification email…
         </div>
@@ -1617,6 +1622,7 @@ function GmailStepBody({
   if (id === "confirm") {
     return (
       <>
+        <GmailStepSchematic id="confirm" />
         <p className="text-sm">
           {t("gmail.steps.confirm.body", { target: state.targetEmail })}
         </p>
@@ -1643,6 +1649,7 @@ function GmailStepBody({
   if (id === "done") {
     return (
       <>
+        <GmailStepSchematic id="done" />
         <p className="text-sm">
           {t("gmail.steps.done.body", { target: state.targetEmail })}
         </p>
@@ -1665,7 +1672,7 @@ function FieldRow({
 }) {
   return (
     <div className="space-y-1">
-      <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+      <label className="block text-xs font-medium text-mk-text-tertiary">
         {label}
       </label>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -1692,7 +1699,7 @@ function PasswordRow({
   const [visible, setVisible] = useState(false);
   return (
     <div className="space-y-1">
-      <label className="block text-xs font-medium text-zinc-500 dark:text-zinc-400">
+      <label className="block text-xs font-medium text-mk-text-tertiary">
         {label}
       </label>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
@@ -1823,7 +1830,7 @@ function ProgressRow({
       <Loader2 className="size-4 animate-spin text-zinc-600" aria-hidden />
     ) : (
       <span
-        className="inline-block size-4 rounded-full border border-zinc-300 dark:border-zinc-700"
+        className="inline-block size-4 rounded-full border border-mk-border-strong"
         aria-hidden
       />
     );
@@ -1833,9 +1840,7 @@ function ProgressRow({
         {icon}
         {label}
       </span>
-      <span className="text-xs text-zinc-500 dark:text-zinc-400">
-        {stateLabel}
-      </span>
+      <span className="text-xs text-mk-text-tertiary">{stateLabel}</span>
     </li>
   );
 }

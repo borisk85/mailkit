@@ -21,7 +21,7 @@ export function RefundsSection({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold text-zinc-950 dark:text-zinc-50">
+      <h2 className="text-lg font-semibold text-mk-text-primary">
         {t("title")}
       </h2>
 
@@ -76,17 +76,17 @@ export function RefundsSection({
             className="space-y-1 rounded-lg border border-zinc-200 p-4 dark:border-zinc-800"
           >
             <div className="flex items-baseline justify-between">
-              <span className="text-sm font-medium text-zinc-950 dark:text-zinc-50">
+              <span className="text-sm font-medium text-mk-text-primary">
                 {formatMoney(r.amountCents, r.currency)}
               </span>
               <time
                 dateTime={r.createdAt}
-                className="text-xs text-zinc-500 dark:text-zinc-400"
+                className="text-xs text-mk-text-tertiary"
               >
                 {new Date(r.createdAt).toLocaleDateString(locale)}
               </time>
             </div>
-            <p className="text-xs text-zinc-700 dark:text-zinc-300">
+            <p className="text-xs text-mk-text-secondary">
               {translateReason(t, r.reason)} ·{" "}
               {translateTriggeredBy(t, r.triggeredBy)}
             </p>

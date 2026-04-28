@@ -102,12 +102,10 @@ export default async function AppHome({
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <header className="space-y-1">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-950 dark:text-zinc-50">
+        <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
           {t("title", { name: displayName })}
         </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          {t("subtitle")}
-        </p>
+        <p className="text-sm text-mk-text-tertiary">{t("subtitle")}</p>
       </header>
 
       {isEmpty ? (
