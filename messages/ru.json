@@ -40,13 +40,13 @@
         "fromDefault": "alex.morgan@gmail.com",
         "fromDefaultBadge": "Сейчас",
         "fromCustom1": "hello@вашдомен.ru",
-        "fromCustom2": "hi@вашдомен.ru",
+        "fromCustom2": "support@вашдомен.ru",
         "fromCustomBadge": "с Mailkit",
         "toLabel": "Кому",
         "toPlaceholder": "sarah@northwind.co",
         "subjectLabel": "Тема",
         "subjectPlaceholder": "Быстрый вопрос",
-        "bodyPlaceholder": "Текст сообщения…",
+        "bodyPlaceholder": "Привет, Сара!",
         "sendButton": "Отправить"
       }
     },

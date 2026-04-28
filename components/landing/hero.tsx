@@ -147,7 +147,7 @@ function GmailComposeMockup() {
         </div>
 
         <div className="mt-3 min-h-[60px] rounded-md bg-surface-base/50 p-3">
-          <span className="text-xs italic text-mk-text-tertiary">
+          <span className="text-xs text-mk-text-secondary">
             {t("bodyPlaceholder")}
           </span>
         </div>
