@@ -17,7 +17,7 @@ export function IntegrationsBar() {
       className="w-full border-y border-mk-border-subtle bg-surface-elevated/40"
     >
       <div className="mx-auto flex max-w-6xl flex-col items-center gap-10 px-4 py-20 sm:px-6 sm:py-24">
-        <span className="text-lg font-medium text-mk-text-secondary">
+        <span className="text-3xl font-semibold tracking-tight text-mk-text-primary">
           {t("label")}
         </span>
         <ul className="flex flex-wrap items-center justify-center gap-x-16 gap-y-10 sm:gap-x-20">
