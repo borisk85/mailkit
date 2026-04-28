@@ -8,6 +8,10 @@ import { SiCloudflare, SiBrevo } from "react-icons/si";
  * uses the official multi-color envelope SVG (Wikimedia Commons,
  * 2020 Google brand mark) since users recognize it visually and the
  * single-color Simple Icons wordmark looked off.
+ *
+ * Layout: inline horizontal — label on the left, vertical divider,
+ * brand row on the right. Brand name labels are secondary-tone so
+ * they don't compete with the primary "Работает на" heading.
  */
 export function IntegrationsBar() {
   const t = useTranslations("landing.integrations");
@@ -16,23 +20,23 @@ export function IntegrationsBar() {
       aria-label={t("label")}
       className="w-full border-y border-mk-border-subtle bg-surface-elevated/40"
     >
-      <div className="mx-auto flex max-w-6xl flex-col items-center gap-10 px-4 py-20 sm:px-6 sm:py-24">
-        <span className="text-3xl font-semibold tracking-tight text-mk-text-primary">
+      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-6 px-4 py-8 sm:px-6 sm:py-10">
+        <span className="text-base font-semibold uppercase tracking-[0.2em] text-mk-accent">
           {t("label")}
         </span>
-        <ul className="flex flex-wrap items-center justify-center gap-x-16 gap-y-10 sm:gap-x-20">
+        <ul className="flex flex-1 flex-wrap items-center justify-end gap-x-10 gap-y-6 sm:gap-x-14">
           <LogoItem name="Cloudflare">
-            <SiCloudflare size={36} color="#F38020" aria-hidden />
+            <SiCloudflare size={28} color="#F38020" aria-hidden />
           </LogoItem>
           <LogoItem name="Brevo">
-            <SiBrevo size={36} color="#0B996E" aria-hidden />
+            <SiBrevo size={28} color="#0B996E" aria-hidden />
           </LogoItem>
           <LogoItem name="Gmail">
             <Image
               src="/brand/gmail.svg"
               alt=""
-              width={36}
-              height={28}
+              width={28}
+              height={22}
               aria-hidden
             />
           </LogoItem>
@@ -51,12 +55,11 @@ function LogoItem({
 }) {
   return (
     <li>
-      <span
-        aria-label={name}
-        className="inline-flex items-center gap-3 text-mk-text-primary"
-      >
+      <span aria-label={name} className="inline-flex items-center gap-2.5">
         {children}
-        <span className="text-2xl font-semibold tracking-tight">{name}</span>
+        <span className="text-xl font-medium tracking-tight text-mk-text-secondary">
+          {name}
+        </span>
       </span>
     </li>
   );
