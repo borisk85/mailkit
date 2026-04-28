@@ -3,19 +3,6 @@
     "title": "MailKit — Email on your domain in 5 minutes",
     "description": "Skip 30 minutes of DNS hell. Automated Cloudflare + Brevo setup with guided Gmail Send-As. $5 per mailbox."
   },
-  "header": {
-    "logo": "Mailkit",
-    "nav": {
-      "features": "Features",
-      "pricing": "Pricing",
-      "docs": "Docs"
-    },
-    "languageSwitcher": {
-      "label": "Language",
-      "en": "English",
-      "ru": "Russian"
-    }
-  },
   "landing": {
     "announcementBanner": {
       "message": "Launch week — first 100 setups free with promo FIRST100",
@@ -227,21 +214,6 @@
         "Cancel anytime"
       ]
     }
-  },
-  "hero": {
-    "badge": "Launching soon — join the waitlist",
-    "title": "Email on your domain in 5 minutes",
-    "subtitle": "Connect your domain and Gmail — we handle Cloudflare Email Routing, Brevo SMTP, and guide you through Gmail Send-As. No 30-minute DNS hell.",
-    "cta": "Join waitlist",
-    "emailPlaceholder": "you@example.com",
-    "honest": "We automate 100% of the technical complexity. You do 3 simple copy-paste actions.",
-    "guarantee": "Money-back guarantee if it takes longer than 5 minutes."
-  },
-  "waitlist": {
-    "success": "You're on the list — we'll email you at launch.",
-    "error": "Something went wrong. Please try again.",
-    "alreadyIn": "You're already on the waitlist.",
-    "invalidEmail": "Please enter a valid email."
   },
   "auth": {
     "signInWithGoogle": "Sign in with Google",

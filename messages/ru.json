@@ -3,19 +3,6 @@
     "title": "MailKit — Почта на домене за 5 минут",
     "description": "Пропусти час возни с DNS. Автоматическая настройка Cloudflare + Brevo и пошаговый Gmail Send-As. $5 за ящик."
   },
-  "header": {
-    "logo": "Mailkit",
-    "nav": {
-      "features": "Возможности",
-      "pricing": "Цены",
-      "docs": "Документация"
-    },
-    "languageSwitcher": {
-      "label": "Язык",
-      "en": "English",
-      "ru": "Русский"
-    }
-  },
   "landing": {
     "announcementBanner": {
       "message": "Launch week — первые 100 настроек бесплатно по промокоду FIRST100",
@@ -227,21 +214,6 @@
         "Отмена в любой момент"
       ]
     }
-  },
-  "hero": {
-    "badge": "Скоро запуск — присоединяйтесь к списку ожидания",
-    "title": "Почта на домене за 5 минут",
-    "subtitle": "Подключите домен и Gmail — мы настроим Cloudflare Email Routing, Brevo SMTP и проведем вас через Gmail Send-As. Без 30-минутной возни с DNS.",
-    "cta": "В список ожидания",
-    "emailPlaceholder": "you@example.com",
-    "honest": "Мы автоматизируем 100% технической сложности. От вас — 3 простых copy-paste действия.",
-    "guarantee": "Гарантия возврата денег если заняло больше 5 минут."
-  },
-  "waitlist": {
-    "success": "Вы в списке — напишем на email когда запустимся.",
-    "error": "Что-то пошло не так. Попробуйте еще раз.",
-    "alreadyIn": "Вы уже в списке ожидания.",
-    "invalidEmail": "Пожалуйста, введите корректный email."
   },
   "auth": {
     "signInWithGoogle": "Войти через Google",
