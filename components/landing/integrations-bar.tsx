@@ -20,28 +20,23 @@ export function IntegrationsBar() {
       aria-label={t("label")}
       className="w-full border-y border-mk-border-subtle bg-surface-elevated/40"
     >
-      <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-x-8 gap-y-6 px-4 py-8 sm:px-6 sm:py-10">
-        <span className="text-lg font-semibold tracking-tight text-mk-text-primary">
-          {t("label")}
-        </span>
-        <ul className="flex flex-1 flex-wrap items-center justify-end gap-x-10 gap-y-6 sm:gap-x-14">
-          <LogoItem name="Cloudflare">
-            <SiCloudflare size={28} color="#F38020" aria-hidden />
-          </LogoItem>
-          <LogoItem name="Brevo">
-            <SiBrevo size={28} color="#0B996E" aria-hidden />
-          </LogoItem>
-          <LogoItem name="Gmail">
-            <Image
-              src="/brand/gmail.svg"
-              alt=""
-              width={28}
-              height={22}
-              aria-hidden
-            />
-          </LogoItem>
-        </ul>
-      </div>
+      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-14 gap-y-6 px-4 py-8 sm:px-6 sm:py-10">
+        <LogoItem name="Cloudflare">
+          <SiCloudflare size={28} color="#F38020" aria-hidden />
+        </LogoItem>
+        <LogoItem name="Brevo">
+          <SiBrevo size={28} color="#0B996E" aria-hidden />
+        </LogoItem>
+        <LogoItem name="Gmail">
+          <Image
+            src="/brand/gmail.svg"
+            alt=""
+            width={28}
+            height={22}
+            aria-hidden
+          />
+        </LogoItem>
+      </ul>
     </section>
   );
 }
