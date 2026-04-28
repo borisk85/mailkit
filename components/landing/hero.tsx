@@ -76,9 +76,23 @@ export function Hero() {
             </a>
           </div>
 
-          <p className="mk-caption mt-2 text-mk-text-tertiary">
-            {t("trustNote")}
-          </p>
+          <ul className="mt-2 flex flex-wrap gap-2">
+            {t("trustNote")
+              .split(" · ")
+              .map((item) => (
+                <li
+                  key={item}
+                  className="inline-flex items-center gap-1.5 rounded-full border border-mk-border-subtle bg-surface-elevated/60 px-3 py-1 text-xs font-medium text-mk-text-secondary"
+                >
+                  <Check
+                    className="size-3.5 text-mk-accent"
+                    aria-hidden
+                    strokeWidth={2.5}
+                  />
+                  {item}
+                </li>
+              ))}
+          </ul>
         </div>
 
         <div className="lg:col-span-5">
