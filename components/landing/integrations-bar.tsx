@@ -1,11 +1,13 @@
+import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { SiCloudflare, SiBrevo, SiGmail } from "react-icons/si";
+import { SiCloudflare, SiBrevo } from "react-icons/si";
 
 /**
- * Tech-stack strip below the hero — three official brand-color marks
- * sourced from Simple Icons (via react-icons). Each icon is the
- * canonical brand silhouette in the brand's primary color, so we don't
- * ship hand-rolled approximations. No hover, no description text.
+ * Integrations strip below the hero. Cloudflare and Brevo render from
+ * Simple Icons (via react-icons) in their primary brand color. Gmail
+ * uses the official multi-color envelope SVG (Wikimedia Commons,
+ * 2020 Google brand mark) since users recognize it visually and the
+ * single-color Simple Icons wordmark looked off.
  */
 export function IntegrationsBar() {
   const t = useTranslations("landing.integrations");
@@ -24,7 +26,13 @@ export function IntegrationsBar() {
             <SiBrevo size={36} color="#0B996E" aria-hidden />
           </LogoItem>
           <LogoItem name="Gmail">
-            <SiGmail size={36} color="#EA4335" aria-hidden />
+            <Image
+              src="/brand/gmail.svg"
+              alt=""
+              width={36}
+              height={28}
+              aria-hidden
+            />
           </LogoItem>
         </ul>
       </div>
