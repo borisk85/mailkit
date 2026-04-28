@@ -33,7 +33,7 @@
       "subhead": "Connect your domain to your existing Gmail. Send and receive email from your new branded address.",
       "primaryCta": "Set up my email",
       "secondaryCta": "See how it works",
-      "trustNote": "Free with promo · No subscription",
+      "trustNote": "Free during promo · No subscription",
       "mockup": {
         "alt": "Gmail Compose window — the From dropdown shows your custom-domain addresses instead of @gmail.com",
         "windowTitle": "New message",
