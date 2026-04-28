@@ -51,7 +51,11 @@ export default async function TermsPage({
   const text = locale === "ru" ? TERMS_RU : TERMS_EN;
   const title = locale === "ru" ? "Условия пользования" : "Terms of Service";
   const lastUpdated =
-    locale === "ru" ? "Обновлено 2026-04-25" : "Last updated 2026-04-25";
+    locale === "ru" ? "Обновлено 25.04.2026" : "Updated 2026-04-25";
+  const lede =
+    locale === "ru"
+      ? "Mailkit — это разовая настройка почты на твоем домене за $5. Мы автоматизируем техническую часть (Cloudflare и Brevo), ты копируешь четыре строки в Gmail. Возврат — по двум сценариям: автоматически при сбое нашей настройки и по запросу в течение 30 дней, если не работает. Подробности ниже."
+      : "Mailkit is a one-time domain email setup for $5. We automate the technical side (Cloudflare and Brevo); you copy-paste four lines into Gmail. Refunds work two ways: automatic if our setup fails, on request within 30 days if you can't actually send email. The formal terms below cover the edge cases.";
 
   return (
     <>
@@ -59,6 +63,7 @@ export default async function TermsPage({
       <LegalDocLayout
         title={title}
         lastUpdatedLabel={lastUpdated}
+        lede={lede}
         body={text}
       />
       <Footer />

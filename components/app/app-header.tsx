@@ -1,11 +1,11 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import type { User } from "@supabase/supabase-js";
 
+import { MailkitIcon } from "@/components/brand/mailkit-icon";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase/client";
 
@@ -39,14 +39,7 @@ export function AppHeader({ user, locale }: { user: User; locale: string }) {
           className="flex items-center gap-2.5 text-base font-semibold tracking-tight text-mk-text-primary"
           aria-label={tBrand("logo")}
         >
-          <Image
-            src="/brand/mailkit-icon.png"
-            alt=""
-            width={24}
-            height={24}
-            priority
-            className="size-6 shrink-0"
-          />
+          <MailkitIcon className="size-6 shrink-0" />
           <span>{tBrand("logo")}</span>
         </Link>
         <div className="flex items-center gap-3">

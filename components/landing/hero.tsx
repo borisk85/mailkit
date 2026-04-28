@@ -37,7 +37,7 @@ export function Hero() {
         }}
       />
 
-      <div className="mx-auto grid max-w-6xl items-center gap-16 px-4 py-24 sm:px-6 sm:py-32 lg:grid-cols-12 lg:gap-12 lg:py-40">
+      <div className="mx-auto grid max-w-6xl items-center gap-16 px-4 py-20 sm:px-6 sm:py-30 lg:grid-cols-12 lg:gap-12 lg:py-32">
         <div className="flex flex-col gap-6 lg:col-span-7">
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
 
@@ -47,9 +47,7 @@ export function Hero() {
           >
             <span className="block">{t("headlineLine1")}</span>
             <span className="block">{t("headlineLine2")}</span>
-            <span className="block text-mk-text-secondary">
-              {t("headlineLine3")}
-            </span>
+            <span className="mk-display-fade block">{t("headlineLine3")}</span>
           </h1>
 
           <p className="mk-body-large max-w-2xl text-balance text-mk-text-secondary">
@@ -93,6 +91,11 @@ export function Hero() {
           <GmailComposeMockup />
         </div>
       </div>
+
+      {/* Sentinel for the cookie banner — once it scrolls into view
+       * the banner is allowed to mount. Keeps the hero clean on first
+       * paint per Design V2 §3. */}
+      <div id="hero-end-sentinel" aria-hidden className="h-px" />
     </section>
   );
 }
@@ -102,7 +105,7 @@ function GmailComposeMockup() {
 
   return (
     <div
-      className="relative mx-auto w-full max-w-md lg:max-w-none"
+      className="relative mx-auto w-full max-w-[calc(100vw-32px)] sm:max-w-md lg:max-w-none"
       style={{ perspective: "1200px" }}
     >
       <div
@@ -117,8 +120,12 @@ function GmailComposeMockup() {
       <div
         role="img"
         aria-label={t("alt")}
-        className="mk-mockup-tilt rounded-2xl border border-mk-border-strong bg-surface-elevated p-5 mk-card-shadow"
+        className="mk-mockup-tilt rounded-2xl border border-mk-border-strong bg-surface-elevated-2 p-5 mk-card-shadow-strong"
       >
+        <div className="mb-3 flex items-center justify-between text-[10px] text-mk-text-tertiary">
+          <span className="font-medium">{t("inboxLabel")}</span>
+          <span className="font-mono">{t("draftSavedLabel")}</span>
+        </div>
         <div className="mb-4 flex items-center justify-between border-b border-mk-border-subtle pb-3">
           <span className="text-xs font-semibold text-mk-text-secondary">
             {t("windowTitle")}

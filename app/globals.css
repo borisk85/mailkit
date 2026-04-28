@@ -61,6 +61,7 @@
   /* Premium-pass aliases — addressable as `bg-surface-base`, `text-mk-secondary` etc. */
   --color-surface-base: var(--surface-base);
   --color-surface-elevated: var(--surface-elevated);
+  --color-surface-elevated-2: var(--surface-elevated-2);
   --color-mk-border-subtle: var(--mk-border-subtle);
   --color-mk-border-strong: var(--mk-border-strong);
   --color-mk-text-primary: var(--mk-text-primary);
@@ -77,6 +78,9 @@
   /* Light mode tokens (premium pass §1.1) */
   --surface-base: #fafafa;
   --surface-elevated: #ffffff;
+  /* Light mode has no extra step — already pure white on base; this
+   * alias keeps the dual-mode token surface symmetric for components. */
+  --surface-elevated-2: #ffffff;
   --mk-border-subtle: #e4e4e7;
   --mk-border-strong: #d4d4d8;
   --mk-text-primary: #0a0a0b;
@@ -129,6 +133,10 @@
   /* Dark mode tokens — premium pass §1.1 */
   --surface-base: #0a0a0b;
   --surface-elevated: #131314;
+  /* Second elevated tier per Design V2 §1.1 — for surfaces that need
+   * a hard visual lift (hero mockup, pricing card, guarantee cards).
+   * 9-pt delta from elevated; legible on top of `surface-base`. */
+  --surface-elevated-2: #1a1a1d;
   --mk-border-subtle: #1f1f22;
   --mk-border-strong: #2a2a2f;
   --mk-text-primary: #fafafa;
@@ -283,6 +291,45 @@
       0 0 0 1px rgba(255, 255, 255, 0.06);
   }
 
+  /* Stronger shadow for the hero mockup + pricing card per V2 §4.3.
+   * Wider drop-shadow + inner highlight ring for the lifted look. */
+  .mk-card-shadow-strong {
+    box-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.04) inset,
+      0 24px 48px -12px rgba(0, 0, 0, 0.16),
+      0 0 0 1px rgba(0, 0, 0, 0.04);
+  }
+  .dark .mk-card-shadow-strong {
+    box-shadow:
+      0 1px 0 rgba(255, 255, 255, 0.06) inset,
+      0 24px 48px -12px rgba(0, 0, 0, 0.5),
+      0 0 0 1px rgba(255, 255, 255, 0.04);
+  }
+
+  /* Display-1 third-line fade per V2 §1.3 — vertical 100→55% gradient
+   * on the muted closing line of the hero headline. Only used once per
+   * page (the hero); a focal point, not decoration. */
+  .mk-display-fade {
+    background: linear-gradient(
+      180deg,
+      var(--mk-text-primary) 0%,
+      rgba(10, 10, 11, 0.55) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .dark .mk-display-fade {
+    background: linear-gradient(
+      180deg,
+      var(--mk-text-primary) 0%,
+      rgba(250, 250, 250, 0.55) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
   /* FAQ accent left-border on open per §2.9. shadcn Accordion sets
    * data-state="open" on AccordionItem; we drive the indicator off
    * that without touching the primitive. */
@@ -292,20 +339,25 @@
   }
 
   /* Hero product mockup — subtle 3D tilt on lg+ screens only.
-   * Disabled on mobile (no perspective, no rotation) per §2.3. */
+   * Disabled on mobile (no perspective) and under reduced-motion.
+   * V2 §1.2 restored the `translateZ(0)` (compositor hoist) + the
+   * eased transition so the tilt animates in instead of snapping. */
   .mk-mockup-tilt {
     transform: none;
+    transform-origin: center;
     transform-style: preserve-3d;
+    transition: transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
     will-change: transform;
   }
   @media (min-width: 1024px) {
     .mk-mockup-tilt {
-      transform: rotateY(-4deg) rotateX(2deg);
+      transform: rotateY(-4deg) rotateX(2deg) translateZ(0);
     }
   }
   @media (prefers-reduced-motion: reduce) {
     .mk-mockup-tilt {
       transform: none;
+      transition: none;
     }
   }
 

@@ -65,15 +65,15 @@ export function wrapBrandedHtml({
   const paragraphHtml = paragraphs
     .map(
       (p) =>
-        `      <p style="font-size:16px;line-height:1.6;color:#52525B;margin:0 0 16px;">${escapeHtml(
+        `      <p class="mk-p" style="font-size:16px;line-height:1.6;color:#52525B;margin:0 0 16px;">${escapeHtml(
           p,
         )}</p>`,
     )
     .join("\n");
 
   const ctaHtml = cta
-    ? `      <p style="margin:24px 0;">
-        <a href="${escapeHtml(cta.url)}" style="display:inline-block;background:#7C5CFF;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:500;font-size:15px;">${escapeHtml(
+    ? `      <p class="mk-p" style="margin:24px 0;">
+        <a href="${escapeHtml(cta.url)}" class="mk-cta" style="display:inline-block;background:#7C5CFF;color:#FFFFFF;padding:12px 24px;border-radius:8px;text-decoration:none;font-weight:500;font-size:15px;">${escapeHtml(
           cta.text,
         )}</a>
       </p>`
@@ -84,7 +84,21 @@ export function wrapBrandedHtml({
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="light dark">
+  <meta name="supported-color-schemes" content="light dark">
   <title>${escapedTitle}</title>
+  <style>
+    @media (prefers-color-scheme: dark) {
+      body { background: #0A0A0B !important; }
+      .mk-card { background: #131314 !important; }
+      .mk-h1 { color: #FAFAFA !important; }
+      .mk-p { color: #A1A1AA !important; }
+      .mk-cta { background: #7C5CFF !important; color: #FFFFFF !important; }
+      .mk-footer-text { color: #71717A !important; }
+      .mk-footer-link { color: #71717A !important; }
+      .mk-divider { border-top-color: #2A2A2F !important; }
+    }
+  </style>
 </head>
 <body style="margin:0;padding:32px 16px;background:#FAFAFA;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',system-ui,sans-serif;">
   ${
@@ -95,32 +109,33 @@ export function wrapBrandedHtml({
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;">
     <tr>
       <td align="center">
-        <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;max-width:560px;margin:0 auto;background:#FFFFFF;border-radius:12px;padding:40px;">
+        <table role="presentation" class="mk-card" width="560" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;max-width:560px;margin:0 auto;background:#FFFFFF;border-radius:12px;padding:40px;">
           <tr>
             <td style="padding-bottom:32px;">
-              <img src="${SITE_URL}/brand/mailkit-logo-full.png" alt="MailKit" width="120" style="display:block;border:0;outline:none;text-decoration:none;width:120px;height:auto;">
+              <img src="${SITE_URL}/brand/mailkit-logo-full.png" alt="Mailkit" width="120" height="auto" style="display:block;border:0;outline:none;text-decoration:none;width:120px;height:auto;">
             </td>
           </tr>
           <tr>
             <td>
-              <h1 style="font-size:24px;font-weight:600;color:#0A0A0B;margin:0 0 16px;line-height:1.3;">${escapedTitle}</h1>
+              <h1 class="mk-h1" style="font-size:24px;font-weight:600;color:#0A0A0B;margin:0 0 16px;line-height:1.3;">${escapedTitle}</h1>
 ${paragraphHtml}
 ${ctaHtml}
             </td>
           </tr>
           <tr>
-            <td style="margin-top:40px;padding-top:24px;border-top:1px solid #E4E4E7;">
-              <p style="font-size:13px;line-height:1.6;color:#71717A;margin:24px 0 8px;">${escapeHtml(
+            <td class="mk-divider" style="margin-top:40px;padding-top:24px;border-top:1px solid #E4E4E7;">
+              <p class="mk-footer-text" style="font-size:13px;line-height:1.6;color:#71717A;margin:24px 0 8px;">${escapeHtml(
                 footer.questions,
               )}</p>
-              <p style="font-size:13px;line-height:1.6;color:#71717A;margin:0;">
-                <a href="${SITE_URL}/terms" style="color:#71717A;text-decoration:underline;">${escapeHtml(
+              <p class="mk-footer-text" style="font-size:12px;line-height:1.6;color:#71717A;margin:0 0 12px;">support@getmailkit.com</p>
+              <p class="mk-footer-text" style="font-size:13px;line-height:1.6;color:#71717A;margin:0;">
+                <a href="${SITE_URL}/terms" class="mk-footer-link" style="color:#71717A;text-decoration:underline;">${escapeHtml(
                   footer.termsLabel,
                 )}</a> ·
-                <a href="${SITE_URL}/privacy" style="color:#71717A;text-decoration:underline;">${escapeHtml(
+                <a href="${SITE_URL}/privacy" class="mk-footer-link" style="color:#71717A;text-decoration:underline;">${escapeHtml(
                   footer.privacyLabel,
                 )}</a> ·
-                <a href="${SITE_URL}/guarantee" style="color:#71717A;text-decoration:underline;">${escapeHtml(
+                <a href="${SITE_URL}/guarantee" class="mk-footer-link" style="color:#71717A;text-decoration:underline;">${escapeHtml(
                   footer.guaranteeLabel,
                 )}</a>
               </p>

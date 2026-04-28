@@ -1,15 +1,20 @@
 import { useTranslations } from "next-intl";
 
 /**
- * How it works — premium-pass refresh per UI_REVIEW_BRIEF §2.6.
- * Four-step horizontal timeline (3 automated + 1 your-turn) replaces
- * the prior 3-card grid. Architect's call to split out DNS verification
- * as its own step — being honest about what we actually do.
+ * How it works — Design V2 §4.6 polish on top of the V1 four-card
+ * timeline. Two changes vs V1:
  *
- * Connecting line between cards on lg+ shows flow direction; on mobile
- * the timeline collapses to a vertical stack with a left-side rail.
- * Step 4 (Gmail Send-As) carries the "Your turn" pill in accent color
- * to visually separate the part where the user takes over.
+ *  - Headline rewrites to match the visual count ("Four steps. We do
+ *    three. You do one." / "Четыре шага. Мы делаем три. Один — твой.")
+ *    so the eye no longer counts four numbered cards under a "three"
+ *    promise.
+ *  - The first three (Automated) and the fourth (Your turn) get a
+ *    visible separator at lg+. The connecting line breaks at the same
+ *    column boundary so card 04 reads as a distinct hand-off.
+ *
+ * The standalone time pill inside each card was removed — the time is
+ * already in the eyebrow next to the title and the second pill was
+ * pushing the card past the readability threshold.
  */
 export function HowItWorksSection() {
   const t = useTranslations("landing.howItWorks");
@@ -27,7 +32,7 @@ export function HowItWorksSection() {
       className="w-full"
       aria-labelledby="how-it-works-heading"
     >
-      <div className="mx-auto max-w-6xl px-4 py-24 sm:px-6 sm:py-32">
+      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-30 lg:py-32">
         <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
           <h2
@@ -42,17 +47,20 @@ export function HowItWorksSection() {
         </div>
 
         <div className="relative mt-16">
+          {/* Connecting line spans only the three Automated cards.
+           * Stops short of the divider + card 04 so the hand-off
+           * reads as a separate phase. */}
           <div
             aria-hidden
-            className="pointer-events-none absolute inset-x-12 top-12 hidden h-px lg:block"
+            className="pointer-events-none absolute left-12 right-[28%] top-12 hidden h-px lg:block"
             style={{
               background:
                 "linear-gradient(to right, rgba(124,92,255,0.5), rgba(124,92,255,0.1))",
             }}
           />
 
-          <ol className="relative grid gap-6 lg:grid-cols-4 lg:gap-6">
-            {steps.map(({ key, number, automated }) => (
+          <ol className="relative grid gap-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_8px_minmax(0,1fr)] lg:gap-6">
+            {steps.slice(0, 3).map(({ key, number, automated }) => (
               <StepCard
                 key={key}
                 number={number}
@@ -64,6 +72,27 @@ export function HowItWorksSection() {
                 manualLabel={t("manualBadge")}
               />
             ))}
+
+            <div
+              aria-hidden
+              className="hidden lg:block self-stretch w-px bg-mk-border-strong mx-1"
+            />
+
+            {(() => {
+              const s = steps[3];
+              return (
+                <StepCard
+                  key={s.key}
+                  number={s.number}
+                  title={t(`${s.key}.title`)}
+                  time={t(`${s.key}.time`)}
+                  body={t(`${s.key}.body`)}
+                  automated={s.automated}
+                  automatedLabel={t("automatedBadge")}
+                  manualLabel={t("manualBadge")}
+                />
+              );
+            })()}
           </ol>
         </div>
       </div>
@@ -110,14 +139,10 @@ function StepCard({
         </span>
       </div>
 
-      <h3 className="mk-heading-3 text-mk-text-primary">{title}</h3>
-
-      <span
-        className="inline-flex w-fit items-center rounded-full px-2.5 py-1 font-mono text-xs font-semibold text-mk-accent"
-        style={{ backgroundColor: "rgba(124, 92, 255, 0.12)" }}
-      >
-        {time}
-      </span>
+      <div className="flex flex-col gap-1">
+        <span className="mk-caption font-mono text-mk-accent">{time}</span>
+        <h3 className="mk-heading-3 text-mk-text-primary">{title}</h3>
+      </div>
 
       <p className="mk-body-small text-mk-text-secondary">{body}</p>
     </li>

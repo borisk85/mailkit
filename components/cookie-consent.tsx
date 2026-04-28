@@ -1,17 +1,16 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
 const STORAGE_KEY = "mailkit-cookie-consent-v1";
+const FIRST_PAINT_DELAY_MS = 4000;
+const HERO_SENTINEL_ID = "hero-end-sentinel";
 
-/** Lazy-init the visibility flag from localStorage during the first
- * render. Returning false on SSR avoids hydration mismatch — server
- * renders nothing, client mounts with the real persisted value. */
-function readInitialShouldShow(): boolean {
+function readPersistedShouldShow(): boolean {
   if (typeof window === "undefined") return false;
   try {
     return window.localStorage.getItem(STORAGE_KEY) === null;
@@ -23,30 +22,53 @@ function readInitialShouldShow(): boolean {
 }
 
 /**
- * EU-style cookie consent banner (#39). Renders a slide-up
- * notification on first visit; once the user clicks "Got it" the
- * preference is stored in localStorage so the banner doesn't
- * reappear.
+ * EU-style cookie consent (#39, redesigned per Design V2 §3).
  *
- * The MailKit cookie posture is intentionally minimal: only OAuth
- * session cookies + the locale cookie. No marketing trackers, no ad
- * pixels, no behavioral analytics. We don't actually need a
- * gate-style consent — the cookies we set are functional. This
- * banner exists for transparency + EU compliance signal, not as a
- * hard gate before any data flows.
+ * V2 fixes the V1 banner that, as a 520 px bottom-right card, landed
+ * on top of the hero CTA on mobile and the Gmail mockup on desktop.
+ * Three changes:
  *
- * Hydration: the banner mounts hidden and only shows after the
- * `useEffect` reads localStorage. Avoids the SSR-then-flash-of-
- * banner-on-revisit issue.
+ *   1. Compact pill — bottom-center on desktop (auto width, full
+ *      pill shape), bottom-edge on mobile (rounded card). The bar
+ *      no longer competes with the hero's right column.
+ *   2. Tighter copy in both locales (single-sentence body).
+ *   3. Above-the-fold suppression — banner does NOT mount on first
+ *      paint. It only appears after the user scrolls past the hero
+ *      sentinel OR 4 s elapse, whichever comes first. Returning
+ *      users with the dismissed flag persisted in localStorage stay
+ *      hidden either way.
  *
- * Storage key carries a v1 suffix so a future cookie-policy change
- * (e.g. "we now use first-party analytics") can re-prompt without
- * having to invent a migration.
+ * Cookie posture stays minimal — only OAuth + locale, no trackers.
+ * The banner is transparency + EU-compliance signal, not a hard
+ * gate. Storage key has a v1 suffix so a future policy change can
+ * re-prompt by bumping the suffix.
  */
 export function CookieConsent() {
   const t = useTranslations("cookieConsent");
   const locale = useLocale();
-  const [shouldShow, setShouldShow] = useState(readInitialShouldShow);
+  const [shouldShow, setShouldShow] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const sentinel = document.getElementById(HERO_SENTINEL_ID);
+    let revealed = false;
+    const reveal = () => {
+      if (revealed) return;
+      revealed = true;
+      if (readPersistedShouldShow()) setShouldShow(true);
+    };
+    const timer = window.setTimeout(reveal, FIRST_PAINT_DELAY_MS);
+    const io = sentinel
+      ? new IntersectionObserver((entries) => {
+          if (entries.some((e) => e.isIntersecting)) reveal();
+        })
+      : null;
+    if (sentinel && io) io.observe(sentinel);
+    return () => {
+      window.clearTimeout(timer);
+      io?.disconnect();
+    };
+  }, []);
 
   const handleAccept = () => {
     try {
@@ -66,7 +88,7 @@ export function CookieConsent() {
     <div
       role="region"
       aria-label="Cookie consent"
-      className="fixed inset-x-4 bottom-4 z-50 mx-auto flex max-w-[520px] flex-col gap-3 rounded-2xl border border-mk-border-strong bg-surface-elevated/95 p-6 backdrop-blur-md mk-card-shadow sm:left-auto sm:right-6 sm:bottom-6 sm:mx-0"
+      className="fixed left-2 right-2 bottom-2 z-50 flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-mk-border-strong bg-surface-elevated-2/95 px-4 py-3 backdrop-blur-md mk-card-shadow sm:left-1/2 sm:right-auto sm:bottom-4 sm:-translate-x-1/2 sm:rounded-full sm:px-5 sm:py-2.5"
     >
       <p className="mk-body-small text-mk-text-secondary">{t("body")}</p>
       <div className="flex items-center gap-3">
