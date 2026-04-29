@@ -89,27 +89,29 @@ export function ProblemSection() {
                     className="mt-1 size-4 shrink-0 text-mk-accent"
                     aria-hidden
                   />
-                  <span className="mk-body-small text-mk-text-primary">
-                    {step}
-                  </span>
-                  {i === 1 && (
-                    <span className="group relative mt-0.5 shrink-0">
-                      <HelpCircle
-                        className="size-4 cursor-pointer text-mk-text-tertiary transition-colors hover:text-mk-accent"
-                        aria-hidden
-                      />
-                      <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2 text-xs text-mk-text-secondary opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                        <a
-                          href="https://dash.cloudflare.com/profile/api-tokens"
-                          target="_blank"
-                          rel="noreferrer"
-                          className="hover:text-mk-text-primary"
-                        >
-                          {tWith("tokenHint")}
-                        </a>
-                      </span>
+                  <span className="inline-flex items-start gap-1">
+                    <span className="mk-body-small text-mk-text-primary">
+                      {step}
                     </span>
-                  )}
+                    {i === 1 && (
+                      <span className="group relative mt-0.5 shrink-0">
+                        <HelpCircle
+                          className="size-3.5 cursor-pointer text-mk-text-tertiary transition-colors hover:text-mk-accent"
+                          aria-hidden
+                        />
+                        <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2 text-xs text-mk-text-secondary opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                          <a
+                            href="https://dash.cloudflare.com/profile/api-tokens"
+                            target="_blank"
+                            rel="noreferrer"
+                            className="hover:text-mk-text-primary"
+                          >
+                            {tWith("tokenHint")}
+                          </a>
+                        </span>
+                      </span>
+                    )}
+                  </span>
                 </li>
               ))}
             </ul>
