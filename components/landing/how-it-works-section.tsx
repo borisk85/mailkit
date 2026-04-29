@@ -118,7 +118,7 @@ function StepCard({
   manualLabel: string;
 }) {
   return (
-    <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
+    <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated px-6 py-8 mk-card-shadow">
       <span
         aria-hidden
         className="pointer-events-none absolute right-4 top-3 select-none font-mono text-5xl font-bold leading-none text-mk-accent/10"
@@ -141,7 +141,7 @@ function StepCard({
 
       <div className="flex flex-col gap-3">
         <span className="mk-caption font-mono text-mk-accent">{time}</span>
-        <h3 className="text-lg font-semibold leading-snug tracking-tight text-mk-text-primary">
+        <h3 className="text-lg font-semibold leading-snug tracking-tight text-mk-text-primary min-h-[52px]">
           {title}
         </h3>
       </div>
