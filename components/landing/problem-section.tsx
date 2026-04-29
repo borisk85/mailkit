@@ -103,7 +103,7 @@ export function ProblemSection() {
                           href="https://dash.cloudflare.com/profile/api-tokens"
                           target="_blank"
                           rel="noreferrer"
-                          className="underline underline-offset-2 hover:text-mk-text-primary"
+                          className="hover:text-mk-text-primary"
                         >
                           {tWith("tokenHint")}
                         </a>
