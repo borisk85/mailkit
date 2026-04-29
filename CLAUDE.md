@@ -89,33 +89,9 @@ user's domain, then guides the user through the Gmail Send-As final step via a
 
 ### Target audience (MVP)
 
-Широкая аудитория, не только indie hackers. Расширено 2026-04-23:
-
-1. **Indie hackers / solo developers** — хотят `hello@myproduct.com` вместо
-   личного Gmail. Технически грамотные, ценят шорткат.
-2. **SMB owners / малые предприниматели** — магазины, сервисы, консалтинг.
-   Хотят `info@mybiz.com` для профессионализма. Технически **не** грамотны
-   — наш wizard для них часто единственный способ.
-3. **Freelancers / consultants / coaches** — `hello@myname.com` для
-   client communication. Средний tech-level, время дороже технарства.
-4. **Small agencies (2-10 человек)** — настраивают custom email для
-   клиентов. Power-user потенциал через 3-mailbox bundle SKU (#10 в
-   backlog, post-validation).
-5. **Non-English entrepreneurs (RU, другие)** — SMB сегмент где Google
-   Workspace за $6/user/mo — дороговато, а domain email нужен для
-   доверия клиентов. EN/RU локализация first-class.
-
-Marketing angles и objection handling per сегменту: see
-[docs/MARKETING_ANGLES.md](docs/MARKETING_ANGLES.md)
-
-Post-launch support: 30-day functional guarantee + automation-failure
-auto-refund + self-serve diagnostics + $3 re-setup or $3/mo monitoring
-subscription. Full guarantee policy:
-[docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md). Support model details:
-[docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md) "Post-launch Support Model".
-
-Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
-(owner responsibility, not in code scope).
+Indie hackers, SMB owners, freelancers, small agencies, non-English entrepreneurs (RU first-class).
+Details + marketing angles per segment: [docs/MARKETING_ANGLES.md](docs/MARKETING_ANGLES.md).
+Guarantee policy: [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md).
 
 ## Architecture constraints (важно)
 - **Gmail `sendAs.create` blocked on personal @gmail** — the API method requires
@@ -154,17 +130,9 @@ Marketing / channel strategy: see [docs/GO_TO_MARKET.md](docs/GO_TO_MARKET.md)
   [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md).
 
 ## Known constraints
-- Gmail `sendAs.create` blocked on personal @gmail (requires Workspace DWD)
-- Gmail step accepted as 3-min guided UX for MVP
-- Chrome Extension planned for v2 to reduce Gmail step to ~20 sec (legal
-  research + Chrome Store ToS review required BEFORE dev)
-- Brevo ops: single shared account handles all customer sender domains
-- Honest positioning: "5 min, guaranteed" — backed by two-tier policy in
-  [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md), not a loose
-  marketing claim
-- Vercel Framework Preset фиксируется при первом подключении repo.
-  Если подключил до scaffold merge — руками поправить в Settings
-  после merge. См. [docs/LESSONS_LEARNED.md](docs/LESSONS_LEARNED.md)
+- Gmail step accepted as 3-min guided UX for MVP; Chrome Extension planned v2 (ToS review first)
+- Honest positioning: "5 min, guaranteed" — two-tier policy, not a loose claim
+- Vercel Framework Preset фиксируется при первом подключении repo — поправить в Settings после merge
 
 ## What NOT to do
 - Don't build audit tool / DNS checker — out of scope for MVP
@@ -251,39 +219,12 @@ Prod Lighthouse — **gating**, но только при корректной м
 - Сохраняй raw JSON runs — future comparisons должны быть
   apples-to-apples, same methodology
 
-Current stored prod baselines (mailkit-ten.vercel.app, landing):
-- Pre-#4a: EN 87 / RU 87
-- Post-#4a stable warm: EN 77 / RU 74
-- Post-#4b stable warm: EN 75 / RU 85 (2026-04-23, landing)
-- Post-#6 stable warm: EN 73 / RU 70 (2026-04-24, 12h post-merge, n=5 each)
-
-EN on a gentle downslope across features (87 → 77 → 75 → 73 — each −2 is in noise range). RU swings wider (87 → 74 → 85 → 70) — historically variance-prone at prod. Both locales still clear the ≥70 acceptance threshold post-#6. Systemic perf attempt-3 (next-intl `pick`, selective dynamic route segments, bundle analyzer) is the path back into the 80s+, in `docs/TICKETS_BACKLOG.md`.
-
-Full investigation и SOP: [docs/investigation-2026-04-22/FINDINGS.md](docs/investigation-2026-04-22/FINDINGS.md) + [docs/ticket-6-post-merge/summary.md](docs/ticket-6-post-merge/summary.md)
+Current prod baselines (mailkit-ten.vercel.app, post-#6, n=5 each): EN 73 / RU 70.
+Both clear ≥70 threshold. Full history + SOP: [docs/investigation-2026-04-22/FINDINGS.md](docs/investigation-2026-04-22/FINDINGS.md)
 
 ## Issues policy — solo vibe-coding mode
 
-Проект ведется в solo режиме (владелец + Claude Code). GitHub Issues
-избыточны для нашего размера команды. Единственный источник правды
-для трекинга задач — [docs/TICKETS_BACKLOG.md](docs/TICKETS_BACKLOG.md).
-
-### Не создавать Issues по умолчанию
-
-Для tech debt, feature ideas, refactoring tasks — писать прямо в
-`TICKETS_BACKLOG.md` в соответствующую секцию (MVP, Post-validation,
-Tech debt).
-
-### Когда Issues все-таки уместны
-
-- Bug, который пользователь может воспроизвести (нужна трассируемая
-  история с комментариями)
-- Внешний контрибьютор мог бы подхватить (open source scenario)
-- Критичный блокер релиза — хочется видеть в GitHub UI для owner'а
-
-### Существующий Issue #7 (performance) — оставляем
-
-Не закрываем. Но новые подобные задачи идут в `TICKETS_BACKLOG.md`,
-не в Issues.
+Единственный источник правды — [docs/TICKETS_BACKLOG.md](docs/TICKETS_BACKLOG.md). Issues не создавать (solo режим). Исключение: воспроизводимый user-facing bug или критичный блокер релиза. Issue #7 (performance) — оставить открытым.
 
 ## Communication style with owner
 - На «ты», коротко, без маркдауна в простых ответах, без лекций
