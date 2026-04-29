@@ -63,7 +63,7 @@
       "subhead": "Без подписок и скрытых поборов. Платите раз - пользуйтесь всегда.",
       "badge": "Почта на вашем домене в Cloudflare",
       "price": "$5",
-      "priceUnit": "за настройку",
+      "priceUnit": "/ за настройку",
       "inclusionsHeading": "Что входит",
       "inclusions": [
         "Настройка Cloudflare Email Routing",
