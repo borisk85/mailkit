@@ -26,7 +26,7 @@ export function TrustSection() {
           >
             {t("heading")}
           </h2>
-          <p className="mk-body-large max-w-xl text-balance text-mk-text-secondary">
+          <p className="mk-body-large max-w-xl text-mk-text-secondary">
             {t("subhead")}
           </p>
           <Link
