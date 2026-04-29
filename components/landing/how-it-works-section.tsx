@@ -59,7 +59,7 @@ export function HowItWorksSection() {
             }}
           />
 
-          <ol className="relative grid gap-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_8px_minmax(0,1fr)] lg:gap-8">
+          <ol className="relative grid gap-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_8px_minmax(0,1fr)] lg:grid-rows-[auto_auto_1fr] lg:gap-x-8 lg:gap-y-4">
             {steps.slice(0, 3).map(({ key, number, automated }) => (
               <StepCard
                 key={key}
@@ -75,7 +75,7 @@ export function HowItWorksSection() {
 
             <div
               aria-hidden
-              className="hidden lg:block self-stretch w-px bg-mk-border-strong mx-1"
+              className="hidden lg:block lg:row-span-3 self-stretch w-px bg-mk-border-strong mx-1"
             />
 
             {(() => {
@@ -118,7 +118,7 @@ function StepCard({
   manualLabel: string;
 }) {
   return (
-    <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
+    <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow lg:row-span-3 lg:grid lg:[grid-template-rows:subgrid] lg:gap-0">
       <span
         aria-hidden
         className="pointer-events-none absolute right-4 top-3 select-none font-mono text-5xl font-bold leading-none text-mk-accent/10"
@@ -141,7 +141,7 @@ function StepCard({
 
       <div className="flex flex-col gap-3">
         <span className="mk-caption font-mono text-mk-accent">{time}</span>
-        <h3 className="mk-heading-3 min-h-[3.5rem] text-balance text-mk-text-primary">
+        <h3 className="mk-heading-3 text-balance text-mk-text-primary">
           {title}
         </h3>
       </div>
