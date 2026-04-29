@@ -198,8 +198,8 @@
    * sizes is a key premium signal (architect §1.2).
    */
   .mk-display-1 {
-    font-size: 56px;
-    line-height: 64px;
+    font-size: 72px;
+    line-height: 80px;
     letter-spacing: -0.04em;
     font-weight: 600;
   }
