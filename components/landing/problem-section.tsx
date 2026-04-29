@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Check, Clock, Zap } from "lucide-react";
+import { Check, Rocket, Wrench } from "lucide-react";
 
 /**
  * Problem section — premium-pass refresh per UI_REVIEW_BRIEF §2.5.
@@ -39,7 +39,7 @@ export function ProblemSection() {
           <article className="flex h-full flex-col gap-6 rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
             <header className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2.5">
-                <Clock className="size-5 text-mk-text-tertiary" aria-hidden />
+                <Wrench className="size-5 text-mk-text-tertiary" aria-hidden />
                 <h3 className="text-base font-semibold text-mk-text-secondary">
                   {tWithout("title")}
                 </h3>
@@ -70,7 +70,7 @@ export function ProblemSection() {
           <article className="flex h-full flex-col gap-6 rounded-2xl border-2 border-mk-accent bg-surface-elevated p-8 mk-card-shadow">
             <header className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2.5">
-                <Zap className="size-5 text-mk-accent" aria-hidden />
+                <Rocket className="size-5 text-mk-accent" aria-hidden />
                 <h3 className="text-base font-semibold text-mk-text-primary">
                   {tWith("title")}
                 </h3>
