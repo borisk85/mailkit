@@ -76,7 +76,7 @@ export function ProblemSection() {
                 </span>
               </div>
               <span
-                className="font-semibold tracking-tight text-mk-text-primary"
+                className="font-semibold tracking-tight text-mk-text-secondary"
                 style={{ fontSize: "32px", lineHeight: "1" }}
               >
                 {tWith("duration")}
@@ -90,7 +90,7 @@ export function ProblemSection() {
                     aria-hidden
                   />
                   <span className="inline-flex items-start gap-1">
-                    <span className="mk-body-small text-mk-text-primary">
+                    <span className="mk-body-small text-mk-text-secondary">
                       {step}
                     </span>
                     {i === 1 && (
