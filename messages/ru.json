@@ -60,10 +60,10 @@
     "pricing": {
       "eyebrow": "Цена",
       "heading": "Пять долларов. Один раз. Все",
-      "subhead": "Без подписки. Без ежемесячного платежа. Без сюрпризов через месяц.",
-      "badge": "Почта на вашем домене с Cloudflare. $5 разово.",
+      "subhead": "Единоразовый платеж. Навсегда.",
+      "badge": "Почта на вашем домене в Cloudflare.",
       "price": "$5",
-      "priceUnit": "разово",
+      "priceUnit": "за настройку",
       "inclusionsHeading": "Что входит",
       "inclusions": [
         "Настройка Cloudflare Email Routing",
