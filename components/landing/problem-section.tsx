@@ -30,7 +30,7 @@ export function ProblemSection() {
           >
             {t("heading")}
           </h2>
-          <p className="mk-body-large max-w-xl text-balance text-mk-text-secondary">
+          <p className="mk-body-large text-balance text-mk-text-secondary">
             {t("subhead")}
           </p>
         </div>
