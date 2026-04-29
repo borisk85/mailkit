@@ -118,7 +118,7 @@ function StepCard({
   manualLabel: string;
 }) {
   return (
-    <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated p-6 mk-card-shadow">
+    <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
       <span
         aria-hidden
         className="pointer-events-none absolute right-4 top-3 select-none font-mono text-5xl font-bold leading-none text-mk-accent/10"
