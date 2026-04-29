@@ -76,6 +76,20 @@ Google и т.д.) — НЕ рисовать самописные SVG approximati
 секцию в grid из 3 карточек с heading и описаниями. Match the
 verb literally; structural changes — пропоузить, не пушить.
 
+### 7. Обязательная проверка scope перед каждым Edit
+
+Перед ЛЮБЫМ изменением кода — произнести вслух:
+> "Boris попросил [X]. Я меняю [Y]. Y входит в X полностью?"
+
+Если Y содержит что-то чего нет в X — стоп, спросить Boris.
+
+Примеры того что блокируется:
+- Добавление `href` если Boris не написал URL
+- Скрытие элемента если Boris не сказал "убери"
+- Любое новое поведение, атрибут, логика — если Boris не назвал их явно
+
+Правило универсальное — не только для landing, для любого файла.
+
 ## ⚠ Scope Discipline (критично)
 
 MVP v1 scope зафиксирован в [docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md)
@@ -150,7 +164,7 @@ Guarantee policy: [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md).
 - Hosted on Vercel, domain getmailkit.com
 
 ## Pricing
-- Pay-per-setup: **$5** (1 mailbox), **$12** (3 mailboxes on one domain)
+- Pay-per-setup: **$5** (1 mailbox). Bundle 3 mailbox за **$10** (33% скидка) — post-launch, не в v1. Agency tier 5 mailbox за $15 — backlog.
 - Subscription: **$3/mo** deliverability monitoring per domain (optional)
 - Aliases: free bundled with paid mailbox (unlimited via CF Email Routing)
 
@@ -275,21 +289,4 @@ Both clear ≥70 threshold. Full history + SOP: [docs/investigation-2026-04-22/F
 - НИКОГДА Е/ё — только Е/е (все, еще, свое, прошел)
 - Деплой и push — сразу после правки, без вопросов
 - Баги — сразу чинить, без «исправить?»
-- Когда owner поправляет — короткое «ок»/«понял», не выдавать исправленную копию
-- Запрещено слово «принял»
-
-## Repo structure
-```
-/app/[locale]           — Next.js App Router с i18n
-/components/{ui,landing,app}
-/lib/{supabase,integrations}
-/messages/{en,ru}.json  — next-intl strings
-/supabase/migrations    — SQL
-/docs                   — PRODUCT_BRIEF, SPIKE_FINDINGS, архив
-/reference/spike        — код Python-спайка (справочник, не прод)
-```
-
-## Links
-- Product brief: [docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md)
-- Spike findings: [docs/SPIKE_FINDINGS.md](docs/SPIKE_FINDINGS.md)
-- Repo: https://github.com/borisk85/mailkit
+- Когда owner поправляет — короткое «ок»/
