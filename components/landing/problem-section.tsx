@@ -44,7 +44,10 @@ export function ProblemSection() {
                   {tWithout("title")}
                 </h3>
               </div>
-              <span className="rounded-full bg-mk-danger/15 px-3 py-1 text-2xl font-semibold tracking-tight text-mk-danger">
+              <span
+                className="font-semibold tracking-tight text-mk-text-secondary"
+                style={{ fontSize: "32px", lineHeight: "1" }}
+              >
                 {tWithout("duration")}
               </span>
             </header>
