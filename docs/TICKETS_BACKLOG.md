@@ -6,6 +6,19 @@
 ## ✅ Completed
 - #1 Feasibility Spike
 
+## 🚨 BLOCKING LAUNCH — SMTP incident response infrastructure (2026-04-29)
+
+Полный план в [docs/INCIDENT_RUNBOOK_SMTP.md](INCIDENT_RUNBOOK_SMTP.md).
+Эти 4 механизма должны работать ДО запуска на Product Hunt:
+
+- **#SMTP-1** Backend switch automation: скрипты массового создания AWS SES sender identities + DKIM update в CF DNS из users table. Сейчас ничего нет, нужно построить (3-5 дней dev).
+- **#SMTP-2** Mass notification email templates EN/RU + automated рассылка по affected users. Включает 4 follow-up cadence (T+24h, T+72h, T+7d, T+14d).
+- **#SMTP-3** In-product banner UI в `app.getmailkit.com`: красный sticky-top, "Action required: update SMTP credentials", не убирается до verification на странице `/setup/verify-migration`.
+- **#SMTP-4** Status page заглушка на `getmailkit.com/status` (минимум статичная "All systems operational" + ссылка на @MailKitHQ Twitter). Полноценная (UptimeRobot/Better Stack) — post-launch.
+- **#SMTP-5** Sentry alerts на Brevo API errors threshold + SMS/Telegram notification на owner.
+
+Trigger для работы: после merge ветки `feat/smtp-dependency-disclosure`. Без этих 5 пунктов launch на Product Hunt блокирован — иначе incident может убить репутацию в первые же недели.
+
 ## 🔨 MVP v1 (build now, 3-4 weeks total)
 - #2 Production scaffold (done)
 - #3 Auth + Google OAuth flow (done, PR #8)
@@ -176,8 +189,4 @@
   - Follow-up attempt 2: LCP/FCP — framework split + hero critical inline CSS + image priority (after Ticket #4a merged)
   - Attempt 2 scope **также включает `/app/setup`** — authenticated route, single-run preview Perf EN 78 / RU 70 по замеру в PR #10. Чинится той же работой по framework chunk split / polyfills, не отдельный PR.
   - **Post-#4a-merge regression на landing** (2026-04-21, prod commit 626ed14): median 3×3 прогонов — EN 76→71 (warm), RU 63→55 (warm), TBT RU взлетел до 1008ms (было 70ms). Кандидат: `lucide-react` icons (AlertCircle, CheckCircle2, Loader2) из wizard + `zod` от setup-actions попали в shared chunk landing'а через code-split. Attempt 2 должен замерить bundle-analyzer diff pre/post-#4a и либо изолировать app/setup icons через `dynamic()`, либо tree-shake lucide по named imports.
-  - **Post-#4b check** (2026-04-23, merge 18b6d42 + ~13h warm, n=5/locale median, methodology в [POST_MERGE_SOP.md](investigation-2026-04-22/POST_MERGE_SOP.md)): EN 75 (vs post-#4a 77, delta −2 = noise), RU 85 (vs post-#4a 74, delta +11 = improvement). #4b не добавил регрессии; previewный "RU −12" сигнал был lambda cold-start variance, не код. Investigation closed. Systemic perf work renames → **attempt-3** scope: `NextIntlClientProvider` `pick(messages,...)`, selective `export const dynamic="force-dynamic"` на `/app/*`, bundle-analyzer через `pnpm next experimental-analyze`, font-strategy review. Открывать как `chore/perf-systemic-attempt-3` отдельным PR (не бандлить с feature).
-  - Tracked on GitHub Issue #7 (legacy — новые подобные сюда, не в Issues)
-- Prettier drift на scaffold/shadcn файлах (30 шт), фиксить отдельным
-  chore-PR без функциональных правок. Фиксируется одним запуском
-  `pnpm format`; ревью сжимается до diff-а (generated-only).
+  - **Post-#4b check** (2026-04-23, merge 18b6d42 + ~13h warm, n=5/locale median, methodology в [POST_MERGE_SOP.md](investigation-2026-04-22/POST_MERGE_SOP.md)): EN 75 (vs post-#4a 77, delta −2 = noise), RU 85 (vs post-#4a 74, delta +11 = improvement). #4b не добавил регрессии; previewный "RU −12" сигнал был lambda cold-start variance, не код. Investigation closed. Systemic perf work renames → **attempt-3** scope: `NextIntlClientProvider` `pick(messages,...)`, selective `

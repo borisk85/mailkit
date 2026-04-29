@@ -74,10 +74,10 @@
         "Автоматический возврат при сбое нашей системы"
       ],
       "cta": "Настроить email",
-      "paymentNote": "Платежи через Lemon Squeezy. Принимаем Stripe, Apple Pay, Google Pay.",
+      "paymentNote": "Visa · Mastercard · Apple Pay · Google Pay",
       "compareLabel": "Сравни за год",
       "compare": "Для сравнения: Google Workspace $6/пользователь/мес. ImprovMX $9/мес. Mailkit $5 разово.",
-      "faqLink": "Есть вопросы до оплаты? FAQ ниже →"
+      "faqLink": "Вопросы до оплаты? FAQ ниже →"
     },
     "howItWorks": {
       "eyebrow": "Как это работает",
