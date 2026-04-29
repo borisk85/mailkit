@@ -104,7 +104,7 @@
     "problem": {
       "eyebrow": "The problem",
       "heading": "Setting up email on your own domain takes about an hour.",
-      "subhead": "Two services to configure, five DNS records to enter by hand, and one wrong character means starting over.",
+      "subhead": "Finding a current guide, navigating three different dashboards, and knowing which field gets what — that's where most people get stuck.",
       "without": {
         "title": "Manual setup",
         "duration": "~1 hour",
