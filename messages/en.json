@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "MailKit — Email on your domain in 5 minutes",
-    "description": "Skip 30 minutes of DNS hell. Automated Cloudflare + Brevo setup with guided Gmail Send-As. $5 per mailbox."
+    "title": "MailKit — Email on your Cloudflare domain in under 10 minutes",
+    "description": "Already on Cloudflare DNS? Automated Email Routing + Brevo SMTP setup with guided Gmail Send-As. $5 per mailbox."
   },
   "landing": {
     "announcementBanner": {
@@ -28,9 +28,12 @@
       }
     },
     "hero": {
-      "headlineLine1": "Email on your domain",
-      "headlineLine2": "in 5 minutes.",
-      "subhead": "Connect your domain to your existing Gmail. Send and receive from your new branded address.",
+      "headlineLine1": "Email on your Cloudflare domain",
+      "headlineLine2": "in under 10 minutes.",
+      "subhead": "Already on Cloudflare DNS? We configure Email Routing and Brevo SMTP for you, then walk you through Gmail Send-As — three copy-paste actions, done.",
+      "guaranteeNote": "Guaranteed.",
+      "guaranteeLink": "see policy",
+      "microcopy": "Cloudflare DNS required. Not on Cloudflare? Free migration takes ~30 min.",
       "primaryCta": "Set up email",
       "secondaryCta": "See how it works",
       "trustNote": "Free during promo · No subscription required",
@@ -57,7 +60,7 @@
       "eyebrow": "Pricing",
       "heading": "Five dollars. One time. Done.",
       "subhead": "No subscription. No recurring fee. No surprise charges next month.",
-      "badge": "Mailkit setup",
+      "badge": "Email on your Cloudflare domain. $5 once.",
       "price": "$5",
       "priceUnit": "one-time",
       "inclusionsHeading": "What's included",
@@ -78,7 +81,7 @@
     "howItWorks": {
       "eyebrow": "How it works",
       "heading": "Four steps. We do three. You do one.",
-      "subheading": "Total time under 5 minutes. Total work on your side: four copy-paste actions.",
+      "subheading": "Total time under 10 minutes. Total work on your side: three copy-paste actions in Gmail.",
       "automatedBadge": "Automated",
       "manualBadge": "Your turn",
       "step1": {
@@ -119,10 +122,10 @@
       },
       "with": {
         "title": "Automated",
-        "duration": "5 min",
+        "duration": "under 10 min",
         "steps": [
           "Sign in with Google",
-          "Paste Cloudflare token",
+          "Paste Cloudflare API token",
           "Watch automation run (~90 sec)",
           "Copy four lines into Gmail"
         ]
@@ -143,12 +146,18 @@
         "badge": "30-day"
       },
       "policyPill": "Two policies, plain language, /guarantee",
-      "policyLinkLabel": "Read full policy →"
+      "policyLinkLabel": "Read full policy →",
+      "audienceNote": "Built for Cloudflare DNS users. Free migration guide for users on other registrars."
     },
     "faq": {
       "eyebrow": "Common questions",
       "heading": "Everything you'd ask before paying $5.",
       "items": [
+        {
+          "id": "cf-required",
+          "q": "Does this work with any domain?",
+          "a": "Right now MailKit only works if your domain uses Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace, or another registrar, you'll need to migrate nameservers to Cloudflare first. Cloudflare DNS is free and migration takes about 30 minutes plus DNS propagation up to 24 hours. After migration, MailKit setup runs in under 10 minutes. Multi-provider support is on our roadmap."
+        },
         {
           "id": "cost",
           "q": "Do I have to keep paying every month?",
@@ -157,7 +166,7 @@
         {
           "id": "duration",
           "q": "Can I do this myself for free?",
-          "a": "Yes — by hand it takes 60–90 minutes for an experienced engineer and 3+ hours for everyone else, juggling Cloudflare Email Routing, Brevo SMTP, five DNS records (MX, SPF, DKIM signature, DMARC policy, Brevo verification) and the Gmail Send-As setup. Mailkit collapses that into about 5 minutes for $5: ~15 sec for the Cloudflare phase, ~60 sec for Brevo, ~3 min of copy-paste in Gmail."
+          "a": "Yes — by hand it takes 60–90 minutes for an experienced engineer and 3+ hours for everyone else, juggling Cloudflare Email Routing, Brevo SMTP, five DNS records (MX, SPF, DKIM signature, DMARC policy, Brevo verification) and the Gmail Send-As setup. Mailkit collapses that into under 10 minutes for $5: ~15 sec for the Cloudflare phase, ~60 sec for Brevo, ~3 min of copy-paste in Gmail."
         },
         {
           "id": "vs-workspace",
@@ -172,7 +181,7 @@
         {
           "id": "registrar",
           "q": "Does it work with my domain registered at Namecheap, GoDaddy, or other registrars?",
-          "a": "Yes. The only requirement is that the domain's DNS is on Cloudflare. If it isn't yet, the one-time step is moving the nameservers to Cloudflare (free, takes 5 minutes at your registrar's panel) — Cloudflare's docs walk you through it. After that, Mailkit handles the rest through the Cloudflare API."
+          "a": "MailKit currently requires Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace or another registrar, you need to migrate nameservers to Cloudflare first (free, about 30 minutes plus DNS propagation). After migration, MailKit setup runs in under 10 minutes."
         },
         {
           "id": "manual-step",
@@ -203,14 +212,14 @@
     },
     "finalCta": {
       "eyebrow": "Ready",
-      "heading": "Five minutes from now, you'll have email on your domain.",
+      "heading": "Under 10 minutes from now, you'll have email on your Cloudflare domain.",
       "subhead": "Or your money back, automatically. No tickets, no calls, no questions.",
       "primaryCta": "Get your email — $5",
       "secondaryCta": "Read the guarantee first",
       "trustItems": [
         "30-day money-back guarantee",
         "No subscription, ever",
-        "Setup in 5 minutes",
+        "Setup in under 10 minutes",
         "Refund-first policy, no questions asked"
       ]
     }
@@ -228,7 +237,7 @@
     "subtitle": "Manage your domains, view past setups, contact support, or buy another mailbox.",
     "emptyState": {
       "title": "Set up your first domain",
-      "body": "You haven't started a setup yet. It takes about 5 minutes — paste a Cloudflare token, pick your zone, follow the Gmail wizard.",
+      "body": "You haven't started a setup yet. It takes under 10 minutes — paste a Cloudflare API token, pick your zone, follow the Gmail wizard.",
       "cta": "Start setup"
     },
     "setups": {
@@ -311,9 +320,9 @@
   },
   "setup": {
     "nsWarning": {
-      "heading": "{domain} is not using Cloudflare DNS",
-      "body": "MailKit currently only works with Cloudflare DNS. Migrate your nameservers to Cloudflare first (free, ~30 minutes). Then run setup again.",
-      "guideLink": "Cloudflare migration guide →",
+      "heading": "{domain} doesn't appear to use Cloudflare DNS",
+      "body": "MailKit currently requires Cloudflare DNS. Migrate your nameservers to Cloudflare first (free, about 30 minutes). After migration, run setup again.",
+      "guideLink": "Read Cloudflare migration guide →",
       "cancelBtn": "I'll migrate first"
     },
     "title": "Connect your domain",
