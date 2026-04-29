@@ -63,7 +63,7 @@ export function PricingSection() {
               {inclusions.map((item) => (
                 <li key={item} className="flex items-start gap-3">
                   <Check
-                    className="mt-1 size-4 shrink-0 text-mk-success"
+                    className="mt-1 size-4 shrink-0 text-mk-accent"
                     aria-hidden
                   />
                   <span className="mk-body-small text-mk-text-primary">
