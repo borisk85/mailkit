@@ -49,8 +49,8 @@ export function AnnouncementBanner() {
   }
 
   return (
-    <div className="relative w-full bg-amber-400 text-stone-900">
-      <div className="mx-auto flex min-h-10 max-w-6xl items-center justify-center gap-2 px-10 py-2 text-center sm:gap-3">
+    <div className="relative w-full bg-amber-300 text-stone-900">
+      <div className="mx-auto flex min-h-10 max-w-6xl flex-col items-center justify-center gap-1 px-10 py-2 text-center sm:flex-row sm:gap-3">
         <span className="mk-body-small font-semibold">{t("message")}</span>
         <a
           href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}

@@ -20,19 +20,19 @@ export function IntegrationsBar() {
       aria-label={t("label")}
       className="w-full border-y border-mk-border-subtle bg-surface-elevated/40"
     >
-      <ul className="mx-auto flex max-w-6xl flex-wrap items-center justify-center gap-x-14 gap-y-6 px-4 py-8 sm:px-6 sm:py-10">
+      <ul className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-y-8 px-4 py-10 sm:flex-row sm:gap-x-16 sm:gap-y-0 sm:px-6 sm:py-12">
         <LogoItem name="Cloudflare">
-          <SiCloudflare size={28} color="#F38020" aria-hidden />
+          <SiCloudflare size={40} color="#F38020" aria-hidden />
         </LogoItem>
         <LogoItem name="Brevo">
-          <SiBrevo size={28} color="#0B996E" aria-hidden />
+          <SiBrevo size={40} color="#0B996E" aria-hidden />
         </LogoItem>
         <LogoItem name="Gmail">
           <Image
             src="/brand/gmail.svg"
             alt=""
-            width={28}
-            height={22}
+            width={40}
+            height={32}
             aria-hidden
           />
         </LogoItem>
