@@ -85,11 +85,37 @@ multi-domain, etc.) до явного разрешения после валид
 ## Quick context
 Hybrid MVP SaaS: automates Cloudflare Email Routing + Brevo SMTP setup on the
 user's domain, then guides the user through the Gmail Send-As final step via a
-3-minute copy-paste wizard. **$5 per mailbox** setup.
+3-minute copy-paste wizard. **$5 per mailbox** setup. **Под 10 минут полная
+настройка** (не 5 минут — честная переоценка после market research 2026-04-29).
 
-### Target audience (MVP)
+### Target audience (MVP) — narrowed 2026-04-29
 
-Indie hackers, SMB owners, freelancers, small agencies, non-English entrepreneurs (RU first-class).
+**ТОЛЬКО пользователи у которых домен на Cloudflare DNS.** Не пытаемся
+обслуживать GoDaddy/Namecheap/reg.ru/Squarespace юзеров — для них процесс
+требует миграции nameservers на Cloudflare сначала, что нарушает promise
+"под 10 минут".
+
+Внутри сегмента CF DNS users (around 2.3M активных доменов глобально per
+w3techs) фокусируемся на не-технических SMB которые попали на Cloudflare
+через free tier маркетинг ("DDoS защита бесплатно", "ускори свой сайт")
+но не имеют технических навыков для настройки Email Routing + Brevo
+SMTP + DKIM/SPF/DMARC + Gmail Send-As самостоятельно.
+
+Per market research (docs/AI_SEARCH_STRATEGY.md либо отдельный research
+2026-04-29): CF демография примерно 55-60% технические профессионалы /
+40-45% не-технические SMB. Технические сделают сами — не наша аудитория.
+Не-технические нуждаются в guided automation — это наш TAM.
+
+Realistic TAM расчёт: 2.3M доменов × 40% не-tech × 25% нуждаются в email
+× 65% готовы платить = 150-200K потенциальных клиентов глобально. При
+$5 на покупку и 0.5-2% capture за год = $3.7K-$15K годовой выручки.
+Lifestyle business масштаб, не unicorn. Owner ожидание $500/мес+ как
+side income — реалистично достижимо.
+
+Что говорить юзерам не на Cloudflare DNS: "MailKit currently requires
+Cloudflare DNS. Migrate nameservers to Cloudflare first (free, ~30 min
+plus DNS propagation) либо wait for multi-provider support in roadmap."
+
 Details + marketing angles per segment: [docs/MARKETING_ANGLES.md](docs/MARKETING_ANGLES.md).
 Guarantee policy: [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md).
 
@@ -117,17 +143,24 @@ Guarantee policy: [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md).
 - Subscription: **$3/mo** deliverability monitoring per domain (optional)
 - Aliases: free bundled with paid mailbox (unlimited via CF Email Routing)
 
-## Honest positioning
-- Tagline: "Email on your domain in 5 minutes, guaranteed."
-- Metric when asked: "We automate 100% of the technical complexity. You do 3
-  simple copy-paste actions."
-- **Never** say: "0 clicks", "full auto", "90% automation", "zero setup" — it's
-  a stretch and breaks trust on first run.
+## Honest positioning (updated 2026-04-29 — narrowed)
+- Tagline: **"Email on your Cloudflare domain in under 10 minutes, guaranteed."**
+  (НЕ "5 minutes" — overpromise; НЕ просто "your domain" — продукт работает
+  только если домен на Cloudflare DNS)
+- Audience explicit: "For Cloudflare DNS users only. Domain on GoDaddy
+  / Namecheap / Squarespace / other? Migrate nameservers to Cloudflare
+  first (free, ~30 min) — then setup takes under 10 minutes."
+- Metric when asked: "We automate 100% of the Cloudflare + Brevo
+  technical setup. You do 3 simple copy-paste actions in Gmail. Total
+  under 10 minutes if your domain is already on Cloudflare DNS."
+- **Never** say: "0 clicks", "full auto", "90% automation", "zero setup",
+  "any domain", "any DNS provider", "5 minutes" — все эти фразы либо
+  overpromise либо implying multi-provider support которого нет.
 - Guarantee: two-tier. Automation-failure auto-refund (if our CF/Brevo
   setup fails on backend) + 30-day functional guarantee (if you can't
   actually send/receive email via configured setup). NOT tied to user
-  pace on Gmail wizard step. Full policy:
-  [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md).
+  pace on Gmail wizard step или Cloudflare migration time для тех кто
+  не на CF. Full policy: [docs/GUARANTEE_POLICY.md](docs/GUARANTEE_POLICY.md).
 
 ## Known constraints
 - Gmail step accepted as 3-min guided UX for MVP; Chrome Extension planned v2 (ToS review first)

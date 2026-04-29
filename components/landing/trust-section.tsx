@@ -36,6 +36,7 @@ export function TrustSection() {
             <Shield className="size-3" aria-hidden />
             {t("policyPill")}
           </Link>
+          <p className="text-xs text-mk-text-tertiary">{t("audienceNote")}</p>
         </div>
 
         <div className="mt-16 grid gap-6 lg:grid-cols-2 lg:gap-8">

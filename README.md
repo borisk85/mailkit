@@ -1,13 +1,13 @@
 # MailKit
 
-**Email on your domain in 5 minutes, guaranteed.** Skip 30 minutes of DNS hell.
+**Email on your Cloudflare domain in under 10 minutes, guaranteed.** For Cloudflare DNS users only.
 
 MailKit is a hybrid-MVP SaaS that automates **Cloudflare Email Routing** and
 **Brevo SMTP** setup for a user's domain, then guides them through the final
-Gmail Send-As step via a 3-minute copy-paste wizard. Target: indie hackers and
-solopreneurs with personal Gmail who want `hello@mydomain.com` working in their
-existing inbox — without 30 minutes of manual DNS / SMTP / Gmail Settings
-fiddling.
+Gmail Send-As step via a 3-minute copy-paste wizard. Target: non-technical users
+who have their domain on Cloudflare DNS and want `hello@mydomain.com` working in
+their existing Gmail inbox — without an hour of manual DNS / SMTP / Gmail Settings
+configuration.
 
 **Status:** scaffold in progress (Ticket #2). Product brief:
 [docs/PRODUCT_BRIEF.md](docs/PRODUCT_BRIEF.md). Spike findings (why Gmail step

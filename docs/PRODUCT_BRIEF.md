@@ -6,11 +6,40 @@ Predecessor: [archive/PRODUCT_BRIEF_v1_pre_spike.md](archive/PRODUCT_BRIEF_v1_pr
 
 ---
 
+## Audience scope (updated 2026-04-29)
+
+**Target: Cloudflare DNS users only.** Не пытаемся обслуживать GoDaddy /
+Namecheap / Squarespace / других DNS провайдеров — для них процесс
+требует миграции nameservers сначала, что нарушает time promise.
+
+Внутри CF DNS users (около 2.3M активных доменов глобально) фокусируемся
+на не-технических SMB которые попали на Cloudflare через free tier
+маркетинг и не имеют технических навыков самостоятельно настраивать
+Email Routing + Brevo SMTP + DKIM/SPF/DMARC + Gmail Send-As.
+
+Per market research 2026-04-29: CF демография 55-60% технические /
+40-45% не-технические. Технические — не наша аудитория (сделают сами).
+Не-технические — наш TAM (~150-200K потенциальных клиентов глобально).
+Realistic capture за год — 0.5-2% TAM = $3.7K-$15K годовой выручки.
+
+Что говорить юзерам не на Cloudflare DNS: явный disclaimer на лендинге
+плюс pre-flight check в setup wizard перед оплатой (DNS lookup на NS
+records, если не Cloudflare — friendly предупреждение со ссылкой на
+Cloudflare migration guide).
+
 ## Tagline
 
-**EN:** Email on your domain in 5 minutes, guaranteed. Skip 30 minutes of DNS hell.
+**EN:** Email on your Cloudflare domain in under 10 minutes, guaranteed. Skip 60 minutes of DNS hell.
 
-**RU:** Почта на домене за 5 минут. С гарантией что все работает. Без 30 минут возни с DNS.
+(Старый tagline "5 minutes" deprecated 2026-04-29 — overpromise после market check.
+"Under 10 minutes" — честный median для CF юзеров. Domain не на Cloudflare —
+need migration first, см. Audience scope выше.)
+
+**RU:** Почта на домене с Cloudflare под 10 минут, с гарантией. Без часа возни с DNS.
+
+(Старая формулировка "за 5 минут" deprecated 2026-04-29. "Под 10 минут" —
+честный median для пользователей у которых домен уже на Cloudflare DNS.
+Не на Cloudflare — нужна сначала миграция nameservers, см. Audience scope.)
 
 ### Не говорим никогда
 «0 clicks», «full auto», «90% automation», «zero setup» — это натяжка. Реальность:

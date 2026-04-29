@@ -1,7 +1,24 @@
 # MailKit — Go-To-Market Strategy
 
 Owner-side стратегия по распределению маркетинговых усилий, каналам и
-контенту. Обновлено 2026-04-20.
+контенту. Обновлено 2026-04-29 (narrowed audience после market research).
+
+## Target audience (CRITICAL — narrowed 2026-04-29)
+
+**Только пользователи Cloudflare DNS.** Не пытаемся обслуживать
+GoDaddy / Namecheap / Squarespace / других провайдеров. Если домен
+не на CF — явный disclaimer "migrate first" либо отказ.
+
+Внутри CF юзеров приоритет — не-технические SMB которые попали на
+Cloudflare через free tier маркетинг и нуждаются в guided автоматизации
+(не сделают сами Email Routing + DKIM + SMTP). Per market research —
+40-45% от 2.3M CF доменов глобально, ~150-200K реалистичный TAM.
+
+Не-технические сегменты ищем через каналы где они гуглят/обсуждают
+проблемы CF: r/cloudflare community, Cloudflare community forums,
+comparison articles "Cloudflare Email Routing vs ImprovMX". Меньше
+фокус на indie hackers / Hacker News / Product Hunt — там в основном
+технические которые сделают сами.
 
 ## Markets split
 
