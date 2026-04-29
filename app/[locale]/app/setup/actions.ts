@@ -1227,3 +1227,42 @@ export async function confirmGmailSendAs(input: {
 
   return { status: "ok", runId: row.id, runStatus: "done" };
 }
+
+/**
+ * Pre-flight NS check — verifies the domain's authoritative nameservers
+ * are Cloudflare's (*.ns.cloudflare.com) using Cloudflare DNS-over-HTTPS.
+ * Called after zone selection, before setup starts, to surface a clear
+ * warning when the domain is on Cloudflare account but nameservers haven't
+ * propagated or the zone is in partial/CNAME mode.
+ */
+export async function checkDomainNS(input: {
+  domain: string;
+}): Promise<
+  { status: "cloudflare" } | { status: "not_cloudflare" } | { status: "error" }
+> {
+  const domain = input.domain?.trim().toLowerCase();
+  if (!domain) return { status: "error" };
+
+  try {
+    const res = await fetch(
+      `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=NS`,
+      { headers: { Accept: "application/dns-json" }, next: { revalidate: 0 } },
+    );
+    if (!res.ok) return { status: "error" };
+
+    const data = (await res.json()) as { Answer?: { data: string }[] };
+    const nsRecords =
+      data.Answer?.map((r) => r.data.toLowerCase().replace(/\.$/, "")) ?? [];
+
+    if (nsRecords.length === 0) return { status: "error" };
+
+    const allCloudflare = nsRecords.every((ns) =>
+      ns.endsWith(".ns.cloudflare.com"),
+    );
+    return allCloudflare
+      ? { status: "cloudflare" }
+      : { status: "not_cloudflare" };
+  } catch {
+    return { status: "error" };
+  }
+}

@@ -19,6 +19,7 @@ import { GmailStepSchematic } from "@/components/app/gmail-step-schematic";
 import { cn } from "@/lib/utils";
 
 import {
+  checkDomainNS,
   confirmGmailSendAs,
   continueBrevoSetup,
   prepareGmailStep,
@@ -127,6 +128,14 @@ type WizardState =
       errorKey: string;
       errorDetails?: string;
       source?: "cf" | "brevo" | "gmail";
+    }
+  | {
+      kind: "ns_warning";
+      domain: string;
+      zones: Zone[];
+      token: string;
+      zoneId: string;
+      mailboxLocal: string;
     };
 
 const MOCK_ZONES: Zone[] = [
@@ -347,14 +356,26 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
           onSubmit={(zoneId, mailboxLocal) => {
             const chosen = state.zones.find((z) => z.id === zoneId);
             if (!chosen) return;
-            setState({
-              kind: "setup_running",
-              token: state.token,
-              zoneName: chosen.name,
-              mailboxLocal,
-              reached: "routing",
-            });
             startTransition(async () => {
+              const nsCheck = await checkDomainNS({ domain: chosen.name });
+              if (nsCheck.status === "not_cloudflare") {
+                setState({
+                  kind: "ns_warning",
+                  domain: chosen.name,
+                  zones: state.zones,
+                  token: state.token,
+                  zoneId,
+                  mailboxLocal,
+                });
+                return;
+              }
+              setState({
+                kind: "setup_running",
+                token: state.token,
+                zoneName: chosen.name,
+                mailboxLocal,
+                reached: "routing",
+              });
               const result = await startSetupRun({
                 token: state.token,
                 zoneId,
@@ -439,6 +460,45 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
           }}
           t={t}
         />
+      ) : null}
+
+      {state.kind === "ns_warning" ? (
+        <div className="rounded-2xl border border-mk-border-strong bg-surface-elevated p-8 text-center">
+          <AlertCircle
+            className="mx-auto mb-4 size-10 text-mk-warning"
+            aria-hidden
+          />
+          <h2 className="mk-heading-2 mb-2 text-mk-text-primary">
+            {t("nsWarning.heading", { domain: state.domain })}
+          </h2>
+          <p className="mk-body text-mk-text-secondary mb-6">
+            {t("nsWarning.body")}
+          </p>
+          <p className="mk-body-small text-mk-text-tertiary mb-6">
+            <a
+              href="https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/"
+              target="_blank"
+              rel="noreferrer"
+              className="underline underline-offset-2 hover:text-mk-text-secondary"
+            >
+              {t("nsWarning.guideLink")}
+            </a>
+          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <Button
+              variant="outline"
+              onClick={() =>
+                setState({
+                  kind: "zone_selection",
+                  zones: state.zones,
+                  token: state.token,
+                })
+              }
+            >
+              {t("nsWarning.cancelBtn")}
+            </Button>
+          </div>
+        </div>
       ) : null}
 
       {state.kind === "setup_running" ? (

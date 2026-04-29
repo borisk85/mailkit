@@ -1,4 +1,5 @@
-import { useTranslations } from "next-intl";
+import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { ArrowRight, Check } from "lucide-react";
 
 import {
@@ -18,6 +19,7 @@ import {
  */
 export function Hero() {
   const t = useTranslations("landing.hero");
+  const locale = useLocale();
 
   return (
     <section
@@ -48,6 +50,16 @@ export function Hero() {
 
           <p className="mk-body-large text-mk-text-secondary">{t("subhead")}</p>
 
+          <p className="text-sm italic text-mk-text-tertiary">
+            {t("guaranteeNote")}{" "}
+            <Link
+              href={`/${locale}/guarantee`}
+              className="underline underline-offset-2 hover:text-mk-text-secondary"
+            >
+              {t("guaranteeLink")}
+            </Link>
+          </p>
+
           <div className="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-x-6">
             <a
               href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
@@ -75,6 +87,8 @@ export function Hero() {
               />
             </a>
           </div>
+
+          <p className="text-xs text-mk-text-tertiary">{t("microcopy")}</p>
 
           <ul className="mt-2 flex flex-wrap gap-2">
             {t("trustNote")

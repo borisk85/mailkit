@@ -3,24 +3,42 @@
 База для landing copy, ads, Product Hunt description, социальных постов.
 Все цифры и фразы — с честной математикой, без маркетинговых натяжек.
 
+## Audience scope (updated 2026-04-29)
+
+**ТОЛЬКО пользователи у которых домен на Cloudflare DNS.** Внутри этой
+группы фокус на не-технических SMB которые попали на Cloudflare через
+free tier маркетинг (DDoS защита, бесплатный CDN), но не имеют навыков
+настраивать Email Routing + DKIM/SPF/DMARC + SMTP сами.
+
+Технических CF-юзеров (developers, sysadmins) маркетинг не таргетирует —
+они сделают сами. Тратить marketing-budget на них = потеря.
+
+Юзеры не на Cloudflare DNS — НЕ наша аудитория для launch'а. Им явно
+говорим: "MailKit currently requires Cloudflare DNS. Migrate first
+(free, ~30 min), then setup takes under 10 minutes."
+
 ## Core value prop
 
-**EN:** "Email on your domain in 5 minutes. Skip 90 minutes of DNS hell,
-Brevo gotchas, and Gmail setup dance."
+**EN:** "Email on your Cloudflare domain in under 10 minutes. We
+configure Email Routing, Brevo SMTP, and DNS records — you do the
+3-minute Gmail Send-As wizard."
 
-**RU:** "Почта на домене за 5 минут. Без часа возни с DNS, граблей Brevo
-и танцев с Gmail Send-As."
+**RU:** "Почта на твоём домене с Cloudflare — под 10 минут. Настраиваем
+Email Routing, Brevo SMTP, DNS-записи. Ты делаешь 3-минутный мастер
+Gmail Send-As."
 
-## Time comparison (actual)
+## Time comparison (actual, updated 2026-04-29)
 
-| Scenario | Inexperienced user | Experienced but forgetful |
+| Scenario | Inexperienced CF user | Experienced CF user |
 |---|---|---|
 | Fully manual (2026 reality with ChatGPT help) | 60-90 min | 45-60 min |
-| With MailKit MVP | 5 min | 5 min |
-| With MailKit + Extension (v2) | ~1.5 min | ~1 min |
+| With MailKit MVP (CF DNS already setup) | 8-12 min | 6-8 min |
+| With MailKit + Extension (v2) | ~3-5 min | ~2-3 min |
 
-Time savings MVP: 90%+
-Time savings with Extension: 97%+
+Time savings MVP: 80-85% для не-технических CF юзеров.
+
+(Старая таблица "5 минут" deprecated 2026-04-29 — не учитывала login
+в Cloudflare, генерацию API token, copy-paste SMTP полей в Gmail.)
 
 ## Why ChatGPT/Claude isn't a real fix
 
@@ -57,11 +75,22 @@ SPF/DKIM. MailKit реально все настраивает.
 5. **Retries и fallback** — если DKIM не верифицируется с первой попытки,
    LLM скажет "подождите". Мы автоматически ретраем с backoff.
 
-## Audience segments (для таргетинга рекламы)
+## Audience segments (для таргетинга рекламы — narrowed 2026-04-29)
 
-**Primary — Serial Indie Hackers:**
+**ВСЕ сегменты ниже фильтруются по одному условию: домен на Cloudflare
+DNS.** Не-CF юзеры — не наша аудитория для launch'а.
+
+**Primary — Non-tech CF users (free tier converts):**
+- Pain: "у меня домен на Cloudflare для DDoS защиты, хочу почту на нём,
+  но Email Routing + Brevo + Gmail Send-As — слишком сложно"
+- Hook: "Cloudflare уже работает. Email — ещё проще, под 10 минут."
+- Channels: r/cloudflare, Cloudflare community forums, comparison
+  searches "Cloudflare Email Routing vs ImprovMX"
+- Это наш ключевой сегмент по market research — 40-45% CF юзеров
+
+**Secondary — Indie Hackers (CF DNS users):**
 - Pain: "запускаю новый проект раз в месяц, каждый раз email-ад"
-- Hook: "Your 10th side project. Your 1st 5-min email setup."
+- Hook: "Your 10th side project. Your 1st 8-min email setup."
 - Channels: X/Twitter, Indie Hackers, Product Hunt
 
 **Secondary — Agency owners / Freelancers:**
@@ -87,7 +116,7 @@ SPF/DKIM. MailKit реально все настраивает.
 
 **Quinary — Non-English entrepreneurs (RU и другие):**
 - Pain: "RU SMB — Google Workspace overkill по цене, но хочу domain email"
-- Hook: "Почта на домене за 5 минут. Гарантия возврата денег."
+- Hook: "Почта на твоём домене с Cloudflare — под 10 минут. Гарантия возврата."
 - Channels: VK, Telegram, RU entrepreneur communities
 - Важно: tone of voice на русском — не переведенный EN маркетинг, а
   native-copy с учетом локальных expectation'ов. Русский SMB больше
@@ -106,17 +135,20 @@ SPF/DKIM. MailKit реально все настраивает.
 | "А если у вас автоматика не сработает?" | "Автоматический refund в 24 часа, без запроса. Мы видим сбой, возвращаем деньги сами. См. /guarantee." |
 | "А если через неделю перестанет работать?" | "30-дневная функциональная гарантия. Напиши в support — починим или вернем деньги полностью." |
 
-## Tagline candidates (для A/B на лендинге)
+## Tagline candidates (для A/B на лендинге — updated 2026-04-29)
+
+**Ключевая правка:** все taglines теперь явно указывают на Cloudflare
+audience и используют "under 10 minutes" вместо "5 minutes".
 
 EN:
-- "Email on your domain in 5 minutes. Guaranteed."
-- "Skip 90 minutes of email setup hell."
-- "Your 10th project. Your 1st 5-min email setup."
+- "Email on your Cloudflare domain in under 10 minutes. Guaranteed."
+- "Cloudflare DNS user? Skip 60 minutes of email setup hell."
+- "Your domain. Your Gmail. Under 10 minutes. (Cloudflare DNS users only.)"
 
 RU:
-- "Почта на домене за 5 минут."
-- "Пропусти час возни с DNS."
-- "Десятый проект. Первая быстрая настройка почты."
+- "Почта на твоём Cloudflare-домене — под 10 минут. С гарантией."
+- "Cloudflare уже стоит? Пропусти час возни с DNS — настройка под 10 минут."
+- "Твой домен. Твой Gmail. Под 10 минут. (Только для Cloudflare DNS.)"
 
 ## Launch promo
 
