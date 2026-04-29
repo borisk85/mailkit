@@ -71,7 +71,7 @@ need migration first, см. Audience scope выше.)
 - Self-serve diagnostics / Re-verify button (Ticket #8)
 - Paid re-setup flow ($3)
 - Monitoring subscription ($3/mo)
-- 3-mailbox bundle ($12) — только $5 single в v1
+- 3-mailbox bundle ($10) — только $5 single в v1, bundle добавляем post-launch (см. Pricing notes ниже)
 - Chrome Extension
 - Workspace-only automation (Phase B)
 - White-label for agencies
@@ -163,7 +163,13 @@ Gmail API метод `users.settings.sendAs.create` с SMTP MSA возвраща
 | SKU | Price | Details |
 |---|---|---|
 | 1 mailbox | **$5** | Single Send-As on your domain |
-| 3 mailboxes | **$12** | Three Send-As on same domain (save $3) |
+| 3 mailboxes (post-launch) | **$10** | Three Send-As on same domain — 33% скидка (save $5). НЕ в v1 launch — добавляется когда будет signal от юзеров. |
+
+### Pricing decisions log (2026-04-29)
+
+- **Bundle 3 mailbox: $10, не $12.** Старая цена $12 давала экономию $3 (20%) — слабый стимул к апгрейду. $10 = 33% скидка, психологически читается как реальная выгода. Маржа всё ещё положительная. Bundle вводится post-launch когда будет signal что юзеры реально покупают по 2-3 mailbox.
+- **Agency tier (5 mailbox за $15, 40% скидка) — backlog.** Отдельный tier для freelancer'ов делающих клиентам по 5-10 доменов в месяц. Малая ниша, но высокий LTV. Добавлять через 2-3 мес после launch если придут такие клиенты.
+- **$5 single mailbox — confirmed.** Не снижаем до $3. Lemon Squeezy fees съедят margin, conversion lift минимален в этой ценовой категории, $5 — established impulse-buy threshold.
 
 ### Subscriptions
 | SKU | Price | Details |
@@ -268,6 +274,23 @@ functional guarantee (email не работает после setup → full refu
 ---
 
 ## Roadmap v2 (post-MVP)
+
+### Расширение на не-Cloudflare DNS (через ImprovMX)
+- **Trigger:** v1 даёт стабильные $500+/мес на узком CF-сегменте, есть
+  подтверждённый product-market fit.
+- **Что делаем:** интеграция с ImprovMX API как альтернативный inbound
+  forwarder для доменов на GoDaddy/Namecheap/Squarespace/любом DNS.
+  Юзер не видит ImprovMX — мы инкапсулируем под капотом.
+- **Эффект:** TAM расширяется в 2-3 раза, продукт работает с любым DNS
+  провайдером без миграции.
+- **Что НЕ делаем:** свой migration wizard для смены nameservers на
+  Cloudflare. У CF есть официальная документация — пусть юзер сам
+  мигрирует и возвращается. Дублировать чужие docs смысла нет.
+- **Tagline pivot после расширения:** убираем CF-only disclaimer,
+  обновляем landing на "Email on your domain in under 10 minutes,
+  any DNS provider."
+- **Dev эффорт:** 2-3 недели (ImprovMX integration + abstraction layer
+  поверх forwarder API + UI logic detect-DNS-and-route).
 
 ### Chrome Extension для Gmail-шага
 - Content script автозаполняет Gmail Settings → Send-As форму
