@@ -105,7 +105,7 @@ export function ProblemSection() {
                           className="size-3.5 text-mk-text-tertiary transition-colors group-hover:text-mk-accent"
                           aria-label={tWith("tokenHint")}
                         />
-                        <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2 text-xs text-mk-text-secondary opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
+                        <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden w-56 -translate-x-1/2 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2 text-xs text-mk-text-secondary opacity-0 shadow-lg transition-opacity group-hover:opacity-100 sm:block">
                           {tWith("tokenHint")}
                         </span>
                       </a>
