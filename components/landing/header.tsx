@@ -6,6 +6,7 @@ import { ThemeToggle } from "@/components/theme-toggle";
 
 import { LanguageSwitcher } from "./language-switcher";
 import { LogoLink } from "./logo-link";
+import { NavAnchor } from "./nav-anchor";
 import { SignInLink } from "./sign-in-link";
 
 /**
@@ -41,24 +42,24 @@ export function Header() {
         </LogoLink>
 
         <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
-          <Link
-            href={`${landingHref}#how-it-works`}
+          <NavAnchor
+            sectionId="how-it-works"
             className="text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
             {t("nav.howItWorks")}
-          </Link>
-          <Link
-            href={`${landingHref}#pricing`}
+          </NavAnchor>
+          <NavAnchor
+            sectionId="pricing"
             className="text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
             {t("nav.pricing")}
-          </Link>
-          <Link
-            href={`${landingHref}#faq`}
+          </NavAnchor>
+          <NavAnchor
+            sectionId="faq"
             className="text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
             {t("nav.faq")}
-          </Link>
+          </NavAnchor>
         </nav>
 
         <div className="flex items-center gap-1 sm:gap-2">

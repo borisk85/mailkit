@@ -22,7 +22,8 @@ export function LogoLink({
       className={className}
       style={style}
       aria-label={ariaLabel}
-      onClick={() => {
+      onClick={(e) => {
+        e.preventDefault();
         history.replaceState(null, "", window.location.pathname);
         window.scrollTo({ top: 0, behavior: "smooth" });
       }}
