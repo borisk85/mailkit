@@ -141,7 +141,7 @@ function StepCard({
 
       <div className="flex flex-col gap-3">
         <span className="mk-caption font-mono text-mk-accent">{time}</span>
-        <h3 className="mk-heading-3 min-h-[3.5rem] text-balance text-mk-text-primary">
+        <h3 className="text-lg font-semibold leading-snug tracking-tight text-mk-text-primary">
           {title}
         </h3>
       </div>
