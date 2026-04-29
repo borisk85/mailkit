@@ -22,7 +22,10 @@ export function LogoLink({
       className={className}
       style={style}
       aria-label={ariaLabel}
-      onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+      onClick={() => {
+        history.replaceState(null, "", window.location.pathname);
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }}
     >
       {children}
     </Link>
