@@ -71,9 +71,9 @@ export function ProblemSection() {
             <header className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2.5">
                 <Rocket className="size-5 text-mk-accent" aria-hidden />
-                <h3 className="text-base font-semibold text-mk-text-primary">
-                  {tWith("title")}
-                </h3>
+                <span className="rounded-full bg-mk-accent/15 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-wide text-mk-accent">
+                  Mailkit
+                </span>
               </div>
               <span
                 className="font-semibold tracking-tight text-mk-accent"
