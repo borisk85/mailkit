@@ -104,6 +104,10 @@
 - MAILKIT pill в hero Gmail-mockup использует uppercase, тогда как фактический wordmark в navbar — `Mailkit` с capital M. Привести pill к согласованному casing'у `Mailkit` для brand consistency.
 - Cookie consent banner на 768px viewport (tablet portrait) — sentinel-порог появления баннера сейчас 100vh, в момент scroll на этом разрешении баннер перекрывает subhead в hero. Поднять порог до ~130vh чтобы баннер появлялся после первого экрана.
 
+## 🐛 Pre-existing bugs (P3, non-blocking)
+- #21 ThemeToggle hydration mismatch — SSR/client aria-label расходится ("светлую" vs "тёмную"). Стандартный next-themes SSR баг. Не ломает функциональность. Fix: `suppressHydrationWarning` на button или `useEffect` для aria-label.
+- #22 gmail.svg image warning — Next.js предупреждает что изменён width или height без второго измерения. Fix: добавить `width="auto"` или `height="auto"` к img тегу. Косметика, не влияет на рендер.
+
 ## 🧹 Tech debt
 - LS checkout store migration — **pre-launch BLOCKER**, owner contacting LS support.
   - Current: product в velabot store (owner's другой project), checkout
