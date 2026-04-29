@@ -34,8 +34,8 @@ export function Hero() {
         }}
       />
 
-      <div className="mx-auto grid max-w-6xl items-center gap-16 px-4 py-20 sm:px-6 sm:py-30 lg:grid-cols-12 lg:gap-12 lg:py-32">
-        <div className="flex flex-col gap-6 lg:col-span-7">
+      <div className="mx-auto grid max-w-6xl items-center gap-16 px-4 py-20 sm:px-6 sm:py-30 md:grid-cols-12 md:gap-12 md:py-32 lg:py-32">
+        <div className="flex flex-col gap-6 md:col-span-7">
           <h1
             id="hero-heading"
             className="mk-display-1 text-balance text-mk-text-primary"
@@ -48,7 +48,7 @@ export function Hero() {
 
           <p className="mk-body-large text-mk-text-secondary">{t("subhead")}</p>
 
-          <div className="mt-2 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <div className="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-x-6">
             <a
               href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
               target="_blank"
@@ -95,7 +95,7 @@ export function Hero() {
           </ul>
         </div>
 
-        <div className="lg:col-span-5">
+        <div className="md:col-span-5">
           <GmailComposeMockup />
         </div>
       </div>
