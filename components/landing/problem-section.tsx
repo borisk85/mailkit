@@ -36,7 +36,7 @@ export function ProblemSection() {
         </div>
 
         <div className="mt-16 grid items-stretch gap-6 lg:grid-cols-2 lg:gap-8">
-          <article className="flex h-full flex-col gap-6 rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow transition-transform duration-200 hover:-translate-y-1">
+          <article className="flex h-full flex-col gap-6 rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
             <header className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2.5">
                 <Wrench className="size-5 text-mk-text-tertiary" aria-hidden />
@@ -67,7 +67,7 @@ export function ProblemSection() {
             </ul>
           </article>
 
-          <article className="flex h-full flex-col gap-6 rounded-2xl border-2 border-mk-accent bg-surface-elevated p-8 mk-card-shadow transition-transform duration-200 hover:-translate-y-1 hover:bg-mk-accent/[0.09]">
+          <article className="flex h-full flex-col gap-6 rounded-2xl border-2 border-mk-accent bg-surface-elevated p-8 mk-card-shadow transition-transform duration-300 hover:-translate-y-0.5">
             <header className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2.5">
                 <Rocket className="size-5 text-mk-accent" aria-hidden />
