@@ -121,18 +121,11 @@ function StepCard({
     <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated p-6 mk-card-shadow">
       <span
         aria-hidden
-        className="pointer-events-none absolute -right-3 -top-4 select-none font-semibold leading-none text-mk-accent"
-        style={{ fontSize: "96px", opacity: 0.07, letterSpacing: "-0.04em" }}
+        className="pointer-events-none absolute right-4 top-3 select-none font-mono text-5xl font-bold leading-none text-mk-accent/10"
       >
         {number}
       </span>
       <div className="flex items-center justify-between">
-        <span
-          className="relative font-semibold tracking-tight text-mk-accent"
-          style={{ fontSize: "32px", lineHeight: "1" }}
-        >
-          {number}
-        </span>
         <span
           className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold"
           style={{
