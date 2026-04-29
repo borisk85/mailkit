@@ -123,6 +123,7 @@
       "with": {
         "title": "С Mailkit",
         "duration": "за 10 мин",
+        "tokenHint": "Инструкция по созданию токена в личном кабинете",
         "steps": [
           "Войти в Mailkit через Google",
           "Вставить API токен Cloudflare",

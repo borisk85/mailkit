@@ -123,11 +123,13 @@
       "with": {
         "title": "Automated",
         "duration": "under 10 min",
+        "tokenHint": "How to create your API token in Cloudflare dashboard",
         "steps": [
           "Sign in with Google",
           "Paste Cloudflare API token",
           "Watch automation run (~90 sec)",
-          "Copy four lines into Gmail"
+          "Copy four lines into Gmail",
+          "Your branded email is ready"
         ]
       }
     },
