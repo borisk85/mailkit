@@ -59,7 +59,7 @@ export function HowItWorksSection() {
             }}
           />
 
-          <ol className="relative grid gap-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_8px_minmax(0,1fr)] lg:gap-6">
+          <ol className="relative grid gap-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_8px_minmax(0,1fr)] lg:gap-8">
             {steps.slice(0, 3).map(({ key, number, automated }) => (
               <StepCard
                 key={key}
