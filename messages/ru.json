@@ -30,7 +30,7 @@
     "hero": {
       "headlineLine1": "Почта на твоем домене с Cloudflare",
       "headlineLine2": "за 10 минут.",
-      "subhead": "Домен уже на Cloudflare DNS? Настраиваем Email Routing и Brevo SMTP за тебя, потом ведем через Gmail Send-As — три копи-паст действия, готово.",
+      "subhead": "Подключите домен на Cloudflare к существующему Gmail и отправляйте письма с нового брендированного адреса.",
       "guaranteeNote": "С гарантией.",
       "guaranteeLink": "условия",
       "microcopy": "Нужен Cloudflare DNS. Не на Cloudflare? Бесплатная миграция ~30 мин.",
