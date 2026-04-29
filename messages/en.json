@@ -34,7 +34,7 @@
       "guaranteeNote": "Guaranteed.",
       "guaranteeLink": "see policy",
       "microcopy": "Cloudflare DNS required. Not on Cloudflare? Free migration takes ~30 min.",
-      "migrationHint": "Open Cloudflare migration guide →",
+      "migrationHint": "Open Cloudflare migration guide",
       "primaryCta": "Set up email",
       "secondaryCta": "See how it works",
       "trustNote": "Free during promo · No subscription required",
