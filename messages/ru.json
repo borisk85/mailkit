@@ -122,7 +122,7 @@
       },
       "with": {
         "title": "С Mailkit",
-        "duration": "10 мин",
+        "duration": "10 мин.",
         "tokenHint": "Инструкция по созданию токена в личном кабинете (~ 2 мин.)",
         "steps": [
           "Войти в Mailkit через Google",
