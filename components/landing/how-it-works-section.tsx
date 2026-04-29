@@ -144,7 +144,9 @@ function StepCard({
         <h3 className="mk-heading-3 text-mk-text-primary">{title}</h3>
       </div>
 
-      <p className="mk-body-small text-mk-text-secondary">{body}</p>
+      <p className="mk-body-small text-justify text-mk-text-secondary">
+        {body}
+      </p>
     </li>
   );
 }

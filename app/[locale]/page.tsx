@@ -11,6 +11,7 @@ import { IntegrationsBar } from "@/components/landing/integrations-bar";
 import { PricingSection } from "@/components/landing/pricing-section";
 import { ProblemSection } from "@/components/landing/problem-section";
 import { TrustSection } from "@/components/landing/trust-section";
+import { SectionHashTracker } from "@/components/landing/section-hash-tracker";
 import { StructuredData } from "@/components/seo/structured-data";
 import { landingGraph, type FaqItem } from "@/lib/seo/structured-data";
 
