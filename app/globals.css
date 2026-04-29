@@ -255,6 +255,13 @@
     text-transform: uppercase;
   }
 
+  @media (min-width: 769px) and (max-width: 1023px) {
+    .mk-display-1 {
+      font-size: 64px;
+      line-height: 72px;
+    }
+  }
+
   @media (max-width: 768px) {
     .mk-display-1 {
       font-size: 56px;
