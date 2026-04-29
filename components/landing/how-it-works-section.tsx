@@ -130,9 +130,9 @@ function StepCard({
           className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold"
           style={{
             backgroundColor: automated
-              ? "rgba(34, 197, 94, 0.12)"
-              : "rgba(124, 92, 255, 0.12)",
-            color: automated ? "var(--mk-success)" : "var(--mk-accent)",
+              ? "rgba(124, 92, 255, 0.12)"
+              : "rgba(34, 197, 94, 0.12)",
+            color: automated ? "var(--mk-accent)" : "var(--mk-success)",
           }}
         >
           {automated ? automatedLabel : manualLabel}
