@@ -1,5 +1,5 @@
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowRight, Check } from "lucide-react";
+import { Check } from "lucide-react";
 
 import {
   LEMON_SQUEEZY_CHECKOUT_URL,
@@ -51,10 +51,6 @@ export function FinalCtaSection() {
             className="mk-cta-shadow group inline-flex h-[60px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-9 text-lg font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
           >
             {t("primaryCta")}
-            <ArrowRight
-              className="size-5 transition-transform group-hover:translate-x-0.5"
-              aria-hidden
-            />
           </a>
           <a
             href={`/${locale}/guarantee`}
@@ -63,10 +59,6 @@ export function FinalCtaSection() {
             <span className="underline-offset-4 group-hover:underline">
               {t("secondaryCta")}
             </span>
-            <ArrowRight
-              className="size-4 transition-transform group-hover:translate-x-0.5"
-              aria-hidden
-            />
           </a>
         </div>
 

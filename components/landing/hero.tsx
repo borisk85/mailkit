@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowRight, Check, HelpCircle, Shield } from "lucide-react";
+import { Check, HelpCircle, Shield } from "lucide-react";
 
 import {
   LEMON_SQUEEZY_CHECKOUT_URL,
@@ -59,10 +59,6 @@ export function Hero() {
               style={{ minHeight: 52 }}
             >
               {t("primaryCta")}
-              <ArrowRight
-                className="size-4 transition-transform group-hover:translate-x-0.5"
-                aria-hidden
-              />
             </a>
             <a
               href="#how-it-works"
@@ -71,10 +67,6 @@ export function Hero() {
               <span className="underline-offset-4 group-hover:underline">
                 {t("secondaryCta")}
               </span>
-              <ArrowRight
-                className="size-4 transition-transform group-hover:translate-x-0.5"
-                aria-hidden
-              />
             </a>
           </div>
 
