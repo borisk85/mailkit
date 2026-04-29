@@ -67,7 +67,7 @@ export function ProblemSection() {
             </ul>
           </article>
 
-          <article className="flex h-full flex-col gap-6 rounded-2xl border-2 border-mk-accent bg-surface-elevated p-8 mk-card-shadow transition-transform duration-300 hover:-translate-y-0.5">
+          <article className="flex h-full flex-col gap-6 rounded-2xl border border-mk-accent bg-surface-elevated p-8 mk-card-shadow transition-transform duration-300 hover:-translate-y-0.5">
             <header className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2.5">
                 <Rocket className="size-5 text-mk-accent" aria-hidden />
