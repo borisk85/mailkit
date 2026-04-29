@@ -1,5 +1,3 @@
-"use client";
-
 import type { ReactNode } from "react";
 
 export function NavAnchor({
@@ -11,17 +9,8 @@ export function NavAnchor({
   className?: string;
   children: ReactNode;
 }) {
-  const handleClick = (e: React.MouseEvent) => {
-    e.preventDefault();
-    const el = document.getElementById(sectionId);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth" });
-      history.replaceState(null, "", `#${sectionId}`);
-    }
-  };
-
   return (
-    <a href={`#${sectionId}`} className={className} onClick={handleClick}>
+    <a href={`#${sectionId}`} className={className}>
       {children}
     </a>
   );

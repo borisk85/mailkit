@@ -3,6 +3,10 @@
 
 @custom-variant dark (&:is(.dark *));
 
+html {
+  scroll-behavior: smooth;
+}
+
 /*
  * Premium pass design tokens — applied globally per docs/UI_REVIEW_BRIEF.md §1.
  * Single accent (#7C5CFF), monochrome surfaces, strict spacing scale,
