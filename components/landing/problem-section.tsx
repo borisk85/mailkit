@@ -76,7 +76,7 @@ export function ProblemSection() {
                 </span>
               </div>
               <span
-                className="font-semibold tracking-tight text-mk-accent"
+                className="font-semibold tracking-tight text-mk-text-primary"
                 style={{ fontSize: "32px", lineHeight: "1" }}
               >
                 {tWith("duration")}
