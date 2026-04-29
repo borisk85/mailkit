@@ -5,6 +5,7 @@ import { MailkitIcon } from "@/components/brand/mailkit-icon";
 import { ThemeToggle } from "@/components/theme-toggle";
 
 import { LanguageSwitcher } from "./language-switcher";
+import { LogoLink } from "./logo-link";
 import { SignInLink } from "./sign-in-link";
 
 /**
@@ -25,7 +26,7 @@ export function Header() {
   return (
     <header className="sticky top-0 z-40 w-full border-b border-mk-border-subtle bg-surface-base/80 shadow-[0_1px_0_rgba(0,0,0,0.4)] backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/70">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-6 px-4 sm:px-6">
-        <Link
+        <LogoLink
           href={landingHref}
           className="flex items-center gap-2.5 text-mk-text-primary"
           style={{
@@ -37,7 +38,7 @@ export function Header() {
         >
           <MailkitIcon className="size-6 shrink-0" />
           <span>{t("logo")}</span>
-        </Link>
+        </LogoLink>
 
         <nav aria-label="Primary" className="hidden items-center gap-7 md:flex">
           <Link
