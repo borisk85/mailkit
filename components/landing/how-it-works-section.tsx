@@ -1,21 +1,5 @@
 import { useTranslations } from "next-intl";
 
-/**
- * How it works — Design V2 §4.6 polish on top of the V1 four-card
- * timeline. Two changes vs V1:
- *
- *  - Headline rewrites to match the visual count ("Four steps. We do
- *    three. You do one." / "Четыре шага. Мы делаем три. Один — твой.")
- *    so the eye no longer counts four numbered cards under a "three"
- *    promise.
- *  - The first three (Automated) and the fourth (Your turn) get a
- *    visible separator at lg+. The connecting line breaks at the same
- *    column boundary so card 04 reads as a distinct hand-off.
- *
- * The standalone time pill inside each card was removed — the time is
- * already in the eyebrow next to the title and the second pill was
- * pushing the card past the readability threshold.
- */
 export function HowItWorksSection() {
   const t = useTranslations("landing.howItWorks");
 
@@ -46,20 +30,17 @@ export function HowItWorksSection() {
           </p>
         </div>
 
-        <div className="relative mt-16">
-          {/* Connecting line spans only the three Automated cards.
-           * Stops short of the divider + card 04 so the hand-off
-           * reads as a separate phase. */}
-          <div
-            aria-hidden
-            className="pointer-events-none absolute left-12 right-[28%] top-12 hidden h-px lg:block"
-            style={{
-              background:
-                "linear-gradient(to right, rgba(124,92,255,0.5), rgba(124,92,255,0.1))",
-            }}
-          />
-
-          <ol className="relative grid gap-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_8px_minmax(0,1fr)] lg:gap-8">
+        <div className="mt-16 flex flex-col gap-6 lg:gap-8">
+          {/* Automated steps — 3-column row so titles fit on one line */}
+          <ol className="relative grid gap-6 lg:grid-cols-3 lg:gap-8">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-12 right-12 top-12 hidden h-px lg:block"
+              style={{
+                background:
+                  "linear-gradient(to right, rgba(124,92,255,0.5), rgba(124,92,255,0.1))",
+              }}
+            />
             {steps.slice(0, 3).map(({ key, number, automated }) => (
               <StepCard
                 key={key}
@@ -72,12 +53,16 @@ export function HowItWorksSection() {
                 manualLabel={t("manualBadge")}
               />
             ))}
+          </ol>
 
-            <div
-              aria-hidden
-              className="hidden lg:block self-stretch w-px bg-mk-border-strong mx-1"
-            />
+          {/* Separator between automated and manual phases */}
+          <div
+            aria-hidden
+            className="hidden h-px bg-mk-border-strong lg:block"
+          />
 
+          {/* Manual step — standalone card at 1/3 width */}
+          <ol className="grid gap-6 lg:grid-cols-3 lg:gap-8">
             {(() => {
               const s = steps[3];
               return (
@@ -118,7 +103,7 @@ function StepCard({
   manualLabel: string;
 }) {
   return (
-    <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated px-6 py-8 mk-card-shadow lg:self-start">
+    <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
       <span
         aria-hidden
         className="pointer-events-none absolute right-4 top-3 select-none font-mono text-5xl font-bold leading-none text-mk-accent/10"
@@ -141,7 +126,7 @@ function StepCard({
 
       <div className="flex flex-col gap-3">
         <span className="mk-caption font-mono text-mk-accent">{time}</span>
-        <h3 className="text-lg font-semibold leading-snug tracking-tight text-mk-text-primary min-h-[52px]">
+        <h3 className="text-lg font-semibold leading-snug tracking-tight text-mk-text-primary">
           {title}
         </h3>
       </div>
