@@ -89,6 +89,11 @@ export default async function LocaleLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full overflow-x-hidden antialiased`}
     >
       <body className="min-h-full flex flex-col overflow-x-hidden">
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `if(location.hash)history.replaceState(null,'',location.pathname+location.search);`,
+          }}
+        />
         <ThemeProvider
           attribute="class"
           defaultTheme="dark"

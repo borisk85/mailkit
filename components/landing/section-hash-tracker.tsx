@@ -2,34 +2,18 @@
 
 import { useEffect } from "react";
 
-const SECTION_IDS = ["how-it-works", "pricing", "trust", "faq"];
-
 export function SectionHashTracker() {
   useEffect(() => {
     let ticking = false;
+    const base = window.location.pathname + window.location.search;
 
     const onScroll = () => {
       if (ticking) return;
       ticking = true;
       requestAnimationFrame(() => {
         if (window.scrollY < 200) {
-          history.replaceState(null, "", window.location.pathname);
-          ticking = false;
-          return;
+          history.replaceState(null, "", base);
         }
-
-        let current = "";
-        for (const id of SECTION_IDS) {
-          const el = document.getElementById(id);
-          if (el && el.getBoundingClientRect().top <= 120) {
-            current = id;
-          }
-        }
-
-        if (current) {
-          history.replaceState(null, "", `#${current}`);
-        }
-
         ticking = false;
       });
     };
