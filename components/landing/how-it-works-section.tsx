@@ -29,7 +29,7 @@ export function HowItWorksSection() {
   return (
     <section
       id="how-it-works"
-      className="w-full"
+      className="w-full overflow-hidden"
       aria-labelledby="how-it-works-heading"
     >
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-30 lg:py-32">
@@ -118,10 +118,17 @@ function StepCard({
   manualLabel: string;
 }) {
   return (
-    <li className="relative flex flex-col gap-4 rounded-2xl border border-mk-border-subtle bg-surface-elevated p-6 mk-card-shadow">
+    <li className="relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated p-6 mk-card-shadow">
+      <span
+        aria-hidden
+        className="pointer-events-none absolute -right-3 -top-4 select-none font-semibold leading-none text-mk-accent"
+        style={{ fontSize: "96px", opacity: 0.07, letterSpacing: "-0.04em" }}
+      >
+        {number}
+      </span>
       <div className="flex items-center justify-between">
         <span
-          className="font-semibold tracking-tight text-mk-accent"
+          className="relative font-semibold tracking-tight text-mk-accent"
           style={{ fontSize: "32px", lineHeight: "1" }}
         >
           {number}
