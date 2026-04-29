@@ -124,7 +124,7 @@
         "title": "С Mailkit",
         "duration": "за 10 мин",
         "steps": [
-          "Вход в Mailkit через Google",
+          "Войти в Mailkit через Google",
           "Вставить API токен Cloudflare",
           "Автоматическая настройка (~ 90 сек.)",
           "Скопировать четыре строки в настройки Gmail",
