@@ -80,22 +80,21 @@ export function Hero() {
 
           <p className="inline-flex items-center gap-1 text-xs text-mk-text-tertiary">
             {t("microcopy")}
-            <span className="group relative">
+            <a
+              href="https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/"
+              target="_blank"
+              rel="noreferrer"
+              title={t("migrationHint")}
+              className="group relative inline-flex"
+            >
               <HelpCircle
-                className="size-3.5 cursor-pointer text-mk-text-tertiary transition-colors hover:text-mk-accent"
-                aria-hidden
+                className="size-3.5 text-mk-text-tertiary transition-colors group-hover:text-mk-accent"
+                aria-label={t("migrationHint")}
               />
               <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-64 -translate-x-1/2 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2 text-xs text-mk-text-secondary opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                <a
-                  href="https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="hover:text-mk-text-primary"
-                >
-                  {t("migrationHint")}
-                </a>
+                {t("migrationHint")}
               </span>
-            </span>
+            </a>
           </p>
 
           <ul className="mt-2 flex flex-wrap gap-2">

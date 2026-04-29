@@ -94,22 +94,21 @@ export function ProblemSection() {
                       {step}
                     </span>
                     {i === 1 && (
-                      <span className="group relative mt-0.5 shrink-0">
+                      <a
+                        href="https://dash.cloudflare.com/profile/api-tokens"
+                        target="_blank"
+                        rel="noreferrer"
+                        title={tWith("tokenHint")}
+                        className="group relative mt-0.5 shrink-0 inline-flex"
+                      >
                         <HelpCircle
-                          className="size-3.5 cursor-pointer text-mk-text-tertiary transition-colors hover:text-mk-accent"
-                          aria-hidden
+                          className="size-3.5 text-mk-text-tertiary transition-colors group-hover:text-mk-accent"
+                          aria-label={tWith("tokenHint")}
                         />
                         <span className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2 text-xs text-mk-text-secondary opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                          <a
-                            href="https://dash.cloudflare.com/profile/api-tokens"
-                            target="_blank"
-                            rel="noreferrer"
-                            className="hover:text-mk-text-primary"
-                          >
-                            {tWith("tokenHint")}
-                          </a>
+                          {tWith("tokenHint")}
                         </span>
-                      </span>
+                      </a>
                     )}
                   </span>
                 </li>
