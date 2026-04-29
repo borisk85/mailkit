@@ -60,7 +60,7 @@ export default async function GuaranteePage({
     locale === "ru" ? "Обновлено 25.04.2026" : "Updated 2026-04-25";
   const lede =
     locale === "ru"
-      ? "Mailkit стоит $5. Если наша автоматика упала на нашей стороне — возврат автоматический в течение 24 часов. Если в течение 30 дней не можешь отправлять почту со своего домена — возврат по запросу в support. Но: если наши логи подтверждают, что настройка со стороны MailKit завершена корректно — support сначала помогает найти причину, а не возвращает деньги сразу. Подробная политика ниже."
+      ? "Настройка стоит $5. Если наша автоматика упала на нашей стороне — возврат автоматический в течение 24 часов. Если в течение 30 дней не можешь отправлять почту со своего домена — возврат по запросу в support. Но: если наши логи подтверждают, что настройка со стороны MailKit завершена корректно — support сначала помогает найти причину, а не возвращает деньги сразу. Подробная политика ниже."
       : "Mailkit costs $5. If our setup fails on our end, you get the $5 back automatically within 24 hours. If within 30 days you can't actually send email through your domain, you also get your $5 back — just email support. The full policy below explains the edge cases.";
 
   return (
