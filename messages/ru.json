@@ -122,7 +122,7 @@
       },
       "with": {
         "title": "С Mailkit",
-        "duration": "под 10 мин",
+        "duration": "за 10 мин",
         "steps": [
           "Авторизация в Mailkit через Google",
           "Вставить API токен Cloudflare",
