@@ -30,17 +30,17 @@ export function HowItWorksSection() {
           </p>
         </div>
 
-        <div className="mt-16 flex flex-col gap-6 lg:gap-8">
-          {/* Automated steps — 3-column row so titles fit on one line */}
-          <ol className="relative grid gap-6 lg:grid-cols-3 lg:gap-8">
-            <div
-              aria-hidden
-              className="pointer-events-none absolute left-12 right-12 top-12 hidden h-px lg:block"
-              style={{
-                background:
-                  "linear-gradient(to right, rgba(124,92,255,0.5), rgba(124,92,255,0.1))",
-              }}
-            />
+        <div className="relative mt-16">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute left-12 right-[28%] top-12 hidden h-px lg:block"
+            style={{
+              background:
+                "linear-gradient(to right, rgba(124,92,255,0.5), rgba(124,92,255,0.1))",
+            }}
+          />
+
+          <ol className="relative grid gap-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_8px_minmax(0,1fr)] lg:gap-8">
             {steps.slice(0, 3).map(({ key, number, automated }) => (
               <StepCard
                 key={key}
@@ -53,16 +53,12 @@ export function HowItWorksSection() {
                 manualLabel={t("manualBadge")}
               />
             ))}
-          </ol>
 
-          {/* Separator between automated and manual phases */}
-          <div
-            aria-hidden
-            className="hidden h-px bg-mk-border-strong lg:block"
-          />
+            <div
+              aria-hidden
+              className="hidden lg:block self-stretch w-px bg-mk-border-strong mx-1"
+            />
 
-          {/* Manual step — standalone card at 1/3 width */}
-          <ol className="grid gap-6 lg:grid-cols-3 lg:gap-8">
             {(() => {
               const s = steps[3];
               return (
