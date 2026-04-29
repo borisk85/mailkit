@@ -110,11 +110,11 @@
         "title": "Manual setup",
         "duration": "~1 hour",
         "steps": [
-          "Research routing services",
-          "Read Brevo SMTP docs (twice)",
-          "Hand-write five DNS records",
-          "Debug DKIM verification",
-          "Configure Gmail Send-As manually"
+          "Find an up-to-date guide on email routing",
+          "Create accounts and figure out multiple service dashboards",
+          "Copy and paste the right credentials into the right fields",
+          "Set up Gmail Send-As without mistakes",
+          "Hit a wall at any point and start over"
         ]
       },
       "with": {
