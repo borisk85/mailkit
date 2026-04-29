@@ -142,11 +142,13 @@ function GmailComposeMockup() {
           />
           <FromRow
             value={t("fromCustom1")}
+            badgePrefix={t("fromCustomBadgePrefix")}
             badge={t("fromCustomBadge")}
             highlighted
           />
           <FromRow
             value={t("fromCustom2")}
+            badgePrefix={t("fromCustomBadgePrefix")}
             badge={t("fromCustomBadge")}
             highlighted
           />
@@ -187,11 +189,13 @@ function GmailComposeMockup() {
 function FromRow({
   value,
   badge,
+  badgePrefix,
   highlighted = false,
   muted = false,
 }: {
   value: string;
   badge: string;
+  badgePrefix?: string;
   highlighted?: boolean;
   muted?: boolean;
 }) {
@@ -201,8 +205,15 @@ function FromRow({
         <span className="font-mono text-xs font-medium text-mk-text-primary">
           {value}
         </span>
-        <span className="rounded-full bg-mk-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mk-accent">
-          {badge}
+        <span className="inline-flex items-center gap-1.5">
+          {badgePrefix && (
+            <span className="text-[10px] font-medium text-mk-text-tertiary">
+              {badgePrefix}
+            </span>
+          )}
+          <span className="rounded-full bg-mk-accent/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-mk-accent">
+            {badge}
+          </span>
         </span>
       </div>
     );
