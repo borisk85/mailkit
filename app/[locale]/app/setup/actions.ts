@@ -1228,6 +1228,479 @@ export async function confirmGmailSendAs(input: {
   return { status: "ok", runId: row.id, runStatus: "done" };
 }
 
+/* ------------------------------------------------------------------ *
+ * feat/ses-backend-swap — SES setup pipeline
+ *
+ * These actions parallel the Brevo pipeline above. The wizard switches
+ * between `continueBrevoSetup` (current) and `continueSesSetup` (new)
+ * after production AWS access is approved and the feature flag is set.
+ * Neither path touches the other's code.
+ *
+ * Key timing difference vs Brevo: SES DKIM verification takes 5–30 min
+ * (not 2–8 sec). The pipeline therefore splits into two actions:
+ *   1. continueSesSetup  — creates tenant + identity, writes CNAME DNS,
+ *                          returns ses_dkim_pending immediately
+ *   2. pollSesVerification — polls DKIM status; when verified, issues
+ *                            SMTP credentials and advances to ses_done
+ * ------------------------------------------------------------------ */
+
+import {
+  SesError,
+  SES_STATUS,
+  createTenant,
+  verifyDomainForTenant,
+  pollDomainVerification,
+  createSmtpCredentialsForTenant,
+  type SesDomainIdentity,
+} from "@/lib/integrations/ses";
+
+const SES_RESUMABLE = new Set([
+  "cf_done",
+  SES_STATUS.tenantCreated,
+  SES_STATUS.identityCreated,
+  SES_STATUS.dkimPending,
+]);
+
+const SES_ALREADY_DONE = new Set([
+  SES_STATUS.identityVerified,
+  SES_STATUS.credentialsIssued,
+  SES_STATUS.done,
+  "gmail_instructions_shown",
+  "gmail_smtp_ready",
+  "gmail_send_as_verified",
+  "done",
+]);
+
+type SesOk = {
+  status: "ok";
+  runId: string;
+  runStatus:
+    | "ses_tenant_created"
+    | "ses_identity_created"
+    | "ses_dkim_pending"
+    | "ses_identity_verified"
+    | "ses_credentials_issued"
+    | "ses_done";
+};
+
+const sesContinueSchema = z.object({
+  runId: z.string().uuid(),
+  cfToken: z.string().min(20).max(200),
+});
+
+function mapSesError(e: unknown): ActionError {
+  if (e instanceof SesError) {
+    if (e.code === "missing_aws_credentials") {
+      return {
+        status: "error",
+        errorKey: "setup.errors.ses_not_configured",
+      };
+    }
+    if (e.code === "ses_create_identity_failed") {
+      return {
+        status: "error",
+        errorKey: "setup.errors.ses_identity_failed",
+      };
+    }
+    return { status: "error", errorKey: "setup.errors.ses_unavailable" };
+  }
+  if (e instanceof CloudflareError) return mapCfError(e);
+  return { status: "error", errorKey: "setup.errors.unexpected" };
+}
+
+async function patchSesState(
+  admin: Awaited<ReturnType<typeof createServiceClient>>,
+  runId: string,
+  input: {
+    status: string;
+    sesState: Record<string, unknown>;
+    step: Step | string;
+  },
+) {
+  const { data } = await admin
+    .from("setup_runs")
+    .select("ses_state")
+    .eq("id", runId)
+    .maybeSingle();
+  const current = (data?.ses_state as object) ?? {};
+  const nextState = { ...current, ...input.sesState, last_step: input.step };
+  await admin
+    .from("setup_runs")
+    .update({ status: input.status, ses_state: nextState })
+    .eq("id", runId);
+}
+
+/**
+ * SES setup continuation — step 1 of 2.
+ *
+ * Called from cf_done. Creates SES tenant + email identity (Easy DKIM),
+ * writes 3 DKIM CNAME records + SPF update to the customer's CF zone,
+ * then returns ses_dkim_pending. DKIM verification happens asynchronously
+ * (5–30 min); use pollSesVerification to advance past this point.
+ */
+export async function continueSesSetup(input: {
+  runId: string;
+  cfToken: string;
+}): Promise<SesOk | ActionError> {
+  const parsed = sesContinueSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.invalid_input",
+      details: parsed.error.flatten(),
+    };
+  }
+
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return { status: "error", errorKey: "setup.errors.not_authenticated" };
+  }
+
+  const admin = createServiceClient();
+  const { data: row } = await admin
+    .from("setup_runs")
+    .select("id, user_id, domain, mailbox_local, status, cf_zone_id, ses_state")
+    .eq("id", parsed.data.runId)
+    .maybeSingle();
+
+  if (!row || row.user_id !== user.id) {
+    return { status: "error", errorKey: "setup.errors.run_not_found" };
+  }
+
+  if (SES_ALREADY_DONE.has(row.status)) {
+    return {
+      status: "ok",
+      runId: row.id,
+      runStatus: SES_STATUS.done,
+    };
+  }
+
+  if (!SES_RESUMABLE.has(row.status)) {
+    return { status: "error", errorKey: "setup.errors.run_wrong_state" };
+  }
+
+  const zoneId = row.cf_zone_id;
+  const zoneName = row.domain;
+  if (!zoneId || !zoneName) {
+    return { status: "error", errorKey: "setup.errors.run_corrupt" };
+  }
+
+  const cf = createCloudflareClient(parsed.data.cfToken);
+  const customerId = row.id;
+
+  try {
+    let sesState = ((row.ses_state as Record<string, unknown>) ?? {}) as Record<
+      string,
+      unknown
+    >;
+    let runStatus = row.status;
+
+    // Step 1: create SES tenant.
+    if (runStatus === "cf_done") {
+      const tenantName = await createTenant(customerId);
+      sesState = { ...sesState, tenantName };
+      await patchSesState(admin, row.id, {
+        status: SES_STATUS.tenantCreated,
+        sesState,
+        step: "ses_create_tenant",
+      });
+      runStatus = SES_STATUS.tenantCreated;
+    }
+
+    // Step 2: create email identity + get DKIM CNAME tokens.
+    let identity: SesDomainIdentity | null = sesState.identity
+      ? (sesState.identity as SesDomainIdentity)
+      : null;
+    if (
+      runStatus === SES_STATUS.tenantCreated ||
+      (runStatus === SES_STATUS.identityCreated && !identity)
+    ) {
+      identity = await verifyDomainForTenant(customerId, zoneName);
+      sesState = {
+        ...sesState,
+        identity: {
+          identityArn: identity.identityArn,
+          tenantName: identity.tenantName,
+        },
+        dnsRecords: identity.dnsRecords,
+      };
+      await patchSesState(admin, row.id, {
+        status: SES_STATUS.identityCreated,
+        sesState,
+        step: "ses_create_identity",
+      });
+      runStatus = SES_STATUS.identityCreated;
+    }
+
+    // Step 3: write DKIM CNAME records to CF.
+    if (runStatus === SES_STATUS.identityCreated && identity) {
+      // DKIM CNAMEs
+      for (const rec of identity.dnsRecords) {
+        if (rec.type === "CNAME") {
+          await cf.createDnsRecord(zoneId, {
+            type: "CNAME",
+            name: rec.name,
+            content: rec.value,
+            ttl: 1,
+            proxied: false,
+          });
+        }
+      }
+
+      // SPF: add include:amazonses.com
+      const existingTxt = await cf.listDnsRecords(zoneId, {
+        type: "TXT",
+        name: zoneName,
+      });
+      const existingSpf = existingTxt.find((r) =>
+        r.content.toLowerCase().startsWith("v=spf1"),
+      );
+      const spfContent = existingSpf
+        ? addSpfInclude(existingSpf.content, "amazonses.com")
+        : "v=spf1 include:amazonses.com ~all";
+      await upsertDnsByPattern(cf, zoneId, {
+        pattern: "v=spf1",
+        record: { type: "TXT", name: zoneName, content: spfContent, ttl: 1 },
+      });
+
+      // DMARC (idempotent upsert)
+      await upsertDnsByPattern(cf, zoneId, {
+        pattern: "v=dmarc1",
+        record: {
+          type: "TXT",
+          name: `_dmarc.${zoneName}`,
+          content: `v=DMARC1; p=none; rua=mailto:postmaster@${zoneName}`,
+          ttl: 1,
+        },
+      });
+
+      await patchSesState(admin, row.id, {
+        status: SES_STATUS.dkimPending,
+        sesState: { ...sesState, dnsWritten: true },
+        step: "ses_dns_written",
+      });
+      runStatus = SES_STATUS.dkimPending;
+    }
+
+    return {
+      status: "ok",
+      runId: row.id,
+      runStatus: runStatus as SesOk["runStatus"],
+    };
+  } catch (e) {
+    await failRun(admin, row.id, "ses_create_tenant" as Step, errMsg(e));
+    return mapSesError(e);
+  }
+}
+
+/**
+ * SES setup continuation — step 2 of 2.
+ *
+ * Polls SES for DKIM verification status. When verified, creates
+ * per-tenant IAM SMTP credentials and advances to ses_done so
+ * prepareGmailStep can proceed.
+ *
+ * Expected to be called by the UI every 30s from ses_dkim_pending.
+ * Returns { dkimPending: true } while waiting, runStatus: ses_done on success.
+ */
+export async function pollSesVerification(input: {
+  runId: string;
+}): Promise<
+  | (SesOk & { dkimPending?: boolean })
+  | (ActionError & { dkimPending?: boolean })
+> {
+  const parsed = gmailRunSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.invalid_input",
+      details: parsed.error.flatten(),
+    };
+  }
+
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return { status: "error", errorKey: "setup.errors.not_authenticated" };
+  }
+
+  const admin = createServiceClient();
+  const { data: row } = await admin
+    .from("setup_runs")
+    .select("id, user_id, domain, status, ses_state")
+    .eq("id", parsed.data.runId)
+    .maybeSingle();
+
+  if (!row || row.user_id !== user.id) {
+    return { status: "error", errorKey: "setup.errors.run_not_found" };
+  }
+
+  // Already past verification
+  if (SES_ALREADY_DONE.has(row.status)) {
+    return { status: "ok", runId: row.id, runStatus: SES_STATUS.done };
+  }
+
+  if (row.status !== SES_STATUS.dkimPending) {
+    return { status: "error", errorKey: "setup.errors.run_wrong_state" };
+  }
+
+  const sesState = ((row.ses_state as Record<string, unknown>) ?? {}) as Record<
+    string,
+    unknown
+  >;
+  const customerId = row.id;
+  const zoneName = row.domain;
+
+  try {
+    const verifyResult = await pollDomainVerification(customerId, zoneName);
+
+    if (verifyResult.verificationStatus !== "SUCCESS") {
+      // Still pending — return dkimPending signal, UI re-polls in 30s
+      return {
+        status: "ok",
+        runId: row.id,
+        runStatus: SES_STATUS.dkimPending,
+        dkimPending: true,
+      };
+    }
+
+    // DKIM verified — issue SMTP credentials
+    await patchSesState(admin, row.id, {
+      status: SES_STATUS.identityVerified,
+      sesState: { ...sesState, dkimVerifiedAt: new Date().toISOString() },
+      step: "ses_dkim_verified",
+    });
+
+    const identityArn =
+      (sesState.identity as Record<string, string> | undefined)?.identityArn ??
+      `arn:aws:ses:${process.env.AWS_SES_REGION ?? "us-east-1"}:${process.env.AWS_ACCOUNT_ID ?? ""}:identity/${zoneName}`;
+
+    const smtpCreds = await createSmtpCredentialsForTenant(
+      customerId,
+      identityArn,
+    );
+
+    await patchSesState(admin, row.id, {
+      status: SES_STATUS.done,
+      sesState: {
+        ...sesState,
+        smtp: {
+          host: smtpCreds.host,
+          port: smtpCreds.port,
+          username: smtpCreds.username,
+          password: smtpCreds.password,
+          securityMode: smtpCreds.securityMode,
+          keyVersion: 1,
+        },
+        iamUsername: smtpCreds.iamUsername,
+        credentialsIssuedAt: new Date().toISOString(),
+      },
+      step: "ses_credentials_issued",
+    });
+
+    return { status: "ok", runId: row.id, runStatus: SES_STATUS.done };
+  } catch (e) {
+    await failRun(admin, row.id, "ses_poll_verification" as Step, errMsg(e));
+    return mapSesError(e);
+  }
+}
+
+/**
+ * prepareSesGmailStep — SES variant of prepareGmailStep.
+ *
+ * Reads SMTP credentials from ses_state JSONB (per-customer IAM creds)
+ * instead of shared Brevo env vars. Otherwise identical flow.
+ * The wizard calls this instead of prepareGmailStep when SES is active.
+ */
+export async function prepareSesGmailStep(input: {
+  runId: string;
+}): Promise<GmailPrepareOk | ActionError> {
+  const parsed = gmailRunSchema.safeParse(input);
+  if (!parsed.success) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.invalid_input",
+      details: parsed.error.flatten(),
+    };
+  }
+  const user = await getAuthenticatedUser();
+  if (!user) {
+    return { status: "error", errorKey: "setup.errors.not_authenticated" };
+  }
+
+  const admin = createServiceClient();
+  const { data: row } = await admin
+    .from("setup_runs")
+    .select(
+      "id, user_id, domain, mailbox_local, status, ses_state, gmail_state",
+    )
+    .eq("id", parsed.data.runId)
+    .maybeSingle();
+
+  if (!row || row.user_id !== user.id) {
+    return { status: "error", errorKey: "setup.errors.run_not_found" };
+  }
+
+  const sesResumeStatuses = new Set([
+    SES_STATUS.done,
+    "gmail_instructions_shown",
+  ]);
+  if (!sesResumeStatuses.has(row.status)) {
+    return { status: "error", errorKey: "setup.errors.run_wrong_state" };
+  }
+
+  // Read SMTP from ses_state
+  const sesState = ((row.ses_state as Record<string, unknown>) ?? {}) as Record<
+    string,
+    unknown
+  >;
+  const smtpRaw = sesState.smtp as Record<string, unknown> | undefined;
+  if (!smtpRaw?.host || !smtpRaw?.username || !smtpRaw?.password) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.ses_credentials_missing",
+    };
+  }
+
+  const smtp: SmtpDisplay = {
+    host: smtpRaw.host as string,
+    port: (smtpRaw.port as number) ?? 587,
+    username: smtpRaw.username as string,
+    password: smtpRaw.password as string,
+    securityMode: "starttls",
+    keyVersion: (smtpRaw.keyVersion as number) ?? 1,
+  };
+
+  const targetEmail = `${row.mailbox_local}@${row.domain}`;
+  const displayName = titleCaseLocal(row.mailbox_local);
+  const existingGmailState =
+    (row.gmail_state as Record<string, unknown> | null) ?? {};
+  const nextGmailState = {
+    ...existingGmailState,
+    target_email: targetEmail,
+    display_name: displayName,
+    smtp_config_version: smtp.keyVersion,
+    last_step: STEP.gmailPrepare,
+    smtp_source: "ses",
+  };
+
+  await admin
+    .from("setup_runs")
+    .update({
+      status: "gmail_instructions_shown",
+      gmail_state: nextGmailState,
+    })
+    .eq("id", row.id);
+
+  return {
+    status: "ok",
+    runId: row.id,
+    runStatus: "gmail_instructions_shown",
+    targetEmail,
+    displayName,
+    smtp,
+  };
+}
+
 /**
  * Pre-flight NS check — verifies the domain's authoritative nameservers
  * are Cloudflare's (*.ns.cloudflare.com) using Cloudflare DNS-over-HTTPS.

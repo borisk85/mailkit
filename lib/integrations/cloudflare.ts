@@ -68,6 +68,7 @@ export type DnsRecordInput = {
   content: string;
   ttl?: number;
   priority?: number;
+  proxied?: boolean;
 };
 
 export type EmailRoutingStatus = {
