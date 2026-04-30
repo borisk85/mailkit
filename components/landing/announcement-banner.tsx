@@ -56,7 +56,7 @@ export function AnnouncementBanner() {
           href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
           target="_blank"
           rel="noreferrer"
-          className="mk-body-small font-semibold underline underline-offset-4 hover:opacity-90"
+          className="mk-body-small font-semibold hover:opacity-75 focus:outline-none"
         >
           {t("cta")}
         </a>
