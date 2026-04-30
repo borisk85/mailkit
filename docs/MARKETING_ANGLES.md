@@ -17,28 +17,51 @@ free tier маркетинг (DDoS защита, бесплатный CDN), но
 говорим: "MailKit currently requires Cloudflare DNS. Migrate first
 (free, ~30 min), then setup takes under 10 minutes."
 
-## Core value prop
+## Core value prop (updated 2026-04-29 — repositioning от скорости к снятию боли)
 
-**EN:** "Email on your Cloudflare domain in under 10 minutes. We
-configure Email Routing, Brevo SMTP, and DNS records — you do the
-3-minute Gmail Send-As wizard."
+**EN:** "Professional email on your domain — without the DNS headache.
+We set up Cloudflare and Amazon SES for you. You keep using your
+regular Gmail."
 
-**RU:** "Почта на твоём домене с Cloudflare — под 10 минут. Настраиваем
-Email Routing, Brevo SMTP, DNS-записи. Ты делаешь 3-минутный мастер
-Gmail Send-As."
+**RU:** "Профессиональная почта на твоём домене — без часа возни с
+настройками. Cloudflare и Amazon настраиваем мы. Ты пользуешься своим
+обычным Gmail."
 
-## Time comparison (actual, updated 2026-04-29)
+## Стратегический сдвиг позиционирования (2026-04-29)
 
-| Scenario | Inexperienced CF user | Experienced CF user |
-|---|---|---|
-| Fully manual (2026 reality with ChatGPT help) | 60-90 min | 45-60 min |
-| With MailKit MVP (CF DNS already setup) | 8-12 min | 6-8 min |
-| With MailKit + Extension (v2) | ~3-5 min | ~2-3 min |
+**Было:** "Под 10 минут полный setup". Скорость как core value.
 
-Time savings MVP: 80-85% для не-технических CF юзеров.
+**Стало:** "Снятие страха разобраться самому, гарантия что не сломаешь,
+упрощение технического процесса". Скорость как side benefit, не центральная.
 
-(Старая таблица "5 минут" deprecated 2026-04-29 — не учитывала login
-в Cloudflare, генерацию API token, copy-paste SMTP полей в Gmail.)
+**Почему сменили.** Email setup — не задача "сделать срочно". Юзер может
+терпеть часы или сутки на ожидании. Конкурировать с DIY на скорость
+бессмысленно — технически грамотный юзер сделает сам если ему важна
+скорость. Реальная боль не в скорости, а в:
+- "Не понимаю как настроить DNS, SMTP, DKIM"
+- "Боюсь что-то сломать"
+- "Не хочу тратить вечер на гайды и форумы"
+- "Хочу гарантию что результат работает"
+
+Новое позиционирование решает эти боли напрямую.
+
+## Time mentions — где упоминаем, где нет
+
+**Не упоминаем на:** Hero, sub-hero, главные CTA, comparison table, ads.
+
+**Упоминаем в:** FAQ как ответ на конкретный вопрос "Сколько времени
+это займёт?". Честный ответ:
+
+| Этап | Время |
+|---|---|
+| Регистрация и настройка через wizard | 7-10 мин активной работы |
+| Проверка домена на стороне Amazon | 5-30 мин ожидания (мы пишем письмо когда готово) |
+| Финальный шаг в Gmail Settings | 3 мин копи-паст |
+| **Активного времени юзера** | **~10-13 мин** |
+| **Wall clock с ожиданием** | **15-45 мин** |
+
+Async ожидание — стандартный паттерн в email-индустрии (Stripe, Twilio,
+любой email provider).
 
 ## Why ChatGPT/Claude isn't a real fix
 
@@ -135,20 +158,27 @@ DNS.** Не-CF юзеры — не наша аудитория для launch'а.
 | "А если у вас автоматика не сработает?" | "Автоматический refund в 24 часа, без запроса. Мы видим сбой, возвращаем деньги сами. См. /guarantee." |
 | "А если через неделю перестанет работать?" | "30-дневная функциональная гарантия. Напиши в support — починим или вернем деньги полностью." |
 
-## Tagline candidates (для A/B на лендинге — updated 2026-04-29)
+## Tagline candidates (для A/B на лендинге — updated 2026-04-29 v2)
 
-**Ключевая правка:** все taglines теперь явно указывают на Cloudflare
-audience и используют "under 10 minutes" вместо "5 minutes".
+**Ключевая правка v2:** убираем фокус на скорость ("под 10 минут"), переходим
+на снятие боли разбираться самому. Скорость не main selling point — для
+этой аудитории она не имеет ценности.
 
 EN:
-- "Email on your Cloudflare domain in under 10 minutes. Guaranteed."
-- "Cloudflare DNS user? Skip 60 minutes of email setup hell."
-- "Your domain. Your Gmail. Under 10 minutes. (Cloudflare DNS users only.)"
+- "Professional email on your domain — without the DNS headache."
+- "Stop fighting DNS, SMTP, and DKIM. We set it up. You use Gmail as usual."
+- "Your domain. Your Gmail. We handle the technical part. (Cloudflare DNS users.)"
 
 RU:
-- "Почта на твоём Cloudflare-домене — под 10 минут. С гарантией."
-- "Cloudflare уже стоит? Пропусти час возни с DNS — настройка под 10 минут."
-- "Твой домен. Твой Gmail. Под 10 минут. (Только для Cloudflare DNS.)"
+- "Профессиональная почта на твоём домене — без часа возни с настройками."
+- "Не разбираешься в DNS, SMTP, DKIM? И не нужно — мы это знаем."
+- "Твой домен. Твой Gmail. Технику берём на себя. (Для пользователей Cloudflare DNS.)"
+
+**Deprecated (use as historical reference only):**
+- "Email on your Cloudflare domain in under 10 minutes" — скорость как
+  main selling point оказалась слабым позиционированием. Обновлено
+  2026-04-29 после рефлексии: для не-технического SMB важна не скорость,
+  а уверенность в результате и снятие страха технической сложности.
 
 ## Launch promo
 

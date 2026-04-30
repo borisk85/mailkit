@@ -150,7 +150,12 @@
       },
       "policyPill": "Two policies, plain language, /guarantee",
       "policyLinkLabel": "Read full policy →",
-      "audienceNote": "Built for Cloudflare DNS users. Free migration guide for users on other registrars."
+      "audienceNote": "Built for Cloudflare DNS users. Free migration guide for users on other registrars.",
+      "objections": [
+        "Don't know DNS, SMTP, or DKIM? You don't need to — we do.",
+        "Worried about breaking something? We offer a full money-back guarantee.",
+        "Don't want to spend your evening on guides and forums? We do it for you."
+      ]
     },
     "faq": {
       "eyebrow": "Common questions",
@@ -160,6 +165,26 @@
           "id": "cf-required",
           "q": "Does this work with any domain?",
           "a": "Right now MailKit only works if your domain uses Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace, or another registrar, you'll need to migrate nameservers to Cloudflare first. Cloudflare DNS is free and migration takes about 30 minutes plus DNS propagation up to 24 hours. After migration, MailKit setup runs in under 10 minutes. Multi-provider support is on our roadmap."
+        },
+        {
+          "id": "smtp-dependency",
+          "q": "What if MailKit shuts down?",
+          "a": "Your domain, DNS records, Cloudflare Email Routing, and Gmail Send-As are yours forever — they live on your accounts, not ours. The only piece tied to our infrastructure is the SMTP relay (AWS SES). If we ever close, we give you 90 days notice plus a step-by-step guide to migrate the SMTP relay to your own AWS SES or alternative provider account. No lock-in."
+        },
+        {
+          "id": "timing",
+          "q": "How long does it take?",
+          "a": "10 minutes of active work, then 5-30 minutes while Amazon verifies your domain's DNS. We'll email you when it's ready. Then just 3 minutes to paste four lines into Gmail."
+        },
+        {
+          "id": "no-tech-skills",
+          "q": "What if I have no technical skills?",
+          "a": "That's exactly what we're here for. DNS, SMTP, DKIM, DMARC — that's our part. You paste four lines into Gmail following our step-by-step guide. No technical configuration required."
+        },
+        {
+          "id": "wont-break-site",
+          "q": "Will this break my website?",
+          "a": "No. Email configuration doesn't touch your website settings. Email and web run on different DNS records — we only modify the ones needed for email."
         },
         {
           "id": "cost",

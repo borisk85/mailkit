@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useLocale, useTranslations } from "next-intl";
-import { Shield, Zap } from "lucide-react";
+import { Check, Shield, Zap } from "lucide-react";
 
 /**
  * Trust + guarantees — premium-pass refresh per UI_REVIEW_BRIEF §2.8.
@@ -14,6 +14,7 @@ import { Shield, Zap } from "lucide-react";
 export function TrustSection() {
   const t = useTranslations("landing.trust");
   const locale = useLocale();
+  const objections = t.raw("objections") as string[];
 
   return (
     <section id="trust" className="w-full" aria-labelledby="trust-heading">
@@ -56,7 +57,22 @@ export function TrustSection() {
           />
         </div>
 
-        <p className="mt-10 text-center">
+        <ul className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
+          {objections.map((item) => (
+            <li
+              key={item}
+              className="inline-flex items-start gap-2 rounded-full border border-mk-border-subtle bg-surface-elevated/60 px-4 py-2 text-sm text-mk-text-secondary"
+            >
+              <Check
+                className="mt-0.5 size-3.5 shrink-0 text-mk-accent"
+                aria-hidden
+              />
+              {item}
+            </li>
+          ))}
+        </ul>
+
+        <p className="mt-6 text-center">
           <Link
             href={`/${locale}/guarantee`}
             className="mk-body-small font-medium text-mk-accent underline-offset-4 hover:underline"
