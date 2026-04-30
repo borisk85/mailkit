@@ -2,6 +2,8 @@
 
 import { useLocale, useTranslations } from "next-intl";
 import { Check, Globe } from "lucide-react";
+import GB from "country-flag-icons/react/3x2/GB";
+import RU from "country-flag-icons/react/3x2/RU";
 
 import {
   DropdownMenu,
@@ -12,20 +14,17 @@ import {
 import { usePathname, useRouter } from "@/i18n/navigation";
 import { routing } from "@/i18n/routing";
 
-/**
- * Language switcher — shadcn DropdownMenu trigger + two items (EN/RU).
- * Replaces the pre-#11 pill-toggle design per LANDING_SPEC_V1.md
- * section 9.5 — cleaner at header density, room for a third locale
- * later without layout pressure.
- */
 export function LanguageSwitcher() {
   const t = useTranslations("landing.header.languageSwitcher");
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
 
-  const flagForLocale = (l: string) =>
-    l === "en" ? "🇬🇧" : l === "ru" ? "🇷🇺" : "";
+  const FlagForLocale = ({ l }: { l: string }) => {
+    if (l === "en") return <GB className="h-3.5 w-auto rounded-sm" />;
+    if (l === "ru") return <RU className="h-3.5 w-auto rounded-sm" />;
+    return null;
+  };
 
   const labelForLocale = (l: string) =>
     l === "en" ? t("en") : l === "ru" ? t("ru") : l.toUpperCase();
@@ -51,7 +50,9 @@ export function LanguageSwitcher() {
               className="flex items-center justify-between"
             >
               <span className="flex items-center gap-2">
-                <span aria-hidden>{flagForLocale(l)}</span>
+                <span aria-hidden>
+                  <FlagForLocale l={l} />
+                </span>
                 {labelForLocale(l)}
               </span>
               {active ? (
