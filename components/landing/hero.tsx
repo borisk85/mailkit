@@ -68,6 +68,8 @@ export function Hero() {
             </a>
           </div>
 
+          <p className="text-xs text-mk-text-tertiary">{t("timeSplit")}</p>
+
           <p className="inline-flex items-center gap-1 text-xs text-mk-text-tertiary">
             {t("microcopy")}
             <a

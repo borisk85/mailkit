@@ -34,6 +34,7 @@
       "guaranteeNote": "С гарантией",
       "guaranteeLink": "условия",
       "microcopy": "Необходим Cloudflare DNS. Если нет — бесплатная миграция ~30 мин.",
+      "timeSplit": "10 минут вашего времени. Остальное — на нашей стороне.",
       "migrationHint": "Открыть инструкцию Cloudflare",
       "primaryCta": "Настроить email",
       "secondaryCta": "Как это работает",
