@@ -155,6 +155,29 @@ def main() -> None:
     if not messages_path.exists():
         sys.exit(0)
 
+    # --- Approval gate ---
+    # Any commit that touches landing copy MUST contain [copy-approved] in the
+    # commit message. This enforces that Boris explicitly approved the text
+    # before it goes to git. Without this token the commit is blocked.
+    import subprocess
+    staged = subprocess.run(
+        ["git", "diff", "--cached", "--name-only"],
+        capture_output=True, text=True
+    ).stdout.splitlines()
+    copy_files = {"messages/ru.json", "messages/en.json"}
+    if any(f in copy_files for f in staged):
+        if "[copy-approved]" not in command:
+            reason = (
+                "Коммит содержит изменения landing copy но НЕ содержит токен "
+                "[copy-approved] в сообщении коммита.\n\n"
+                "Правило: любой landing copy коммит требует явного одобрения "
+                "владельца. Добавь [copy-approved] в сообщение коммита только "
+                "после того как Boris написал 'ок', 'давай', 'пушь' или "
+                "аналог на конкретный текст."
+            )
+            print(json.dumps({"decision": "block", "reason": reason}))
+            sys.exit(0)
+
     try:
         data = json.loads(messages_path.read_text(encoding="utf-8"))
     except Exception as e:
