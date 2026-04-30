@@ -62,7 +62,7 @@ export function Hero() {
             </a>
             <a
               href="#how-it-works"
-              className="inline-flex items-center gap-1.5 rounded-full border border-mk-border-strong px-4 py-2 text-sm font-medium text-mk-text-secondary transition-colors hover:bg-surface-elevated hover:text-mk-text-primary"
+              className="inline-flex h-[52px] items-center gap-1.5 rounded-[10px] border border-mk-border-strong px-7 text-base font-medium text-mk-text-secondary transition-colors hover:bg-surface-elevated hover:text-mk-text-primary"
             >
               {t("secondaryCta")}
             </a>

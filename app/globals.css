@@ -202,8 +202,8 @@ html {
    * sizes is a key premium signal (architect §1.2).
    */
   .mk-display-1 {
-    font-size: 72px;
-    line-height: 80px;
+    font-size: 60px;
+    line-height: 68px;
     letter-spacing: -0.04em;
     font-weight: 600;
   }
@@ -261,15 +261,15 @@ html {
 
   @media (min-width: 769px) and (max-width: 1023px) {
     .mk-display-1 {
-      font-size: 48px;
-      line-height: 56px;
+      font-size: 42px;
+      line-height: 50px;
     }
   }
 
   @media (max-width: 768px) {
     .mk-display-1 {
-      font-size: 38px;
-      line-height: 46px;
+      font-size: 34px;
+      line-height: 42px;
     }
     .mk-display-2 {
       font-size: 36px;
