@@ -24,6 +24,9 @@ export function LanguageSwitcher() {
   const router = useRouter();
   const pathname = usePathname();
 
+  const flagForLocale = (l: string) =>
+    l === "en" ? "🇬🇧" : l === "ru" ? "🇷🇺" : "";
+
   const labelForLocale = (l: string) =>
     l === "en" ? t("en") : l === "ru" ? t("ru") : l.toUpperCase();
 
@@ -47,7 +50,10 @@ export function LanguageSwitcher() {
               }}
               className="flex items-center justify-between"
             >
-              <span>{labelForLocale(l)}</span>
+              <span className="flex items-center gap-2">
+                <span aria-hidden>{flagForLocale(l)}</span>
+                {labelForLocale(l)}
+              </span>
               {active ? (
                 <Check className="size-4 text-neutral-500" aria-hidden />
               ) : null}
