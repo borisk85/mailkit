@@ -139,6 +139,52 @@ export function humanizeFailedStep(step: string): string {
  * (auto-refund) logs and continues. Copy from architect-approved
  * template in the etap-1 directive.
  */
+/**
+ * Notify customer that their domain's DKIM has been verified in SES and
+ * they can now finish the Gmail Send-As step. Includes a deep link.
+ */
+export async function sendDomainVerifiedEmail(args: {
+  toEmail: string;
+  toName?: string;
+  domain: string;
+  runId: string;
+  locale?: string;
+}): Promise<void> {
+  const { toEmail, toName, domain, runId, locale } = args;
+  const isRu = locale === "ru";
+  const finishUrl = `https://getmailkit.com/${locale ?? "en"}/app/setup/gmail-step?run=${runId}`;
+
+  const subject = isRu
+    ? `MailKit · Твой домен подтверждён — заверши настройку за 3 минуты`
+    : `MailKit · Your domain is verified — finish setup in 3 minutes`;
+
+  const textContent = isRu
+    ? [
+        "Привет,",
+        "",
+        `Домен ${domain} подтверждён в нашей инфраструктуре. Осталось вставить четыре строки в настройки Gmail — займёт 3 минуты.`,
+        "",
+        `Продолжить настройку: ${finishUrl}`,
+        "",
+        "— MailKit",
+      ].join("\n")
+    : [
+        "Hi,",
+        "",
+        `Your domain ${domain} has been verified in our infrastructure. Just paste four lines into Gmail settings — takes about 3 minutes.`,
+        "",
+        `Finish setup: ${finishUrl}`,
+        "",
+        "— MailKit",
+      ].join("\n");
+
+  await sendTransactionalEmail({
+    to: { email: toEmail, name: toName },
+    subject,
+    textContent,
+  });
+}
+
 export async function sendAutoRefundEmail(args: {
   toEmail: string;
   toName?: string;

@@ -1253,6 +1253,7 @@ import {
   createSmtpCredentialsForTenant,
   type SesDomainIdentity,
 } from "@/lib/integrations/ses";
+import { sendDomainVerifiedEmail } from "@/lib/integrations/brevo-transactional";
 
 const SES_RESUMABLE = new Set([
   "cf_done",
@@ -1596,6 +1597,19 @@ export async function pollSesVerification(input: {
       },
       step: "ses_credentials_issued",
     });
+
+    // Fire-and-forget notification email — do not let a failed email
+    // abort the credential-issue success path.
+    sendDomainVerifiedEmail({
+      toEmail: user.email ?? "",
+      domain: zoneName,
+      runId: row.id,
+    }).catch((err) =>
+      console.error(
+        `[ses/pollVerification] domain-verified email failed for run ${row.id}:`,
+        err,
+      ),
+    );
 
     return { status: "ok", runId: row.id, runStatus: SES_STATUS.done };
   } catch (e) {
