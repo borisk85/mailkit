@@ -3,6 +3,73 @@
 База для landing copy, ads, Product Hunt description, социальных постов.
 Все цифры и фразы — с честной математикой, без маркетинговых натяжек.
 
+## Категория продукта — критично для позиционирования (2026-04-30)
+
+Поскольку имя "MailKit" совпадает с зарегистрированным брендом Mailkit
+s.r.o. (чешская email marketing platform с 2006 года), мы должны
+строго отделять нашу категорию продукта от их категории на всех
+маркетинговых поверхностях.
+
+**МЫ ЕСТЬ — email setup automation tool.**
+
+**МЫ НЕ ЕСТЬ — email marketing platform / ESP / transactional email
+service / email infrastructure platform.**
+
+Эта категориальная разница снижает trademark confusion likelihood
+если когда-нибудь возникнет вопрос. Mailkit s.r.o. защищён в категории
+email-маркетинга — мы не пересекаемся с этой категорией ни услугой,
+ни описанием.
+
+**Запрещённые слова в копи и SEO targeting:**
+
+- email marketing
+- email campaigns
+- newsletter platform
+- email service provider / ESP
+- transactional email service
+- bulk email
+- email blast
+- email automation (без уточнения "setup automation")
+- mailing list management
+- email infrastructure platform
+
+**Разрешённые и приоритетные ключевые фразы:**
+
+- email setup automation
+- Cloudflare Email Routing setup
+- domain email automation
+- Gmail Send-As setup wizard
+- automated DNS configuration for email
+- professional email on your domain (без слова "platform")
+- DNS-free email setup
+- email setup without DNS headaches
+- one-click email forwarding
+- automated MX/DKIM/SPF setup
+
+## SEO target keywords (приоритет для блога и ranking)
+
+Эти запросы — наши уникальные, минимальная конкуренция с Mailkit s.r.o.:
+
+- "Cloudflare Email Routing setup" — основной target
+- "Gmail Send-As automation" — высокий intent
+- "how to set up email on Cloudflare domain"
+- "free email forwarding for custom domain"
+- "set up business email on personal domain"
+- "Cloudflare Email Routing vs ImprovMX" — comparison content
+- "Cloudflare Email Routing tutorial"
+- "Send email from custom domain through Gmail"
+- "how to use my own domain in Gmail"
+- "professional email without Google Workspace"
+
+**Запросы которые НЕ таргетируем** (это территория Mailkit s.r.o.):
+
+- "email marketing platform"
+- "email service provider"
+- "transactional email API"
+- "email deliverability service"
+- "email infrastructure"
+- "bulk email service"
+
 ## Audience scope (updated 2026-04-29)
 
 **ТОЛЬКО пользователи у которых домен на Cloudflare DNS.** Внутри этой
@@ -45,20 +112,41 @@ regular Gmail."
 
 Новое позиционирование решает эти боли напрямую.
 
-## Time mentions — где упоминаем, где нет
+## Time mentions — финальная политика (updated 2026-04-29 v3)
 
-**Не упоминаем на:** Hero, sub-hero, главные CTA, comparison table, ads.
+**На основе research данных AWS DKIM verification:** типичный случай
+2-15 минут (большую часть времени — несколько минут). Обычный диапазон
+до 1 часа. Долгий хвост (часы) — обычно конфиг-ошибки, у нас их нет
+потому что записи пишутся автоматически без опечаток и без proxy.
 
-**Упоминаем в:** FAQ как ответ на конкретный вопрос "Сколько времени
-это займёт?". Честный ответ:
+**В Hero используем "за 30 минут":** покрывает 90% случаев, оставшиеся
+10% обрабатываются через async email notification (юзер не сидит на
+странице, мы пишем когда готово — для него это не overrun, а нормальный
+flow с уведомлением).
+
+**Hero EN:** "Email on your domain in 30 minutes — without the DNS headache."
+**Hero RU:** "Почта на твоём домене за 30 минут — без часа возни с DNS."
+
+**В FAQ полная честная разбивка:**
 
 | Этап | Время |
 |---|---|
-| Регистрация и настройка через wizard | 7-10 мин активной работы |
-| Проверка домена на стороне Amazon | 5-30 мин ожидания (мы пишем письмо когда готово) |
-| Финальный шаг в Gmail Settings | 3 мин копи-паст |
-| **Активного времени юзера** | **~10-13 мин** |
-| **Wall clock с ожиданием** | **15-45 мин** |
+| Активная работа в нашем мастере (вход, токен, имя ящика) | 7-10 мин |
+| Проверка домена на стороне Amazon (мы ждём за тебя) | 2-15 мин типично, до 30 мин в обычной ситуации |
+| Финальный шаг в Gmail Settings (копи-паст) | 3 мин |
+| **Активного времени юзера** | **~10 мин максимум** |
+| **Полное wall clock время** | **15-30 мин в 90% случаев** |
+
+**Tail case (>30 минут, ~10% случаев):** AWS иногда замедляется. В этом
+случае мы продолжаем мониторить статус автоматически и пишем email
+сразу как только готово — юзер не блокирован, не сидит на странице,
+не теряет время. Worst case описан в FAQ как "иногда до 1 часа в редких
+случаях".
+
+**На лендинге явно прописано:**
+- "10 минут твоего активного времени"
+- "Остальное — на стороне Amazon, мы пишем email когда готово к финалу"
+- "В 90% случаев всё готово за 30 минут"
 
 Async ожидание — стандартный паттерн в email-индустрии (Stripe, Twilio,
 любой email provider).

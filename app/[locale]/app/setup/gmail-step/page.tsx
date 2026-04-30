@@ -9,11 +9,6 @@ import { redirect } from "next/navigation";
  * Anyone who hits it directly (old bookmark, cached link, typed URL)
  * bounces back to /app/setup where the wizard picks up their state.
  */
-export default async function GmailStepPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}) {
-  const { locale } = await params;
-  redirect(`/${locale}/app/setup`);
+export default async function GmailStepPage() {
+  redirect("/app/setup");
 }

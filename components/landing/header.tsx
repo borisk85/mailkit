@@ -1,10 +1,8 @@
-import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import { MailkitIcon } from "@/components/brand/mailkit-icon";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-import { LanguageSwitcher } from "./language-switcher";
 import { LogoLink } from "./logo-link";
 import { NavAnchor } from "./nav-anchor";
 import { SignInLink } from "./sign-in-link";
@@ -21,8 +19,7 @@ import { SignInLink } from "./sign-in-link";
  */
 export function Header() {
   const t = useTranslations("landing.header");
-  const locale = useLocale();
-  const landingHref = `/${locale}`;
+  const landingHref = "/";
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-mk-border-subtle bg-surface-base/80 shadow-[0_1px_0_rgba(0,0,0,0.4)] backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/70">
@@ -63,7 +60,6 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1 sm:gap-2">
-          <LanguageSwitcher />
           <ThemeToggle />
           <div className="mx-1 h-5 w-px bg-mk-border-subtle sm:mx-2" />
           <SignInLink />

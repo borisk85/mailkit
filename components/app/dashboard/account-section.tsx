@@ -26,12 +26,10 @@ import {
 export function AccountSection({
   email,
   fullName,
-  locale,
   deleteAction,
 }: {
   email: string;
   fullName: string | null;
-  locale: string;
   deleteAction: () => Promise<void>;
 }) {
   const t = useTranslations("dashboard.account");
@@ -43,9 +41,7 @@ export function AccountSection({
     startTransition(async () => {
       try {
         await deleteAction();
-        // Account is gone — bounce to root. The root layout's auth
-        // gate will redirect to landing on the next request.
-        router.replace(`/${locale}`);
+        router.replace("/");
         router.refresh();
       } finally {
         setOpen(false);

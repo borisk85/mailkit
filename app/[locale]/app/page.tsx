@@ -71,7 +71,7 @@ export default async function AppHome({
     if (!user) {
       // Defensive — the parent layout already gates auth, but if
       // anyone reaches this page without a session they go to landing.
-      redirect(`/${locale}`);
+      redirect("/");
     }
 
     const { data: profile } = await supabase
@@ -112,27 +112,22 @@ export default async function AppHome({
       </header>
 
       {isEmpty ? (
-        <DashboardEmptyState locale={locale} />
+        <DashboardEmptyState />
       ) : (
         <>
-          <SetupsSection setups={data.setups} locale={locale} />
-          <PurchasesSection
-            purchases={data.purchases}
-            refunds={data.refunds}
-            locale={locale}
-          />
-          <RefundsSection refunds={data.refunds} locale={locale} />
+          <SetupsSection setups={data.setups} />
+          <PurchasesSection purchases={data.purchases} refunds={data.refunds} />
+          <RefundsSection refunds={data.refunds} />
         </>
       )}
 
       <AccountSection
         email={displayEmail}
         fullName={fullName}
-        locale={locale}
         deleteAction={deleteAccountAction}
       />
 
-      <ResourcesSection locale={locale} />
+      <ResourcesSection />
     </div>
   );
 }

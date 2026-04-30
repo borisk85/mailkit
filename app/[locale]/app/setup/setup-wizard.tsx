@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState, useTransition } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 import {
   AlertCircle,
   Check,
@@ -287,8 +288,6 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
   const tState = useTranslations("setup.step3.state");
   const tSteps = useTranslations("setup.step3.steps");
   const tBrevo = useTranslations("setup.brevoSteps");
-  const locale = useLocale();
-
   const [state, setState] = useState<WizardState>(() =>
     mockInitialState(initialMock),
   );
@@ -344,7 +343,6 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
             });
           }}
           t={t}
-          locale={locale}
           translateErr={translateErr}
         />
       ) : null}
@@ -690,7 +688,7 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
       ) : null}
 
       {state.kind === "gmail_done" ? (
-        <GmailDoneStep state={state} locale={locale} t={t} />
+        <GmailDoneStep state={state} t={t} />
       ) : null}
 
       {state.kind === "failed" ? (
@@ -718,7 +716,6 @@ function TokenEntryStep({
   errorDetails?: string;
   onSubmit: (token: string) => void;
   t: (key: string) => string;
-  locale: string;
   translateErr: (key: string, details?: string) => string;
 }) {
   const [token, setToken] = useState("");
@@ -1842,11 +1839,9 @@ function CopyButton({
 
 function GmailDoneStep({
   state,
-  locale,
   t,
 }: {
   state: Extract<WizardState, { kind: "gmail_done" }>;
-  locale: string;
   t: (key: string, values?: Record<string, string>) => string;
 }) {
   return (
@@ -1863,11 +1858,11 @@ function GmailDoneStep({
       <p className="rounded-md border border-emerald-200/60 bg-emerald-50/40 px-3 py-2 text-xs leading-5 text-emerald-900/80 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-100/80">
         {t("gmail.steps.done.warmupTip")}
       </p>
-      <a href={`/${locale}/app`} className="inline-flex">
+      <Link href="/app" className="inline-flex">
         <Button variant="outline">
           {t("gmail.steps.done.backToDashboard")}
         </Button>
-      </a>
+      </Link>
     </section>
   );
 }

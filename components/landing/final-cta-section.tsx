@@ -1,4 +1,5 @@
-import { useLocale, useTranslations } from "next-intl";
+import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 
 import {
@@ -20,7 +21,6 @@ import {
  */
 export function FinalCtaSection() {
   const t = useTranslations("landing.finalCta");
-  const locale = useLocale();
   const trustItems = t.raw("trustItems") as string[];
 
   return (
@@ -52,14 +52,14 @@ export function FinalCtaSection() {
           >
             {t("primaryCta")}
           </a>
-          <a
-            href={`/${locale}/guarantee`}
+          <Link
+            href="/guarantee"
             className="group inline-flex items-center gap-1.5 text-base font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
             <span className="underline-offset-4 group-hover:underline">
               {t("secondaryCta")}
             </span>
-          </a>
+          </Link>
         </div>
 
         <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-mk-text-tertiary">

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Check, HelpCircle, Shield } from "lucide-react";
 
 import {
@@ -19,7 +19,6 @@ import {
  */
 export function Hero() {
   const t = useTranslations("landing.hero");
-  const locale = useLocale();
 
   return (
     <section
@@ -107,7 +106,7 @@ export function Hero() {
               ))}
             <li>
               <Link
-                href={`/${locale}/guarantee`}
+                href="/guarantee"
                 className="inline-flex items-center gap-1.5 rounded-full border border-mk-border-subtle bg-surface-elevated/60 px-3 py-1 text-xs font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
               >
                 <Shield

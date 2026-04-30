@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { ArrowRight } from "lucide-react";
 
 import { Footer } from "@/components/landing/footer";
@@ -17,8 +17,6 @@ import { Header } from "@/components/landing/header";
  */
 export default function NotFound() {
   const t = useTranslations("notFound");
-  const locale = useLocale();
-
   return (
     <>
       <Header />
@@ -28,7 +26,7 @@ export default function NotFound() {
         <p className="mk-body max-w-md text-mk-text-secondary">{t("body")}</p>
         <div className="mt-2 flex flex-wrap items-center justify-center gap-x-6 gap-y-3">
           <Link
-            href={`/${locale}`}
+            href="/"
             className="mk-cta-shadow group inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
           >
             {t("homeCta")}

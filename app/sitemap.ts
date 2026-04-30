@@ -12,41 +12,18 @@ import type { MetadataRoute } from "next";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
 
-const LOCALES = ["en", "ru"] as const;
-
-type Route = {
-  path: string;
-  priority: number;
-  changeFrequency: "monthly" | "weekly";
-};
-
-const PUBLIC_ROUTES: Route[] = [
-  { path: "", priority: 1.0, changeFrequency: "weekly" },
-  { path: "/terms", priority: 0.5, changeFrequency: "monthly" },
-  { path: "/privacy", priority: 0.5, changeFrequency: "monthly" },
+const PUBLIC_ROUTES = [
+  { path: "", priority: 1.0, changeFrequency: "weekly" as const },
+  { path: "/terms", priority: 0.5, changeFrequency: "monthly" as const },
+  { path: "/privacy", priority: 0.5, changeFrequency: "monthly" as const },
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const lastModified = new Date();
-  const entries: MetadataRoute.Sitemap = [];
-
-  for (const locale of LOCALES) {
-    for (const route of PUBLIC_ROUTES) {
-      entries.push({
-        url: `${SITE_URL}/${locale}${route.path}`,
-        lastModified,
-        changeFrequency: route.changeFrequency,
-        priority: route.priority,
-        // hreflang for the alternate locale — tells crawlers which
-        // page is the localized variant of which.
-        alternates: {
-          languages: Object.fromEntries(
-            LOCALES.map((alt) => [alt, `${SITE_URL}/${alt}${route.path}`]),
-          ),
-        },
-      });
-    }
-  }
-
-  return entries;
+  return PUBLIC_ROUTES.map((route) => ({
+    url: `${SITE_URL}${route.path}`,
+    lastModified,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
 }
