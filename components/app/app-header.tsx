@@ -19,7 +19,7 @@ import { createClient } from "@/lib/supabase/client";
  *   - logo links to `/{locale}/app` (dashboard).
  *   - right side carries email + sign-out instead of anchor nav.
  */
-export function AppHeader({ user, locale }: { user: User; locale: string }) {
+export function AppHeader({ user }: { user: User }) {
   const tAuth = useTranslations("auth");
   const tBrand = useTranslations("landing.header");
   const router = useRouter();
@@ -27,7 +27,7 @@ export function AppHeader({ user, locale }: { user: User; locale: string }) {
   const handleSignOut = async () => {
     const supabase = createClient();
     await supabase.auth.signOut();
-    router.push(`/${locale}`);
+    router.push("/");
     router.refresh();
   };
 
@@ -35,7 +35,7 @@ export function AppHeader({ user, locale }: { user: User; locale: string }) {
     <header className="border-b border-mk-border-subtle bg-surface-base/70 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/60">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link
-          href={`/${locale}/app`}
+          href="/app"
           className="flex items-center gap-2.5 text-base font-semibold tracking-tight text-mk-text-primary"
           aria-label={tBrand("logo")}
         >

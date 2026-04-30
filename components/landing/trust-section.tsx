@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Check, Shield, Zap } from "lucide-react";
 
 /**
@@ -13,7 +13,6 @@ import { Check, Shield, Zap } from "lucide-react";
  */
 export function TrustSection() {
   const t = useTranslations("landing.trust");
-  const locale = useLocale();
   const objections = t.raw("objections") as string[];
 
   return (
@@ -31,7 +30,7 @@ export function TrustSection() {
             {t("subhead")}
           </p>
           <Link
-            href={`/${locale}/guarantee`}
+            href="/guarantee"
             className="mk-caption inline-flex items-center gap-2 rounded-full border border-mk-border-strong bg-surface-elevated/60 px-3 py-1 text-mk-text-secondary transition-colors hover:bg-surface-elevated hover:text-mk-text-primary"
           >
             <Shield className="size-3" aria-hidden />
@@ -74,7 +73,7 @@ export function TrustSection() {
 
         <p className="mt-6 text-center">
           <Link
-            href={`/${locale}/guarantee`}
+            href="/guarantee"
             className="mk-body-small font-medium text-mk-accent underline-offset-4 hover:underline"
           >
             {t("policyLinkLabel")}

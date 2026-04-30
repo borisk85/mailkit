@@ -1,6 +1,6 @@
 "use client";
 
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { LogIn } from "lucide-react";
 
 import { createClient } from "@/lib/supabase/client";
@@ -34,14 +34,12 @@ const OAUTH_SCOPES = ["openid", "email", "profile"].join(" ");
  */
 export function SignInLink() {
   const t = useTranslations("landing.header");
-  const locale = useLocale();
-
   const handleSignIn = async () => {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/${locale}/auth/callback`,
+        redirectTo: `${window.location.origin}/auth/callback`,
         scopes: OAUTH_SCOPES,
         queryParams: {
           access_type: "offline",

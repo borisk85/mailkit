@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
@@ -45,7 +45,6 @@ function readPersistedShouldShow(): boolean {
  */
 export function CookieConsent() {
   const t = useTranslations("cookieConsent");
-  const locale = useLocale();
   const [shouldShow, setShouldShow] = useState(false);
 
   useEffect(() => {
@@ -96,7 +95,7 @@ export function CookieConsent() {
           {t("accept")}
         </Button>
         <Link
-          href={`/${locale}/privacy`}
+          href="/privacy"
           className="mk-body-small font-medium text-mk-text-secondary underline-offset-4 hover:text-mk-text-primary hover:underline"
         >
           {t("details")}

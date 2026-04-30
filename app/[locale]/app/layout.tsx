@@ -35,7 +35,7 @@ export default async function AppLayout({
   if (h.get("x-mailkit-mock") === "1") {
     return (
       <>
-        <AppHeader user={MOCK_USER} locale={locale} />
+        <AppHeader user={MOCK_USER} />
         <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
         <AppFooter />
       </>
@@ -48,12 +48,12 @@ export default async function AppLayout({
   } = await supabase.auth.getUser();
 
   if (!user) {
-    redirect(`/${locale}`);
+    redirect("/");
   }
 
   return (
     <>
-      <AppHeader user={user} locale={locale} />
+      <AppHeader user={user} />
       <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
       <AppFooter />
     </>

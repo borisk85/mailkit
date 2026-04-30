@@ -36,13 +36,7 @@ const stateTone: Record<
  * and desktop (two-column grid). No table — setups are usually 1-3
  * rows for the MVP, table shape buys nothing here.
  */
-export function SetupsSection({
-  setups,
-  locale,
-}: {
-  setups: DashboardSetup[];
-  locale: string;
-}) {
+export function SetupsSection({ setups }: { setups: DashboardSetup[] }) {
   const t = useTranslations("dashboard.setups");
 
   if (setups.length === 0) return null;
@@ -67,7 +61,7 @@ export function SetupsSection({
                     <p className="mt-0.5 text-xs text-mk-text-tertiary">
                       {t("createdLabel")}:{" "}
                       <time dateTime={setup.createdAt}>
-                        {new Date(setup.createdAt).toLocaleDateString(locale)}
+                        {new Date(setup.createdAt).toLocaleDateString("en")}
                       </time>
                     </p>
                   </div>
@@ -87,19 +81,19 @@ export function SetupsSection({
                 ) : null}
                 <div className="flex items-center gap-2">
                   {isSetupReSetupEligible(setup) ? (
-                    <Link href={`/${locale}/app/setup`}>
+                    <Link href="/app/setup">
                       <Button size="sm" variant="default">
                         {t("actions.reSetup")}
                       </Button>
                     </Link>
                   ) : state === "done" ? (
-                    <Link href={`/${locale}/app/setup`}>
+                    <Link href="/app/setup">
                       <Button size="sm" variant="outline">
                         {t("actions.open")}
                       </Button>
                     </Link>
                   ) : (
-                    <Link href={`/${locale}/app/setup`}>
+                    <Link href="/app/setup">
                       <Button size="sm" variant="default">
                         {t("actions.continue")}
                       </Button>

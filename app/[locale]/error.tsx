@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import * as Sentry from "@sentry/nextjs";
 import { AlertTriangle } from "lucide-react";
 
@@ -30,7 +30,6 @@ export default function ErrorBoundary({
   reset: () => void;
 }) {
   const t = useTranslations("error");
-  const locale = useLocale();
 
   useEffect(() => {
     Sentry.captureException(error);
@@ -46,7 +45,7 @@ export default function ErrorBoundary({
 
       <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
         <Button onClick={reset}>{t("retryCta")}</Button>
-        <Link href={`/${locale}`}>
+        <Link href="/">
           <Button variant="outline">{t("homeCta")}</Button>
         </Link>
       </div>

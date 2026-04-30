@@ -8,13 +8,7 @@ import { formatMoney, type DashboardRefund } from "@/lib/dashboard-data";
  * the auto-refund flow wrote an LS_CALL_FAILED row (amount=0), it
  * shows up here too so the user has visibility into the trail.
  */
-export function RefundsSection({
-  refunds,
-  locale,
-}: {
-  refunds: DashboardRefund[];
-  locale: string;
-}) {
+export function RefundsSection({ refunds }: { refunds: DashboardRefund[] }) {
   const t = useTranslations("dashboard.refunds");
 
   if (refunds.length === 0) return null;
@@ -52,7 +46,7 @@ export function RefundsSection({
               >
                 <td className="px-4 py-3">
                   <time dateTime={r.createdAt}>
-                    {new Date(r.createdAt).toLocaleDateString(locale)}
+                    {new Date(r.createdAt).toLocaleDateString("en")}
                   </time>
                 </td>
                 <td className="px-4 py-3 tabular-nums">
@@ -83,7 +77,7 @@ export function RefundsSection({
                 dateTime={r.createdAt}
                 className="text-xs text-mk-text-tertiary"
               >
-                {new Date(r.createdAt).toLocaleDateString(locale)}
+                {new Date(r.createdAt).toLocaleDateString("en")}
               </time>
             </div>
             <p className="text-xs text-mk-text-secondary">

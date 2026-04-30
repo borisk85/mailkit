@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
  * and /guarantee are the three SSG legal surfaces — all three
  * routes are live.
  */
-export function ResourcesSection({ locale }: { locale: string }) {
+export function ResourcesSection() {
   const t = useTranslations("dashboard.resources");
 
   const supportAddress = t("supportAddress");
@@ -19,7 +19,7 @@ export function ResourcesSection({ locale }: { locale: string }) {
       <ul className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
         <li>
           <Link
-            href={`/${locale}/terms`}
+            href="/terms"
             className="text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-300"
           >
             {t("terms")}
@@ -27,7 +27,7 @@ export function ResourcesSection({ locale }: { locale: string }) {
         </li>
         <li>
           <Link
-            href={`/${locale}/privacy`}
+            href="/privacy"
             className="text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-300"
           >
             {t("privacy")}
@@ -35,7 +35,7 @@ export function ResourcesSection({ locale }: { locale: string }) {
         </li>
         <li>
           <Link
-            href={`/${locale}/guarantee`}
+            href="/guarantee"
             className="text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-300"
           >
             {t("guarantee")}

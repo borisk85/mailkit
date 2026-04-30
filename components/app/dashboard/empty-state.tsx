@@ -11,7 +11,7 @@ import { Button } from "@/components/ui/button";
  * of plain text-on-card. The CTA still points at /app/setup which
  * enforces the purchase gate.
  */
-export function DashboardEmptyState({ locale }: { locale: string }) {
+export function DashboardEmptyState() {
   const t = useTranslations("dashboard.emptyState");
   return (
     <div className="relative overflow-hidden rounded-2xl border border-dashed border-mk-border-strong bg-surface-elevated p-12 text-center mk-card-shadow">
@@ -30,7 +30,7 @@ export function DashboardEmptyState({ locale }: { locale: string }) {
       <p className="mx-auto mt-3 max-w-md mk-body text-mk-text-secondary">
         {t("body")}
       </p>
-      <Link href={`/${locale}/app/setup`} className="mt-6 inline-flex">
+      <Link href="/app/setup" className="mt-6 inline-flex">
         <Button>{t("cta")}</Button>
       </Link>
     </div>

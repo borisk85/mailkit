@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 
 import { MailkitIcon } from "@/components/brand/mailkit-icon";
 
@@ -17,8 +17,7 @@ const GITHUB_URL = "https://github.com/borisk85/mailkit";
 
 export function Footer() {
   const t = useTranslations("footer");
-  const locale = useLocale();
-  const landingHref = `/${locale}`;
+  const landingHref = "/";
 
   return (
     <footer className="w-full border-t border-mk-border-subtle bg-surface-elevated">
@@ -55,19 +54,13 @@ export function Footer() {
             <FooterLink href={`${landingHref}#faq`}>
               {t("links.faq")}
             </FooterLink>
-            <FooterLink href={`/${locale}/app`}>{t("links.signIn")}</FooterLink>
+            <FooterLink href="/app">{t("links.signIn")}</FooterLink>
           </FooterColumn>
 
           <FooterColumn heading={t("legalHeading")}>
-            <FooterLink href={`/${locale}/terms`}>
-              {t("links.terms")}
-            </FooterLink>
-            <FooterLink href={`/${locale}/privacy`}>
-              {t("links.privacy")}
-            </FooterLink>
-            <FooterLink href={`/${locale}/guarantee`}>
-              {t("links.guarantee")}
-            </FooterLink>
+            <FooterLink href="/terms">{t("links.terms")}</FooterLink>
+            <FooterLink href="/privacy">{t("links.privacy")}</FooterLink>
+            <FooterLink href="/guarantee">{t("links.guarantee")}</FooterLink>
           </FooterColumn>
 
           <FooterColumn heading={t("contactHeading")}>
