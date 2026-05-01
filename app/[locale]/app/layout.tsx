@@ -5,6 +5,7 @@ import type { User } from "@supabase/supabase-js";
 
 import { AppFooter } from "@/components/app/app-footer";
 import { AppHeader } from "@/components/app/app-header";
+import { IncidentBanner } from "@/components/app/incident-banner";
 import { createClient } from "@/lib/supabase/server";
 
 const MOCK_USER: User = {
@@ -35,6 +36,7 @@ export default async function AppLayout({
   if (h.get("x-mailkit-mock") === "1") {
     return (
       <>
+        <IncidentBanner />
         <AppHeader user={MOCK_USER} />
         <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
         <AppFooter />
@@ -53,6 +55,7 @@ export default async function AppLayout({
 
   return (
     <>
+      <IncidentBanner />
       <AppHeader user={user} />
       <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
       <AppFooter />

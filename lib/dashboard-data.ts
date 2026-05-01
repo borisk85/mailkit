@@ -1,6 +1,7 @@
 import "server-only";
 
 import type { createClient } from "@/lib/supabase/server";
+import { friendlyErrorMessage } from "@/lib/error-messages";
 
 type SsrClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -167,7 +168,7 @@ export async function getDashboardData(
       domain: s.domain,
       mailboxLocal: s.mailbox_local,
       status: s.status,
-      errorMsg: s.error_msg,
+      errorMsg: friendlyErrorMessage(s.error_msg),
       createdAt: s.created_at,
       updatedAt: s.updated_at,
     })),

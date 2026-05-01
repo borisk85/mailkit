@@ -7,6 +7,9 @@ import { routing } from "./i18n/routing";
 const intlMiddleware = createMiddleware(routing);
 
 function isProtectedAppRoute(pathname: string): boolean {
+  // localePrefix: "never" — routes have no locale segment in the URL
+  if (pathname === "/app" || pathname.startsWith("/app/")) return true;
+  // Keep locale-prefixed variant for safety during any future migration
   return routing.locales.some(
     (l) => pathname === `/${l}/app` || pathname.startsWith(`/${l}/app/`),
   );
