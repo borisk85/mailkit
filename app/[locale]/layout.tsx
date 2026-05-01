@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
 
 import { CookieConsent } from "@/components/cookie-consent";
+import SupportChatWidgetMount from "@/components/landing/SupportChatWidgetMount";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { routing } from "@/i18n/routing";
@@ -90,6 +91,7 @@ export default async function LocaleLayout({
           <NextIntlClientProvider>
             {children}
             <CookieConsent />
+            <SupportChatWidgetMount />
           </NextIntlClientProvider>
           <Toaster />
         </ThemeProvider>

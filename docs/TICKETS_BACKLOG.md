@@ -6,6 +6,146 @@
 ## ✅ Completed
 - #1 Feasibility Spike
 
+## 🚨 BLOCKING LAUNCH — Anti-abuse readiness (2026-04-29)
+
+Ветка `feat/anti-abuse-launch-readiness`. Без этих 4 пунктов запуск
+блокируется — иначе deliberate attack может убить AWS аккаунт за дни.
+
+- **#ABUSE-1** Owner alerting на INSERT в `abuse_events`:
+  - Sentry alert (low priority — для history)
+  - Telegram bot **`@MailKitOwnerAlerts`** (создать заранее, токен в env vars) — push notification на phone owner'а в реальном времени
+  - Содержание уведомления: domain клиента, event_type (rate_limit / bounce_threshold / complaint_threshold / phishing_pattern), observed values, direct link на abuse_events row в админке
+  - Boris подтверждает что хочет именно Telegram, не SMS
+- **#ABUSE-2** Brevo abuse desk response kit (адаптировано под AWS SES после migration): скрипт `scripts/abuse-export.ts <domain>` → ZIP с send logs из CloudWatch, abuse_events, purchase + consent fields, ToS version. Готовый пакет для AWS abuse desk при инцидентах.
+- **#ABUSE-3** Lightweight phishing pattern check на `prepareGmailStep`: blacklist suspicious mailbox names (`noreply`, `support`, `admin`, `paypal`, `apple`, `google`, `bank`, `secure`, `verify`) + domain typosquatting (Levenshtein < 2 от top brands). Match → `purchases.kyc_review_required = true` + alert через #ABUSE-1 канал. НЕ блокирует автоматически — только flags на manual review.
+- **#ABUSE-4** Hard-suspend tenant в AWS SES: при `flagSuspended` → auto pause через SES API (delete email identity либо update sending status). Destructive trade-off, acceptable для abuse cases.
+
+Существующая anti-abuse инфраструктура (готова, не трогаем):
+- Per-domain rate limits (`lib/send-limits.ts`): 500/day, 50/hour, 5/minute
+- Deliverability monitoring (`lib/deliverability.ts`): bounce + complaint thresholds + auto-pause
+- Audit trail (`abuse_events` table в Supabase)
+- Domain ownership verification через CF API при setup
+- Per-customer attribution (`purchases.user_email`, `custom_data.domain`)
+
+## 🎨 Dashboard polish (2026-04-30) — ветка `feat/dashboard-polish`
+
+После просмотра скриншотов личного кабинета. Делается параллельно с `feat/smtp-dependency-disclosure` либо отдельной веткой. Не блокирует первый launch, но критично для professional UX.
+
+- **#DASH-1 User-friendly error messages**
+  - Заменить все технические dump'ы (`Error: 50000, Authenticate error`, `brevo missing_records`, `brevo duplicate_parameter`, `Error: state.suspended_by_owner: no`) на человеко-понятный текст с инструкциями что делать
+  - Убрать упоминания `brevo` из всего user-facing UI (legal + privacy)
+  - Убрать числовые error codes из видимости пользователя (логировать в Sentry, показывать только friendly text)
+  - Mapping technical → user-friendly создать в `lib/error-messages.ts`
+
+- **#DASH-2 Async flow status states**
+  - Добавить промежуточные статусы между `pending` и `failed/active`:
+    - "Configuring DNS" (первые 30 секунд автоматики)
+    - "Waiting for AWS verification (typical 5-15 min, up to 30 min)"
+    - "Ready for Gmail step" (DKIM verified, юзер должен зайти и закончить)
+    - "Active" (после успешного test send)
+  - Соответствующие visual indicators (icon, color) для каждого статуса
+  - Прогресс-бар либо timeline компонент
+
+- **#DASH-3 Failed setups cleanup**
+  - Auto-archive failed карточек старше 7 дней (фоновый cron)
+  - Manual delete кнопка на каждой failed карточке
+  - Группировка "Previous failed attempts (N)" в свёрнутый блок если много
+
+- **#DASH-4 Sending limits widget**
+  - Мини-виджет на dashboard "You've sent X of 500 emails today"
+  - Прогресс-бар с цветовыми зонами (зелёный <50%, жёлтый 50-80%, красный >80%)
+  - Tooltip с разбивкой по minute/hour/day
+  - Ссылка на FAQ "About limits"
+
+- **#DASH-5 Delete account в Danger Zone**
+  - Переместить "Delete my account" из Account section в отдельную Danger Zone секцию внизу страницы
+  - Confirmation modal с вводом email для подтверждения
+  - Visual styling: красная рамка, warning icon, текст "This action cannot be undone"
+
+- **#DASH-6 Email support клик-действие**
+  - "Email support" в Resources секции должен быть mailto:support@getmailkit.com либо триггерить открытие RAG bot widget когда он будет готов
+  - Добавить иконку email рядом
+
+- **#DASH-7 (опционально, post-launch) Basic metrics widget**
+  - Total emails sent (за всё время и за последние 7/30 дней)
+  - Bounce rate, complaint rate (за 30 дней)
+  - Source: AWS CloudWatch metrics per tenant
+  - Полезно для customer self-service диагностики deliverability
+
+Verification: Playwright скриншоты dashboard в разных состояниях (empty, with active setup, with failed setup, with limit warnings).
+
+## 🛠 Operational integrations (2026-04-30)
+
+Не блокируют launch как такового, но должны быть в production до первых
+платящих клиентов чтобы не пропускать инциденты и метрики.
+
+- **#OPS-1 Sentry integration**
+  - Owner создаёт Sentry account (бесплатный план до 5K событий/мес)
+  - Передаёт DSN ключ разработчику через secure channel
+  - Разработчик встраивает Sentry SDK в Next.js (server + client) и edge runtime
+  - Source maps настраиваются для readable stack traces
+  - Alert rules: email на owner при unhandled exceptions, performance degradation, error spike
+
+- **#OPS-2 Better Stack status page (post-launch)**
+  - Заменяет статичный заглушку `getmailkit.com/status` который ставится в #SMTP-4
+  - Better Stack бесплатный план достаточен для micro-SaaS
+  - Owner создаёт аккаунт, настраивает probes на `getmailkit.com`, `app.getmailkit.com`, AWS SES API endpoint
+  - Embed виджет на нашу страницу `/status` либо CNAME `status.getmailkit.com` на их хост
+  - Автоматические incident reports при downtime
+  - Post-launch — после первых 50-100 платящих, не сразу при launch
+
+- **#OPS-3 Dogfooding setup для owner**
+  - После merge ветки `feat/ses-backend-swap` и production approve от AWS
+  - Owner проходит полный flow продукта на собственном домене getmailkit.com
+  - Настраивает `support@getmailkit.com` через свой собственный продукт
+  - Цели: реальный end-to-end smoke test (payment → wizard → DKIM async → Gmail Send-As → готово), catch-bug stage до открытия для платящих, плюс настройка production support email
+  - После dogfooding — запись отзыва на основе личного опыта для будущего marketing
+  - Замечания и баги в процессе → отдельный тикет либо сразу в работу
+
+## 🤖 AI support bot (RAG) на лендинге (2026-04-30)
+
+Цель — закрыть 90-95% вопросов клиентов автоматически без участия owner'а.
+Эскалация на email только для редких сложных кейсов.
+
+- **#RAG-1** Vector store с базой знаний:
+  - FAQ (все вопросы и ответы с лендинга)
+  - Excerpts из ToS / Acceptable Use Policy / Guarantee Policy
+  - Setup wizard инструкции
+  - Список лимитов с конкретными цифрами
+  - Troubleshooting по типичным проблемам (DKIM не верифицируется, Gmail Send-As не сохраняет credentials, домен не на Cloudflare)
+  - Эмбеддинги через OpenAI text-embedding-3-small либо Anthropic-совместимая альтернатива
+  - Хранение в Supabase pgvector (уже есть в стеке, не нужна отдельная инфра)
+- **#RAG-2** Backend route `/api/support/chat`:
+  - Принимает вопрос пользователя
+  - Делает similarity search в pgvector
+  - Передаёт top-K результатов в Claude/GPT-4o-mini как контекст
+  - Возвращает ответ + confidence score
+  - При confidence < 70% — предлагает «не нашёл точный ответ, написать в support@»
+- **#RAG-3** Frontend виджет:
+  - Кнопка чата в правом нижнем углу лендинга и личного кабинета
+  - Открывается окошко chat UI
+  - История диалога в localStorage (не персистится в БД для privacy)
+  - Стандартные suggested questions при открытии («Сколько занимает настройка?», «Что если у меня домен не на Cloudflare?», «Какие лимиты на отправку?»)
+- **#RAG-4** Эскалация:
+  - При negative feedback от пользователя («это не помогло») — автоматически открывается mailto:support@getmailkit.com с историей чата в теле письма
+  - Owner получает контекст вопроса + что бот ответил, может отвечать предметно
+
+Time estimate: 1-2 дня dev работы. Trigger для запуска — после launch'а либо параллельно если AWS approval затянется. Зависимости — Supabase pgvector extension (включить через миграцию).
+
+## 🚨 BLOCKING LAUNCH — Rate limits в публичных текстах (2026-04-30)
+
+Лимиты на отправку (500 писем в день, 50 в час, 5 в минуту с одного
+клиентского домена) сейчас прописаны только в коде `lib/send-limits.ts`.
+Должны быть видны клиентам до и после покупки.
+
+- **#LIMITS-1** В FAQ на лендинге добавить пункт «Какие лимиты на отправку?» с конкретными цифрами и объяснением что лимиты можно увеличить по запросу через support после первого месяца использования.
+- **#LIMITS-2** В Terms of Service / Acceptable Use Policy добавить формальное описание лимитов как часть условий использования.
+- **#LIMITS-3** В личном кабинете клиента (после покупки) сделать страницу «Your sending limits» с текущими цифрами и счётчиком использованных писем за день/час.
+- **#LIMITS-4** В onboarding email после успешной настройки добавить одно предложение про лимиты со ссылкой на FAQ.
+
+Конкретные цифры брать из `lib/send-limits.ts` константы `DEFAULT_SEND_LIMITS`.
+Делается параллельно с веткой `feat/smtp-dependency-disclosure`.
+
 ## 🚨 BLOCKING LAUNCH — SMTP incident response infrastructure (2026-04-29)
 
 Полный план в [docs/INCIDENT_RUNBOOK_SMTP.md](INCIDENT_RUNBOOK_SMTP.md).
