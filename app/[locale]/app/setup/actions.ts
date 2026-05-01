@@ -24,6 +24,8 @@ import {
   type SmtpDisplay,
 } from "@/lib/integrations/brevo-smtp";
 import { triggerAutoRefund } from "@/lib/auto-refund";
+import { checkPhishingPattern } from "@/lib/phishing";
+import { sendTelegramAlert, escapeHtml } from "@/lib/telegram-alert";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 /**
@@ -1110,6 +1112,53 @@ function mapSmtpConfigError(e: unknown): ActionError {
   return { status: "error", errorKey: "setup.errors.unexpected" };
 }
 
+async function flagPhishingPurchase(
+  admin: ReturnType<typeof createServiceClient>,
+  userId: string,
+  domain: string,
+  reason: string,
+): Promise<void> {
+  try {
+    // Flag the most recent paid purchase for this user
+    const { data: purchase } = await admin
+      .from("purchases")
+      .select("id")
+      .eq("user_id", userId)
+      .eq("status", "paid")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (purchase) {
+      await admin
+        .from("purchases")
+        .update({ kyc_review_required: true })
+        .eq("id", purchase.id);
+    }
+
+    await admin.from("abuse_events").insert({
+      domain,
+      event_type: "phishing_pattern",
+      action_taken: "kyc_flagged",
+      notes: reason,
+      purchase_id: purchase?.id ?? null,
+    });
+
+    void sendTelegramAlert([
+      "🚨 <b>Phishing pattern detected — MailKit</b>",
+      "",
+      `<b>Domain:</b> ${escapeHtml(domain)}`,
+      `<b>Reason:</b> ${escapeHtml(reason)}`,
+      `<b>Action:</b> kyc_review_required = true`,
+      purchase ? `<b>Purchase ID:</b> ${escapeHtml(purchase.id)}` : null,
+      "",
+      "Review in Supabase admin → purchases table.",
+    ]);
+  } catch (e) {
+    console.error("[phishing-flag]", e);
+  }
+}
+
 export async function prepareGmailStep(input: {
   runId: string;
 }): Promise<GmailPrepareOk | ActionError> {
@@ -1145,6 +1194,17 @@ export async function prepareGmailStep(input: {
   }
   if (!GMAIL_PREPARE_RESUMABLE.has(row.status)) {
     return { status: "error", errorKey: "setup.errors.run_wrong_state" };
+  }
+
+  // #ABUSE-3 — phishing pattern check (non-blocking, fire-and-forget)
+  const phishingResult = checkPhishingPattern(row.mailbox_local, row.domain);
+  if (phishingResult.flagged) {
+    void flagPhishingPurchase(
+      admin,
+      user.id,
+      row.domain,
+      phishingResult.reason,
+    );
   }
 
   const targetEmail = `${row.mailbox_local}@${row.domain}`;
