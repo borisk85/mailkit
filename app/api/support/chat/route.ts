@@ -1,41 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
-import OpenAI from "openai";
-import { createClient } from "@supabase/supabase-js";
 import { SUPPORT_SYSTEM_PROMPT } from "@/lib/support-system-prompt";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-);
 
 type IncomingMessage = { role: "user" | "assistant"; content: string };
-
-async function getRelevantContext(question: string): Promise<string> {
-  const embRes = await openai.embeddings.create({
-    model: "text-embedding-3-small",
-    input: question,
-  });
-  const embedding = embRes.data[0].embedding;
-
-  const { data, error } = await supabaseAdmin.rpc("match_chunks", {
-    query_embedding: embedding,
-    match_count: 5,
-    min_similarity: 0.3,
-  });
-
-  if (error || !data?.length) return "";
-
-  return (data as Array<{ content: string; similarity: number }>)
-    .map((r) => r.content)
-    .join("\n\n---\n\n");
-}
 
 export async function POST(req: NextRequest) {
   try {
@@ -63,19 +35,13 @@ export async function POST(req: NextRequest) {
       )
       .slice(-10);
 
-    const context = await getRelevantContext(message);
-
-    const systemWithContext = context
-      ? `${SUPPORT_SYSTEM_PROMPT}\n\n# Relevant knowledge base context\n\n${context}`
-      : SUPPORT_SYSTEM_PROMPT;
-
     const response = await anthropic.messages.create({
-      model: "claude-haiku-4-5-20251001",
+      model: "claude-sonnet-4-6",
       max_tokens: 1024,
       system: [
         {
           type: "text",
-          text: systemWithContext,
+          text: SUPPORT_SYSTEM_PROMPT,
           cache_control: { type: "ephemeral" },
         },
       ],
@@ -91,12 +57,7 @@ export async function POST(req: NextRequest) {
       .join("\n")
       .trim();
 
-    // Strip ё per project convention
-    const YO_L = "ё";
-    const YO_U = "Ё";
-    const reply = rawReply
-      .replace(new RegExp(YO_L, "g"), "е")
-      .replace(new RegExp(YO_U, "g"), "Е");
+    const reply = rawReply.replace(/ё/g, "е").replace(/Ё/g, "Е");
 
     return NextResponse.json({
       reply:

@@ -54,17 +54,7 @@ function saveHistory(messages: Message[]) {
   } catch {}
 }
 
-function buildEscalationMailto(messages: Message[]): string {
-  const transcript = messages
-    .filter((m) => !m.isFeedback)
-    .map((m) => `${m.role === "user" ? "You" : "Assistant"}: ${m.content}`)
-    .join("\n\n");
-
-  const body = encodeURIComponent(
-    `Hi,\n\nThe support assistant couldn't help me. Here's our conversation:\n\n${transcript}\n\nMy question: `,
-  );
-  return `mailto:support@getmailkit.com?subject=${encodeURIComponent("Support needed — chat history attached")}&body=${body}`;
-}
+const MAX_SESSION_DISLIKES = 3;
 
 export default function SupportChatWidget() {
   const [open, setOpen] = useState(false);
@@ -74,9 +64,11 @@ export default function SupportChatWidget() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [ratings, setRatings] = useState<Record<number, "up" | "down">>({});
+  const [sessionDislikes, setSessionDislikes] = useState(0);
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const initialized = useRef(false);
+  const ratedIdxRef = useRef<Set<number>>(new Set());
 
   // Derived: show suggestions only while the conversation has just the greeting
   const showSuggestions =
@@ -152,26 +144,45 @@ export default function SupportChatWidget() {
   }
 
   function rate(idx: number, val: "up" | "down") {
-    setRatings((prev) => {
-      const copy = { ...prev };
-      if (copy[idx] === val) {
-        delete copy[idx];
-      } else {
-        copy[idx] = val;
-      }
-      return copy;
-    });
+    // Prevent toggling off an existing rating
+    if (ratings[idx] === val) return;
+    // Prevent rating the same message twice
+    if (ratedIdxRef.current.has(idx)) return;
+    // Dislike cap — prevent spam
+    if (val === "down" && sessionDislikes >= MAX_SESSION_DISLIKES) return;
 
-    if (val === "up") {
-      setMessages((prev) => [
-        ...prev,
-        {
-          role: "assistant",
-          content: "Thanks for the feedback!",
-          isFeedback: true,
-        },
-      ]);
+    ratedIdxRef.current.add(idx);
+
+    setRatings((prev) => ({ ...prev, [idx]: val }));
+
+    const assistantMsg = messages[idx];
+    const userMsg = idx > 0 ? messages[idx - 1] : null;
+
+    if (val === "down") {
+      setSessionDislikes((n) => n + 1);
     }
+
+    setMessages((prev) => [
+      ...prev,
+      {
+        role: "assistant",
+        content:
+          val === "up"
+            ? "Thanks for the feedback!"
+            : "Got it — if you still need help, email us at support@getmailkit.com.",
+        isFeedback: true,
+      },
+    ]);
+
+    fetch("/api/support/feedback", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({
+        rating: val,
+        assistantReply: assistantMsg?.content ?? "",
+        userQuestion: userMsg?.role === "user" ? userMsg.content : null,
+      }),
+    }).catch(() => {});
   }
 
   return (
@@ -232,15 +243,17 @@ export default function SupportChatWidget() {
                     >
                       <ThumbsUp className="h-3.5 w-3.5" />
                     </button>
-                    <a
-                      href={buildEscalationMailto(messages.slice(0, i + 1))}
+                    <button
                       onClick={() => rate(i, "down")}
-                      className={`rounded-md p-1.5 transition-colors ${ratings[i] === "down" ? "text-red-500" : "text-muted-foreground hover:text-foreground"}`}
-                      title="Not helpful — email support"
+                      disabled={
+                        !ratings[i] && sessionDislikes >= MAX_SESSION_DISLIKES
+                      }
+                      className={`rounded-md p-1.5 transition-colors disabled:cursor-not-allowed disabled:opacity-30 ${ratings[i] === "down" ? "text-red-500" : "text-muted-foreground hover:text-foreground"}`}
+                      title="Not helpful"
                       aria-label="Not helpful"
                     >
                       <ThumbsDown className="h-3.5 w-3.5" />
-                    </a>
+                    </button>
                   </div>
                 )}
               </div>
