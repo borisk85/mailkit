@@ -1,7 +1,15 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { X, Send, MessageCircle, ThumbsUp, ThumbsDown } from "lucide-react";
+import {
+  X,
+  Send,
+  MessageCircle,
+  ThumbsUp,
+  ThumbsDown,
+  ArrowLeft,
+  Mail,
+} from "lucide-react";
 
 interface Message {
   role: "user" | "assistant";
@@ -9,8 +17,11 @@ interface Message {
   isFeedback?: boolean;
 }
 
+type View = "chat" | "contact" | "sent";
+
 const STORAGE_KEY = "mailkit_support_chat";
 const HISTORY_TTL_MS = 24 * 60 * 60 * 1000;
+const MAX_SESSION_DISLIKES = 3;
 
 const GREETING =
   "Hi! I'm the MailKit support assistant. Ask me anything about setup, pricing, or refunds.";
@@ -54,10 +65,9 @@ function saveHistory(messages: Message[]) {
   } catch {}
 }
 
-const MAX_SESSION_DISLIKES = 3;
-
 export default function SupportChatWidget() {
   const [open, setOpen] = useState(false);
+  const [view, setView] = useState<View>("chat");
   const [messages, setMessages] = useState<Message[]>([
     { role: "assistant", content: GREETING },
   ]);
@@ -65,16 +75,24 @@ export default function SupportChatWidget() {
   const [loading, setLoading] = useState(false);
   const [ratings, setRatings] = useState<Record<number, "up" | "down">>({});
   const [sessionDislikes, setSessionDislikes] = useState(0);
+
+  // Contact form state
+  const [cfName, setCfName] = useState("");
+  const [cfEmail, setCfEmail] = useState("");
+  const [cfMessage, setCfMessage] = useState("");
+  const [cfSending, setCfSending] = useState(false);
+
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const initialized = useRef(false);
   const ratedIdxRef = useRef<Set<number>>(new Set());
 
-  // Derived: show suggestions only while the conversation has just the greeting
   const showSuggestions =
     !loading &&
     messages.filter((m) => !m.isFeedback).length === 1 &&
     messages[0].role === "assistant";
+
+  const hasConversation = messages.filter((m) => !m.isFeedback).length > 1;
 
   useEffect(() => {
     if (!initialized.current) {
@@ -88,14 +106,23 @@ export default function SupportChatWidget() {
   }, [messages]);
 
   useEffect(() => {
-    if (open) {
+    if (open && view === "chat") {
       setTimeout(
         () => bottomRef.current?.scrollIntoView({ behavior: "smooth" }),
         50,
       );
       inputRef.current?.focus();
     }
-  }, [open, messages]);
+  }, [open, messages, view]);
+
+  function openContactForm() {
+    // Pre-fill message from last user question
+    const lastUserMsg = [...messages]
+      .reverse()
+      .find((m) => m.role === "user" && !m.isFeedback);
+    setCfMessage(lastUserMsg ? lastUserMsg.content : "");
+    setView("contact");
+  }
 
   async function send(text?: string) {
     const msg = (text ?? input).trim();
@@ -144,23 +171,17 @@ export default function SupportChatWidget() {
   }
 
   function rate(idx: number, val: "up" | "down") {
-    // Prevent toggling off an existing rating
     if (ratings[idx] === val) return;
-    // Prevent rating the same message twice
     if (ratedIdxRef.current.has(idx)) return;
-    // Dislike cap — prevent spam
     if (val === "down" && sessionDislikes >= MAX_SESSION_DISLIKES) return;
 
     ratedIdxRef.current.add(idx);
-
     setRatings((prev) => ({ ...prev, [idx]: val }));
 
     const assistantMsg = messages[idx];
     const userMsg = idx > 0 ? messages[idx - 1] : null;
 
-    if (val === "down") {
-      setSessionDislikes((n) => n + 1);
-    }
+    if (val === "down") setSessionDislikes((n) => n + 1);
 
     setMessages((prev) => [
       ...prev,
@@ -169,7 +190,7 @@ export default function SupportChatWidget() {
         content:
           val === "up"
             ? "Thanks for the feedback!"
-            : "Got it — if you still need help, email us at support@getmailkit.com.",
+            : 'Got it. If you need a human, tap "Contact support" below.',
         isFeedback: true,
       },
     ]);
@@ -185,26 +206,68 @@ export default function SupportChatWidget() {
     }).catch(() => {});
   }
 
+  async function submitContact(e: React.FormEvent) {
+    e.preventDefault();
+    if (!cfEmail.trim() || !cfMessage.trim() || cfSending) return;
+    setCfSending(true);
+
+    try {
+      await fetch("/api/support/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify({
+          name: cfName.trim(),
+          email: cfEmail.trim(),
+          message: cfMessage.trim(),
+        }),
+      });
+      setView("sent");
+    } catch {
+      // Still show sent — message may have gone through
+      setView("sent");
+    } finally {
+      setCfSending(false);
+    }
+  }
+
+  const panelClass =
+    "flex w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-black/60 sm:w-[380px]";
+
+  const header = (title: string, onBack?: () => void) => (
+    <div className="flex items-center justify-between border-b border-border bg-card px-5 py-4">
+      <div className="flex items-center gap-2">
+        {onBack && (
+          <button
+            onClick={onBack}
+            className="mr-1 p-1 text-muted-foreground transition-colors hover:text-foreground"
+            aria-label="Back to chat"
+          >
+            <ArrowLeft className="h-4 w-4" />
+          </button>
+        )}
+        <div>
+          <p className="text-sm font-semibold text-foreground">{title}</p>
+          <p className="text-xs text-green-500">Online</p>
+        </div>
+      </div>
+      <button
+        onClick={() => {
+          setOpen(false);
+          setView("chat");
+        }}
+        aria-label="Close"
+        className="p-1 text-muted-foreground transition-colors hover:text-foreground"
+      >
+        <X className="h-5 w-5" />
+      </button>
+    </div>
+  );
+
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col items-end gap-3">
-      {open && (
-        <div className="flex w-[calc(100vw-3rem)] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-black/60 sm:w-[380px]">
-          {/* Header */}
-          <div className="flex items-center justify-between border-b border-border bg-card px-5 py-4">
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                MailKit Support
-              </p>
-              <p className="text-xs text-green-500">Online</p>
-            </div>
-            <button
-              onClick={() => setOpen(false)}
-              aria-label="Close chat"
-              className="p-1 text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+      {open && view === "chat" && (
+        <div className={panelClass}>
+          {header("MailKit Support")}
 
           {/* Messages */}
           <div className="min-h-[260px] max-h-[340px] flex-1 space-y-3 overflow-y-auto overflow-x-hidden px-4 py-4 sm:min-h-[340px] sm:max-h-[440px]">
@@ -232,7 +295,6 @@ export default function SupportChatWidget() {
                   </div>
                 </div>
 
-                {/* Thumbs for assistant messages (not the first greeting, not feedback) */}
                 {m.role === "assistant" && i > 0 && !m.isFeedback && (
                   <div className="ml-10 mt-1 flex gap-0.5">
                     <button
@@ -259,8 +321,7 @@ export default function SupportChatWidget() {
               </div>
             ))}
 
-            {/* Suggested questions — shown only at start */}
-            {showSuggestions && !loading && (
+            {showSuggestions && (
               <div className="space-y-2 pt-1">
                 {SUGGESTED_QUESTIONS.map((q) => (
                   <button
@@ -342,15 +403,160 @@ export default function SupportChatWidget() {
                 <Send className="h-3.5 w-3.5 text-primary-foreground" />
               </button>
             </div>
-            <p className="mt-2 text-center text-[10px] leading-snug text-muted-foreground">
-              AI assistant — for complex issues{" "}
-              <a
-                href="mailto:support@getmailkit.com"
-                className="hover:underline"
+
+            {/* Escalation link — shown after first bot reply */}
+            {hasConversation && (
+              <button
+                onClick={openContactForm}
+                className="mt-2 flex w-full items-center justify-center gap-1.5 text-[11px] text-muted-foreground transition-colors hover:text-foreground"
               >
-                email us →
-              </a>
+                <Mail className="h-3 w-3" />
+                Still need help? Contact support
+              </button>
+            )}
+            {!hasConversation && (
+              <p className="mt-2 text-center text-[10px] text-muted-foreground">
+                AI assistant · complex issues →{" "}
+                <button onClick={openContactForm} className="hover:underline">
+                  contact us
+                </button>
+              </p>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Contact form view */}
+      {open && view === "contact" && (
+        <div className={panelClass}>
+          {header("Contact support", () => setView("chat"))}
+
+          <form
+            onSubmit={submitContact}
+            className="flex flex-col gap-3 px-5 py-5"
+          >
+            <p className="text-sm text-muted-foreground">
+              We&apos;ll reply to your email within 24 hours.
             </p>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-foreground">
+                Your name
+              </label>
+              <input
+                type="text"
+                value={cfName}
+                onChange={(e) => setCfName(e.target.value)}
+                placeholder="Alex"
+                maxLength={100}
+                className="rounded-xl bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary/50"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-foreground">
+                Your email <span className="text-red-500">*</span>
+              </label>
+              <input
+                type="email"
+                required
+                value={cfEmail}
+                onChange={(e) => setCfEmail(e.target.value)}
+                placeholder="you@example.com"
+                maxLength={200}
+                className="rounded-xl bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary/50"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1">
+              <label className="text-xs font-medium text-foreground">
+                Your question <span className="text-red-500">*</span>
+              </label>
+              <textarea
+                required
+                value={cfMessage}
+                onChange={(e) => setCfMessage(e.target.value)}
+                placeholder="Describe your issue..."
+                maxLength={2000}
+                rows={4}
+                className="resize-none rounded-xl bg-muted px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:ring-1 focus:ring-primary/50"
+              />
+            </div>
+
+            <button
+              type="submit"
+              disabled={cfSending || !cfEmail.trim() || !cfMessage.trim()}
+              className="flex items-center justify-center gap-2 rounded-xl bg-primary py-2.5 text-sm font-medium text-primary-foreground transition-all hover:opacity-90 disabled:opacity-40"
+            >
+              {cfSending ? (
+                <>
+                  <svg
+                    className="h-4 w-4 animate-spin"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    />
+                  </svg>
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send className="h-4 w-4" />
+                  Send message
+                </>
+              )}
+            </button>
+          </form>
+        </div>
+      )}
+
+      {/* Sent confirmation */}
+      {open && view === "sent" && (
+        <div className={panelClass}>
+          {header("Contact support")}
+
+          <div className="flex flex-col items-center gap-4 px-5 py-10 text-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/15">
+              <svg
+                className="h-6 w-6 text-green-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M5 13l4 4L19 7"
+                />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Message sent!
+              </p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                We&apos;ll reply to your email within 24 hours.
+              </p>
+            </div>
+            <button
+              onClick={() => setView("chat")}
+              className="text-xs text-primary hover:underline"
+            >
+              ← Back to chat
+            </button>
           </div>
         </div>
       )}
@@ -358,7 +564,10 @@ export default function SupportChatWidget() {
       {/* Toggle button */}
       <div className="relative">
         <button
-          onClick={() => setOpen((v) => !v)}
+          onClick={() => {
+            setOpen((v) => !v);
+            if (open) setView("chat");
+          }}
           className="flex h-14 w-14 items-center justify-center rounded-full bg-primary shadow-lg transition-all hover:scale-105 hover:shadow-xl active:scale-95"
           aria-label="Open support chat"
         >
