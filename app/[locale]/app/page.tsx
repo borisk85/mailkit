@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { AccountSection } from "@/components/app/dashboard/account-section";
+import { DangerZoneSection } from "@/components/app/dashboard/danger-zone-section";
 import { DashboardEmptyState } from "@/components/app/dashboard/empty-state";
 import { PurchasesSection } from "@/components/app/dashboard/purchases-section";
 import { RefundsSection } from "@/components/app/dashboard/refunds-section";
@@ -121,13 +122,11 @@ export default async function AppHome({
         </>
       )}
 
-      <AccountSection
-        email={displayEmail}
-        fullName={fullName}
-        deleteAction={deleteAccountAction}
-      />
+      <AccountSection email={displayEmail} fullName={fullName} />
 
       <ResourcesSection />
+
+      <DangerZoneSection deleteAction={deleteAccountAction} />
     </div>
   );
 }

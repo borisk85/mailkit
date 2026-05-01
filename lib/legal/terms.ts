@@ -98,39 +98,52 @@ By using MailKit, you agree that:
 - You will warm up sender reputation on your domain gradually before
   sending high volumes of email
 
-7. Account suspension
+7. Sending limits
+
+The Service operates on a shared email relay subject to the following
+per-domain rate limits:
+- 500 emails per day
+- 50 emails per hour
+- 5 emails per minute
+
+These limits are enforced automatically. Exceeding them will pause
+outbound delivery for the remainder of the window. For most
+small-business use these limits are not a constraint. If you need
+higher throughput after 30 days of use, contact support@getmailkit.com
+— requests are reviewed individually based on sending history.
+
+8. Account suspension
 
 We reserve the right to suspend or terminate service for any account
 that exhibits signs of abuse, including but not limited to:
 - Bounce rate exceeding 5% over a 7-day rolling window
 - Complaint rate exceeding 0.1% over a 7-day rolling window
-- Sending volume exceeding 500 emails per day per domain without
-  prior arrangement
+- Sending volume that repeatedly hits the daily limit in patterns
+  consistent with bulk or unsolicited email
 - Reports of spam, phishing, or malicious content originating from
   the domain
 
 Suspension may be immediate if abuse signals are severe. Refund
 eligibility follows the refund policy.
 
-8. Data and privacy
+9. Data and privacy
 
 - Your Cloudflare API token is used to configure your domain and is
   discarded after the setup pipeline completes. We do not retain
   copies on our servers.
-- Your Brevo SMTP credentials (username and password) are generated
-  by Brevo and displayed to you during the Gmail Send-As wizard. You
-  paste them directly into Gmail. We do not retain the password after
-  the session ends.
+- Your SMTP credentials are generated and displayed to you during the
+  Gmail Send-As wizard. You paste them directly into Gmail. We do not
+  retain the password after the session ends.
 - We do not read, store, or send emails on your behalf beyond the
   one-time verification process during setup.
 - For detailed security notes see /security.
 
-9. Changes to terms
+10. Changes to terms
 
 We may update these Terms. Changes take effect when posted at /terms.
 Continued use of the Service after changes constitutes acceptance.
 
-10. Governing law
+11. Governing law
 
 These Terms are governed by the laws of the Operator's jurisdiction.
 Disputes should first be addressed to support@getmailkit.com. If
