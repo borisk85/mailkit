@@ -1,7 +1,7 @@
 {
   "metadata": {
     "title": "MailKit — Email on your Cloudflare domain in under 10 minutes",
-    "description": "Already on Cloudflare DNS? Automated Email Routing + Brevo SMTP setup with guided Gmail Send-As. $5 per mailbox."
+    "description": "Already on Cloudflare DNS? Automated Email Routing + Amazon SES SMTP setup with guided Gmail Send-As. $5 per mailbox."
   },
   "landing": {
     "announcementBanner": {
@@ -68,7 +68,7 @@
       "inclusionsHeading": "What's included",
       "inclusions": [
         "Cloudflare Email Routing setup",
-        "Brevo SMTP authentication (sender verification, DKIM signature)",
+        "Amazon SES SMTP setup (sender verification, DKIM signature, SPF, DMARC)",
         "Step-by-step Gmail Send-As walkthrough",
         "Unlimited extra addresses on your domain (no extra charge)",
         "30-day money-back guarantee",
@@ -92,9 +92,9 @@
         "body": "We turn on email routing for your domain and add the records that let it receive mail."
       },
       "step2": {
-        "title": "Brevo SMTP authentication",
+        "title": "Amazon SES SMTP setup",
         "time": "~60 sec",
-        "body": "We register your domain in our Brevo account and add the signature records that prove your email is yours."
+        "body": "We configure Amazon SES for your domain and add the signature records that prove your email is yours."
       },
       "step3": {
         "title": "DNS verification",
@@ -141,7 +141,7 @@
       "subhead": "Two clear guarantees, written in plain language.",
       "automation": {
         "title": "Automation failure",
-        "body": "If our automated setup fails on our end (Cloudflare or Brevo phase) — full refund within 24 hours. Automatic. No request needed.",
+        "body": "If our automated setup fails on our end (Cloudflare or Amazon SES phase) — full refund within 24 hours. Automatic. No request needed.",
         "badge": "Auto-refund"
       },
       "functional": {
@@ -409,13 +409,13 @@
       },
       "done": {
         "title": "Cloudflare is ready",
-        "body": "Your domain now routes {mailbox}@{domain} to Gmail. Next up: Brevo SMTP — coming in Ticket #4b.",
-        "continueCta": "Continue (disabled until #4b)"
+        "body": "Your domain now routes {mailbox}@{domain} to Gmail. Next: we set up Amazon SES so you can send from it.",
+        "continueCta": "Continue to SMTP setup"
       },
       "failed": {
         "title": "Setup failed",
         "body": "We couldn't finish the Cloudflare step. Fix the issue below and restart from Step 1.",
-        "bodyBrevo": "We couldn't finish the Brevo step. Fix the issue below and restart from Step 1.",
+        "bodyBrevo": "We couldn't finish the SMTP setup step. Fix the issue below and restart from Step 1.",
         "restartCta": "Restart from Step 1"
       }
     },
@@ -434,40 +434,40 @@
       "run_corrupt": "Setup run is missing required data; start a new one.",
       "db_insert_failed": "Could not record the setup run. Try again.",
       "unexpected": "Something unexpected happened.",
-      "brevo_invalid_token": "Brevo rejected our API key. Hold tight while we rotate it — nothing for you to do.",
-      "brevo_domain_taken": "Brevo already knows this domain from a previous run — we picked up the existing setup.",
-      "brevo_rate_limited": "Brevo throttled our requests. Retrying shortly.",
-      "brevo_unavailable": "Brevo is temporarily unavailable. Try again in a few minutes.",
-      "brevo_verify_timeout": "Brevo could not verify your domain yet. DNS propagation can take a few minutes — retry soon.",
-      "brevo_state_unrecoverable": "Brevo knows this domain but did not return the DKIM records we need to configure DNS. The existing Brevo entry is in a partial state — please ping support.",
-      "spf_conflict": "Your SPF record ends in -all (strict policy). Soften it to ~all so Brevo can send on your behalf, then retry.",
+      "brevo_invalid_token": "Our SMTP provider rejected the API key. Hold tight while we rotate it — nothing for you to do.",
+      "brevo_domain_taken": "Our SMTP provider already knows this domain from a previous run — we picked up the existing setup.",
+      "brevo_rate_limited": "Our SMTP provider throttled our requests. Retrying shortly.",
+      "brevo_unavailable": "Our SMTP provider is temporarily unavailable. Try again in a few minutes.",
+      "brevo_verify_timeout": "Our SMTP provider could not verify your domain yet. DNS propagation can take a few minutes — retry soon.",
+      "brevo_state_unrecoverable": "Our SMTP provider returned an incomplete setup for this domain. Please ping support.",
+      "spf_conflict": "Your SPF record ends in -all (strict policy). Soften it to ~all so our SMTP relay can send on your behalf, then retry.",
       "dns_write_failed": "We could not write a DNS record cleanly. Details: {details}",
       "brevo_smtp_misconfigured": "Our SMTP relay is not configured yet. This is on us — nothing to fix on your side; ping support if you see this for more than a minute."
     },
     "brevoSteps": {
-      "sender": "Brevo sender domain claimed",
-      "dns": "Brevo DNS records written (DKIM, brevo-code, SPF merged, DMARC)",
-      "verify": "Brevo verified the domain",
+      "sender": "SMTP sender domain registered",
+      "dns": "DNS records written (DKIM, SPF, DMARC)",
+      "verify": "Domain verified by SMTP provider",
       "done": "SMTP ready for your mailbox"
     },
     "brevo": {
-      "continueCta": "Continue to Brevo setup",
-      "continueCtaLoading": "Starting Brevo…",
+      "continueCta": "Continue to SMTP setup",
+      "continueCtaLoading": "Starting SMTP setup…",
       "recheck": {
-        "title": "Waiting for Brevo to verify DNS",
-        "body": "DNS records are in place. Brevo hasn't confirmed them yet — propagation usually takes a few minutes.",
+        "title": "Waiting for DNS verification",
+        "body": "DNS records are in place. Our SMTP provider hasn't confirmed them yet — propagation usually takes a few minutes.",
         "cta": "Re-check verification",
         "ctaLoading": "Checking…"
       },
       "terminal": {
         "title": "Email infrastructure ready",
-        "body": "Brevo now handles outbound mail for {mailbox}@{domain}. One step left — Gmail Send-As.",
+        "body": "Amazon SES now handles outbound mail for {mailbox}@{domain}. One step left — Gmail Send-As.",
         "gmailCta": "Continue to Gmail Send-As →"
       }
     },
     "gmailStep": {
       "title": "Gmail Send-As — coming soon",
-      "body": "This step is Ticket #6. Your Cloudflare routing and Brevo SMTP are already live — you'll plug Gmail in as the last link once the UI lands.",
+      "body": "Your Cloudflare routing and Amazon SES SMTP are ready. This last step connects your Gmail so you can send from {target}.",
       "back": "Back to setup"
     },
     "gmail": {
