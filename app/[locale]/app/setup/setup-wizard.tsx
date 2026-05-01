@@ -925,15 +925,19 @@ function AwaitingVerifyStep({
           );
         })}
       </ol>
-      <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-900 dark:bg-amber-950">
-        <div className="font-medium text-amber-900 dark:text-amber-100">
+      <div
+        className="rounded-md border border-amber-400 bg-amber-50 p-5 text-sm dark:border-amber-600 dark:bg-amber-950"
+        style={{ borderLeftWidth: "4px", borderLeftColor: "rgb(245 158 11)" }}
+      >
+        <div className="flex items-center gap-2 text-base font-semibold text-amber-900 dark:text-amber-100">
+          <AlertCircle className="size-5 shrink-0" aria-hidden />
           {t("step3.awaitingVerify.title")}
         </div>
-        <p className="mt-1 text-amber-900 dark:text-amber-100">
+        <p className="mt-2 text-amber-900 dark:text-amber-100">
           {t("step3.awaitingVerify.body", { email: state.destinationEmail })}
         </p>
         <Button
-          className="mt-3"
+          className="mt-4"
           onClick={onRetry}
           disabled={isPending}
           variant="outline"
