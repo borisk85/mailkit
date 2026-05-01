@@ -13,7 +13,7 @@ import { getDashboardData, type DashboardData } from "@/lib/dashboard-data";
 import { createClient } from "@/lib/supabase/server";
 import { mockDashboardForFixture } from "@/lib/dashboard-mock";
 
-import { deleteAccount } from "./account-actions";
+import { deleteAccount, deleteFailedSetup } from "./account-actions";
 
 /**
  * /app dashboard. Server component — all reads happen here, sections
@@ -116,7 +116,11 @@ export default async function AppHome({
         <DashboardEmptyState />
       ) : (
         <>
-          <SetupsSection setups={data.setups} />
+          <SetupsSection
+            setups={data.setups}
+            sendUsage={data.sendUsage}
+            deleteSetupAction={deleteFailedSetup}
+          />
           <PurchasesSection purchases={data.purchases} refunds={data.refunds} />
           <RefundsSection refunds={data.refunds} />
         </>

@@ -6,11 +6,14 @@ import {
   setupDetailLabel,
   setupOverallState,
   type DashboardSetup,
+  type SendUsage,
   type SetupOverallState,
 } from "@/lib/dashboard-data";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
+import { DeleteSetupButton } from "./delete-setup-button";
+import { SendingLimitsWidget } from "./sending-limits-widget";
 import { StatusBadge } from "./status-badge";
 
 const stateTone: Record<
@@ -37,7 +40,15 @@ const stateTone: Record<
  * and desktop (two-column grid). No table — setups are usually 1-3
  * rows for the MVP, table shape buys nothing here.
  */
-export function SetupsSection({ setups }: { setups: DashboardSetup[] }) {
+export function SetupsSection({
+  setups,
+  sendUsage,
+  deleteSetupAction,
+}: {
+  setups: DashboardSetup[];
+  sendUsage: SendUsage[];
+  deleteSetupAction: (runId: string) => Promise<void>;
+}) {
   const t = useTranslations("dashboard.setups");
 
   if (setups.length === 0) return null;
@@ -51,6 +62,7 @@ export function SetupsSection({ setups }: { setups: DashboardSetup[] }) {
         {setups.map((setup) => {
           const state = setupOverallState(setup);
           const tone = stateTone[state];
+          const usage = sendUsage.find((u) => u.domain === setup.domain);
           return (
             <Card key={setup.id}>
               <CardContent className="space-y-3 p-4">
@@ -87,11 +99,18 @@ export function SetupsSection({ setups }: { setups: DashboardSetup[] }) {
                 ) : null}
                 <div className="flex items-center gap-2">
                   {isSetupReSetupEligible(setup) ? (
-                    <Link href="/app/setup">
-                      <Button size="sm" variant="default">
-                        {t("actions.reSetup")}
-                      </Button>
-                    </Link>
+                    <>
+                      <Link href="/app/setup">
+                        <Button size="sm" variant="default">
+                          {t("actions.reSetup")}
+                        </Button>
+                      </Link>
+                      <DeleteSetupButton
+                        runId={setup.id}
+                        domain={setup.domain}
+                        deleteAction={deleteSetupAction}
+                      />
+                    </>
                   ) : state === "done" ? (
                     <Link href="/app/setup">
                       <Button size="sm" variant="outline">
@@ -106,6 +125,9 @@ export function SetupsSection({ setups }: { setups: DashboardSetup[] }) {
                     </Link>
                   )}
                 </div>
+                {state === "done" && usage && (
+                  <SendingLimitsWidget usage={usage} />
+                )}
               </CardContent>
             </Card>
           );

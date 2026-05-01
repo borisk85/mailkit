@@ -29,6 +29,7 @@ const EMPTY: DashboardData = {
   setups: [],
   purchases: [],
   refunds: [],
+  sendUsage: [],
 };
 
 const ACTIVE: DashboardData = {
@@ -60,6 +61,7 @@ const ACTIVE: DashboardData = {
     },
   ],
   refunds: [],
+  sendUsage: [],
 };
 
 const DONE: DashboardData = {
@@ -76,6 +78,7 @@ const DONE: DashboardData = {
   ],
   purchases: ACTIVE.purchases,
   refunds: [],
+  sendUsage: [],
 };
 
 const FAILED_REFUNDED: DashboardData = {
@@ -118,6 +121,7 @@ const FAILED_REFUNDED: DashboardData = {
       createdAt: YESTERDAY,
     },
   ],
+  sendUsage: [],
 };
 
 const FIXTURES: Record<string, DashboardData> = {

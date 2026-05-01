@@ -53,3 +53,32 @@ export async function deleteAccount(): Promise<void> {
     // Ignore — session is already invalid server-side.
   }
 }
+
+/**
+ * #DASH-3 — Delete a single failed setup_run. Only the owner can
+ * delete their own runs; the RLS policy enforces this via the
+ * user-session client check below.
+ */
+export async function deleteFailedSetup(runId: string): Promise<void> {
+  const supabase = await createClient();
+  const {
+    data: { user },
+    error: authErr,
+  } = await supabase.auth.getUser();
+
+  if (authErr || !user) {
+    throw new Error("Not authenticated");
+  }
+
+  const admin = createServiceClient();
+  const { error } = await admin
+    .from("setup_runs")
+    .delete()
+    .eq("id", runId)
+    .eq("user_id", user.id)
+    .eq("status", "failed");
+
+  if (error) {
+    throw new Error(`Failed to delete setup: ${error.message}`);
+  }
+}

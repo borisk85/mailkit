@@ -2,6 +2,11 @@ import "server-only";
 
 import type { createClient } from "@/lib/supabase/server";
 import { friendlyErrorMessage } from "@/lib/error-messages";
+import {
+  currentWindowBuckets,
+  DEFAULT_SEND_LIMITS,
+  type WindowType,
+} from "@/lib/send-limits";
 
 type SsrClient = Awaited<ReturnType<typeof createClient>>;
 
@@ -79,10 +84,18 @@ export type DashboardRefund = {
   createdAt: string;
 };
 
+export type SendUsage = {
+  domain: string;
+  day: { count: number; limit: number };
+  hour: { count: number; limit: number };
+  minute: { count: number; limit: number };
+};
+
 export type DashboardData = {
   setups: DashboardSetup[];
   purchases: DashboardPurchase[];
   refunds: DashboardRefund[];
+  sendUsage: SendUsage[];
 };
 
 /** UI-facing setup state — collapses the 14-status enum into 4 buckets
@@ -105,6 +118,9 @@ export async function getDashboardData(
   supabase: SsrClient,
   userId: string,
 ): Promise<DashboardData> {
+  const now = new Date();
+  const buckets = currentWindowBuckets(now);
+
   const [setupsRes, purchasesRes, refundsRes] = await Promise.all([
     supabase
       .from("setup_runs")
@@ -199,7 +215,49 @@ export async function getDashboardData(
       notes: r.notes,
       createdAt: r.created_at,
     })),
+    sendUsage: await fetchSendUsage(supabase, setupsRaw, buckets),
   };
+}
+
+async function fetchSendUsage(
+  supabase: SsrClient,
+  setups: Array<{ domain: string; status: string }>,
+  buckets: Record<WindowType, string>,
+): Promise<SendUsage[]> {
+  const activeDomains = setups
+    .filter((s) => s.status === "done")
+    .map((s) => s.domain);
+
+  if (activeDomains.length === 0) return [];
+
+  const { data } = await supabase
+    .from("send_counters")
+    .select("domain, window_type, window_start, count")
+    .in("domain", activeDomains)
+    .in("window_type", ["day", "hour", "minute"] as WindowType[])
+    .in("window_start", Object.values(buckets));
+
+  const rows = (data ?? []) as Array<{
+    domain: string;
+    window_type: WindowType;
+    window_start: string;
+    count: number;
+  }>;
+
+  return activeDomains.map((domain) => {
+    const domainRows = rows.filter((r) => r.domain === domain);
+    const get = (w: WindowType) =>
+      domainRows.find(
+        (r) => r.window_type === w && r.window_start === buckets[w],
+      )?.count ?? 0;
+
+    return {
+      domain,
+      day: { count: get("day"), limit: DEFAULT_SEND_LIMITS.day },
+      hour: { count: get("hour"), limit: DEFAULT_SEND_LIMITS.hour },
+      minute: { count: get("minute"), limit: DEFAULT_SEND_LIMITS.minute },
+    };
+  });
 }
 
 /**
