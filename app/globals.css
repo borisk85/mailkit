@@ -79,43 +79,39 @@ html {
 }
 
 :root {
-  /* Light mode tokens (premium pass §1.1) */
-  --surface-base: #fafafa;
-  --surface-elevated: #ffffff;
-  /* Light mode has no extra step — already pure white on base; this
-   * alias keeps the dual-mode token surface symmetric for components. */
-  --surface-elevated-2: #ffffff;
-  --mk-border-subtle: #e4e4e7;
-  --mk-border-strong: #d4d4d8;
-  --mk-text-primary: #0a0a0b;
-  --mk-text-secondary: #52525b;
-  --mk-text-tertiary: #71717a;
-  --mk-accent: #7c5cff;
-  --mk-accent-hover: #6b4fe6;
-  --mk-success: #22c55e;
-  --mk-warning: #f59e0b;
-  --mk-danger: #ef4444;
+  /* Light mode tokens — warm neutral base, layered surfaces, clear depth */
+  --surface-base: #f5f4f1; /* warm off-white, not blinding pure white */
+  --surface-elevated: #faf9f7; /* cards lift off base with warmth */
+  --surface-elevated-2: #ffffff; /* topmost layer — forms, modals */
+  --mk-border-subtle: #e0ded8; /* warm gray border, visible but quiet */
+  --mk-border-strong: #cbc9c2; /* heavier border for inputs, separators */
+  --mk-text-primary: #1a1916; /* near-black with warm undertone */
+  --mk-text-secondary: #4a4844; /* warm mid-gray */
+  --mk-text-tertiary: #6e6c67; /* muted label gray */
+  --mk-accent: #6b4fe6; /* slightly deeper purple — pops on light */
+  --mk-accent-hover: #5a40cc;
+  --mk-success: #16a34a; /* deeper green — readable on light */
+  --mk-warning: #d97706;
+  --mk-danger: #dc2626;
 
-  /* shadcn primitives mapped to premium tokens — components like
-   * Button/Card/Dialog use these var names internally, so updating
-   * here cascades site-wide without touching ui/* files. */
+  /* shadcn primitives mapped to premium tokens */
   --background: var(--surface-base);
   --foreground: var(--mk-text-primary);
   --card: var(--surface-elevated);
   --card-foreground: var(--mk-text-primary);
-  --popover: var(--surface-elevated);
+  --popover: var(--surface-elevated-2);
   --popover-foreground: var(--mk-text-primary);
   --primary: var(--mk-accent);
   --primary-foreground: #ffffff;
   --secondary: var(--surface-elevated);
   --secondary-foreground: var(--mk-text-primary);
-  --muted: #f4f4f5;
+  --muted: #eceae5; /* warm muted surface — noticeably different from base */
   --muted-foreground: var(--mk-text-secondary);
-  --accent: #f4f4f5;
+  --accent: #eceae5;
   --accent-foreground: var(--mk-text-primary);
   --destructive: var(--mk-danger);
   --border: var(--mk-border-subtle);
-  --input: var(--mk-border-subtle);
+  --input: var(--mk-border-strong);
   --ring: var(--mk-accent);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
