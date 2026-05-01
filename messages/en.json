@@ -236,6 +236,11 @@
           "id": "workspace-support",
           "q": "Do you support Google Workspace mailboxes?",
           "a": "Not at launch. The Gmail Send-As walkthrough is built for personal @gmail.com accounts — Workspace admins can already create domain mailboxes natively without Mailkit. If there's enough demand, Workspace support is on the post-launch roadmap."
+        },
+        {
+          "id": "sending-limits",
+          "q": "What are the sending limits?",
+          "a": "500 emails per day, 50 per hour, 5 per minute — per domain. These are standard limits on our shared email relay. For most small-business use, you'll never hit them. If you need higher throughput after your first month, email support@getmailkit.com — we review requests individually."
         }
       ]
     },
@@ -345,6 +350,17 @@
       "guarantee": "Refund guarantee",
       "support": "Email support",
       "supportAddress": "support@getmailkit.com"
+    },
+    "dangerZone": {
+      "title": "Danger zone",
+      "description": "Permanently delete your account and all associated data.",
+      "deleteCta": "Delete account",
+      "deleteConfirm": {
+        "title": "Delete your account?",
+        "body": "This removes your profile, setup history, and purchase records from MailKit. Your DNS records and Gmail Send-As setup stay unchanged — those live in Cloudflare and Gmail. This cannot be undone.",
+        "confirmCta": "Delete account",
+        "cancel": "Cancel"
+      }
     }
   },
   "setup": {

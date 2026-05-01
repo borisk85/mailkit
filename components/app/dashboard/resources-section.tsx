@@ -20,7 +20,7 @@ export function ResourcesSection() {
         <li>
           <Link
             href="/terms"
-            className="text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-300"
+            className="text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
             {t("terms")}
           </Link>
@@ -28,7 +28,7 @@ export function ResourcesSection() {
         <li>
           <Link
             href="/privacy"
-            className="text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-300"
+            className="text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
             {t("privacy")}
           </Link>
@@ -36,7 +36,7 @@ export function ResourcesSection() {
         <li>
           <Link
             href="/guarantee"
-            className="text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-300"
+            className="text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
             {t("guarantee")}
           </Link>
@@ -44,7 +44,7 @@ export function ResourcesSection() {
         <li>
           <a
             href={`mailto:${supportAddress}`}
-            className="text-zinc-700 underline-offset-4 hover:underline dark:text-zinc-300"
+            className="text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
             {t("support")}
           </a>
