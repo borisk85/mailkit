@@ -424,10 +424,8 @@ export default function SupportChatWidget() {
             )}
             {!hasConversation && (
               <p className="mt-2 text-center text-[10px] text-muted-foreground">
-                AI assistant · complex issues →{" "}
-                <button onClick={openContactForm} className="hover:underline">
-                  contact us
-                </button>
+                AI assistant · answers questions about setup, pricing, and
+                refunds.
               </p>
             )}
           </div>
