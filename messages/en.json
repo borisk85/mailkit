@@ -161,6 +161,7 @@
     "faq": {
       "eyebrow": "Common questions",
       "heading": "Everything you'd ask before paying $5.",
+      "seeAll": "See all {count} questions →",
       "items": [
         {
           "id": "cf-required",
@@ -190,32 +191,27 @@
         {
           "id": "cost",
           "q": "Do I have to keep paying every month?",
-          "a": "No. Mailkit is a one-time $5 fee per mailbox — no subscription, no recurring charges. That covers the full automated setup: Cloudflare Email Routing for receiving, Brevo SMTP for sending, and the step-by-step Gmail Send-As walkthrough. Compared to Google Workspace at $6/user/month ($72 a year per mailbox), Mailkit is a one-and-done payment."
+          "a": "No. MailKit is a one-time $5 fee per mailbox — no subscription, no recurring charges. That covers the full automated setup: Cloudflare Email Routing for receiving, Amazon SES SMTP for sending, and the step-by-step Gmail Send-As walkthrough. Compared to Google Workspace at $6/user/month ($72 a year per mailbox), MailKit is a one-and-done payment."
         },
         {
           "id": "duration",
           "q": "Can I do this myself for free?",
-          "a": "Yes — by hand it takes 60–90 minutes for an experienced engineer and 3+ hours for everyone else, juggling Cloudflare Email Routing, Brevo SMTP, five DNS records (MX, SPF, DKIM signature, DMARC policy, Brevo verification) and the Gmail Send-As setup. Mailkit collapses that into under 10 minutes for $5: ~15 sec for the Cloudflare phase, ~60 sec for Brevo, ~3 min of copy-paste in Gmail."
+          "a": "Yes — but expect an evening of documentation and wrong turns. You'd navigate Cloudflare Email Routing, Amazon SES SMTP configuration, five DNS records (MX, SPF, DKIM, DMARC, SES domain verification), and the Gmail Send-As setup — each requiring its own guide, its own dashboard, and a wait to see if the change took effect. MailKit automates the Amazon SES piece — the most technically involved part — and guides you step by step through the rest."
         },
         {
           "id": "vs-workspace",
           "q": "How is this different from Google Workspace?",
-          "a": "Google Workspace gives you a separate inbox at $6/user/month forever — a new mailbox to check, a separate password, full migration if you stop paying. Mailkit configures your existing Gmail to send and receive from your domain via Gmail Send-As. Same Gmail inbox, no migration, no monthly fee. The trade-off: with Mailkit your domain email lives inside your personal Gmail, not in a Workspace tenant."
+          "a": "Google Workspace gives you a separate inbox at $6/user/month forever — a new mailbox to check, a separate password, full migration if you stop paying. MailKit configures your existing Gmail to send and receive from your domain via Gmail Send-As. Same Gmail inbox, no migration, no monthly fee. The trade-off: with MailKit your domain email lives inside your personal Gmail, not in a Workspace tenant."
         },
         {
           "id": "fail",
           "q": "What happens if the setup fails halfway?",
-          "a": "If our Cloudflare or Brevo automation fails, we issue an automatic full refund within 24 hours. The dashboard shows you which step failed and why. If you'd like to retry once we've fixed our side, we'll let you know — no extra charge if the failure was on our end."
-        },
-        {
-          "id": "registrar",
-          "q": "Does it work with my domain registered at Namecheap, GoDaddy, or other registrars?",
-          "a": "MailKit currently requires Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace or another registrar, you need to migrate nameservers to Cloudflare first (free, about 30 minutes plus DNS propagation). After migration, MailKit setup runs in under 10 minutes."
+          "a": "If our Cloudflare or Amazon SES automation fails, we issue an automatic full refund within 24 hours. The dashboard shows you which step failed and why. If you'd like to retry once we've fixed our side, we'll let you know — no extra charge if the failure was on our end."
         },
         {
           "id": "manual-step",
           "q": "Why doesn't Mailkit fully automate the Gmail step?",
-          "a": "The Gmail API method that adds Send-As entries (gmail.settings.sendAs.create) is blocked on personal @gmail.com accounts — it requires Google Workspace with domain-wide delegation. We made that part a 3-minute guided walkthrough with copy-paste values instead. The other technical parts (Cloudflare + Brevo + DNS) are fully automated."
+          "a": "The Gmail API method that adds Send-As entries (gmail.settings.sendAs.create) is blocked on personal @gmail.com accounts — it requires Google Workspace with domain-wide delegation. We made that part a 3-minute guided walkthrough with copy-paste values instead. The other technical parts (Cloudflare + Amazon SES + DNS) are fully automated."
         },
         {
           "id": "token-safety",
@@ -225,12 +221,12 @@
         {
           "id": "spam",
           "q": "Why might my emails go to spam?",
-          "a": "Mailkit configures technically correct SPF policy, DKIM signature, and DMARC authentication. Whether email lands in a specific recipient's inbox depends on sender reputation, content, sending practices, and the recipient's policies — all outside Mailkit's control. Domain warmup, recipient list hygiene, and consent compliance are the sender's job. Practical advice: send 10–20 emails per day in the first week from a fresh domain, then ramp up gradually."
+          "a": "MailKit configures technically correct SPF policy, DKIM signature, and DMARC authentication. Whether email lands in a specific recipient's inbox depends on sender reputation, content, sending practices, and the recipient's policies — all outside MailKit's control. Domain warmup, recipient list hygiene, and consent compliance are the sender's job. Practical advice: send 10–20 emails per day in the first week from a fresh domain, then ramp up gradually."
         },
         {
           "id": "improvmx",
           "q": "How is this different from ImprovMX?",
-          "a": "Mailkit replaces the receiving piece (ImprovMX forwarding) with Cloudflare Email Routing and adds outbound sending via Brevo SMTP through Gmail Send-As — ImprovMX's free tier doesn't do outbound. You'll need to remove the existing MX records on your domain before setup; our wizard detects conflicts and tells you exactly which records block the run."
+          "a": "MailKit replaces the receiving piece (ImprovMX forwarding) with Cloudflare Email Routing and adds outbound sending via Amazon SES SMTP through Gmail Send-As — ImprovMX's free tier doesn't do outbound. You'll need to remove the existing MX records on your domain before setup; our wizard detects conflicts and tells you exactly which records block the run."
         },
         {
           "id": "workspace-support",

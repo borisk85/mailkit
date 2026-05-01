@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import {
@@ -7,22 +8,12 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-/**
- * FAQ — premium-pass refresh per UI_REVIEW_BRIEF §2.9. Trimmed from
- * 19 to 10 highest-priority questions per architect — the long tail
- * read as FAQ-stuffing for SEO. The remaining ten are the questions
- * a buyer actually asks before paying $5: cost, time-vs-DIY,
- * vs-Workspace, registrar compatibility, ImprovMX migration, why the
- * Gmail step is manual, what happens on failure, deliverability
- * caveat, token safety, and refund process.
- *
- * shadcn Accordion stays — the open state now carries an accent
- * left-border (3px) per the brief, achieved via the data-state
- * selector on AccordionItem in globals.css extension.
- */
-export function FaqSection() {
+export function FaqSection({ previewCount }: { previewCount?: number } = {}) {
   const t = useTranslations("landing.faq");
   const items = t.raw("items") as Array<{ id: string; q: string; a: string }>;
+  const displayed =
+    previewCount !== undefined ? items.slice(0, previewCount) : items;
+  const hasMore = previewCount !== undefined && items.length > previewCount;
 
   return (
     <section id="faq" className="w-full" aria-labelledby="faq-heading">
@@ -38,7 +29,7 @@ export function FaqSection() {
         </div>
 
         <Accordion className="mt-16 flex w-full flex-col gap-2">
-          {items.map((item) => (
+          {displayed.map((item) => (
             <AccordionItem
               key={item.id}
               value={item.id}
@@ -53,6 +44,17 @@ export function FaqSection() {
             </AccordionItem>
           ))}
         </Accordion>
+
+        {hasMore && (
+          <div className="mt-10 text-center">
+            <Link
+              href="/faq"
+              className="mk-body inline-flex items-center gap-1 font-medium text-mk-accent underline underline-offset-4 transition-opacity hover:opacity-70"
+            >
+              {t("seeAll", { count: items.length })}
+            </Link>
+          </div>
+        )}
       </div>
     </section>
   );

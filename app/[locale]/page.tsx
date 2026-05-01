@@ -42,7 +42,7 @@ export default async function LandingPage({
         <HowItWorksSection />
         <PricingSection />
         <TrustSection />
-        <FaqSection />
+        <FaqSection previewCount={5} />
         <FinalCtaSection />
       </main>
       <Footer />
