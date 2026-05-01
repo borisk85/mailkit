@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 
 import {
   isSetupReSetupEligible,
+  setupDetailLabel,
   setupOverallState,
   type DashboardSetup,
   type SetupOverallState,
@@ -64,6 +65,11 @@ export function SetupsSection({ setups }: { setups: DashboardSetup[] }) {
                         {new Date(setup.createdAt).toLocaleDateString("en")}
                       </time>
                     </p>
+                    {setupDetailLabel(setup.status) ? (
+                      <p className="mt-1 text-xs text-mk-text-secondary">
+                        {setupDetailLabel(setup.status)}
+                      </p>
+                    ) : null}
                   </div>
                   <StatusBadge tone={tone}>{t(`status.${state}`)}</StatusBadge>
                 </div>

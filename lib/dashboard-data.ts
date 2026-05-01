@@ -248,6 +248,45 @@ export function isSetupReSetupEligible(setup: {
 }
 
 /**
+ * #DASH-2 — granular one-line status description shown beneath the
+ * badge in setup cards. Returns null for terminal states (done/failed)
+ * where the badge + errorMsg carry enough context.
+ */
+export function setupDetailLabel(status: SetupStatus): string | null {
+  switch (status) {
+    case "started":
+      return "Starting setup…";
+    case "cf_routing_enabled":
+      return "Cloudflare Email Routing enabled";
+    case "cf_dns_written":
+      return "DNS records written (MX, SPF, DMARC)";
+    case "cf_awaiting_destination_verify":
+      return "Check your Gmail for a Cloudflare verification email";
+    case "cf_rule_created":
+      return "Cloudflare routing rule created";
+    case "cf_done":
+      return "Cloudflare phase complete";
+    case "brevo_sender_created":
+      return "SMTP sender registered";
+    case "brevo_dns_written":
+      return "Authentication records added — waiting for DNS propagation";
+    case "brevo_verified":
+      return "DNS records verified";
+    case "brevo_done":
+      return "SMTP phase complete";
+    case "gmail_instructions_shown":
+      return "Open setup to complete the Gmail Send-As step";
+    case "gmail_smtp_ready":
+      return "Paste the four lines into Gmail to finish";
+    case "gmail_send_as_verified":
+      return "Gmail Send-As confirmed";
+    case "done":
+    case "failed":
+      return null;
+  }
+}
+
+/**
  * Format an amount_cents + currency as a UI string. Both EN and RU
  * dashboards display the same numeric format ("$5.00"), only the
  * surrounding labels are translated. Currency is uppercased to

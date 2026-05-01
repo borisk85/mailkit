@@ -1,15 +1,14 @@
+"use client";
+
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-/**
- * Section: links to legal pages + support email. /terms, /privacy
- * and /guarantee are the three SSG legal surfaces — all three
- * routes are live.
- */
+function openSupportChat() {
+  window.dispatchEvent(new CustomEvent("mailkit:open-support"));
+}
+
 export function ResourcesSection() {
   const t = useTranslations("dashboard.resources");
-
-  const supportAddress = t("supportAddress");
 
   return (
     <section className="space-y-3">
@@ -42,12 +41,12 @@ export function ResourcesSection() {
           </Link>
         </li>
         <li>
-          <a
-            href={`mailto:${supportAddress}`}
+          <button
+            onClick={openSupportChat}
             className="text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
             {t("support")}
-          </a>
+          </button>
         </li>
       </ul>
     </section>
