@@ -415,7 +415,7 @@
       "failed": {
         "title": "Setup failed",
         "body": "We couldn't finish the Cloudflare step. Fix the issue below and restart from Step 1.",
-        "bodyBrevo": "We couldn't finish the SMTP setup step. Fix the issue below and restart from Step 1.",
+        "bodySmtp": "We couldn't finish the SMTP setup step. Fix the issue below and restart from Step 1.",
         "restartCta": "Restart from Step 1"
       }
     },
@@ -434,23 +434,28 @@
       "run_corrupt": "Setup run is missing required data; start a new one.",
       "db_insert_failed": "Could not record the setup run. Try again.",
       "unexpected": "Something unexpected happened.",
-      "brevo_invalid_token": "Our SMTP provider rejected the API key. Hold tight while we rotate it — nothing for you to do.",
-      "brevo_domain_taken": "Our SMTP provider already knows this domain from a previous run — we picked up the existing setup.",
-      "brevo_rate_limited": "Our SMTP provider throttled our requests. Retrying shortly.",
-      "brevo_unavailable": "Our SMTP provider is temporarily unavailable. Try again in a few minutes.",
-      "brevo_verify_timeout": "Our SMTP provider could not verify your domain yet. DNS propagation can take a few minutes — retry soon.",
-      "brevo_state_unrecoverable": "Our SMTP provider returned an incomplete setup for this domain. Please ping support.",
+      "smtp_invalid_token": "Our SMTP provider rejected the API key. Hold tight while we rotate it — nothing for you to do.",
+      "smtp_domain_taken": "Our SMTP provider already knows this domain from a previous run — we picked up the existing setup.",
+      "smtp_rate_limited": "Our SMTP provider throttled our requests. Retrying shortly.",
+      "smtp_unavailable": "Our SMTP provider is temporarily unavailable. Try again in a few minutes.",
+      "smtp_verify_timeout": "Our SMTP provider could not verify your domain yet. DNS propagation can take a few minutes — retry soon.",
+      "smtp_state_unrecoverable": "Our SMTP provider returned an incomplete setup for this domain. Please ping support.",
       "spf_conflict": "Your SPF record ends in -all (strict policy). Soften it to ~all so our SMTP relay can send on your behalf, then retry.",
       "dns_write_failed": "We could not write a DNS record cleanly. Details: {details}",
-      "brevo_smtp_misconfigured": "Our SMTP relay is not configured yet. This is on us — nothing to fix on your side; ping support if you see this for more than a minute."
+      "smtp_misconfigured": "Our SMTP relay is not configured yet. This is on us — nothing to fix on your side; ping support if you see this for more than a minute.",
+      "postmark_invalid_token": "Our SMTP provider rejected the API key. Hold tight while we rotate it — nothing for you to do.",
+      "postmark_domain_taken": "Our SMTP provider already knows this domain from a previous run — we picked up the existing setup.",
+      "postmark_rate_limited": "Our SMTP provider throttled our requests. Retrying shortly.",
+      "postmark_unavailable": "Our SMTP provider is temporarily unavailable. Try again in a few minutes.",
+      "postmark_dkim_timeout": "DKIM verification timed out. DNS propagation can take a few minutes — retry soon."
     },
-    "brevoSteps": {
+    "smtpSteps": {
       "sender": "SMTP sender domain registered",
       "dns": "DNS records written (DKIM, SPF, DMARC)",
       "verify": "Domain verified by SMTP provider",
       "done": "SMTP ready for your mailbox"
     },
-    "brevo": {
+    "smtp": {
       "continueCta": "Continue to SMTP setup",
       "continueCtaLoading": "Starting SMTP setup…",
       "recheck": {

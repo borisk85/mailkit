@@ -1,8 +1,13 @@
 import "server-only";
 
-import type { SmtpDisplay } from "@/lib/integrations/brevo-smtp";
-
-export { SmtpDisplay };
+export type SmtpDisplay = {
+  host: string;
+  port: number;
+  username: string;
+  password: string;
+  securityMode: "starttls" | "ssl";
+  keyVersion: number;
+};
 
 export class PostmarkSmtpConfigError extends Error {
   constructor(message: string) {
@@ -13,7 +18,7 @@ export class PostmarkSmtpConfigError extends Error {
 
 /**
  * Build per-customer SMTP display from the customer's Postmark Server API token.
- * Unlike Brevo (shared account credentials), every Postmark Server has its own
+ * Unlike Postmark (shared account credentials), every Postmark Server has its own
  * token which doubles as both SMTP username and password.
  */
 export function buildPostmarkSmtpDisplay(serverToken: string): SmtpDisplay {

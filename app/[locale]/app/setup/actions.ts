@@ -14,16 +14,6 @@ import {
 } from "@/lib/integrations/cloudflare-dns-upsert";
 import { addSpfInclude, SpfMergeHardFail } from "@/lib/integrations/dns-merge";
 import {
-  BrevoError,
-  createBrevoClient,
-  type SenderDomain,
-} from "@/lib/integrations/brevo";
-import {
-  BrevoSmtpConfigError,
-  loadSmtpDisplay,
-  type SmtpDisplay,
-} from "@/lib/integrations/brevo-smtp";
-import {
   PostmarkError,
   createPostmarkAccountClient,
   type PostmarkDomain,
@@ -32,6 +22,7 @@ import {
 import {
   PostmarkSmtpConfigError,
   buildPostmarkSmtpDisplay,
+  type SmtpDisplay,
 } from "@/lib/integrations/postmark-smtp";
 import { triggerAutoRefund } from "@/lib/auto-refund";
 import { checkPhishingPattern } from "@/lib/phishing";
@@ -58,11 +49,11 @@ const STEP = {
   createDestination: "create_destination",
   listRules: "list_rules",
   createRule: "create_rule",
-  brevoCreateSender: "brevo_create_sender",
-  brevoDnsUpsert: "brevo_dns_upsert",
-  brevoSpfMerge: "brevo_spf_merge",
-  brevoVerify: "brevo_verify",
-  brevoFinalize: "brevo_finalize",
+  smtpCreateSender: "brevo_create_sender",
+  smtpDnsUpsert: "brevo_dns_upsert",
+  smtpSpfMerge: "brevo_spf_merge",
+  smtpVerify: "brevo_verify",
+  smtpFinalize: "brevo_finalize",
   gmailPrepare: "gmail_prepare",
   gmailConfirm: "gmail_confirm",
 } as const;
@@ -226,7 +217,7 @@ async function failRun(
     .eq("id", runId);
 
   // Auto-refund on the subset of steps where the failure is clearly
-  // our infra's fault (cf_* + brevo_* per lib/refund-policy.ts).
+  // our infra's fault (cf_* + smtp_* per lib/refund-policy.ts).
   // Policy-gated inside triggerAutoRefund; noop for gmail_* / start /
   // list_zones steps. Errors are swallowed inside the trigger — failing
   // the refund must not cascade into the failing action's caller.
@@ -663,7 +654,6 @@ async function patchRun(
 
 function errMsg(e: unknown): string {
   if (e instanceof CloudflareError) return `${e.code}: ${e.message}`;
-  if (e instanceof BrevoError) return `brevo ${e.code}: ${e.message}`;
   if (e instanceof PostmarkError) return `postmark ${e.code}: ${e.message}`;
   if (e instanceof SpfMergeHardFail) return `spf_hard_fail: ${e.message}`;
   if (e instanceof DnsUpsertError) return `dns_upsert: ${e.message}`;
@@ -716,20 +706,20 @@ function mapPostmarkError(e: unknown): ActionError {
 }
 
 /* ------------------------------------------------------------------ *
- * Ticket #4b — Brevo continuation
+ * Ticket #4b — SMTP backend setup (Postmark)
  * ------------------------------------------------------------------ */
 
-const BREVO_RESUMABLE = new Set([
+const SMTP_RESUMABLE = new Set([
   "cf_done",
   "brevo_sender_created",
   "brevo_dns_written",
   "brevo_verified",
 ]);
 
-// Statuses past brevo_done — Brevo already finished, continueBrevoSetup
+// Statuses past brevo_done — setup already finished, continueSmtpSetup
 // is a no-op idempotent "already done" response so a stale click from
 // the CTA does not reject with run_wrong_state.
-const BREVO_ALREADY_DONE = new Set([
+const SMTP_ALREADY_DONE = new Set([
   "brevo_done",
   "gmail_instructions_shown",
   "gmail_smtp_ready",
@@ -737,13 +727,10 @@ const BREVO_ALREADY_DONE = new Set([
   "done",
 ]);
 
-const BREVO_VERIFY_POLL_DELAYS_MS = [2000, 4000, 8000] as const;
-const BREVO_SPF_INCLUDE_HOST = "spf.brevo.com";
-
 const POSTMARK_SPF_INCLUDE_HOST = "spf.mtasv.net";
 const POSTMARK_DKIM_VERIFY_POLL_DELAYS_MS = [3000, 5000, 10000] as const;
 
-type BrevoOk = {
+type SmtpSetupOk = {
   status: "ok";
   runId: string;
   runStatus:
@@ -753,67 +740,16 @@ type BrevoOk = {
     | "brevo_done";
 };
 
-const brevoContinueSchema = z.object({
+const smtpContinueSchema = z.object({
   runId: z.string().uuid(),
   cfToken: z.string().min(20).max(200),
 });
 
-function mapBrevoError(e: unknown): ActionError {
-  if (e instanceof SpfMergeHardFail) {
-    return {
-      status: "error",
-      errorKey: "setup.errors.spf_conflict",
-      details: { message: e.message },
-    };
-  }
-  if (e instanceof DnsUpsertError) {
-    return {
-      status: "error",
-      errorKey: "setup.errors.dns_write_failed",
-      details: { message: e.message },
-    };
-  }
-  if (e instanceof BrevoError) {
-    const http = e.httpStatus;
-    const code = String(e.code).toLowerCase();
-    if (http === 401 || http === 403 || code === "unauthorized") {
-      return { status: "error", errorKey: "setup.errors.brevo_invalid_token" };
-    }
-    if (http === 429) {
-      return { status: "error", errorKey: "setup.errors.brevo_rate_limited" };
-    }
-    if (http >= 500) {
-      return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
-    }
-    // Brevo returns HTTP 404 on some duplicate scenarios (observed during
-    // live smoke 2026-04-22) — the code string is a more reliable signal
-    // than status. Match regardless of http.
-    if (
-      code === "duplicate_parameter" ||
-      code === "duplicate" ||
-      /already exists|already registered/i.test(e.message)
-    ) {
-      return { status: "error", errorKey: "setup.errors.brevo_domain_taken" };
-    }
-    if (code === "missing_records") {
-      return {
-        status: "error",
-        errorKey: "setup.errors.brevo_state_unrecoverable",
-      };
-    }
-    return { status: "error", errorKey: "setup.errors.brevo_unavailable" };
-  }
-  if (e instanceof CloudflareError) {
-    return mapCfError(e);
-  }
-  return { status: "error", errorKey: "setup.errors.unexpected" };
-}
-
-export async function continueBrevoSetup(input: {
+export async function continueSmtpSetup(input: {
   runId: string;
   cfToken: string;
-}): Promise<BrevoOk | ActionError> {
-  const parsed = brevoContinueSchema.safeParse(input);
+}): Promise<SmtpSetupOk | ActionError> {
+  const parsed = smtpContinueSchema.safeParse(input);
   if (!parsed.success) {
     return {
       status: "error",
@@ -827,9 +763,9 @@ export async function continueBrevoSetup(input: {
     return { status: "error", errorKey: "setup.errors.not_authenticated" };
   }
 
-  const brevoKey = process.env.BREVO_API_KEY;
-  if (!brevoKey) {
-    return { status: "error", errorKey: "setup.errors.brevo_invalid_token" };
+  const postmarkToken = process.env.POSTMARK_ACCOUNT_TOKEN;
+  if (!postmarkToken) {
+    return { status: "error", errorKey: "setup.errors.postmark_invalid_token" };
   }
 
   const admin = createServiceClient();
@@ -843,18 +779,11 @@ export async function continueBrevoSetup(input: {
     return { status: "error", errorKey: "setup.errors.run_not_found" };
   }
 
-  // Idempotency: if Brevo already done (or caller is deep into Gmail),
-  // report success with the actual runStatus so the UI lands on the
-  // matching kind instead of forcing the user through Brevo again.
-  if (BREVO_ALREADY_DONE.has(row.status)) {
-    return {
-      status: "ok",
-      runId: row.id,
-      runStatus: "brevo_done",
-    };
+  if (SMTP_ALREADY_DONE.has(row.status)) {
+    return { status: "ok", runId: row.id, runStatus: "brevo_done" };
   }
 
-  if (!BREVO_RESUMABLE.has(row.status)) {
+  if (!SMTP_RESUMABLE.has(row.status)) {
     return { status: "error", errorKey: "setup.errors.run_wrong_state" };
   }
 
@@ -864,267 +793,13 @@ export async function continueBrevoSetup(input: {
     return { status: "error", errorKey: "setup.errors.run_corrupt" };
   }
 
-  // Postmark backend delegation — activated via SMTP_BACKEND=postmark env var.
-  if (process.env.SMTP_BACKEND === "postmark") {
-    const postmarkToken = process.env.POSTMARK_ACCOUNT_TOKEN;
-    if (!postmarkToken) {
-      return {
-        status: "error",
-        errorKey: "setup.errors.postmark_invalid_token",
-      };
-    }
-    const pm = createPostmarkAccountClient(postmarkToken);
-    const cfPm = createCloudflareClient(parsed.data.cfToken);
-    return runPostmarkSetup({ pm, cf: cfPm, admin, row });
-  }
-
+  const pm = createPostmarkAccountClient(postmarkToken);
   const cf = createCloudflareClient(parsed.data.cfToken);
-  const brevo = createBrevoClient(brevoKey);
-
-  try {
-    let runStatus = row.status as string;
-    let brevoState =
-      ((row.cf_state as Record<string, unknown>)?.brevo as
-        | Record<string, unknown>
-        | undefined) ?? {};
-
-    // Step 1: sender domain create or resume.
-    let domain: SenderDomain | null = brevoState.domain as SenderDomain | null;
-    if (runStatus === "cf_done") {
-      const { domain: created, created: wasCreated } =
-        await brevo.createSenderDomain(zoneName);
-      domain = created;
-      brevoState = {
-        ...brevoState,
-        domain: created,
-        sender_id: created.id,
-        sender_created: wasCreated,
-        ...(created.authenticated ? { already_authenticated: true } : {}),
-      };
-      await patchBrevoState(admin, row.id, {
-        status: "brevo_sender_created",
-        brevoState,
-        step: STEP.brevoCreateSender,
-      });
-      runStatus = "brevo_sender_created";
-    } else if (!domain) {
-      // Resuming at brevo_sender_created+ without cached domain → refetch.
-      domain = await brevo.getSenderDomain(zoneName);
-      brevoState = {
-        ...brevoState,
-        domain,
-        sender_id: domain.id,
-        ...(domain.authenticated ? { already_authenticated: true } : {}),
-      };
-    }
-
-    // Once the sender exists, its authenticated state decides which DNS
-    // work is needed. DKIM + brevo_code are emitted by Brevo only on
-    // the non-authenticated path (first-time setup). SPF + DMARC are
-    // sender-side and must be ensured on every call — addSpfInclude and
-    // upsertDnsByPattern are both idempotent, so replaying on an
-    // already-correct zone is a no-op.
-    const alreadyAuthenticated = !!domain?.authenticated;
-
-    // Step 2: DNS upsert.
-    if (runStatus === "brevo_sender_created") {
-      const dnsActions: Record<string, { id: string; action: string }> = {};
-
-      if (!alreadyAuthenticated) {
-        const dkim = domain!.dkim_record;
-        const brevoCode = domain!.brevo_code_record;
-        if (!dkim || !brevoCode) {
-          throw new BrevoError({
-            message: "Brevo response missing DKIM or brevo-code record",
-            code: "missing_records",
-            httpStatus: 0,
-          });
-        }
-        const dkimRes = await upsertDnsByPattern(cf, zoneId, {
-          pattern: "v=dkim1",
-          record: {
-            type: "TXT",
-            name: dkim.hostname,
-            content: dkim.value,
-            ttl: 1,
-          },
-        });
-        const brevoCodeRes = await upsertDnsByPattern(cf, zoneId, {
-          pattern: "brevo-code:",
-          record: {
-            type: "TXT",
-            name: brevoCode.hostname,
-            content: brevoCode.value,
-            ttl: 1,
-          },
-        });
-        dnsActions.dkim = { id: dkimRes.id, action: dkimRes.action };
-        dnsActions.brevo_code = {
-          id: brevoCodeRes.id,
-          action: brevoCodeRes.action,
-        };
-      }
-
-      const { spf: spfRes, dmarc: dmarcRes } = await ensureBrevoDnsAuthRecords({
-        cf,
-        zoneId,
-        zoneName,
-        dmarcFromBrevo: domain?.dmarc_record?.value,
-      });
-      dnsActions.dmarc = { id: dmarcRes.id, action: dmarcRes.action };
-      dnsActions.spf = { id: spfRes.id, action: spfRes.action };
-
-      brevoState = { ...brevoState, dns: dnsActions };
-      await patchBrevoState(admin, row.id, {
-        status: "brevo_dns_written",
-        brevoState,
-        step: STEP.brevoDnsUpsert,
-      });
-      runStatus = "brevo_dns_written";
-    }
-
-    // Step 3: Brevo verify. On already-authenticated domains, Brevo has
-    // nothing to poll — fast-path to verified. Non-authenticated path
-    // keeps the poll loop for fresh setups.
-    if (runStatus === "brevo_dns_written") {
-      if (alreadyAuthenticated) {
-        brevoState = { ...brevoState, verified: true };
-        await patchBrevoState(admin, row.id, {
-          status: "brevo_verified",
-          brevoState,
-          step: STEP.brevoVerify,
-        });
-        runStatus = "brevo_verified";
-      } else {
-        let verifiedDomain: SenderDomain | null = null;
-        let attempt = 0;
-        while (attempt <= BREVO_VERIFY_POLL_DELAYS_MS.length) {
-          const d = await brevo.verifyDomain(zoneName);
-          if (d.authenticated || d.verified) {
-            verifiedDomain = d;
-            break;
-          }
-          if (attempt === BREVO_VERIFY_POLL_DELAYS_MS.length) break;
-          await sleepMs(BREVO_VERIFY_POLL_DELAYS_MS[attempt]);
-          attempt += 1;
-        }
-        if (!verifiedDomain) {
-          return {
-            status: "error",
-            errorKey: "setup.errors.brevo_verify_timeout",
-          };
-        }
-        brevoState = { ...brevoState, domain: verifiedDomain, verified: true };
-        await patchBrevoState(admin, row.id, {
-          status: "brevo_verified",
-          brevoState,
-          step: STEP.brevoVerify,
-        });
-        runStatus = "brevo_verified";
-      }
-    }
-
-    // Step 4: finalize.
-    if (runStatus === "brevo_verified") {
-      await patchBrevoState(admin, row.id, {
-        status: "brevo_done",
-        brevoState,
-        step: STEP.brevoFinalize,
-      });
-      runStatus = "brevo_done";
-    }
-
-    return {
-      status: "ok",
-      runId: row.id,
-      runStatus: runStatus as BrevoOk["runStatus"],
-    };
-  } catch (e) {
-    await failRun(admin, row.id, STEP.brevoCreateSender, errMsg(e));
-    return mapBrevoError(e);
-  }
-}
-
-/**
- * Always-run sender-side DNS: SPF merge + DMARC upsert. Split out of
- * the gated DKIM+brevo_code block so that Brevo domains re-encountered
- * in the already-authenticated short-circuit still get their SPF/DMARC
- * ensured. Both helpers are idempotent: addSpfInclude returns the same
- * record when the Brevo include is already present, and
- * upsertDnsByPattern matches content before writing.
- */
-async function ensureBrevoDnsAuthRecords(args: {
-  cf: CloudflareClient;
-  zoneId: string;
-  zoneName: string;
-  dmarcFromBrevo?: string | null;
-}): Promise<{
-  spf: { id: string; action: string };
-  dmarc: { id: string; action: string };
-}> {
-  const { cf, zoneId, zoneName, dmarcFromBrevo } = args;
-
-  const existingTxt = await cf.listDnsRecords(zoneId, {
-    type: "TXT",
-    name: zoneName,
-  });
-  const existingSpf = existingTxt.find((r) =>
-    r.content.toLowerCase().startsWith("v=spf1"),
-  );
-  const spfContent = existingSpf
-    ? addSpfInclude(existingSpf.content, BREVO_SPF_INCLUDE_HOST)
-    : `v=spf1 include:${BREVO_SPF_INCLUDE_HOST} ~all`;
-  const spfRes = await upsertDnsByPattern(cf, zoneId, {
-    pattern: "v=spf1",
-    record: { type: "TXT", name: zoneName, content: spfContent, ttl: 1 },
-  });
-
-  const dmarcContent =
-    dmarcFromBrevo ?? `v=DMARC1; p=none; rua=mailto:postmaster@${zoneName}`;
-  const dmarcRes = await upsertDnsByPattern(cf, zoneId, {
-    pattern: "v=dmarc1",
-    record: {
-      type: "TXT",
-      name: `_dmarc.${zoneName}`,
-      content: dmarcContent,
-      ttl: 1,
-    },
-  });
-
-  return {
-    spf: { id: spfRes.id, action: spfRes.action },
-    dmarc: { id: dmarcRes.id, action: dmarcRes.action },
-  };
-}
-
-async function patchBrevoState(
-  admin: Awaited<ReturnType<typeof createServiceClient>>,
-  runId: string,
-  input: {
-    status: string;
-    brevoState: Record<string, unknown>;
-    step: Step;
-  },
-) {
-  const { data } = await admin
-    .from("setup_runs")
-    .select("cf_state")
-    .eq("id", runId)
-    .maybeSingle();
-  const current = (data?.cf_state as object) ?? {};
-  const nextState = {
-    ...current,
-    last_step: input.step,
-    brevo: input.brevoState,
-  };
-  await admin
-    .from("setup_runs")
-    .update({ status: input.status, cf_state: nextState })
-    .eq("id", runId);
+  return runPostmarkSetup({ pm, cf, admin, row });
 }
 
 /* ------------------------------------------------------------------ *
- * Postmark backend — parallel to Brevo; activated via SMTP_BACKEND=postmark
+ * Postmark backend implementation
  * ------------------------------------------------------------------ */
 
 type PostmarkSetupRow = {
@@ -1141,7 +816,7 @@ async function runPostmarkSetup(args: {
   cf: CloudflareClient;
   admin: ReturnType<typeof createServiceClient>;
   row: PostmarkSetupRow;
-}): Promise<BrevoOk | ActionError> {
+}): Promise<SmtpSetupOk | ActionError> {
   const { pm, cf, admin, row } = args;
   const zoneId = row.cf_zone_id;
   const zoneName = row.domain;
@@ -1164,7 +839,7 @@ async function runPostmarkSetup(args: {
       await patchPostmarkState(admin, row.id, {
         status: "brevo_sender_created",
         pmState,
-        step: STEP.brevoCreateSender,
+        step: STEP.smtpCreateSender,
         postmarkServerId: server.id,
       });
       runStatus = "brevo_sender_created";
@@ -1217,7 +892,7 @@ async function runPostmarkSetup(args: {
       await patchPostmarkState(admin, row.id, {
         status: "brevo_dns_written",
         pmState,
-        step: STEP.brevoDnsUpsert,
+        step: STEP.smtpDnsUpsert,
       });
       runStatus = "brevo_dns_written";
     }
@@ -1250,7 +925,7 @@ async function runPostmarkSetup(args: {
       await patchPostmarkState(admin, row.id, {
         status: "brevo_verified",
         pmState,
-        step: STEP.brevoVerify,
+        step: STEP.smtpVerify,
       });
       runStatus = "brevo_verified";
     }
@@ -1260,7 +935,7 @@ async function runPostmarkSetup(args: {
       await patchPostmarkState(admin, row.id, {
         status: "brevo_done",
         pmState,
-        step: STEP.brevoFinalize,
+        step: STEP.smtpFinalize,
       });
       runStatus = "brevo_done";
     }
@@ -1268,10 +943,10 @@ async function runPostmarkSetup(args: {
     return {
       status: "ok",
       runId: row.id,
-      runStatus: runStatus as BrevoOk["runStatus"],
+      runStatus: runStatus as SmtpSetupOk["runStatus"],
     };
   } catch (e) {
-    await failRun(admin, row.id, STEP.brevoCreateSender, errMsg(e));
+    await failRun(admin, row.id, STEP.smtpCreateSender, errMsg(e));
     return mapPostmarkError(e);
   }
 }
@@ -1400,11 +1075,11 @@ function titleCaseLocal(mailboxLocal: string): string {
 }
 
 function mapSmtpConfigError(e: unknown): ActionError {
-  if (e instanceof BrevoSmtpConfigError) {
+  if (e instanceof PostmarkSmtpConfigError) {
     return {
       status: "error",
-      errorKey: "setup.errors.brevo_smtp_misconfigured",
-      details: { reason: e.message },
+      errorKey: "setup.errors.smtp_misconfigured",
+      details: { reason: e instanceof Error ? e.message : String(e) },
     };
   }
   return { status: "error", errorKey: "setup.errors.unexpected" };
@@ -1487,30 +1162,18 @@ export async function prepareGmailStep(input: {
     return { status: "error", errorKey: "setup.errors.run_wrong_state" };
   }
 
-  // Load per-backend SMTP credentials.
+  // Load per-customer SMTP credentials from the Postmark server token stored in cf_state.
   let smtp: SmtpDisplay;
-  if (process.env.SMTP_BACKEND === "postmark") {
-    try {
-      const pmState =
-        ((row.cf_state as Record<string, unknown> | null)?.postmark as
-          | Record<string, unknown>
-          | undefined) ?? {};
-      smtp = buildPostmarkSmtpDisplay(
-        (pmState.server_token as string | undefined) ?? "",
-      );
-    } catch (e) {
-      return {
-        status: "error",
-        errorKey: "setup.errors.postmark_smtp_misconfigured",
-        details: { reason: e instanceof Error ? e.message : String(e) },
-      };
-    }
-  } else {
-    try {
-      smtp = loadSmtpDisplay();
-    } catch (e) {
-      return mapSmtpConfigError(e);
-    }
+  try {
+    const pmState =
+      ((row.cf_state as Record<string, unknown> | null)?.postmark as
+        | Record<string, unknown>
+        | undefined) ?? {};
+    smtp = buildPostmarkSmtpDisplay(
+      (pmState.server_token as string | undefined) ?? "",
+    );
+  } catch (e) {
+    return mapSmtpConfigError(e);
   }
 
   // #ABUSE-3 — phishing pattern check (non-blocking, fire-and-forget)

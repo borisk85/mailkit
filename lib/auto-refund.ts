@@ -1,6 +1,6 @@
 import "server-only";
 
-import { sendAutoRefundEmail } from "@/lib/integrations/brevo-transactional";
+import { sendAutoRefundEmail } from "@/lib/integrations/postmark-transactional";
 import {
   LemonSqueezyError,
   createLemonSqueezyClient,

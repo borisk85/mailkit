@@ -266,7 +266,7 @@ async function fetchSendUsage(
  * your action" vs "we're done".
  *
  *   - failed       → status === 'failed' (terminal red)
- *   - done         → status === 'done' (terminal green: CF + Brevo +
+ *   - done         → status === 'done' (terminal green: CF + Postmark +
  *                     Gmail confirmed)
  *   - awaiting_verification → cf_awaiting_destination_verify (the
  *                     user has to click an email in CF) and the

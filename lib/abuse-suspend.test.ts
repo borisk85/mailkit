@@ -20,7 +20,7 @@ import {
 } from "./deliverability";
 import type { SendLimitEvaluation } from "./send-limits";
 
-const BREVO_BASE = "https://api.brevo.com/v3";
+const POSTMARK_BASE = "https://api.postmarkapp.com";
 
 const server = setupServer();
 beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
@@ -29,13 +29,13 @@ afterAll(() => server.close());
 
 beforeEach(() => {
   vi.clearAllMocks();
-  process.env.BREVO_API_KEY = "k";
+  process.env.POSTMARK_TRANSACTIONAL_SERVER_TOKEN = "test-postmark-token";
   process.env.MAILKIT_SUPPORT_FROM_EMAIL = "support@mailkit-test.ru";
   process.env.MAILKIT_SUPPORT_FROM_NAME = "MailKit support";
 });
 
 afterEach(() => {
-  delete process.env.BREVO_API_KEY;
+  delete process.env.POSTMARK_TRANSACTIONAL_SERVER_TOKEN;
   delete process.env.MAILKIT_SUPPORT_FROM_EMAIL;
   delete process.env.MAILKIT_SUPPORT_FROM_NAME;
 });
@@ -238,10 +238,10 @@ describe("suspendForRateLimit", () => {
   test("happy path: minute window tripped → flag + audit + email attempt", async () => {
     let emailSent = false;
     server.use(
-      http.post(`${BREVO_BASE}/smtp/email`, async ({ request }) => {
-        const body = (await request.json()) as { subject?: string };
-        emailSent = !!body.subject?.includes("temporarily paused");
-        return HttpResponse.json({ messageId: "m1" });
+      http.post(`${POSTMARK_BASE}/email`, async ({ request }) => {
+        const body = (await request.json()) as { Subject?: string };
+        emailSent = !!body.Subject?.includes("temporarily paused");
+        return HttpResponse.json({ MessageID: "m1" });
       }),
     );
 
@@ -269,8 +269,8 @@ describe("suspendForRateLimit", () => {
 
   test("most-restrictive window picked when multiple tripped", async () => {
     server.use(
-      http.post(`${BREVO_BASE}/smtp/email`, () =>
-        HttpResponse.json({ messageId: "m1" }),
+      http.post(`${POSTMARK_BASE}/email`, () =>
+        HttpResponse.json({ MessageID: "m1" }),
       ),
     );
     const admin = makeAdmin({ purchases: [purchase()] });
@@ -309,8 +309,8 @@ describe("suspendForRateLimit", () => {
 
   test("already-suspended purchase: audit row written, flag NOT overwritten", async () => {
     server.use(
-      http.post(`${BREVO_BASE}/smtp/email`, () =>
-        HttpResponse.json({ messageId: "m1" }),
+      http.post(`${POSTMARK_BASE}/email`, () =>
+        HttpResponse.json({ MessageID: "m1" }),
       ),
     );
     const admin = makeAdmin({
@@ -338,7 +338,7 @@ describe("suspendForRateLimit", () => {
 
   test("Brevo email failure does not block suspension", async () => {
     server.use(
-      http.post(`${BREVO_BASE}/smtp/email`, () =>
+      http.post(`${POSTMARK_BASE}/email`, () =>
         HttpResponse.json({ message: "down" }, { status: 503 }),
       ),
     );
@@ -397,10 +397,10 @@ describe("actOnDeliverability", () => {
   test("complaint suspended → DB flag + audit + complaint email", async () => {
     let subjectSeen = "";
     server.use(
-      http.post(`${BREVO_BASE}/smtp/email`, async ({ request }) => {
-        const body = (await request.json()) as { subject?: string };
-        subjectSeen = body.subject ?? "";
-        return HttpResponse.json({ messageId: "m1" });
+      http.post(`${POSTMARK_BASE}/email`, async ({ request }) => {
+        const body = (await request.json()) as { Subject?: string };
+        subjectSeen = body.Subject ?? "";
+        return HttpResponse.json({ MessageID: "m1" });
       }),
     );
     const admin = makeAdmin({ purchases: [purchase()] });
@@ -425,10 +425,10 @@ describe("actOnDeliverability", () => {
   test("bounce suspended → bounce email + bounce_threshold audit", async () => {
     let subjectSeen = "";
     server.use(
-      http.post(`${BREVO_BASE}/smtp/email`, async ({ request }) => {
-        const body = (await request.json()) as { subject?: string };
-        subjectSeen = body.subject ?? "";
-        return HttpResponse.json({ messageId: "m1" });
+      http.post(`${POSTMARK_BASE}/email`, async ({ request }) => {
+        const body = (await request.json()) as { Subject?: string };
+        subjectSeen = body.Subject ?? "";
+        return HttpResponse.json({ MessageID: "m1" });
       }),
     );
     const admin = makeAdmin({ purchases: [purchase()] });
@@ -451,10 +451,10 @@ describe("actOnDeliverability", () => {
   test("warned (unsubscribe over): no DB flag flip, warn email sent", async () => {
     let subjectSeen = "";
     server.use(
-      http.post(`${BREVO_BASE}/smtp/email`, async ({ request }) => {
-        const body = (await request.json()) as { subject?: string };
-        subjectSeen = body.subject ?? "";
-        return HttpResponse.json({ messageId: "m1" });
+      http.post(`${POSTMARK_BASE}/email`, async ({ request }) => {
+        const body = (await request.json()) as { Subject?: string };
+        subjectSeen = body.Subject ?? "";
+        return HttpResponse.json({ MessageID: "m1" });
       }),
     );
     const admin = makeAdmin({ purchases: [purchase()] });

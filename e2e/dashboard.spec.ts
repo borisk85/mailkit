@@ -82,7 +82,7 @@ test.describe("Dashboard EN", () => {
   }) => {
     await page.goto("/en/app?mock=failed");
     await expect(page.getByText(/Failed/).first()).toBeVisible();
-    await expect(page.getByText(/Brevo verification timed out/)).toBeVisible();
+    await expect(page.getByText(/SMTP verification timed out/)).toBeVisible();
     await expect(
       page.getByRole("link", { name: /Re-setup this domain/ }).first(),
     ).toBeVisible();

@@ -88,7 +88,8 @@ const FAILED_REFUNDED: DashboardData = {
       domain: "founders.example",
       mailboxLocal: "hello",
       status: "failed",
-      errorMsg: "Brevo verification timed out — DKIM record didn't propagate.",
+      errorMsg:
+        "Postmark verification timed out — DKIM record didn't propagate.",
       createdAt: LAST_WEEK,
       updatedAt: YESTERDAY,
     },

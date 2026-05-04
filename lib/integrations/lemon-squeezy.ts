@@ -6,7 +6,7 @@ import crypto from "node:crypto";
  * Lemon Squeezy API client for Ticket #7 — order retrieval + refund
  * issuance + webhook signature verification.
  *
- * Native fetch, no SDK, mirror of lib/integrations/brevo.ts:
+ * Native fetch, no SDK, mirror of lib/integrations/postmark.ts:
  *   - 429/5xx → exp backoff 1s/2s/4s (honors Retry-After on 429),
  *     3 retries total; other 4xx bubble.
  *   - Errors wrapped in LemonSqueezyError with code + httpStatus.

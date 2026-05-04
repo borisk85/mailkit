@@ -2,7 +2,7 @@
  * Layer 1 anti-abuse — per-domain send-limit predicate.
  *
  * Pure functions over the `send_counters` rows the cron syncs from
- * Brevo every 5-10 minutes. No DB / network here — the cron does the
+ * Postmark every 5-10 minutes. No DB / network here — the cron does the
  * read, this file decides whether the counters cross any threshold.
  *
  * Thresholds taken from docs/TECH_ABUSE_MITIGATIONS.md §2.1, frozen

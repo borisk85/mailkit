@@ -19,7 +19,7 @@ export default defineConfig({
           statements: 80,
           branches: 70,
         },
-        "lib/integrations/brevo.ts": {
+        "lib/integrations/postmark.ts": {
           lines: 80,
           functions: 80,
           statements: 80,

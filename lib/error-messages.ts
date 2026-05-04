@@ -4,7 +4,7 @@
  *
  * Sources of error_msg in setup_runs:
  *   - actions.ts errorKey strings (setup.errors.*)
- *   - Raw Cloudflare / Brevo / SES API error strings stored by the pipeline
+ *   - Raw Cloudflare / Postmark API error strings stored by the pipeline
  */
 
 const RAW_TO_FRIENDLY: Record<string, string> = {
@@ -28,13 +28,13 @@ const RAW_TO_FRIENDLY: Record<string, string> = {
   "setup.errors.cf_dns_conflict":
     "Existing DNS records are blocking setup. Remove conflicting MX or SPF records and retry.",
 
-  // Brevo / SMTP
-  "setup.errors.brevo_smtp_misconfigured":
+  // SMTP
+  "setup.errors.smtp_misconfigured":
     "SMTP credentials aren't configured on our end. Contact support.",
-  brevo_missing_records:
-    "DNS records for email signing weren't verified. Wait a few minutes and retry.",
-  brevo_duplicate_parameter:
-    "This domain is already registered. Contact support if you didn't set it up.",
+  "setup.errors.postmark_invalid_token":
+    "SMTP provider rejected the API key. Contact support.",
+  "setup.errors.postmark_unavailable":
+    "SMTP provider is temporarily unavailable. Try again in a few minutes.",
 
   // State
   "state.suspended_by_owner":
@@ -66,7 +66,7 @@ export function friendlyErrorMessage(
 
   // Last resort: strip internal codes, keep human fragment if present
   const stripped = raw
-    .replace(/^(Error|setup\.errors\.|brevo_|cf_)[^\s]*/i, "")
+    .replace(/^(Error|setup\.errors\.|smtp_|postmark_|cf_)[^\s]*/i, "")
     .replace(/\{[^}]*\}/g, "")
     .trim();
 

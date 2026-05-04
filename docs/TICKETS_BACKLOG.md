@@ -16,7 +16,7 @@
   - Telegram bot **`@MailKitOwnerAlerts`** (создать заранее, токен в env vars) — push notification на phone owner'а в реальном времени
   - Содержание уведомления: domain клиента, event_type (rate_limit / bounce_threshold / complaint_threshold / phishing_pattern), observed values, direct link на abuse_events row в админке
   - Boris подтверждает что хочет именно Telegram, не SMS
-- **#ABUSE-2** Brevo abuse desk response kit (адаптировано под AWS SES после migration): скрипт `scripts/abuse-export.ts <domain>` → ZIP с send logs из CloudWatch, abuse_events, purchase + consent fields, ToS version. Готовый пакет для AWS abuse desk при инцидентах.
+- **#ABUSE-2** Postmark/AWS SES abuse desk response kit: скрипт `scripts/abuse-export.ts <domain>` → ZIP с send logs из CloudWatch, abuse_events, purchase + consent fields, ToS version. Готовый пакет для AWS abuse desk при инцидентах.
 - **#ABUSE-3** Lightweight phishing pattern check на `prepareGmailStep`: blacklist suspicious mailbox names (`noreply`, `support`, `admin`, `paypal`, `apple`, `google`, `bank`, `secure`, `verify`) + domain typosquatting (Levenshtein < 2 от top brands). Match → `purchases.kyc_review_required = true` + alert через #ABUSE-1 канал. НЕ блокирует автоматически — только flags на manual review.
 - **#ABUSE-4** Hard-suspend tenant в AWS SES: при `flagSuspended` → auto pause через SES API (delete email identity либо update sending status). Destructive trade-off, acceptable для abuse cases.
 
@@ -155,23 +155,23 @@ Time estimate: 1-2 дня dev работы. Trigger для запуска — п
 - **#SMTP-2** Mass notification email templates EN/RU + automated рассылка по affected users. Включает 4 follow-up cadence (T+24h, T+72h, T+7d, T+14d).
 - **#SMTP-3** In-product banner UI в `app.getmailkit.com`: красный sticky-top, "Action required: update SMTP credentials", не убирается до verification на странице `/setup/verify-migration`.
 - **#SMTP-4** Status page заглушка на `getmailkit.com/status` (минимум статичная "All systems operational" + ссылка на @MailKitHQ Twitter). Полноценная (UptimeRobot/Better Stack) — post-launch.
-- **#SMTP-5** Sentry alerts на Brevo API errors threshold + SMS/Telegram notification на owner.
+- **#SMTP-5** Sentry alerts на Postmark API errors threshold + SMS/Telegram notification на owner.
 
 Trigger для работы: после merge ветки `feat/smtp-dependency-disclosure`. Без этих 5 пунктов launch на Product Hunt блокирован — иначе incident может убить репутацию в первые же недели.
 
 ## 🔨 MVP v1 (build now, 3-4 weeks total)
 - #2 Production scaffold (done)
 - #3 Auth + Google OAuth flow (done, PR #8)
-- #4 Setup pipeline backend (Cloudflare + Brevo in TS)
+- #4 Setup pipeline backend (Cloudflare + Postmark in TS)
   - #4a Cloudflare pipeline (done, merged PR #10)
-  - #4b Brevo SMTP integration
-    - **Pre-requisites (MUST fix before Brevo API calls):**
+  - #4b Postmark SMTP integration
+    - **Pre-requisites (MUST fix before Postmark API calls):**
       - **SPF merge policy**: если `@ TXT v=spf1` уже существует — merge
-        (добавить `include:<brevo>` сохранив existing includes), не
+        (добавить `include:<postmark>` сохранив existing includes), не
         overwrite. Нужен parser для SPF mechanism list
         (`include:`, `ip4:`, `ip6:`, `a:`, `mx:`, `~all`/`-all`/`+all`).
       - **Content-pattern upsert**: match TXT records по content prefix
-        (`v=spf1` / `v=DMARC1` / `brevo-code:` /
+        (`v=spf1` / `v=DMARC1` / `pm-bounces:` /
         `google-site-verification:`), не first-match по позиции. В
         `listDnsRecords` добавить фильтр + pattern-match helper.
 - #5 Onboarding UI wizard
@@ -181,7 +181,7 @@ Trigger для работы: после merge ветки `feat/smtp-dependency-d
     - Webhook handler для `order.paid` / `order.refunded` events от Lemon
       Squeezy → обновление `purchases` table + `refunds` audit log.
     - Auto-refund trigger при `setup_runs.status → failed` где
-      `failed_step ∈ {cf_*, brevo_*}` → вызов Lemon Squeezy `POST /refunds`
+      `failed_step ∈ {cf_*, postmark_*}` → вызов Lemon Squeezy `POST /refunds`
       API + email уведомление юзеру. Если `failed_step` = `gmail_*` —
       user-side issue, refund только через 30-day canal (не auto).
     - `refunds` table в Supabase (см. migration в #16 ниже) + RLS.
@@ -227,7 +227,7 @@ Trigger для работы: после merge ветки `feat/smtp-dependency-d
   - Webhook endpoint `/api/webhooks/lemon-squeezy` — обработка
     `order.refunded` → log в `refunds` + email уведомление.
   - Internal trigger — cron / event listener на `setup_runs.status → failed`
-    с `failed_step ∈ {cf_*, brevo_*}` → вызов Lemon Squeezy refund API →
+    с `failed_step ∈ {cf_*, postmark_*}` → вызов Lemon Squeezy refund API →
     log + email. Idempotent (один refund на run, не дублировать).
 - #19 ToS page + обновить existing footer links
   - Если ToS страница уже существует — обновить section "Refunds" текстом
@@ -281,22 +281,19 @@ Trigger для работы: после merge ветки `feat/smtp-dependency-d
   - Timeline: 1-2 дня, зависит от LS support response time.
   - НЕ блокер для #11 landing code — hardcoded constant, swap одной
     строки при получении нового URL.
-- Auto-verification Gmail Send-As via Brevo SMTP test-send + inbox poll.
+- Auto-verification Gmail Send-As via Postmark SMTP test-send + inbox poll.
   Trigger: первая жалоба пользователя «настроил, но не отправляет», либо
   при наборе >100 paying users — тогда оправдана оптимизация funnel
   completion rate. В MVP (#6) принимаем user-asserted confirmation
   (checkbox + server action), verification на честное слово. Техническая
-  развилка при реализации: `nodemailer` dep + через Brevo SMTP послать
+  развилка при реализации: `nodemailer` dep + через Postmark SMTP послать
   тестовое письмо на `target_email`, ждать receipt в Gmail inbox через
   `gmail.readonly` scope + polling. Обе side-effect'а — новые зависимости,
   доп. OAuth consent-screen trust ("зачем им читать мою почту?"). Если
   landing этого фичера снизит conversion — откатывать.
-- Brevo SMTP shared-credential abuse mitigations (см. [docs/SECURITY.md](SECURITY.md)):
-  rate limit per `setup_run` через `/v3/smtp/statistics/events` polling
-  + UI block on breach; SMTP key rotation UX (re-paste banner когда
-  `BREVO_SMTP_KEY_VERSION` в env > `gmail_state.smtp_config_version` в
-  run). Оба — post-launch, триггер "первая abuse incident либо плановая
-  90-day rotation".
+- Postmark per-tenant credential rotation UX: re-paste banner когда
+  `POSTMARK_SERVER_TOKEN_VERSION` в env > `gmail_state.smtp_config_version` в
+  run. Post-launch, триггер "первая abuse incident либо плановая 90-day rotation".
 - [GH #6](https://github.com/borisk85/mailkit/issues/6) Tighten waitlist insert via anon key + RLS INSERT policy (switch off service_role for public form)
 - Проверить Vercel Framework Preset = Next.js при каждом мажорном
   merge в main (автоматизировать через GitHub Action в будущем)

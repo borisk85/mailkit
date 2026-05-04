@@ -18,7 +18,7 @@ vi.mock("@/lib/supabase/server", () => ({
 import * as sbModule from "@/lib/supabase/server";
 import { GET } from "./route";
 
-const BREVO_BASE = "https://api.brevo.com/v3";
+const POSTMARK_BASE = "https://api.postmarkapp.com";
 
 const server = setupServer();
 beforeAll(() => server.listen({ onUnhandledRequest: "bypass" }));
@@ -28,13 +28,13 @@ afterAll(() => server.close());
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.CRON_SECRET = "cron-test";
-  process.env.BREVO_API_KEY = "k";
+  process.env.POSTMARK_TRANSACTIONAL_SERVER_TOKEN = "test-postmark-token";
   process.env.MAILKIT_SUPPORT_FROM_EMAIL = "support@mailkit-test.ru";
 });
 
 afterEach(() => {
   delete process.env.CRON_SECRET;
-  delete process.env.BREVO_API_KEY;
+  delete process.env.POSTMARK_TRANSACTIONAL_SERVER_TOKEN;
   delete process.env.MAILKIT_SUPPORT_FROM_EMAIL;
 });
 
@@ -47,11 +47,23 @@ type PurchaseRow = {
   suspension_reason: string | null;
 };
 
-function makeAdminStub(init: { purchases?: PurchaseRow[] }) {
+type SetupRunRow = {
+  domain: string;
+  status: string;
+  postmark_server_id: number | null;
+  cf_state: Record<string, unknown>;
+  created_at: string;
+};
+
+function makeAdminStub(init: {
+  purchases?: PurchaseRow[];
+  setup_runs?: SetupRunRow[];
+}) {
   const tables = {
     purchases: [...(init.purchases ?? [])],
     deliverability_snapshots: [] as Array<Record<string, unknown>>,
     abuse_events: [] as Array<Record<string, unknown>>,
+    setup_runs: [...(init.setup_runs ?? [])] as Array<Record<string, unknown>>,
   };
   let idCounter = 0;
 
@@ -60,6 +72,7 @@ function makeAdminStub(init: { purchases?: PurchaseRow[] }) {
     const filters: Array<[string, unknown]> = [];
     const isFilters: Array<[string, unknown]> = [];
     const ltFilters: Array<[string, unknown]> = [];
+    const notFilters: Array<[string, string, unknown]> = [];
     const containsFilters: Array<Record<string, unknown>> = [];
     let op: "select" | "insert" | "update" | "delete" | null = null;
     let payload: unknown = null;
@@ -96,6 +109,10 @@ function makeAdminStub(init: { purchases?: PurchaseRow[] }) {
         isFilters.push([col, v]);
         return api;
       },
+      not(col: string, op: string, v: unknown) {
+        notFilters.push([col, op, v]);
+        return api;
+      },
       lt(col: string, v: unknown) {
         ltFilters.push([col, v]);
         return api;
@@ -112,10 +129,39 @@ function makeAdminStub(init: { purchases?: PurchaseRow[] }) {
         limitN = n;
         return api;
       },
+      maybeSingle() {
+        const recs = rows as unknown as Record<string, unknown>[];
+        let out = applyFilters(recs, filters, isFilters, ltFilters, notFilters);
+        if (order) {
+          out = [...out].sort((a, b) => {
+            const av = a[order!.col] as string;
+            const bv = b[order!.col] as string;
+            return order!.ascending
+              ? av < bv
+                ? -1
+                : av > bv
+                  ? 1
+                  : 0
+              : av > bv
+                ? -1
+                : av < bv
+                  ? 1
+                  : 0;
+          });
+        }
+        if (typeof limitN === "number") out = out.slice(0, limitN);
+        return Promise.resolve({ data: out[0] ?? null, error: null });
+      },
       then(resolve: (v: unknown) => unknown) {
         const recs = rows as unknown as Record<string, unknown>[];
         if (op === "delete") {
-          const targets = applyFilters(recs, filters, isFilters, ltFilters);
+          const targets = applyFilters(
+            recs,
+            filters,
+            isFilters,
+            ltFilters,
+            notFilters,
+          );
           for (const r of targets) {
             const i = recs.indexOf(r);
             if (i >= 0) recs.splice(i, 1);
@@ -123,7 +169,13 @@ function makeAdminStub(init: { purchases?: PurchaseRow[] }) {
           return Promise.resolve({ data: null, error: null }).then(resolve);
         }
         if (op === "update") {
-          const targets = applyFilters(recs, filters, isFilters, ltFilters);
+          const targets = applyFilters(
+            recs,
+            filters,
+            isFilters,
+            ltFilters,
+            notFilters,
+          );
           for (const r of targets)
             Object.assign(r, payload as Record<string, unknown>);
           return Promise.resolve({ data: null, error: null }).then(resolve);
@@ -144,7 +196,13 @@ function makeAdminStub(init: { purchases?: PurchaseRow[] }) {
           return Promise.resolve({ data: null, error: null }).then(resolve);
         }
         if (op === "select") {
-          let out = applyFilters(recs, filters, isFilters, ltFilters);
+          let out = applyFilters(
+            recs,
+            filters,
+            isFilters,
+            ltFilters,
+            notFilters,
+          );
           if (containsFilters.length > 0) {
             out = out.filter((r) => {
               const cd = (r.custom_data ?? {}) as Record<string, unknown>;
@@ -192,6 +250,7 @@ function applyFilters(
   eqs: Array<[string, unknown]>,
   iss: Array<[string, unknown]>,
   lts: Array<[string, unknown]>,
+  nots: Array<[string, string, unknown]> = [],
 ): Record<string, unknown>[] {
   return rows.filter((r) => {
     for (const [c, v] of eqs) if (r[c] !== v) return false;
@@ -202,6 +261,13 @@ function applyFilters(
         if (!(rv < v)) return false;
       } else {
         return false;
+      }
+    }
+    for (const [c, op, v] of nots) {
+      if (op === "is") {
+        // `.not("col", "is", null)` → exclude rows where col IS null
+        if (v === null && r[c] === null) return false;
+        if (v === null && r[c] === undefined) return false;
       }
     }
     return true;
@@ -242,19 +308,35 @@ describe("GET /api/cron/sync-deliverability", () => {
           suspension_reason: null,
         },
       ],
+      setup_runs: [
+        {
+          domain: "ok.com",
+          status: "done",
+          postmark_server_id: 1,
+          cf_state: { postmark: { server_token: "token-ok" } },
+          created_at: "2026-04-01T00:00:00Z",
+        },
+      ],
     });
     vi.mocked(sbModule.createServiceClient).mockReturnValue(
       admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
     );
     server.use(
-      http.get(`${BREVO_BASE}/smtp/statistics/aggregatedReport`, () =>
+      http.get(`${POSTMARK_BASE}/stats/outbound`, () =>
         HttpResponse.json({
-          requests: 1000,
-          delivered: 970,
-          hardBounces: 20,
-          softBounces: 10,
-          spamReports: 0,
-          unsubscribed: 5,
+          Sent: 1000,
+          Bounced: 20,
+          SMTPApiErrors: 10,
+          BounceRate: 0.02,
+          SpamComplaintsRate: 0,
+          SpamComplaints: 0,
+          Opens: 0,
+          UniqueOpens: 0,
+          Tracked: 0,
+          WithLinkTracking: 0,
+          WithOpenTracking: 0,
+          TotalTracked: 0,
+          Unique: 0,
         }),
       ),
     );
@@ -277,20 +359,39 @@ describe("GET /api/cron/sync-deliverability", () => {
           suspension_reason: null,
         },
       ],
+      setup_runs: [
+        {
+          domain: "spammy.com",
+          status: "done",
+          postmark_server_id: 2,
+          cf_state: { postmark: { server_token: "token-spammy" } },
+          created_at: "2026-04-01T00:00:00Z",
+        },
+      ],
     });
     vi.mocked(sbModule.createServiceClient).mockReturnValue(
       admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
     );
     server.use(
-      http.get(`${BREVO_BASE}/smtp/statistics/aggregatedReport`, () =>
+      http.get(`${POSTMARK_BASE}/stats/outbound`, () =>
         HttpResponse.json({
-          requests: 1000,
-          delivered: 990,
-          spamReports: 5, // 0.5% > 0.1%
+          Sent: 1000,
+          Bounced: 0,
+          SMTPApiErrors: 0,
+          BounceRate: 0,
+          SpamComplaintsRate: 0.005,
+          SpamComplaints: 5, // 0.5% > 0.1%
+          Opens: 0,
+          UniqueOpens: 0,
+          Tracked: 0,
+          WithLinkTracking: 0,
+          WithOpenTracking: 0,
+          TotalTracked: 0,
+          Unique: 0,
         }),
       ),
-      http.post(`${BREVO_BASE}/smtp/email`, () =>
-        HttpResponse.json({ messageId: "m1" }),
+      http.post(`${POSTMARK_BASE}/email`, () =>
+        HttpResponse.json({ MessageID: "m1" }),
       ),
     );
     const res = await GET(authedGET());
@@ -309,43 +410,45 @@ describe("GET /api/cron/sync-deliverability", () => {
     expect(admin._tables.purchases[0].suspended_at).not.toBeNull();
   });
 
-  test("unsubscribe-only over → action='warned', purchase NOT suspended", async () => {
+  test("domain without postmark server_token → skipped, no snapshot", async () => {
     const admin = makeAdminStub({
       purchases: [
         {
-          id: "p-warn",
-          custom_data: { domain: "noisy.com" },
+          id: "p-no-token",
+          custom_data: { domain: "notoken.com" },
           status: "paid",
           suspended_at: null,
-          user_email: "u@noisy.com",
+          user_email: "u@notoken.com",
           suspension_reason: null,
         },
       ],
+      // No setup_runs for this domain → no server token
+      setup_runs: [],
     });
     vi.mocked(sbModule.createServiceClient).mockReturnValue(
       admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
     );
+    let postmarkHits = 0;
     server.use(
-      http.get(`${BREVO_BASE}/smtp/statistics/aggregatedReport`, () =>
-        HttpResponse.json({
-          requests: 1000,
-          unsubscribed: 25, // 2.5% > 2%
-        }),
-      ),
-      http.post(`${BREVO_BASE}/smtp/email`, () =>
-        HttpResponse.json({ messageId: "m1" }),
-      ),
+      http.get(`${POSTMARK_BASE}/stats/outbound`, () => {
+        postmarkHits += 1;
+        return HttpResponse.json({ Sent: 100 });
+      }),
     );
     const res = await GET(authedGET());
     expect(res.status).toBe(200);
-    expect(admin._tables.deliverability_snapshots[0].action_taken).toBe(
-      "warned",
-    );
-    expect(admin._tables.abuse_events[0].action_taken).toBe("warned");
-    expect(admin._tables.purchases[0].suspended_at).toBeNull();
+    const body = (await res.json()) as {
+      checked: number;
+      outcomes: Array<{ domain: string; error?: string }>;
+    };
+    expect(body.checked).toBe(1);
+    expect(postmarkHits).toBe(0);
+    expect(admin._tables.deliverability_snapshots).toHaveLength(0);
+    const outcome = body.outcomes.find((o) => o.domain === "notoken.com");
+    expect(outcome?.error).toBe("no_postmark_server_token");
   });
 
-  test("per-domain Brevo error doesn't abort the run", async () => {
+  test("per-domain error doesn't abort the run", async () => {
     const admin = makeAdminStub({
       purchases: [
         {
@@ -365,21 +468,48 @@ describe("GET /api/cron/sync-deliverability", () => {
           suspension_reason: null,
         },
       ],
+      setup_runs: [
+        {
+          domain: "down.com",
+          status: "done",
+          postmark_server_id: 4,
+          cf_state: { postmark: { server_token: "token-down" } },
+          created_at: "2026-04-01T00:00:00Z",
+        },
+        {
+          domain: "up.com",
+          status: "done",
+          postmark_server_id: 5,
+          cf_state: { postmark: { server_token: "token-up" } },
+          created_at: "2026-04-01T00:00:00Z",
+        },
+      ],
     });
     vi.mocked(sbModule.createServiceClient).mockReturnValue(
       admin as unknown as ReturnType<typeof sbModule.createServiceClient>,
     );
     server.use(
-      http.get(
-        `${BREVO_BASE}/smtp/statistics/aggregatedReport`,
-        ({ request }) => {
-          const url = new URL(request.url);
-          if (url.searchParams.get("sender") === "down.com") {
-            return HttpResponse.json({ message: "5xx" }, { status: 502 });
-          }
-          return HttpResponse.json({ requests: 200 });
-        },
-      ),
+      http.get(`${POSTMARK_BASE}/stats/outbound`, ({ request }) => {
+        const token = request.headers.get("x-postmark-server-token");
+        if (token === "token-down") {
+          return HttpResponse.json({ Message: "5xx" }, { status: 502 });
+        }
+        return HttpResponse.json({
+          Sent: 200,
+          Bounced: 0,
+          SMTPApiErrors: 0,
+          BounceRate: 0,
+          SpamComplaintsRate: 0,
+          SpamComplaints: 0,
+          Opens: 0,
+          UniqueOpens: 0,
+          Tracked: 0,
+          WithLinkTracking: 0,
+          WithOpenTracking: 0,
+          TotalTracked: 0,
+          Unique: 0,
+        });
+      }),
     );
     const t = vi.spyOn(global, "setTimeout").mockImplementation(((
       cb: () => void,
