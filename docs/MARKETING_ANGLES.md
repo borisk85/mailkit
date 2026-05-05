@@ -270,6 +270,6 @@ RU:
 
 ## Launch promo
 
-**Product Hunt launch:** первые 100 setups бесплатно в обмен на публичный
-отзыв. Формулировка: "Launch Week Special: First 100 mailboxes free,
+**Product Hunt launch:** первые 25 setups бесплатно в обмен на публичный
+отзыв. Формулировка: "Launch Week Special: First 25 mailboxes free,
 just tell us how it went."
