@@ -352,3 +352,24 @@ EU-based (France). This changes the cross-border data transfer profile for GDPR.
 
 **Note:** Current privacy.ts change (Brevo → Postmark name swap) is baseline
 correctness. This ticket covers the GDPR-completeness layer.
+
+---
+
+## #DB-MIGRATE-1 — Rename brevo_* status values to smtp_* through data migration
+
+**Status:** Backlog  
+**Trigger:** 30+ дней после успешного launch без incidents
+
+DB status values `brevo_sender_created`, `brevo_dns_written`, `brevo_verified`,
+`brevo_done` сохранены для backward compatibility с existing rows в setup_runs.
+
+**Options:**
+A. UPDATE existing rows: set status = 'smtp_' + substring(status, 7) where status like 'brevo_%'
+B. Просто удалить stale failed setup_runs старше 60 дней — чище
+
+**CHECK constraint** в migration 0004 тоже потребует обновления при переименовании значений.
+
+**Pre-conditions:**
+- 30+ дней без incidents на production
+- No rows in non-terminal brevo_* states (все завершены или failed)
+- Координация с Boris на момент выполнения
