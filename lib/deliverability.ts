@@ -13,7 +13,7 @@
  */
 
 /** Minimal report shape consumed by evaluateDeliverability. Satisfied by both
- *  BrevoAggregatedReport and the Postmark stats response. */
+ *  Postmark stats response and any future provider. */
 export type AggregatedReportInput = {
   requests: number;
   hardBounces: number;

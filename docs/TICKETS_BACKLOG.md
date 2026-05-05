@@ -327,3 +327,28 @@ Trigger для работы: после merge ветки `feat/smtp-dependency-d
   - Attempt 2 scope **также включает `/app/setup`** — authenticated route, single-run preview Perf EN 78 / RU 70 по замеру в PR #10. Чинится той же работой по framework chunk split / polyfills, не отдельный PR.
   - **Post-#4a-merge regression на landing** (2026-04-21, prod commit 626ed14): median 3×3 прогонов — EN 76→71 (warm), RU 63→55 (warm), TBT RU взлетел до 1008ms (было 70ms). Кандидат: `lucide-react` icons (AlertCircle, CheckCircle2, Loader2) из wizard + `zod` от setup-actions попали в shared chunk landing'а через code-split. Attempt 2 должен замерить bundle-analyzer diff pre/post-#4a и либо изолировать app/setup icons через `dynamic()`, либо tree-shake lucide по named imports.
   - **Post-#4b check** (2026-04-23, merge 18b6d42 + ~13h warm, n=5/locale median, methodology в [POST_MERGE_SOP.md](investigation-2026-04-22/POST_MERGE_SOP.md)): EN 75 (vs post-#4a 77, delta −2 = noise), RU 85 (vs post-#4a 74, delta +11 = improvement). #4b не добавил регрессии; previewный "RU −12" сигнал был lambda cold-start variance, не код. Investigation closed. Systemic perf work renames → **attempt-3** scope: `NextIntlClientProvider` `pick(messages,...)`, selective `
+
+---
+
+## #LEGAL-1 — Privacy Policy update for Postmark as US-based data processor
+
+**Status:** Backlog  
+**Priority:** Pre-launch (non-blocking for first launch, required within 30 days)
+
+Postmark is registered in the US (AC Lion Digital LLC, Pennsylvania). Brevo was
+EU-based (France). This changes the cross-border data transfer profile for GDPR.
+
+**What needs updating in Privacy Policy:**
+
+1. Add SCC reference: data transferred to Postmark (US) is protected under
+   Standard Contractual Clauses per Postmark DPA.
+2. Specify exact categories of data sent to Postmark:
+   - Email addresses of MailKit customers (To/From fields)
+   - Content of transactional notifications (auto-refund text, abuse warnings)
+   - IP addresses captured in Postmark delivery logs
+3. Link to Postmark DPA: https://postmarkapp.com/dpa (verify URL exists)
+4. Update data retention section to reflect Postmark's retention defaults
+   (check Postmark docs for current log retention period).
+
+**Note:** Current privacy.ts change (Brevo → Postmark name swap) is baseline
+correctness. This ticket covers the GDPR-completeness layer.

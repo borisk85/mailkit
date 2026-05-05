@@ -17,12 +17,12 @@
 export const GUARANTEE_EN = `MailKit Guarantee
 
 1. Automation Failure Refund (automatic). If our automated setup of
-Cloudflare Email Routing or Brevo SMTP fails to complete for your
+Cloudflare Email Routing or Postmark SMTP fails to complete for your
 domain within the combined automation phase (typically under 2
 minutes), we issue a full refund automatically within 24 hours of
 the failure. No action required on your part. The automation phase
 is measured server-side from the start of setup to the completion
-of the Brevo verification step. Failure means our system returned
+of the SMTP verification step. Failure means our system returned
 an error and did not reach the Gmail wizard phase.
 
 2. 30-Day Functional Guarantee (by request). If, within 30 days of
@@ -44,7 +44,7 @@ What is not covered:
   optional Deliverability Monitoring subscription ($3/month per
   domain).
 - Failures caused by your domain expiration, registrar changes, or
-  account suspensions at third-party services (Cloudflare, Brevo,
+  account suspensions at third-party services (Cloudflare, Postmark,
   Google) outside our control.
 
 How refunds are processed: Refunds are issued through the original
@@ -58,12 +58,12 @@ requests from the same account may result in account restriction.
 export const GUARANTEE_RU = `Гарантия MailKit
 
 1. Автоматический возврат при сбое автоматики. Если наша
-автоматическая настройка Cloudflare Email Routing или Brevo SMTP
+автоматическая настройка Cloudflare Email Routing или Postmark SMTP
 не завершается для твоего домена в рамках этой фазы (обычно меньше
 2 минут), мы возвращаем деньги полностью автоматически в течение
 24 часов после сбоя. Тебе ничего делать не надо. Время этой фазы
 измеряется на нашем сервере — с момента старта настройки до
-завершения верификации Brevo. Сбой означает, что наша система
+завершения верификации SMTP. Сбой означает, что наша система
 вернула ошибку и не дошла до шага Gmail-мастера.
 
 2. 30-дневная функциональная гарантия (по запросу). Если в течение
@@ -86,7 +86,7 @@ email через настройку, которую мы сделали — да
   нашей опциональной подпиской Deliverability Monitoring ($3/месяц
   на домен).
 - Сбои из-за истечения срока твоего домена, смены регистратора или
-  блокировки аккаунтов в сторонних сервисах (Cloudflare, Brevo,
+  блокировки аккаунтов в сторонних сервисах (Cloudflare, Postmark,
   Google), которые вне нашего контроля.
 
 Как обрабатывается возврат: Деньги возвращаются на ту же карту, с

@@ -54,8 +54,8 @@ export default async function TermsPage({
     locale === "ru" ? "Обновлено 25.04.2026" : "Updated 2026-04-25";
   const lede =
     locale === "ru"
-      ? "Mailkit — это разовая настройка почты на твоем домене за $5. Мы автоматизируем техническую часть (Cloudflare и Brevo), ты копируешь четыре строки в Gmail. Возврат — по двум сценариям: автоматически при сбое нашей настройки и по запросу в течение 30 дней, если не работает. Подробности ниже."
-      : "Mailkit is a one-time domain email setup for $5. We automate the technical side (Cloudflare and Brevo); you copy-paste four lines into Gmail. Refunds work two ways: automatic if our setup fails, on request within 30 days if you can't actually send email. The formal terms below cover the edge cases.";
+      ? "Mailkit — это разовая настройка почты на твоем домене за $5. Мы автоматизируем техническую часть (Cloudflare и Postmark), ты копируешь четыре строки в Gmail. Возврат — по двум сценариям: автоматически при сбое нашей настройки и по запросу в течение 30 дней, если не работает. Подробности ниже."
+      : "Mailkit is a one-time domain email setup for $5. We automate the technical side (Cloudflare and Postmark); you copy-paste four lines into Gmail. Refunds work two ways: automatic if our setup fails, on request within 30 days if you can't actually send email. The formal terms below cover the edge cases.";
 
   return (
     <>
