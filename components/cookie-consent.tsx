@@ -57,15 +57,22 @@ export function CookieConsent() {
       if (readPersistedShouldShow()) setShouldShow(true);
     };
     const timer = window.setTimeout(reveal, FIRST_PAINT_DELAY_MS);
+    // Delay banner until user has scrolled past 130% of viewport height so
+    // it doesn't overlap the hero subhead on tablet portrait (768px).
+    const onScroll = () => {
+      if (window.scrollY > window.innerHeight * 1.3) reveal();
+    };
     const io = sentinel
       ? new IntersectionObserver((entries) => {
-          if (entries.some((e) => e.isIntersecting)) reveal();
+          if (entries.some((e) => e.isIntersecting)) onScroll();
         })
       : null;
     if (sentinel && io) io.observe(sentinel);
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
       window.clearTimeout(timer);
       io?.disconnect();
+      window.removeEventListener("scroll", onScroll);
     };
   }, []);
 

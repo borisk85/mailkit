@@ -29,6 +29,7 @@ export function ThemeToggle() {
       variant="ghost"
       size="icon"
       aria-label={nextMode === "light" ? t("switchToLight") : t("switchToDark")}
+      suppressHydrationWarning
       onClick={() => setTheme(nextMode)}
       className="relative size-9"
     >
