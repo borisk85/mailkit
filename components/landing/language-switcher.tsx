@@ -3,7 +3,6 @@
 import { useLocale, useTranslations } from "next-intl";
 import { Check, Globe } from "lucide-react";
 import GB from "country-flag-icons/react/3x2/GB";
-import RU from "country-flag-icons/react/3x2/RU";
 
 import {
   DropdownMenu,
@@ -19,15 +18,6 @@ export function LanguageSwitcher() {
   const locale = useLocale();
   const router = useRouter();
   const pathname = usePathname();
-
-  const FlagForLocale = ({ l }: { l: string }) => {
-    if (l === "en") return <GB className="h-3.5 w-auto rounded-sm" />;
-    if (l === "ru") return <RU className="h-3.5 w-auto rounded-sm" />;
-    return null;
-  };
-
-  const labelForLocale = (l: string) =>
-    l === "en" ? t("en") : l === "ru" ? t("ru") : l.toUpperCase();
 
   return (
     <DropdownMenu>
@@ -51,9 +41,9 @@ export function LanguageSwitcher() {
             >
               <span className="flex items-center gap-2">
                 <span aria-hidden>
-                  <FlagForLocale l={l} />
+                  <GB className="h-3.5 w-auto rounded-sm" />
                 </span>
-                {labelForLocale(l)}
+                {t("en")}
               </span>
               {active ? (
                 <Check className="size-4 text-neutral-500" aria-hidden />

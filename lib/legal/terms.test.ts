@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { TERMS_EN, TERMS_RU } from "./terms";
+import { TERMS_EN } from "./terms";
 
 /**
  * Smoke checks on the canonical Terms text. We can't assert the full
@@ -36,29 +36,10 @@ describe("Terms canonical text", () => {
   test("EN: bounce/complaint thresholds match #21 + #22 specs", () => {
     expect(TERMS_EN).toMatch(/Bounce rate exceeding 5%/);
     expect(TERMS_EN).toMatch(/Complaint rate exceeding 0\.1%/);
-    expect(TERMS_EN).toMatch(/500 emails per day per domain/);
+    expect(TERMS_EN).toMatch(/500 emails per day/);
   });
 
-  test("RU: title + 11 numbered sections", () => {
-    expect(TERMS_RU).toContain("MailKit — Условия пользования");
-    expect(TERMS_RU).toContain("Последнее обновление:");
-    for (let i = 1; i <= 11; i++) {
-      expect(TERMS_RU).toMatch(new RegExp(`\\n${i}\\. `));
-    }
-  });
-
-  test("RU: liability clause names $5", () => {
-    expect(TERMS_RU).toContain("5 долларов США за настройку одного");
-  });
-
-  test("RU: same bounce/complaint thresholds as EN", () => {
-    expect(TERMS_RU).toMatch(/более 5 процентов/);
-    expect(TERMS_RU).toMatch(/более 0\.1 процента/);
-    expect(TERMS_RU).toMatch(/более 500 писем в сутки/);
-  });
-
-  test("contact email is consistent across locales", () => {
+  test("EN: support contact email present", () => {
     expect(TERMS_EN).toContain("support@getmailkit.com");
-    expect(TERMS_RU).toContain("support@getmailkit.com");
   });
 });

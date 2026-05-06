@@ -1,5 +1,5 @@
 /**
- * Canonical deliverability disclaimer text — EN + RU. Single source of
+ * Canonical deliverability disclaimer text — EN only. Single source of
  * truth for the four placement points listed in #24:
  *   1. Landing FAQ "Why might my emails go to spam?" (#11 этап 3)
  *   2. /terms section 5 — already embedded in lib/legal/terms.ts
@@ -35,17 +35,3 @@ export const DELIVERABILITY_DISCLAIMER_EN = {
    */
   warmupTip: `Tip: warm up the domain gradually — 10–20 emails per day in the first week, then ramp up. Bursts from a fresh domain are the fastest way to land in spam.`,
 };
-
-export const DELIVERABILITY_DISCLAIMER_RU = {
-  full: `MailKit настраивает технически корректную SPF/DKIM/DMARC аутентификацию. Доставляемость писем конкретному получателю зависит от репутации отправителя, содержимого, практик отправки и политик получающей стороны — всё это вне нашего контроля и ответственности. Прогрев домена, работа со списком получателей, соблюдение согласия на рассылку — задача отправителя.`,
-
-  attributionOnly: `Доставляемость писем конкретному получателю зависит от репутации отправителя, содержимого, практик отправки и политик получающей стороны — факторов вне контроля MailKit. Мы настраиваем корректные SPF/DKIM/DMARC; прогрев и гигиена списка — задача отправителя.`,
-
-  warmupTip: `Совет: прогревай домен постепенно — 10–20 писем в день первую неделю, дальше увеличивай. Резкие всплески с нового домена — самый короткий путь в спам.`,
-};
-
-export function disclaimerForLocale(locale: string) {
-  return locale === "ru"
-    ? DELIVERABILITY_DISCLAIMER_RU
-    : DELIVERABILITY_DISCLAIMER_EN;
-}

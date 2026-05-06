@@ -24,7 +24,7 @@ afterEach(() => {
 });
 
 describe("organizationSchema", () => {
-  test("brand identity, contact point with EN+RU support", () => {
+  test("brand identity, contact point with EN support", () => {
     const s = organizationSchema();
     expect(s["@type"]).toBe("Organization");
     expect(s["@id"]).toBe("https://getmailkit.com/#organization");
@@ -32,7 +32,7 @@ describe("organizationSchema", () => {
     expect(s.logo).toBe("https://getmailkit.com/brand/mailkit-logo-full.png");
     const contact = s.contactPoint as Record<string, unknown>;
     expect(contact.email).toBe("support@getmailkit.com");
-    expect(contact.availableLanguage).toEqual(["English", "Russian"]);
+    expect(contact.availableLanguage).toEqual(["English"]);
   });
 
   test("falls back to getmailkit.com when NEXT_PUBLIC_SITE_URL unset", () => {
@@ -51,21 +51,17 @@ describe("organizationSchema", () => {
 });
 
 describe("softwareApplicationSchema", () => {
-  test("EN locale: BusinessApplication + Web + USD 5.00 offer", () => {
-    const s = softwareApplicationSchema("en");
+  test("BusinessApplication + Web + USD 5.00 offer", () => {
+    const s = softwareApplicationSchema();
     expect(s["@type"]).toBe("SoftwareApplication");
     expect(s.applicationCategory).toBe("BusinessApplication");
     expect(s.operatingSystem).toBe("Web");
     expect(s.inLanguage).toBe("en");
-    expect(s.url).toBe("https://getmailkit.com/en");
     const offer = s.offers as Record<string, unknown>;
     expect(offer["@type"]).toBe("Offer");
     expect(offer.price).toBe("5.00");
     expect(offer.priceCurrency).toBe("USD");
     expect(offer.availability).toBe("https://schema.org/InStock");
-    // Description carries the canonical brand-mention from
-    // docs/AI_SEARCH_STRATEGY.md §5 — verbatim phrasing helps LLMs
-    // standardize how they cite us.
     expect(s.description).toContain("5 minutes");
     expect(s.description).toContain("$5 one-time");
     expect(s.description).toContain("Cloudflare");
@@ -73,18 +69,8 @@ describe("softwareApplicationSchema", () => {
     expect(s.description).toContain("Gmail Send-As");
   });
 
-  test("RU locale mirrors structure with Russian description", () => {
-    const s = softwareApplicationSchema("ru");
-    expect(s.inLanguage).toBe("ru");
-    expect(s.url).toBe("https://getmailkit.com/ru");
-    expect(s.description).toContain("5 минут");
-    expect(s.description).toContain("$5");
-    expect(s.description).toContain("Cloudflare");
-    expect(s.description).toContain("Postmark");
-  });
-
   test("publisher cross-references the Organization @id", () => {
-    const s = softwareApplicationSchema("en");
+    const s = softwareApplicationSchema();
     expect(s.publisher).toEqual({
       "@id": "https://getmailkit.com/#organization",
     });
@@ -92,22 +78,17 @@ describe("softwareApplicationSchema", () => {
 });
 
 describe("productSchema", () => {
-  test("Product + Offer with locale-specific name + offer URL", () => {
-    const s = productSchema("en");
+  test("Product + Offer with name + offer URL", () => {
+    const s = productSchema();
     expect(s["@type"]).toBe("Product");
     expect(s.name).toContain("MailKit");
     const offer = s.offers as Record<string, unknown>;
-    expect(offer.url).toBe("https://getmailkit.com/en#pricing");
+    expect(offer.url).toBe("https://getmailkit.com/#pricing");
     expect(offer.price).toBe("5.00");
   });
 
-  test("RU locale gives a Russian product name", () => {
-    const s = productSchema("ru");
-    expect(s.name).toContain("настройка почты");
-  });
-
   test("brand cross-references Organization @id", () => {
-    expect(productSchema("en").brand).toEqual({
+    expect(productSchema().brand).toEqual({
       "@id": "https://getmailkit.com/#organization",
     });
   });
@@ -135,7 +116,7 @@ describe("faqPageSchema", () => {
     expect(main).toHaveLength(2);
     expect(main[0]["@type"]).toBe("Question");
     expect(main[0].name).toBe("How much does MailKit cost?");
-    expect(main[0]["@id"]).toBe("https://getmailkit.com/en#faq-cost");
+    expect(main[0]["@id"]).toBe("https://getmailkit.com/#faq-cost");
     const answer = main[0].acceptedAnswer as Record<string, unknown>;
     expect(answer["@type"]).toBe("Answer");
     expect(answer.text).toBe("MailKit costs $5 once per mailbox.");
@@ -144,17 +125,6 @@ describe("faqPageSchema", () => {
   test("empty items array yields empty mainEntity (legal but inert)", () => {
     const s = faqPageSchema("en", []);
     expect(s.mainEntity).toEqual([]);
-  });
-
-  test("RU locale: schema reflects locale, ids, content", () => {
-    const ruItems: FaqItem[] = [
-      { id: "cost", q: "Сколько стоит?", a: "$5 разово." },
-    ];
-    const s = faqPageSchema("ru", ruItems);
-    expect(s.inLanguage).toBe("ru");
-    const main = s.mainEntity as Array<Record<string, unknown>>;
-    expect(main[0]["@id"]).toBe("https://getmailkit.com/ru#faq-cost");
-    expect(main[0].name).toBe("Сколько стоит?");
   });
 });
 
@@ -173,17 +143,6 @@ describe("landingGraph", () => {
       "Product",
       "FAQPage",
     ]);
-  });
-
-  test("locale flows through to each constituent schema", () => {
-    const g = landingGraph("ru", items);
-    const graph = g["@graph"] as Array<Record<string, unknown>>;
-    const sa = graph[1];
-    const product = graph[2];
-    const faq = graph[3];
-    expect(sa.inLanguage).toBe("ru");
-    expect(product.name).toContain("настройка почты");
-    expect(faq.inLanguage).toBe("ru");
   });
 
   test("FAQ items make it into the graph node verbatim", () => {

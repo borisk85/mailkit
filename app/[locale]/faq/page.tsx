@@ -31,11 +31,9 @@ export default async function FaqPage({
 
   const t = await getTranslations({ locale, namespace: "landing.faq" });
   const faqItems = t.raw("items") as FaqItem[];
-  const schemaLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
-
   return (
     <>
-      <StructuredData data={faqPageSchema(schemaLocale, faqItems)} />
+      <StructuredData data={faqPageSchema("en", faqItems)} />
       <Header />
       <main className="flex flex-1 flex-col">
         <FaqSection />

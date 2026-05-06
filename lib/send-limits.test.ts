@@ -191,10 +191,4 @@ describe("periodLabel", () => {
     expect(periodLabel("hour")).toBe("hour");
     expect(periodLabel("minute")).toBe("minute");
   });
-
-  test("RU labels (used in suspension email)", () => {
-    expect(periodLabel("day", "ru")).toBe("сутки");
-    expect(periodLabel("hour", "ru")).toBe("час");
-    expect(periodLabel("minute", "ru")).toBe("минуту");
-  });
 });

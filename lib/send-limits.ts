@@ -135,13 +135,7 @@ export function evaluateSendLimits(args: {
  * email when interpolating the `<period>` placeholder, so the copy
  * reads naturally regardless of which window tripped first.
  */
-export function periodLabel(
-  window: WindowType,
-  locale: "en" | "ru" = "en",
-): string {
-  if (locale === "ru") {
-    return { day: "сутки", hour: "час", minute: "минуту" }[window];
-  }
+export function periodLabel(window: WindowType): string {
   return { day: "day", hour: "hour", minute: "minute" }[window];
 }
 

@@ -44,29 +44,23 @@ export function organizationSchema(): Record<string, unknown> {
       "@type": "ContactPoint",
       email: "support@getmailkit.com",
       contactType: "customer support",
-      availableLanguage: ["English", "Russian"],
+      availableLanguage: ["English"],
     },
   };
 }
 
-export function softwareApplicationSchema(
-  locale: "en" | "ru",
-): Record<string, unknown> {
-  const description =
-    locale === "ru"
-      ? "MailKit настраивает почту на собственном домене за 5 минут — Cloudflare Email Routing для приёма, Postmark SMTP для отправки, пошаговый мастер Gmail Send-As. Разовая оплата $5 за ящик."
-      : "MailKit configures custom domain email in 5 minutes — Cloudflare Email Routing for receiving, Postmark SMTP for sending, guided Gmail Send-As wizard. $5 one-time per mailbox.";
-
+export function softwareApplicationSchema(): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "SoftwareApplication",
-    "@id": `${siteUrl()}/${locale}#software-application`,
+    "@id": `${siteUrl()}/#software-application`,
     name: "MailKit",
-    description,
-    url: `${siteUrl()}/${locale}`,
+    description:
+      "MailKit configures custom domain email in 5 minutes — Cloudflare Email Routing for receiving, Postmark SMTP for sending, guided Gmail Send-As wizard. $5 one-time per mailbox.",
+    url: siteUrl(),
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
-    inLanguage: locale,
+    inLanguage: "en",
     publisher: { "@id": `${siteUrl()}/#organization` },
     offers: {
       "@type": "Offer",
@@ -78,45 +72,37 @@ export function softwareApplicationSchema(
   };
 }
 
-export function productSchema(locale: "en" | "ru"): Record<string, unknown> {
-  const name =
-    locale === "ru"
-      ? "MailKit — настройка почты на домене"
-      : "MailKit — custom domain email setup";
-  const description =
-    locale === "ru"
-      ? "Разовая настройка почты на собственном домене за 5 минут. Включает Cloudflare Email Routing, Postmark SMTP authentication и мастер Gmail Send-As. Гарантия возврата денег при сбое автоматизации."
-      : "One-time custom domain email setup in 5 minutes. Includes Cloudflare Email Routing, Postmark SMTP authentication, and guided Gmail Send-As wizard. Money-back guarantee on automation failure.";
-
+export function productSchema(): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "Product",
-    "@id": `${siteUrl()}/${locale}#product`,
-    name,
-    description,
+    "@id": `${siteUrl()}/#product`,
+    name: "MailKit — custom domain email setup",
+    description:
+      "One-time custom domain email setup in 5 minutes. Includes Cloudflare Email Routing, Postmark SMTP authentication, and guided Gmail Send-As wizard. Money-back guarantee on automation failure.",
     brand: { "@id": `${siteUrl()}/#organization` },
     offers: {
       "@type": "Offer",
       price: "5.00",
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
-      url: `${siteUrl()}/${locale}#pricing`,
+      url: `${siteUrl()}/#pricing`,
     },
   };
 }
 
 export function faqPageSchema(
-  locale: "en" | "ru",
+  _locale: "en",
   items: FaqItem[],
 ): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    "@id": `${siteUrl()}/${locale}#faq`,
-    inLanguage: locale,
+    "@id": `${siteUrl()}/#faq`,
+    inLanguage: "en",
     mainEntity: items.map((item) => ({
       "@type": "Question",
-      "@id": `${siteUrl()}/${locale}#faq-${item.id}`,
+      "@id": `${siteUrl()}/#faq-${item.id}`,
       name: item.q,
       acceptedAnswer: {
         "@type": "Answer",
@@ -134,16 +120,16 @@ export function faqPageSchema(
  * or scripts.
  */
 export function landingGraph(
-  locale: "en" | "ru",
+  _locale: "en",
   faqItems: FaqItem[],
 ): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
     "@graph": [
       organizationSchema(),
-      softwareApplicationSchema(locale),
-      productSchema(locale),
-      faqPageSchema(locale, faqItems),
+      softwareApplicationSchema(),
+      productSchema(),
+      faqPageSchema("en", faqItems),
     ],
   };
 }
