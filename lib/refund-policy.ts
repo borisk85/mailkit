@@ -24,7 +24,7 @@ const AUTO_REFUND_STEPS = new Set<string>([
   "create_destination",
   "list_rules",
   "create_rule",
-  // Brevo pipeline — our code called Brevo / wrote DNS for SPF/DMARC.
+  // SMTP pipeline — our code called Postmark / wrote DNS for SPF/DMARC.
   "brevo_create_sender",
   "brevo_dns_upsert",
   "brevo_spf_merge",

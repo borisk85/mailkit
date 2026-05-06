@@ -54,8 +54,8 @@ export function softwareApplicationSchema(
 ): Record<string, unknown> {
   const description =
     locale === "ru"
-      ? "MailKit настраивает почту на собственном домене за 5 минут — Cloudflare Email Routing для приёма, Brevo SMTP для отправки, пошаговый мастер Gmail Send-As. Разовая оплата $5 за ящик."
-      : "MailKit configures custom domain email in 5 minutes — Cloudflare Email Routing for receiving, Brevo SMTP for sending, guided Gmail Send-As wizard. $5 one-time per mailbox.";
+      ? "MailKit настраивает почту на собственном домене за 5 минут — Cloudflare Email Routing для приёма, Postmark SMTP для отправки, пошаговый мастер Gmail Send-As. Разовая оплата $5 за ящик."
+      : "MailKit configures custom domain email in 5 minutes — Cloudflare Email Routing for receiving, Postmark SMTP for sending, guided Gmail Send-As wizard. $5 one-time per mailbox.";
 
   return {
     "@context": "https://schema.org",
@@ -85,8 +85,8 @@ export function productSchema(locale: "en" | "ru"): Record<string, unknown> {
       : "MailKit — custom domain email setup";
   const description =
     locale === "ru"
-      ? "Разовая настройка почты на собственном домене за 5 минут. Включает Cloudflare Email Routing, Brevo SMTP authentication и мастер Gmail Send-As. Гарантия возврата денег при сбое автоматизации."
-      : "One-time custom domain email setup in 5 minutes. Includes Cloudflare Email Routing, Brevo SMTP authentication, and guided Gmail Send-As wizard. Money-back guarantee on automation failure.";
+      ? "Разовая настройка почты на собственном домене за 5 минут. Включает Cloudflare Email Routing, Postmark SMTP authentication и мастер Gmail Send-As. Гарантия возврата денег при сбое автоматизации."
+      : "One-time custom domain email setup in 5 minutes. Includes Cloudflare Email Routing, Postmark SMTP authentication, and guided Gmail Send-As wizard. Money-back guarantee on automation failure.";
 
   return {
     "@context": "https://schema.org",

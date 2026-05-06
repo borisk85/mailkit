@@ -1,14 +1,14 @@
 /**
- * SPF TXT merge helper for Ticket #4b Brevo integration.
+ * SPF TXT merge helper for Ticket #4b Postmark integration.
  *
  * Parses `v=spf1 …` strings into a structured shape, merges a new
  * `include:` (or other mechanism) preserving existing ones, and
  * renders back to a DNS-safe TXT string.
  *
  * Background: pipeline #4a discovered that naive "first-match
- * overwrite" on TXT @ records destroys prior Brevo/Google/etc. SPF
- * setups on zones the user already wired elsewhere. #4b's Brevo step
- * needs `include:spf.brevo.com` appended to whatever SPF the zone
+ * overwrite" on TXT @ records destroys prior Postmark/Google/etc. SPF
+ * setups on zones the user already wired elsewhere. #4b's Postmark step
+ * needs `include:spf.postmark.com` appended to whatever SPF the zone
  * currently carries, not a blind overwrite.
  *
  * Scope: SPF mechanism list + qualifier. No modifiers (redirect=, exp=)
@@ -171,7 +171,7 @@ function formatMechanism(m: SpfMechanism): string {
  * - If the terminal qualifier is `-all` we reject the merge with
  *   `SpfMergeHardFail`: a hard-fail policy means the zone owner has
  *   explicitly declared a closed sender set, and silently adding a
- *   Brevo include would contradict their intent. Callers surface this
+ *   Postmark include would contradict their intent. Callers surface this
  *   to the user so they can change their SPF policy first.
  * - Final rendered length must stay ≤ 255 chars (per-string DNS TXT
  *   limit). Overflow throws a clear error rather than silently
@@ -183,7 +183,7 @@ export function mergeSpfMechanism(
 ): SpfRecord {
   if (record.qualifier === "-all") {
     throw new SpfMergeHardFail(
-      "SPF record ends in -all (hard fail); merging a new include would contradict the zone's closed sender policy. Ask the user to soften to ~all before adding Brevo.",
+      "SPF record ends in -all (hard fail); merging a new include would contradict the zone's closed sender policy. Ask the user to soften to ~all before adding Postmark.",
     );
   }
 

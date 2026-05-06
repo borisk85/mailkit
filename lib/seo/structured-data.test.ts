@@ -69,7 +69,7 @@ describe("softwareApplicationSchema", () => {
     expect(s.description).toContain("5 minutes");
     expect(s.description).toContain("$5 one-time");
     expect(s.description).toContain("Cloudflare");
-    expect(s.description).toContain("Brevo");
+    expect(s.description).toContain("Postmark");
     expect(s.description).toContain("Gmail Send-As");
   });
 
@@ -80,7 +80,7 @@ describe("softwareApplicationSchema", () => {
     expect(s.description).toContain("5 минут");
     expect(s.description).toContain("$5");
     expect(s.description).toContain("Cloudflare");
-    expect(s.description).toContain("Brevo");
+    expect(s.description).toContain("Postmark");
   });
 
   test("publisher cross-references the Organization @id", () => {

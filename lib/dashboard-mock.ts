@@ -38,7 +38,7 @@ const ACTIVE: DashboardData = {
       id: "mock-setup-active",
       domain: "founders.example",
       mailboxLocal: "hello",
-      status: "brevo_dns_written",
+      status: "smtp_dns_written",
       errorMsg: null,
       createdAt: YESTERDAY,
       updatedAt: TODAY,
@@ -88,7 +88,8 @@ const FAILED_REFUNDED: DashboardData = {
       domain: "founders.example",
       mailboxLocal: "hello",
       status: "failed",
-      errorMsg: "Brevo verification timed out — DKIM record didn't propagate.",
+      errorMsg:
+        "Postmark verification timed out — DKIM record didn't propagate.",
       createdAt: LAST_WEEK,
       updatedAt: YESTERDAY,
     },

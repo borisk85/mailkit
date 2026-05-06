@@ -176,9 +176,9 @@ function renderSchematic(id: StepId) {
             SMTP Server
           </text>
           {[
-            { label: "Server", value: "smtp-relay.brevo.com", y: 60 },
+            { label: "Server", value: "smtp.postmarkapp.com", y: 60 },
             { label: "Port", value: "587", y: 105 },
-            { label: "Username", value: "1abcde@smtp-brevo.com", y: 150 },
+            { label: "Username", value: "(server token)", y: 150 },
             { label: "Password", value: "••••••••••", y: 195 },
           ].map((row) => (
             <g key={row.label}>

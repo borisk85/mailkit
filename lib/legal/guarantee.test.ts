@@ -22,7 +22,7 @@ describe("Guarantee canonical text", () => {
     expect(GUARANTEE_EN).toContain("Gmail Send-As");
     expect(GUARANTEE_EN).toContain("DNS records");
     expect(GUARANTEE_EN).toContain("deliverability");
-    expect(GUARANTEE_EN).toMatch(/Cloudflare, Brevo,\s*Google/);
+    expect(GUARANTEE_EN).toMatch(/Cloudflare, Postmark,\s*Google/);
   });
 
   test("EN: 24h auto-refund + 30-day functional + 3-10 business days processing", () => {

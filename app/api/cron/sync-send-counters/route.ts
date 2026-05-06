@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { suspendForRateLimit } from "@/lib/abuse-suspend";
-import { createBrevoStatsClient } from "@/lib/integrations/brevo-stats";
+import { createPostmarkStatsClient } from "@/lib/integrations/postmark-stats";
 import {
   currentWindowBuckets,
   evaluateSendLimits,
@@ -10,7 +10,7 @@ import {
 import { createServiceClient } from "@/lib/supabase/server";
 
 /**
- * Layer 1 cron — pulls per-domain send counts from Brevo every
+ * Layer 1 cron — pulls per-domain send counts from Postmark every
  * 5-10 minutes (Vercel `vercel.json` schedule), upserts the day-window
  * counter row, evaluates limits, suspends domains that crossed.
  *
@@ -18,7 +18,7 @@ import { createServiceClient } from "@/lib/supabase/server";
  * the CRON_SECRET env is configured. Anything else → 401 to keep the
  * endpoint from being trivially poked.
  *
- * Why day-only for MVP: Brevo's aggregatedReport API has daily
+ * Why day-only for MVP: Postmark's outbound stats API has daily
  * resolution — startDate/endDate are YYYY-MM-DD. Our hour and minute
  * predicates are kept in lib/send-limits.ts because they'll be wired
  * via a secondary signal (e.g. the SMTP-adapter abstraction in #26
@@ -27,7 +27,7 @@ import { createServiceClient } from "@/lib/supabase/server";
  * defense-in-depth that activates later.
  *
  * Failure posture: per-domain failures don't abort the run. Each
- * domain is wrapped in try/catch so one Brevo timeout doesn't starve
+ * domain is wrapped in try/catch so one Postmark timeout doesn't starve
  * other domains. The route returns 200 with a summary; details land
  * in console.error for Vercel runtime logs.
  */
@@ -42,14 +42,7 @@ export async function GET(request: Request) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey) {
-    console.error("[cron/sync-send-counters] BREVO_API_KEY not set");
-    return new NextResponse("Brevo key not configured", { status: 500 });
-  }
-
   const admin = createServiceClient();
-  const stats = createBrevoStatsClient(apiKey);
 
   // Active customers only — paid + not already suspended.
   const { data: purchases, error: pErr } = await admin
@@ -87,8 +80,35 @@ export async function GET(request: Request) {
     summary.checked += 1;
 
     try {
+      // Look up Postmark server token for this domain.
+      const { data: run } = await admin
+        .from("setup_runs")
+        .select("cf_state")
+        .eq("domain", domain)
+        .eq("status", "done")
+        .not("postmark_server_id", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const serverToken = (
+        (run?.cf_state as Record<string, unknown> | null)?.postmark as
+          | Record<string, unknown>
+          | undefined
+      )?.server_token as string | undefined;
+
+      if (!serverToken) {
+        summary.outcomes.push({
+          domain,
+          dayCount: 0,
+          suspended: false,
+          error: "no_postmark_server_token",
+        });
+        continue;
+      }
+
+      const stats = createPostmarkStatsClient(serverToken);
       const report = await stats.getAggregatedReport({
-        senderDomain: domain,
         startDate: dayDate,
         endDate: todayDate,
       });

@@ -5,7 +5,7 @@ import {
   evaluateDeliverability,
   formatRateForStorage,
 } from "@/lib/deliverability";
-import { createBrevoStatsClient } from "@/lib/integrations/brevo-stats";
+import { createPostmarkStatsClient } from "@/lib/integrations/postmark-stats";
 import { createServiceClient } from "@/lib/supabase/server";
 
 const RETENTION_DAYS = 90;
@@ -36,14 +36,7 @@ export async function GET(request: Request) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const apiKey = process.env.BREVO_API_KEY;
-  if (!apiKey) {
-    console.error("[cron/sync-deliverability] BREVO_API_KEY not set");
-    return new NextResponse("Brevo key not configured", { status: 500 });
-  }
-
   const admin = createServiceClient();
-  const stats = createBrevoStatsClient(apiKey);
 
   const { data: purchases, error: pErr } = await admin
     .from("purchases")
@@ -84,11 +77,35 @@ export async function GET(request: Request) {
     summary.checked += 1;
 
     try {
-      const report = await stats.getAggregatedReport({
-        senderDomain: domain,
-        startDate,
-        endDate,
-      });
+      // Look up the Postmark server token for this domain from the most recent done run.
+      const { data: run } = await admin
+        .from("setup_runs")
+        .select("cf_state")
+        .eq("domain", domain)
+        .eq("status", "done")
+        .not("postmark_server_id", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const serverToken = (
+        (run?.cf_state as Record<string, unknown> | null)?.postmark as
+          | Record<string, unknown>
+          | undefined
+      )?.server_token as string | undefined;
+
+      if (!serverToken) {
+        summary.outcomes.push({
+          domain,
+          action: null,
+          requests: 0,
+          error: "no_postmark_server_token",
+        });
+        continue;
+      }
+
+      const stats = createPostmarkStatsClient(serverToken);
+      const report = await stats.getAggregatedReport({ startDate, endDate });
 
       const evaluation = evaluateDeliverability(report);
 

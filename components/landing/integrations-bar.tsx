@@ -1,13 +1,14 @@
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { SiCloudflare, SiBrevo } from "react-icons/si";
+import { SiCloudflare } from "react-icons/si";
+import { HiMail } from "react-icons/hi";
 
 /**
- * Integrations strip below the hero. Cloudflare and Brevo render from
- * Simple Icons (via react-icons) in their primary brand color. Gmail
- * uses the official multi-color envelope SVG (Wikimedia Commons,
- * 2020 Google brand mark) since users recognize it visually and the
- * single-color Simple Icons wordmark looked off.
+ * Integrations strip below the hero. Cloudflare uses Simple Icons brand color.
+ * Postmark uses a generic mail icon (SiPostmark absent in react-icons 5.6.0 —
+ * upgrade to react-icons ≥5.7 or use Postmark brand SVG when available).
+ * Gmail uses the official multi-color envelope SVG (Wikimedia Commons,
+ * 2020 Google brand mark) since users recognize it visually.
  *
  * Layout: inline horizontal — label on the left, vertical divider,
  * brand row on the right. Brand name labels are secondary-tone so
@@ -24,8 +25,8 @@ export function IntegrationsBar() {
         <LogoItem name="Cloudflare">
           <SiCloudflare size={40} color="#F38020" aria-hidden />
         </LogoItem>
-        <LogoItem name="Brevo">
-          <SiBrevo size={40} color="#0B996E" aria-hidden />
+        <LogoItem name="Postmark">
+          <HiMail size={40} color="#FFDE00" aria-hidden />
         </LogoItem>
         <LogoItem name="Gmail">
           <Image

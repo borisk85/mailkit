@@ -46,7 +46,7 @@ If AWS approval is still pending on launch eve: launch with Brevo only. Migratio
 - LS dashboard (Live mode) → Discounts → New
 - Code: `FIRST100`
 - Type: 100% off
-- Max redemptions: 100
+- Max redemptions: 25
 - Apply to: MailKit Email Setup product
 - Save
 
@@ -143,7 +143,7 @@ All engineering tickets are in `main` as of this checklist's date:
 - Ops: #39 cookie consent, #41 error boundary, #45 Sentry
 - UI: #38 brand lockup unification + cross-page anchor nav
 - OAuth verification prep: #36 narrow scopes + submission handoff
-- Promo: #33 first-100 discount on landing CTAs
+- Promo: #33 first-25 discount on landing CTAs
 
 Outstanding (post-launch, AWS-pending):
 - #26 SMTP-adapter abstraction (after AWS SES production access)

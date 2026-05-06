@@ -251,7 +251,7 @@ export const PRIVACY_RU = `MailKit — Политика конфиденциал
   нашей базе данных после завершения процесса настройки —
   существует только в памяти во время активной сессии.
 - Ваши SMTP-реквизиты для Gmail отображаемые во время мастера
-  Send-As. Реквизиты генерируются компанией Brevo (наш SMTP
+  Send-As. Реквизиты генерируются Postmark (наш SMTP
   провайдер) и показываются вам для копирования в Gmail. Мы не
   сохраняем копию в нашей базе данных после завершения сессии.
 - Состояние и журналы настройки (какой шаг прошёл или не прошёл,
@@ -283,7 +283,7 @@ export const PRIVACY_RU = `MailKit — Политика конфиденциал
 
 - Аутентификация при входе через Google OAuth.
 - Настройка инфраструктуры почты на вашем домене через Cloudflare
-  Email Routing и Brevo SMTP, как вы запросили.
+  Email Routing и Postmark SMTP, как вы запросили.
 - Отображение SMTP-реквизитов во время мастера Gmail Send-As.
 - Обработка платежей и возвратов через Lemon Squeezy.
 - Отправка транзакционных писем связанных с вашей покупкой
@@ -308,7 +308,7 @@ export const PRIVACY_RU = `MailKit — Политика конфиденциал
 
 - Google (OAuth-аутентификация) — google.com/policies/privacy
 - Cloudflare (DNS, Email Routing) — cloudflare.com/privacypolicy
-- Brevo (SMTP-ретрансляция, транзакционные письма) — brevo.com/legal/privacypolicy
+- Postmark (SMTP-ретрансляция, транзакционные письма) — postmarkapp.com/privacy-policy
 - Lemon Squeezy (обработка платежей) — lemonsqueezy.com/privacy
 - Supabase (хостинг базы данных) — supabase.com/privacy
 - Vercel (веб-хостинг) — vercel.com/legal/privacy-policy

@@ -22,7 +22,7 @@ import { cn } from "@/lib/utils";
 import {
   checkDomainNS,
   confirmGmailSendAs,
-  continueBrevoSetup,
+  continueSmtpSetup,
   prepareGmailStep,
   resumeDestinationVerify,
   startSetupRun,
@@ -65,7 +65,7 @@ type WizardState =
       errorKey?: string;
     }
   | {
-      kind: "cf_done_pending_brevo";
+      kind: "cf_done_pending_smtp";
       runId: string;
       cfToken: string;
       zoneName: string;
@@ -74,7 +74,7 @@ type WizardState =
       errorKey?: string;
     }
   | {
-      kind: "brevo_running";
+      kind: "smtp_running";
       runId: string;
       cfToken: string;
       zoneName: string;
@@ -83,7 +83,7 @@ type WizardState =
       reached: "sender" | "dns" | "verify" | "done";
     }
   | {
-      kind: "brevo_awaiting_retry";
+      kind: "smtp_awaiting_retry";
       runId: string;
       cfToken: string;
       zoneName: string;
@@ -92,7 +92,7 @@ type WizardState =
       errorKey?: string;
     }
   | {
-      kind: "brevo_done";
+      kind: "smtp_done";
       runId: string;
       zoneName: string;
       mailboxLocal: string;
@@ -128,7 +128,7 @@ type WizardState =
       kind: "failed";
       errorKey: string;
       errorDetails?: string;
-      source?: "cf" | "brevo" | "gmail";
+      source?: "cf" | "smtp" | "gmail";
     }
   | {
       kind: "ns_warning";
@@ -152,10 +152,10 @@ type MockKey =
   | "awaiting_verify"
   | "done"
   | "failed"
-  | "brevo_sender_created"
-  | "brevo_dns_written"
-  | "brevo_verified"
-  | "brevo_done"
+  | "smtp_sender_created"
+  | "smtp_dns_written"
+  | "smtp_verified"
+  | "smtp_done"
   | "gmail_instructions_shown"
   | "gmail_smtp_ready"
   | "gmail_send_as_verified"
@@ -163,9 +163,9 @@ type MockKey =
   | null;
 
 const MOCK_SMTP: SmtpDisplay = {
-  host: "smtp-relay.brevo.com",
+  host: "smtp.postmarkapp.com",
   port: 587,
-  username: "owner@brevo.com",
+  username: "(server token)",
   password: "xsmtpsib-mock-9f2c8b1a4d6e7f0a",
   securityMode: "starttls",
   keyVersion: 1,
@@ -198,16 +198,16 @@ function mockInitialState(mock: MockKey): WizardState {
       };
     case "done":
       return {
-        kind: "cf_done_pending_brevo",
+        kind: "cf_done_pending_smtp",
         runId: "11111111-2222-4333-8444-555555555555",
         cfToken: "mock_token",
         zoneName: "example.com",
         mailboxLocal: "hello",
         destinationEmail: "owner@gmail.com",
       };
-    case "brevo_sender_created":
+    case "smtp_sender_created":
       return {
-        kind: "brevo_running",
+        kind: "smtp_running",
         runId: "11111111-2222-4333-8444-555555555555",
         cfToken: "mock_token",
         zoneName: "example.com",
@@ -215,19 +215,19 @@ function mockInitialState(mock: MockKey): WizardState {
         destinationEmail: "owner@gmail.com",
         reached: "sender",
       };
-    case "brevo_dns_written":
+    case "smtp_dns_written":
       return {
-        kind: "brevo_awaiting_retry",
+        kind: "smtp_awaiting_retry",
         runId: "11111111-2222-4333-8444-555555555555",
         cfToken: "mock_token",
         zoneName: "example.com",
         mailboxLocal: "hello",
         destinationEmail: "owner@gmail.com",
-        errorKey: "setup.errors.brevo_verify_timeout",
+        errorKey: "setup.errors.smtp_verify_timeout",
       };
-    case "brevo_verified":
+    case "smtp_verified":
       return {
-        kind: "brevo_running",
+        kind: "smtp_running",
         runId: "11111111-2222-4333-8444-555555555555",
         cfToken: "mock_token",
         zoneName: "example.com",
@@ -235,9 +235,9 @@ function mockInitialState(mock: MockKey): WizardState {
         destinationEmail: "owner@gmail.com",
         reached: "verify",
       };
-    case "brevo_done":
+    case "smtp_done":
       return {
-        kind: "brevo_done",
+        kind: "smtp_done",
         runId: "11111111-2222-4333-8444-555555555555",
         zoneName: "example.com",
         mailboxLocal: "hello",
@@ -287,7 +287,7 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
   const tErr = useTranslations("setup.errors");
   const tState = useTranslations("setup.step3.state");
   const tSteps = useTranslations("setup.step3.steps");
-  const tBrevo = useTranslations("setup.brevoSteps");
+  const tSmtp = useTranslations("setup.smtpSteps");
   const [state, setState] = useState<WizardState>(() =>
     mockInitialState(initialMock),
   );
@@ -402,20 +402,20 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
                 });
                 return;
               }
-              // Resume path: existing run may already be past Brevo or
+              // Resume path: existing run may already be past the SMTP setup or
               // deep into the Gmail wizard. Route the UI to the matching
               // kind instead of always dropping onto the "Continue to
-              // Brevo" CTA.
+              // SMTP setup" CTA.
               const zoneName = chosen.name;
               if (
-                result.runStatus === "brevo_done" ||
+                result.runStatus === "smtp_done" ||
                 result.runStatus === "gmail_instructions_shown" ||
                 result.runStatus === "gmail_smtp_ready" ||
                 result.runStatus === "gmail_send_as_verified" ||
                 result.runStatus === "done"
               ) {
                 setState({
-                  kind: "brevo_done",
+                  kind: "smtp_done",
                   runId: result.runId,
                   zoneName,
                   mailboxLocal,
@@ -424,30 +424,30 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
                 return;
               }
               if (
-                result.runStatus === "brevo_sender_created" ||
-                result.runStatus === "brevo_dns_written" ||
-                result.runStatus === "brevo_verified"
+                result.runStatus === "smtp_sender_created" ||
+                result.runStatus === "smtp_dns_written" ||
+                result.runStatus === "smtp_verified"
               ) {
                 const reached: "sender" | "dns" | "verify" =
-                  result.runStatus === "brevo_sender_created"
+                  result.runStatus === "smtp_sender_created"
                     ? "sender"
-                    : result.runStatus === "brevo_dns_written"
+                    : result.runStatus === "smtp_dns_written"
                       ? "dns"
                       : "verify";
                 setState({
-                  kind: "brevo_awaiting_retry",
+                  kind: "smtp_awaiting_retry",
                   runId: result.runId,
                   cfToken: state.token,
                   zoneName,
                   mailboxLocal,
                   destinationEmail: result.destinationEmail,
-                  errorKey: "setup.errors.brevo_verify_timeout",
+                  errorKey: "setup.errors.smtp_verify_timeout",
                 });
                 void reached;
                 return;
               }
               setState({
-                kind: "cf_done_pending_brevo",
+                kind: "cf_done_pending_smtp",
                 runId: result.runId,
                 cfToken: state.token,
                 zoneName,
@@ -534,7 +534,7 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
               }
               if (result.runStatus === "cf_done") {
                 setState({
-                  kind: "cf_done_pending_brevo",
+                  kind: "cf_done_pending_smtp",
                   runId: state.runId,
                   cfToken: state.token,
                   zoneName: state.zoneName,
@@ -547,8 +547,8 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
         />
       ) : null}
 
-      {state.kind === "cf_done_pending_brevo" ? (
-        <CfDonePendingBrevoStep
+      {state.kind === "cf_done_pending_smtp" ? (
+        <CfDonePendingSmtpStep
           state={state}
           isPending={isPending}
           t={t}
@@ -558,7 +558,7 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
           onContinue={() => {
             const snapshot = state;
             setState({
-              kind: "brevo_running",
+              kind: "smtp_running",
               runId: snapshot.runId,
               cfToken: snapshot.cfToken,
               zoneName: snapshot.zoneName,
@@ -567,56 +567,56 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
               reached: "sender",
             });
             startTransition(async () => {
-              const result = await continueBrevoSetup({
+              const result = await continueSmtpSetup({
                 runId: snapshot.runId,
                 cfToken: snapshot.cfToken,
               });
-              handleBrevoResult(result, snapshot, setState);
+              handleSmtpResult(result, snapshot, setState);
             });
           }}
         />
       ) : null}
 
-      {state.kind === "brevo_running" ? (
-        <BrevoRunningStep
+      {state.kind === "smtp_running" ? (
+        <SmtpRunningStep
           state={state}
           t={t}
           tState={tState}
           tSteps={tSteps}
-          tBrevo={tBrevo}
+          tSmtp={tSmtp}
         />
       ) : null}
 
-      {state.kind === "brevo_awaiting_retry" ? (
-        <BrevoAwaitingRetryStep
+      {state.kind === "smtp_awaiting_retry" ? (
+        <SmtpAwaitingRetryStep
           state={state}
           isPending={isPending}
           t={t}
           tState={tState}
           tSteps={tSteps}
-          tBrevo={tBrevo}
+          tSmtp={tSmtp}
           translateErr={translateErr}
           onRetry={() => {
             const snapshot = state;
             startTransition(async () => {
-              const result = await continueBrevoSetup({
+              const result = await continueSmtpSetup({
                 runId: snapshot.runId,
                 cfToken: snapshot.cfToken,
               });
-              handleBrevoResult(result, snapshot, setState);
+              handleSmtpResult(result, snapshot, setState);
             });
           }}
         />
       ) : null}
 
-      {state.kind === "brevo_done" ? (
-        <BrevoDoneStep
+      {state.kind === "smtp_done" ? (
+        <SmtpDoneStep
           state={state}
           isPending={isPending}
           t={t}
           tState={tState}
           tSteps={tSteps}
-          tBrevo={tBrevo}
+          tSmtp={tSmtp}
           translateErr={translateErr}
           onContinue={() => {
             const snapshot = state;
@@ -631,7 +631,7 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
               const result = await prepareGmailStep({ runId: snapshot.runId });
               if (result.status === "error") {
                 setState({
-                  kind: "brevo_done",
+                  kind: "smtp_done",
                   runId: snapshot.runId,
                   zoneName: snapshot.zoneName,
                   mailboxLocal: snapshot.mailboxLocal,
@@ -956,22 +956,17 @@ function AwaitingVerifyStep({
   );
 }
 
-type BrevoReached = "sender" | "dns" | "verify" | "done";
-const BREVO_PROGRESS_ORDER: BrevoReached[] = [
-  "sender",
-  "dns",
-  "verify",
-  "done",
-];
+type SmtpReached = "sender" | "dns" | "verify" | "done";
+const SMTP_PROGRESS_ORDER: SmtpReached[] = ["sender", "dns", "verify", "done"];
 
-function brevoStatusOf(
-  step: BrevoReached,
+function smtpStatusOf(
+  step: SmtpReached,
   overall: "running" | "awaiting" | "done",
-  reached: BrevoReached,
+  reached: SmtpReached,
 ): "pending" | "running" | "ok" | "error" {
   if (overall === "done") return "ok";
-  const idxStep = BREVO_PROGRESS_ORDER.indexOf(step);
-  const idxReached = BREVO_PROGRESS_ORDER.indexOf(reached);
+  const idxStep = SMTP_PROGRESS_ORDER.indexOf(step);
+  const idxReached = SMTP_PROGRESS_ORDER.indexOf(reached);
   if (idxReached > idxStep) return "ok";
   if (idxReached === idxStep) {
     if (overall === "awaiting" && step === "verify") return "running";
@@ -1004,25 +999,25 @@ function CfDoneBlock({
   );
 }
 
-function BrevoProgressList({
+function SmtpProgressList({
   overall,
   reached,
   tState,
-  tBrevo,
+  tSmtp,
 }: {
   overall: "running" | "awaiting" | "done";
-  reached: BrevoReached;
+  reached: SmtpReached;
   tState: (key: string) => string;
-  tBrevo: (key: string) => string;
+  tSmtp: (key: string) => string;
 }) {
   return (
     <ol className="space-y-2">
-      {BREVO_PROGRESS_ORDER.map((step) => {
-        const s = brevoStatusOf(step, overall, reached);
+      {SMTP_PROGRESS_ORDER.map((step) => {
+        const s = smtpStatusOf(step, overall, reached);
         return (
           <ProgressRow
-            key={`brevo-${step}`}
-            label={tBrevo(step)}
+            key={`smtp-${step}`}
+            label={tSmtp(step)}
             status={s}
             stateLabel={tState(s)}
           />
@@ -1032,7 +1027,7 @@ function BrevoProgressList({
   );
 }
 
-function CfDonePendingBrevoStep({
+function CfDonePendingSmtpStep({
   state,
   isPending,
   t,
@@ -1041,7 +1036,7 @@ function CfDonePendingBrevoStep({
   translateErr,
   onContinue,
 }: {
-  state: Extract<WizardState, { kind: "cf_done_pending_brevo" }>;
+  state: Extract<WizardState, { kind: "cf_done_pending_smtp" }>;
   isPending: boolean;
   t: (key: string, values?: Record<string, string>) => string;
   tState: (key: string) => string;
@@ -1067,7 +1062,7 @@ function CfDonePendingBrevoStep({
           })}
         </p>
         <Button className="mt-3" onClick={onContinue} disabled={isPending}>
-          {isPending ? t("brevo.continueCtaLoading") : t("brevo.continueCta")}
+          {isPending ? t("smtp.continueCtaLoading") : t("smtp.continueCta")}
         </Button>
       </div>
       {state.errorKey ? (
@@ -1077,18 +1072,18 @@ function CfDonePendingBrevoStep({
   );
 }
 
-function BrevoRunningStep({
+function SmtpRunningStep({
   state,
   t: _t,
   tState,
   tSteps,
-  tBrevo,
+  tSmtp,
 }: {
-  state: Extract<WizardState, { kind: "brevo_running" }>;
+  state: Extract<WizardState, { kind: "smtp_running" }>;
   t: (key: string, values?: Record<string, string>) => string;
   tState: (key: string) => string;
   tSteps: (key: string) => string;
-  tBrevo: (key: string) => string;
+  tSmtp: (key: string) => string;
 }) {
   void _t;
   return (
@@ -1097,32 +1092,32 @@ function BrevoRunningStep({
         {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
       </h2>
       <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
-      <BrevoProgressList
+      <SmtpProgressList
         overall="running"
         reached={state.reached}
         tState={tState}
-        tBrevo={tBrevo}
+        tSmtp={tSmtp}
       />
     </section>
   );
 }
 
-function BrevoAwaitingRetryStep({
+function SmtpAwaitingRetryStep({
   state,
   isPending,
   t,
   tState,
   tSteps,
-  tBrevo,
+  tSmtp,
   translateErr,
   onRetry,
 }: {
-  state: Extract<WizardState, { kind: "brevo_awaiting_retry" }>;
+  state: Extract<WizardState, { kind: "smtp_awaiting_retry" }>;
   isPending: boolean;
   t: (key: string, values?: Record<string, string>) => string;
   tState: (key: string) => string;
   tSteps: (key: string) => string;
-  tBrevo: (key: string) => string;
+  tSmtp: (key: string) => string;
   translateErr: (key: string, details?: string) => string;
   onRetry: () => void;
 }) {
@@ -1132,18 +1127,18 @@ function BrevoAwaitingRetryStep({
         {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
       </h2>
       <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
-      <BrevoProgressList
+      <SmtpProgressList
         overall="awaiting"
         reached="verify"
         tState={tState}
-        tBrevo={tBrevo}
+        tSmtp={tSmtp}
       />
       <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-900 dark:bg-amber-950">
         <div className="font-medium text-amber-900 dark:text-amber-100">
-          {t("brevo.recheck.title")}
+          {t("smtp.recheck.title")}
         </div>
         <p className="mt-1 text-amber-900 dark:text-amber-100">
-          {t("brevo.recheck.body")}
+          {t("smtp.recheck.body")}
         </p>
         <Button
           className="mt-3"
@@ -1151,7 +1146,7 @@ function BrevoAwaitingRetryStep({
           disabled={isPending}
           variant="outline"
         >
-          {isPending ? t("brevo.recheck.ctaLoading") : t("brevo.recheck.cta")}
+          {isPending ? t("smtp.recheck.ctaLoading") : t("smtp.recheck.cta")}
         </Button>
         {state.errorKey ? (
           <div className="mt-3">
@@ -1163,22 +1158,22 @@ function BrevoAwaitingRetryStep({
   );
 }
 
-function BrevoDoneStep({
+function SmtpDoneStep({
   state,
   isPending,
   t,
   tState,
   tSteps,
-  tBrevo,
+  tSmtp,
   translateErr,
   onContinue,
 }: {
-  state: Extract<WizardState, { kind: "brevo_done" }>;
+  state: Extract<WizardState, { kind: "smtp_done" }>;
   isPending: boolean;
   t: (key: string, values?: Record<string, string>) => string;
   tState: (key: string) => string;
   tSteps: (key: string) => string;
-  tBrevo: (key: string) => string;
+  tSmtp: (key: string) => string;
   translateErr: (key: string, details?: string) => string;
   onContinue: () => void;
 }) {
@@ -1188,19 +1183,19 @@ function BrevoDoneStep({
         {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
       </h2>
       <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
-      <BrevoProgressList
+      <SmtpProgressList
         overall="done"
         reached="done"
         tState={tState}
-        tBrevo={tBrevo}
+        tSmtp={tSmtp}
       />
       <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-900 dark:bg-emerald-950">
         <div className="flex items-center gap-2 font-medium text-emerald-900 dark:text-emerald-100">
           <CheckCircle2 className="size-5" aria-hidden />
-          {t("brevo.terminal.title")}
+          {t("smtp.terminal.title")}
         </div>
         <p className="mt-1 text-emerald-900 dark:text-emerald-100">
-          {t("brevo.terminal.body", {
+          {t("smtp.terminal.body", {
             mailbox: state.mailboxLocal,
             domain: state.zoneName,
           })}
@@ -1208,7 +1203,7 @@ function BrevoDoneStep({
         <Button className="mt-3" onClick={onContinue} disabled={isPending}>
           {isPending
             ? t("gmail.intro.startCtaLoading")
-            : t("brevo.terminal.gmailCta")}
+            : t("smtp.terminal.gmailCta")}
         </Button>
       </div>
       {state.errorKey ? (
@@ -1218,18 +1213,18 @@ function BrevoDoneStep({
   );
 }
 
-function handleBrevoResult(
-  result: Awaited<ReturnType<typeof continueBrevoSetup>>,
+function handleSmtpResult(
+  result: Awaited<ReturnType<typeof continueSmtpSetup>>,
   snapshot: Extract<
     WizardState,
-    { kind: "cf_done_pending_brevo" | "brevo_awaiting_retry" }
+    { kind: "cf_done_pending_smtp" | "smtp_awaiting_retry" }
   >,
   setState: (s: WizardState) => void,
 ) {
   if (result.status === "error") {
-    if (result.errorKey === "setup.errors.brevo_verify_timeout") {
+    if (result.errorKey === "setup.errors.smtp_verify_timeout") {
       setState({
-        kind: "brevo_awaiting_retry",
+        kind: "smtp_awaiting_retry",
         runId: snapshot.runId,
         cfToken: snapshot.cfToken,
         zoneName: snapshot.zoneName,
@@ -1242,16 +1237,16 @@ function handleBrevoResult(
     // Other errors land in the central failed state.
     setState({
       kind: "failed",
-      source: "brevo",
+      source: "smtp",
       errorKey: result.errorKey,
       errorDetails:
         typeof result.details === "string" ? result.details : undefined,
     });
     return;
   }
-  if (result.runStatus === "brevo_done") {
+  if (result.runStatus === "smtp_done") {
     setState({
-      kind: "brevo_done",
+      kind: "smtp_done",
       runId: snapshot.runId,
       zoneName: snapshot.zoneName,
       mailboxLocal: snapshot.mailboxLocal,
@@ -1260,19 +1255,19 @@ function handleBrevoResult(
     return;
   }
   // Intermediate statuses (sender_created / dns_written / verified) without
-  // reaching brevo_done mean the user got a partial response — stay in
+  // reaching smtp_done mean the user got a partial response — stay in
   // running state at the reported reached step so the progress list reflects
   // the actual backend state.
-  const reached: BrevoReached =
-    result.runStatus === "brevo_sender_created"
+  const reached: SmtpReached =
+    result.runStatus === "smtp_sender_created"
       ? "sender"
-      : result.runStatus === "brevo_dns_written"
+      : result.runStatus === "smtp_dns_written"
         ? "dns"
-        : result.runStatus === "brevo_verified"
+        : result.runStatus === "smtp_verified"
           ? "verify"
           : "done";
   setState({
-    kind: "brevo_running",
+    kind: "smtp_running",
     runId: snapshot.runId,
     cfToken: snapshot.cfToken,
     zoneName: snapshot.zoneName,
@@ -1300,8 +1295,8 @@ function FailedStep({
       </h2>
       <p className="text-sm text-red-900 dark:text-red-100">
         {t(
-          state.source === "brevo"
-            ? "step3.failed.bodyBrevo"
+          state.source === "smtp"
+            ? "step3.failed.bodySmtp"
             : "step3.failed.body",
         )}
       </p>

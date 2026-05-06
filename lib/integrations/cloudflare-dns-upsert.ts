@@ -2,12 +2,12 @@
  * Content-pattern DNS upsert helper for Ticket #4b.
  *
  * Ticket #4a's first-match-by-list-position upsert is unsafe on real
- * zones: TXT @ commonly holds SPF + Brevo verification + Google site
+ * zones: TXT @ commonly holds SPF + Postmark verification + Google site
  * verification + more, and CF API list order is not stable. Naive
  * "update existing[0]" overwrites whichever record happened to come
- * first — on mailkit-test.ru smoke it killed the Brevo SPF. This
+ * first — on mailkit-test.ru smoke it killed the Postmark SPF. This
  * helper matches existing TXT records by **content prefix**, so an SPF
- * upsert targets the SPF record regardless of list order, and Brevo
+ * upsert targets the SPF record regardless of list order, and Postmark
  * verification / Google site verification live alongside untouched.
  *
  * Shape of work, per record:

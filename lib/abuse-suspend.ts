@@ -4,7 +4,7 @@ import {
   sendDeliverabilitySuspendEmail,
   sendDeliverabilityWarnEmail,
   sendSendLimitBlockEmail,
-} from "@/lib/integrations/brevo-transactional";
+} from "@/lib/integrations/postmark-transactional";
 import { notifyOwnerViaTelegram } from "@/lib/notifications/telegram";
 import {
   type DeliverabilityEvaluation,
@@ -26,22 +26,15 @@ type AdminClient = ReturnType<typeof createServiceClient>;
  *
  * What this file does NOT do:
  *
- *   1. Hard-suspend the domain in Brevo. Brevo doesn't expose a
- *      "pause-without-delete" endpoint; the available paths are
- *      DELETE /v3/senders/domains/{name} (destructive — wipes the
- *      authentication and forces a full re-setup) or removing DKIM
- *      records via Cloudflare (also destructive). Hard-suspend is
- *      deferred to #26 (SMTP-adapter abstraction) where the SES
- *      adapter gets a clean pause primitive and we route Brevo
- *      through that primitive.
- *
- *      For MVP the DB flag (purchases.suspended_at) is the source of
- *      truth. If a suspended customer keeps sending despite the
- *      email, Brevo's own complaint-rate threshold (0.3-0.5%) takes
- *      over before we'd reach a true incident.
+ *   1. Hard-suspend the domain at the SMTP provider level. Postmark
+ *      supports SmtpApiActivated=false per server (see postmark.ts
+ *      suspendServer). For MVP the DB flag (purchases.suspended_at)
+ *      is the source of truth. If a suspended customer keeps sending,
+ *      Postmark's own complaint-rate threshold takes over before we'd
+ *      reach a true incident.
  *
  *   2. Throw on email failure. The pause / audit row must land even
- *      if Brevo transactional is down, so customer can't use a
+ *      if transactional delivery is down, so a customer can't use a
  *      transient mail outage to skip the suspension trail.
  *
  * Both helpers are idempotent on `purchases.suspended_at IS NULL` —

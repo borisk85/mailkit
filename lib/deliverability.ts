@@ -1,19 +1,19 @@
 /**
  * Layer 2 anti-abuse — deliverability predicate.
  *
- * Pure functions over a Brevo aggregated stats report. The cron does
- * the API read (lib/integrations/brevo-stats.ts) and the DB write
+ * Pure functions over a Postmark aggregated stats report. The cron does
+ * the API read (lib/integrations/postmark-stats.ts) and the DB write
  * (deliverability_snapshots row + abuse_events audit); this file
  * decides whether the rates cross any threshold and what action to
  * take.
  *
  * Thresholds taken from docs/TECH_ABUSE_MITIGATIONS.md §3.1, frozen
  * for MVP. Window default is 7 days rolling — the cron passes that
- * window to the Brevo report when fetching.
+ * window to the Postmark report when fetching.
  */
 
 /** Minimal report shape consumed by evaluateDeliverability. Satisfied by both
- *  BrevoAggregatedReport and the Postmark stats response. */
+ *  Postmark stats response and any future provider. */
 export type AggregatedReportInput = {
   requests: number;
   hardBounces: number;
@@ -59,11 +59,11 @@ export type DeliverabilityEvaluation = {
 };
 
 /**
- * Compute rates + decide action from a Brevo aggregated report.
+ * Compute rates + decide action from a Postmark aggregated report.
  *
  * Action priority (most-severe wins):
  *   1. complaint_threshold → suspended (immediate, even one over the
- *      0.1% line is enough to spike Brevo's own complaint counter).
+ *      0.1% line is enough to spike Postmark's own complaint counter).
  *   2. bounce_threshold → suspended (recipient list quality).
  *   3. unsubscribe_threshold → warned (informational, customer keeps
  *      sending).

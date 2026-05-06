@@ -38,7 +38,7 @@ describe("Privacy canonical text", () => {
     for (const provider of [
       "Google",
       "Cloudflare",
-      "Brevo",
+      "Postmark",
       "Lemon Squeezy",
       "Supabase",
       "Vercel",
