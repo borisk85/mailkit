@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "prepare": "husky",
-    "index-kb": "tsx scripts/index-knowledge-base.ts"
+    "index-kb": "tsx scripts/index-knowledge-base.ts",
+    "abuse:export": "tsx scripts/abuse-export.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.92.0",
@@ -44,11 +45,13 @@
     "@next/bundle-analyzer": "^16.2.4",
     "@playwright/test": "^1.59.1",
     "@tailwindcss/postcss": "^4",
+    "@types/archiver": "^7.0.0",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@vitejs/plugin-react": "^6.0.1",
     "@vitest/coverage-v8": "^4.1.4",
+    "archiver": "^7.0.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.4",
     "husky": "^9.1.7",

@@ -81,6 +81,7 @@ spike.log
 # Ad-hoc smoke scripts (not shipped, run manually). Build tools that
 # do ship live in /tools/ instead.
 /scripts/
+!/scripts/abuse-export.ts
 
 # Temporary public assets staged for Playwright tab-strip mocks etc.
 /public/_temp/
