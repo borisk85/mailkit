@@ -33,7 +33,7 @@ export function IntegrationsBar() {
             src="/brand/gmail.svg"
             alt=""
             width={40}
-            height={32}
+            height={30}
             aria-hidden
           />
         </LogoItem>
