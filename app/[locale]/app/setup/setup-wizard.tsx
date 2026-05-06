@@ -140,6 +140,8 @@ type WizardState =
       mailboxLocal: string;
       destinationEmail: string;
       emailRequested?: boolean;
+      /** Mock/test override — skip the 15-min timer and show "taking longer" UI immediately */
+      mockIsLong?: boolean;
     }
   | {
       kind: "ns_warning";
@@ -167,6 +169,8 @@ type MockKey =
   | "smtp_dns_written"
   | "smtp_verified"
   | "smtp_done"
+  | "smtp_dkim_polling"
+  | "smtp_dkim_polling_long"
   | "gmail_instructions_shown"
   | "gmail_smtp_ready"
   | "gmail_send_as_verified"
@@ -253,6 +257,25 @@ function mockInitialState(mock: MockKey): WizardState {
         zoneName: "example.com",
         mailboxLocal: "hello",
         destinationEmail: "owner@gmail.com",
+      };
+    case "smtp_dkim_polling":
+      return {
+        kind: "smtp_dkim_polling",
+        runId: "11111111-2222-4333-8444-555555555555",
+        cfToken: "mock_token",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+      };
+    case "smtp_dkim_polling_long":
+      return {
+        kind: "smtp_dkim_polling",
+        runId: "11111111-2222-4333-8444-555555555555",
+        cfToken: "mock_token",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+        mockIsLong: true,
       };
     case "gmail_instructions_shown":
       return {
@@ -1933,6 +1956,8 @@ function ProgressRow({
   );
 }
 
+const DKIM_LONG_THRESHOLD_MS = 15 * 60 * 1000;
+
 function DkimPollingStep({
   state,
   onReady,
@@ -1943,9 +1968,11 @@ function DkimPollingStep({
   onEmailRequested: () => void;
 }) {
   const [emailSent, setEmailSent] = useState(false);
+  const [isLong, setIsLong] = useState(state.mockIsLong ?? false);
+  // eslint-disable-next-line react-hooks/purity -- one-time timestamp, not used in render
+  const startedAt = useMemo(() => Date.now(), []);
 
   // Poll every 30 seconds.
-   
   useEffect(() => {
     let cancelled = false;
     let timer: ReturnType<typeof setTimeout>;
@@ -1957,15 +1984,25 @@ function DkimPollingStep({
         onReady();
         return;
       }
+      // Flip "taking longer" UI after threshold.
+      if (Date.now() - startedAt >= DKIM_LONG_THRESHOLD_MS) setIsLong(true);
       timer = setTimeout(check, 30_000);
     }
 
     timer = setTimeout(check, 30_000);
+    // Also set a one-shot timer for the "long" threshold.
+    const longTimer = state.mockIsLong
+      ? undefined
+      : setTimeout(() => setIsLong(true), DKIM_LONG_THRESHOLD_MS);
+
     return () => {
       cancelled = true;
       clearTimeout(timer);
+      if (longTimer !== undefined) clearTimeout(longTimer);
     };
-  }, [state.runId, onReady]);
+  }, [state.runId, state.mockIsLong, onReady, startedAt]);
+
+  const notifyShown = emailSent || state.emailRequested || isLong;
 
   return (
     <section className="space-y-6 rounded-2xl border border-mk-border-strong bg-surface-elevated p-8">
@@ -1998,12 +2035,19 @@ function DkimPollingStep({
               Domain verification with email provider
             </p>
             <p className="text-sm text-mk-text-secondary">
-              Typically 5–15 minutes. We&apos;ll notify when ready.
+              {isLong
+                ? "Taking a bit longer than usual — still verifying in the background."
+                : "Typically 5–15 minutes. We’ll notify when ready."}
             </p>
             <div className="h-1.5 w-full overflow-hidden rounded-full bg-mk-border-subtle">
               <div
-                className="h-full animate-pulse rounded-full bg-mk-accent opacity-60"
-                style={{ width: "60%" }}
+                className={cn(
+                  "h-full rounded-full",
+                  isLong
+                    ? "bg-amber-400"
+                    : "animate-pulse bg-mk-accent opacity-60",
+                )}
+                style={{ width: isLong ? "85%" : "60%" }}
               />
             </div>
           </div>
@@ -2028,7 +2072,18 @@ function DkimPollingStep({
         Or stay here and watch the progress.
       </p>
 
-      {!emailSent && !state.emailRequested ? (
+      {notifyShown ? (
+        <p className="text-sm text-green-600">
+          <Check className="mr-1 inline size-4" aria-hidden />
+          {isLong && !emailSent && !state.emailRequested
+            ? "We’ve sent a link to "
+            : "We’ll email you at "}
+          <span className="font-medium">{state.destinationEmail}</span>
+          {isLong && !emailSent && !state.emailRequested
+            ? " — click it to finish when verification is done."
+            : " when ready."}
+        </p>
+      ) : (
         <Button
           variant="outline"
           size="sm"
@@ -2040,13 +2095,6 @@ function DkimPollingStep({
         >
           Email me instead
         </Button>
-      ) : (
-        <p className="text-sm text-green-600">
-          <Check className="mr-1 inline size-4" aria-hidden />
-          We&apos;ll email you at{" "}
-          <span className="font-medium">{state.destinationEmail}</span> when
-          ready.
-        </p>
       )}
     </section>
   );
