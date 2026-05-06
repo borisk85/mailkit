@@ -897,37 +897,33 @@ async function runPostmarkSetup(args: {
       runStatus = "smtp_dns_written";
     }
 
-    // Step 3: poll DKIM verification
+    // Step 3: quick DKIM check — single attempt after a short delay.
+    // Real propagation typically takes 2-15 minutes, so we do one fast
+    // check to catch instant verifications and then return
+    // smtp_dns_written to the caller. The client polling page and the
+    // check-dkim-status cron handle the rest asynchronously.
     if (runStatus === "smtp_dns_written") {
       const domainId = pmState.domain_id as number | undefined;
       if (!domainId) throw new Error("postmark domain_id missing from state");
 
-      let attempt = 0;
-      let verified = false;
-      while (attempt <= POSTMARK_DKIM_VERIFY_POLL_DELAYS_MS.length) {
-        const d = await pm.verifyDkim(domainId);
-        if (d.dkimVerified) {
-          verified = true;
-          break;
-        }
-        if (attempt === POSTMARK_DKIM_VERIFY_POLL_DELAYS_MS.length) break;
-        await sleepMs(POSTMARK_DKIM_VERIFY_POLL_DELAYS_MS[attempt]);
-        attempt++;
-      }
-
-      if (!verified) {
+      await sleepMs(POSTMARK_DKIM_VERIFY_POLL_DELAYS_MS[0]);
+      const d = await pm.verifyDkim(domainId);
+      if (d.dkimVerified) {
+        pmState = { ...pmState, dkim_verified: true };
+        await patchPostmarkState(admin, row.id, {
+          status: "smtp_verified",
+          pmState,
+          step: STEP.smtpVerify,
+        });
+        runStatus = "smtp_verified";
+      } else {
+        // Return early — client will poll asynchronously.
         return {
-          status: "error",
-          errorKey: "setup.errors.postmark_dkim_timeout",
+          status: "ok",
+          runId: row.id,
+          runStatus: "smtp_dns_written",
         };
       }
-      pmState = { ...pmState, dkim_verified: true };
-      await patchPostmarkState(admin, row.id, {
-        status: "smtp_verified",
-        pmState,
-        step: STEP.smtpVerify,
-      });
-      runStatus = "smtp_verified";
     }
 
     // Step 4: finalize
@@ -1130,6 +1126,104 @@ async function flagPhishingPurchase(
   } catch (e) {
     console.error("[phishing-flag]", e);
   }
+}
+
+// ─── DKIM async polling ──────────────────────────────────────────────────────
+
+/**
+ * Called by the client polling page every 30 seconds while waiting for
+ * DKIM verification. Updates last_active_at so the cron knows the tab is
+ * open. Returns "ready" when DKIM is verified and status advanced to
+ * brevo_done; "polling" while still waiting.
+ */
+export async function pollDkimStatus(input: {
+  runId: string;
+}): Promise<{ status: "polling" | "ready" | "error"; errorKey?: string }> {
+  const parsed = z.object({ runId: z.string().uuid() }).safeParse(input);
+  if (!parsed.success)
+    return { status: "error", errorKey: "setup.errors.invalid_input" };
+
+  const user = await getAuthenticatedUser();
+  if (!user)
+    return { status: "error", errorKey: "setup.errors.not_authenticated" };
+
+  const admin = createServiceClient();
+
+  // Touch last_active_at first — record the heartbeat even if we fail.
+  await admin
+    .from("setup_runs")
+    .update({ last_active_at: new Date().toISOString() })
+    .eq("id", parsed.data.runId)
+    .eq("user_id", user.id);
+
+  const { data: row } = await admin
+    .from("setup_runs")
+    .select("id, user_id, domain, status, cf_state, postmark_server_id")
+    .eq("id", parsed.data.runId)
+    .maybeSingle();
+
+  if (!row || row.user_id !== user.id) {
+    return { status: "error", errorKey: "setup.errors.run_not_found" };
+  }
+
+  if (SMTP_ALREADY_DONE.has(row.status)) return { status: "ready" };
+  if (row.status !== "smtp_dns_written") return { status: "polling" };
+
+  const pmState = ((row.cf_state as Record<string, unknown> | null)?.postmark ??
+    {}) as Record<string, unknown>;
+  const domainId = pmState.domain_id as number | undefined;
+  if (!domainId)
+    return { status: "error", errorKey: "setup.errors.run_corrupt" };
+
+  const postmarkToken = process.env.POSTMARK_ACCOUNT_TOKEN;
+  if (!postmarkToken)
+    return { status: "error", errorKey: "setup.errors.postmark_invalid_token" };
+
+  try {
+    const pm = createPostmarkAccountClient(postmarkToken);
+    const d = await pm.verifyDkim(domainId);
+    if (!d.dkimVerified) return { status: "polling" };
+
+    // DKIM verified — advance to smtp_done in one step.
+    const newPmState = { ...pmState, dkim_verified: true };
+    await patchPostmarkState(admin, row.id, {
+      status: "smtp_verified",
+      pmState: newPmState,
+      step: STEP.smtpVerify,
+    });
+    await patchPostmarkState(admin, row.id, {
+      status: "smtp_done",
+      pmState: newPmState,
+      step: STEP.smtpFinalize,
+    });
+    return { status: "ready" };
+  } catch {
+    return { status: "polling" };
+  }
+}
+
+/**
+ * Called when the user clicks "Email me instead" on the DKIM polling page.
+ * The check-dkim-status cron will send an email as soon as verification
+ * completes regardless of the tab's last_active_at.
+ */
+export async function requestEmailOnReady(input: {
+  runId: string;
+}): Promise<{ ok: boolean }> {
+  const parsed = z.object({ runId: z.string().uuid() }).safeParse(input);
+  if (!parsed.success) return { ok: false };
+
+  const user = await getAuthenticatedUser();
+  if (!user) return { ok: false };
+
+  const admin = createServiceClient();
+  await admin
+    .from("setup_runs")
+    .update({ last_active_at: new Date(0).toISOString() })
+    .eq("id", parsed.data.runId)
+    .eq("user_id", user.id);
+
+  return { ok: true };
 }
 
 export async function prepareGmailStep(input: {

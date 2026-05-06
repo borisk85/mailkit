@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -23,7 +23,9 @@ import {
   checkDomainNS,
   confirmGmailSendAs,
   continueSmtpSetup,
+  pollDkimStatus,
   prepareGmailStep,
+  requestEmailOnReady,
   resumeDestinationVerify,
   startSetupRun,
   verifyCloudflareToken,
@@ -131,6 +133,17 @@ type WizardState =
       source?: "cf" | "smtp" | "gmail";
     }
   | {
+      kind: "smtp_dkim_polling";
+      runId: string;
+      cfToken: string;
+      zoneName: string;
+      mailboxLocal: string;
+      destinationEmail: string;
+      emailRequested?: boolean;
+      /** Mock/test override — skip the 15-min timer and show "taking longer" UI immediately */
+      mockIsLong?: boolean;
+    }
+  | {
       kind: "ns_warning";
       domain: string;
       zones: Zone[];
@@ -156,6 +169,8 @@ type MockKey =
   | "smtp_dns_written"
   | "smtp_verified"
   | "smtp_done"
+  | "smtp_dkim_polling"
+  | "smtp_dkim_polling_long"
   | "gmail_instructions_shown"
   | "gmail_smtp_ready"
   | "gmail_send_as_verified"
@@ -242,6 +257,25 @@ function mockInitialState(mock: MockKey): WizardState {
         zoneName: "example.com",
         mailboxLocal: "hello",
         destinationEmail: "owner@gmail.com",
+      };
+    case "smtp_dkim_polling":
+      return {
+        kind: "smtp_dkim_polling",
+        runId: "11111111-2222-4333-8444-555555555555",
+        cfToken: "mock_token",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+      };
+    case "smtp_dkim_polling_long":
+      return {
+        kind: "smtp_dkim_polling",
+        runId: "11111111-2222-4333-8444-555555555555",
+        cfToken: "mock_token",
+        zoneName: "example.com",
+        mailboxLocal: "hello",
+        destinationEmail: "owner@gmail.com",
+        mockIsLong: true,
       };
     case "gmail_instructions_shown":
       return {
@@ -606,6 +640,22 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
               handleSmtpResult(result, snapshot, setState);
             });
           }}
+        />
+      ) : null}
+
+      {state.kind === "smtp_dkim_polling" ? (
+        <DkimPollingStep
+          state={state}
+          onReady={() =>
+            setState({
+              kind: "smtp_done",
+              runId: state.runId,
+              zoneName: state.zoneName,
+              mailboxLocal: state.mailboxLocal,
+              destinationEmail: state.destinationEmail,
+            })
+          }
+          onEmailRequested={() => setState({ ...state, emailRequested: true })}
         />
       ) : null}
 
@@ -1254,18 +1304,25 @@ function handleSmtpResult(
     });
     return;
   }
-  // Intermediate statuses (sender_created / dns_written / verified) without
-  // reaching smtp_done mean the user got a partial response — stay in
-  // running state at the reported reached step so the progress list reflects
-  // the actual backend state.
+  // DNS records written but DKIM not yet verified — switch to async
+  // polling page instead of showing an error or a spinner.
+  if (
+    result.runStatus === "smtp_dns_written" ||
+    result.runStatus === "smtp_verified"
+  ) {
+    setState({
+      kind: "smtp_dkim_polling",
+      runId: snapshot.runId,
+      cfToken: snapshot.cfToken,
+      zoneName: snapshot.zoneName,
+      mailboxLocal: snapshot.mailboxLocal,
+      destinationEmail: snapshot.destinationEmail,
+    });
+    return;
+  }
+  // Still creating the server or writing DNS records.
   const reached: SmtpReached =
-    result.runStatus === "smtp_sender_created"
-      ? "sender"
-      : result.runStatus === "smtp_dns_written"
-        ? "dns"
-        : result.runStatus === "smtp_verified"
-          ? "verify"
-          : "done";
+    result.runStatus === "smtp_sender_created" ? "sender" : "done";
   setState({
     kind: "smtp_running",
     runId: snapshot.runId,
@@ -1896,6 +1953,150 @@ function ProgressRow({
       </span>
       <span className="text-xs text-mk-text-tertiary">{stateLabel}</span>
     </li>
+  );
+}
+
+const DKIM_LONG_THRESHOLD_MS = 15 * 60 * 1000;
+
+function DkimPollingStep({
+  state,
+  onReady,
+  onEmailRequested,
+}: {
+  state: Extract<WizardState, { kind: "smtp_dkim_polling" }>;
+  onReady: () => void;
+  onEmailRequested: () => void;
+}) {
+  const [emailSent, setEmailSent] = useState(false);
+  const [isLong, setIsLong] = useState(state.mockIsLong ?? false);
+  // eslint-disable-next-line react-hooks/purity -- one-time timestamp, not used in render
+  const startedAt = useMemo(() => Date.now(), []);
+
+  // Poll every 30 seconds.
+  useEffect(() => {
+    let cancelled = false;
+    let timer: ReturnType<typeof setTimeout>;
+
+    async function check() {
+      const res = await pollDkimStatus({ runId: state.runId });
+      if (cancelled) return;
+      if (res.status === "ready") {
+        onReady();
+        return;
+      }
+      // Flip "taking longer" UI after threshold.
+      if (Date.now() - startedAt >= DKIM_LONG_THRESHOLD_MS) setIsLong(true);
+      timer = setTimeout(check, 30_000);
+    }
+
+    timer = setTimeout(check, 30_000);
+    // Also set a one-shot timer for the "long" threshold.
+    const longTimer = state.mockIsLong
+      ? undefined
+      : setTimeout(() => setIsLong(true), DKIM_LONG_THRESHOLD_MS);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+      if (longTimer !== undefined) clearTimeout(longTimer);
+    };
+  }, [state.runId, state.mockIsLong, onReady, startedAt]);
+
+  const notifyShown = emailSent || state.emailRequested || isLong;
+
+  return (
+    <section className="space-y-6 rounded-2xl border border-mk-border-strong bg-surface-elevated p-8">
+      <h2 className="mk-heading-2 text-mk-text-primary">
+        Setting up your professional email
+      </h2>
+
+      <ol className="space-y-4">
+        {/* Step 1 — DNS records configured */}
+        <li className="flex items-start gap-3">
+          <CheckCircle2
+            className="mt-0.5 size-5 shrink-0 text-green-500"
+            aria-hidden
+          />
+          <div>
+            <p className="font-medium text-mk-text-primary">
+              DNS records configured
+            </p>
+          </div>
+        </li>
+
+        {/* Step 2 — Domain verification (current) */}
+        <li className="flex items-start gap-3">
+          <Loader2
+            className="mt-0.5 size-5 shrink-0 animate-spin text-mk-accent"
+            aria-hidden
+          />
+          <div className="flex-1 space-y-2">
+            <p className="font-medium text-mk-text-primary">
+              Domain verification with email provider
+            </p>
+            <p className="text-sm text-mk-text-secondary">
+              {isLong
+                ? "Taking a bit longer than usual — still verifying in the background."
+                : "Typically 5–15 minutes. We’ll notify when ready."}
+            </p>
+            <div className="h-1.5 w-full overflow-hidden rounded-full bg-mk-border-subtle">
+              <div
+                className={cn(
+                  "h-full rounded-full",
+                  isLong
+                    ? "bg-amber-400"
+                    : "animate-pulse bg-mk-accent opacity-60",
+                )}
+                style={{ width: isLong ? "85%" : "60%" }}
+              />
+            </div>
+          </div>
+        </li>
+
+        {/* Step 3 — Gmail (locked) */}
+        <li className="flex items-start gap-3 opacity-40">
+          <Circle
+            className="mt-0.5 size-5 shrink-0 text-mk-text-tertiary"
+            aria-hidden
+          />
+          <div>
+            <p className="font-medium text-mk-text-primary">
+              Ready for final Gmail step
+            </p>
+          </div>
+        </li>
+      </ol>
+
+      <p className="text-sm text-mk-text-secondary">
+        You can close this page if you wish — we&apos;ll email you when ready.
+        Or stay here and watch the progress.
+      </p>
+
+      {notifyShown ? (
+        <p className="text-sm text-green-600">
+          <Check className="mr-1 inline size-4" aria-hidden />
+          {isLong && !emailSent && !state.emailRequested
+            ? "We’ve sent a link to "
+            : "We’ll email you at "}
+          <span className="font-medium">{state.destinationEmail}</span>
+          {isLong && !emailSent && !state.emailRequested
+            ? " — click it to finish when verification is done."
+            : " when ready."}
+        </p>
+      ) : (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={async () => {
+            await requestEmailOnReady({ runId: state.runId });
+            setEmailSent(true);
+            onEmailRequested();
+          }}
+        >
+          Email me instead
+        </Button>
+      )}
+    </section>
   );
 }
 

@@ -17,6 +17,8 @@ const MOCK_STATES = [
   "smtp_dns_written",
   "smtp_verified",
   "smtp_done",
+  "smtp_dkim_polling",
+  "smtp_dkim_polling_long",
   // Ticket #6 etap 2 — Gmail wizard states.
   "gmail_instructions_shown",
   "gmail_smtp_ready",
