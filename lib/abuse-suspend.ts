@@ -5,6 +5,7 @@ import {
   sendDeliverabilityWarnEmail,
   sendSendLimitBlockEmail,
 } from "@/lib/integrations/brevo-transactional";
+import { notifyOwnerViaTelegram } from "@/lib/notifications/telegram";
 import {
   type DeliverabilityEvaluation,
   formatRateForStorage,
@@ -120,6 +121,11 @@ async function insertAbuseEvent(
     snapshot_id: args.snapshotId ?? null,
     notes: args.notes ?? null,
   });
+
+  notifyOwnerViaTelegram(
+    `domain=${args.domain} action=${args.actionTaken}${args.notes ? ` ${args.notes}` : ""}`,
+    args.eventType,
+  ).catch((e) => console.error("[telegram-alert] abuse notify failed:", e));
 }
 
 function nextResumeHint(window: WindowType): string {
