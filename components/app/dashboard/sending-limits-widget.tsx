@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type { SendUsage } from "@/lib/dashboard-data";
 
 function LimitBar({
@@ -17,7 +19,10 @@ function LimitBar({
     <div className="space-y-1">
       <div className="flex justify-between text-[11px]">
         <span className="text-mk-text-tertiary">{label}</span>
-        <span className="tabular-nums text-mk-text-secondary">
+        <span
+          className="tabular-nums text-mk-text-secondary"
+          title={`${count} of ${limit} used`}
+        >
           {count.toLocaleString()} / {limit.toLocaleString()}
         </span>
       </div>
@@ -34,14 +39,27 @@ function LimitBar({
 export function SendingLimitsWidget({ usage }: { usage: SendUsage }) {
   return (
     <div className="space-y-2 rounded-lg border border-mk-border-subtle px-3 py-2.5">
-      <p className="text-[11px] font-medium uppercase tracking-wide text-mk-text-tertiary">
-        Sending usage today
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-[11px] font-medium uppercase tracking-wide text-mk-text-tertiary">
+          Sending usage — {usage.domain}
+        </p>
+        <Link
+          href="/faq#sending-limits"
+          className="text-[11px] text-mk-accent hover:underline"
+        >
+          About limits
+        </Link>
+      </div>
       <LimitBar count={usage.day.count} limit={usage.day.limit} label="Today" />
       <LimitBar
         count={usage.hour.count}
         limit={usage.hour.limit}
         label="This hour"
+      />
+      <LimitBar
+        count={usage.minute.count}
+        limit={usage.minute.limit}
+        label="This minute"
       />
     </div>
   );

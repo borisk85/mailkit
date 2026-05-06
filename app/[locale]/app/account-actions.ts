@@ -1,5 +1,7 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 /**
@@ -81,4 +83,6 @@ export async function deleteFailedSetup(runId: string): Promise<void> {
   if (error) {
     throw new Error(`Failed to delete setup: ${error.message}`);
   }
+
+  revalidatePath("/", "layout");
 }

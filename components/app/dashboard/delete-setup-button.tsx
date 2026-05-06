@@ -16,10 +16,12 @@ export function DeleteSetupButton({
   runId,
   domain,
   deleteAction,
+  onSuccess,
 }: {
   runId: string;
   domain: string;
   deleteAction: (runId: string) => Promise<void>;
+  onSuccess?: () => void;
 }) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
@@ -28,7 +30,9 @@ export function DeleteSetupButton({
     startTransition(async () => {
       try {
         await deleteAction(runId);
-      } finally {
+        setOpen(false);
+        onSuccess?.();
+      } catch {
         setOpen(false);
       }
     });
@@ -49,7 +53,7 @@ export function DeleteSetupButton({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete this failed setup?</DialogTitle>
+            <DialogTitle>Delete this failed setup attempt?</DialogTitle>
             <DialogDescription>
               This removes the failed setup attempt for{" "}
               <span className="font-medium text-foreground">{domain}</span> from

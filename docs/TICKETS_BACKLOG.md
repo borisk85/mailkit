@@ -262,6 +262,20 @@ Trigger для работы: после merge ветки `feat/smtp-dependency-d
 - #22 gmail.svg image warning — Next.js предупреждает что изменён width или height без второго измерения. Fix: добавить `width="auto"` или `height="auto"` к img тегу. Косметика, не влияет на рендер.
 
 ## 🧹 Tech debt
+
+- **#CLEANUP-RU-LEGACY** Finish Russian locale removal (feat/cleanup-ru-final)
+  Incomplete cleanup after feat/remove-russian-locale. Russian constants and
+  routes still live on production. Blocks launch — legal pages at /ru/*
+  reference outdated Brevo text (not updated to Postmark) and incomplete
+  GDPR formulation.
+  Scope:
+  - Remove /ru/privacy, /ru/terms, /ru/guarantee routes or redirect → EN
+  - Delete PRIVACY_RU, TERMS_RU, GUARANTEE_RU from lib/legal/*.ts
+  - Grep project for `_RU`, `'ru'`, `"ru"`, `ru.json` — review and remove
+  - Delete any remaining RU test assertions in lib/legal/*.test.ts
+  - Playwright verify: /ru/* → 404 or redirect, no Russian text on live site
+  Branch: feat/cleanup-ru-final (after LEGAL-1 merge)
+
 - LS checkout store migration — **pre-launch BLOCKER**, owner contacting LS support.
   - Current: product в velabot store (owner's другой project), checkout
     URL показывает `velabot.lemonsqueezy.com/checkout/buy/<uuid>` в
