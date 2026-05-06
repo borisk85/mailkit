@@ -8,6 +8,10 @@
     {
       "path": "/api/cron/sync-deliverability",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/cron/check-dkim-status",
+      "schedule": "* * * * *"
     }
   ]
 }
