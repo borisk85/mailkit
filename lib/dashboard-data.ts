@@ -8,112 +8,35 @@ import {
   type WindowType,
 } from "@/lib/send-limits";
 
+// Re-export shared types and pure functions so existing importers that
+// reference "@/lib/dashboard-data" keep working without change.
+export type {
+  SetupStatus,
+  PurchaseStatus,
+  DashboardSetup,
+  DashboardPurchase,
+  DashboardRefund,
+  SendUsage,
+  DashboardData,
+  SetupOverallState,
+} from "@/lib/dashboard-types";
+export {
+  setupOverallState,
+  isSetupReSetupEligible,
+  setupDetailLabel,
+  formatMoney,
+  purchaseEffectiveStatus,
+} from "@/lib/dashboard-types";
+
+import {
+  type SetupStatus,
+  type PurchaseStatus,
+  type DashboardData,
+  type SendUsage,
+} from "@/lib/dashboard-types";
+
 type SsrClient = Awaited<ReturnType<typeof createClient>>;
 
-/**
- * Read-side data shapes + derivations for the /app dashboard (#37 + #51).
- *
- * RLS-aware: queries run on the user-session client (auth.uid() in the
- * row policies), not service-role. The client can only see their own
- * setup_runs / purchases / refunds — no cross-tenant leakage even if
- * a future bug hands a wrong user_id to a helper.
- *
- * Purpose split:
- *   - `getDashboardData` runs the three table reads in parallel.
- *   - The pure functions below (`setupOverallState`, etc.) are tested
- *     in isolation; they encode the policy decisions that the UI
- *     should not duplicate (e.g. "what counts as a failed setup").
- */
-
-export type SetupStatus =
-  | "started"
-  | "cf_routing_enabled"
-  | "cf_dns_written"
-  | "cf_awaiting_destination_verify"
-  | "cf_rule_created"
-  | "cf_done"
-  | "smtp_sender_created"
-  | "smtp_dns_written"
-  | "smtp_verified"
-  | "smtp_done"
-  | "gmail_instructions_shown"
-  | "gmail_smtp_ready"
-  | "gmail_send_as_verified"
-  | "done"
-  | "failed";
-
-export type PurchaseStatus =
-  | "paid"
-  | "refunded"
-  | "partially_refunded"
-  | "fraudulent";
-
-export type DashboardSetup = {
-  id: string;
-  domain: string;
-  mailboxLocal: string;
-  status: SetupStatus;
-  errorMsg: string | null;
-  createdAt: string;
-  updatedAt: string;
-};
-
-export type DashboardPurchase = {
-  id: string;
-  amountCents: number;
-  currency: string;
-  status: PurchaseStatus;
-  lsOrderId: string;
-  lsOrderIdentifier: string | null;
-  domain: string | null;
-  testMode: boolean;
-  createdAt: string;
-  refundedAt: string | null;
-  suspendedAt: string | null;
-  suspensionReason: string | null;
-};
-
-export type DashboardRefund = {
-  id: string;
-  purchaseId: string;
-  amountCents: number;
-  currency: string;
-  reason: string;
-  triggeredBy: string;
-  notes: string | null;
-  createdAt: string;
-};
-
-export type SendUsage = {
-  domain: string;
-  day: { count: number; limit: number };
-  hour: { count: number; limit: number };
-  minute: { count: number; limit: number };
-};
-
-export type DashboardData = {
-  setups: DashboardSetup[];
-  purchases: DashboardPurchase[];
-  refunds: DashboardRefund[];
-  sendUsage: SendUsage[];
-};
-
-/** UI-facing setup state — collapses the 14-status enum into 4 buckets
- * the dashboard renders as Badges. */
-export type SetupOverallState =
-  | "in_progress"
-  | "awaiting_verification"
-  | "done"
-  | "failed";
-
-/**
- * Run the three reads in parallel via Promise.all. Each is RLS-bounded
- * to the calling user, so an empty array is the natural "no data yet"
- * answer — no errors thrown for first-time users.
- *
- * The `purchases` row carries `custom_data jsonb`; we extract `domain`
- * inline so consumers don't have to dig through the JSON shape.
- */
 export async function getDashboardData(
   supabase: SsrClient,
   userId: string,
@@ -275,102 +198,3 @@ async function fetchSendUsage(
  *   - in_progress  → everything else (active backend work + the
  *                     guided Gmail wizard steps)
  */
-export function setupOverallState(setup: {
-  status: SetupStatus;
-}): SetupOverallState {
-  switch (setup.status) {
-    case "failed":
-      return "failed";
-    case "done":
-      return "done";
-    case "cf_awaiting_destination_verify":
-    case "smtp_dns_written":
-    case "smtp_verified":
-    case "gmail_instructions_shown":
-    case "gmail_smtp_ready":
-    case "gmail_send_as_verified":
-      return "awaiting_verification";
-    default:
-      return "in_progress";
-  }
-}
-
-/**
- * True when this setup is eligible for the "Re-setup this domain"
- * button — failed runs only, per architect spec.
- */
-export function isSetupReSetupEligible(setup: {
-  status: SetupStatus;
-}): boolean {
-  return setup.status === "failed";
-}
-
-/**
- * #DASH-2 — granular one-line status description shown beneath the
- * badge in setup cards. Returns null for terminal states (done/failed)
- * where the badge + errorMsg carry enough context.
- */
-export function setupDetailLabel(status: SetupStatus): string | null {
-  switch (status) {
-    case "started":
-      return "Starting setup…";
-    case "cf_routing_enabled":
-      return "Cloudflare Email Routing enabled";
-    case "cf_dns_written":
-      return "DNS records written (MX, SPF, DMARC)";
-    case "cf_awaiting_destination_verify":
-      return "Check your Gmail for a Cloudflare verification email";
-    case "cf_rule_created":
-      return "Cloudflare routing rule created";
-    case "cf_done":
-      return "Cloudflare phase complete";
-    case "smtp_sender_created":
-      return "SMTP sender registered";
-    case "smtp_dns_written":
-      return "Authentication records added — waiting for DNS propagation";
-    case "smtp_verified":
-      return "DNS records verified";
-    case "smtp_done":
-      return "SMTP phase complete";
-    case "gmail_instructions_shown":
-      return "Open setup to complete the Gmail Send-As step";
-    case "gmail_smtp_ready":
-      return "Paste the four lines into Gmail to finish";
-    case "gmail_send_as_verified":
-      return "Gmail Send-As confirmed";
-    case "done":
-    case "failed":
-      return null;
-  }
-}
-
-/**
- * Format an amount_cents + currency as a UI string. Both EN and RU
- * dashboards display the same numeric format ("$5.00"), only the
- * surrounding labels are translated. Currency is uppercased to
- * normalize the LS payload which sometimes returns "usd".
- */
-export function formatMoney(amountCents: number, currency: string): string {
-  const normalized = (currency || "USD").toUpperCase();
-  const value = (amountCents / 100).toFixed(2);
-  return normalized === "USD" ? `$${value}` : `${value} ${normalized}`;
-}
-
-/**
- * Effective purchase status from the purchase row + the refund history
- * for it. Mostly mirrors `purchase.status`, but if the column says
- * "paid" while a refund row exists for the same purchase, surfaces
- * "refunded" — guards against a state where the LS webhook hadn't
- * landed yet but our auto-refund flow already wrote the refunds row.
- */
-export function purchaseEffectiveStatus(
-  purchase: { status: PurchaseStatus; id: string },
-  refunds: Array<{ purchaseId: string; amountCents: number }>,
-): PurchaseStatus {
-  if (purchase.status !== "paid") return purchase.status;
-  const matched = refunds.filter(
-    (r) => r.purchaseId === purchase.id && r.amountCents > 0,
-  );
-  if (matched.length > 0) return "refunded";
-  return "paid";
-}

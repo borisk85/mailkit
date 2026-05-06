@@ -11,7 +11,7 @@ import {
   type DashboardSetup,
   type SendUsage,
   type SetupOverallState,
-} from "@/lib/dashboard-data";
+} from "@/lib/dashboard-types";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
