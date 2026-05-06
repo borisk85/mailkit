@@ -23,6 +23,16 @@ import {
   loadSmtpDisplay,
   type SmtpDisplay,
 } from "@/lib/integrations/brevo-smtp";
+import {
+  PostmarkError,
+  createPostmarkAccountClient,
+  type PostmarkDomain,
+  type PostmarkAccountClient,
+} from "@/lib/integrations/postmark";
+import {
+  PostmarkSmtpConfigError,
+  buildPostmarkSmtpDisplay,
+} from "@/lib/integrations/postmark-smtp";
 import { triggerAutoRefund } from "@/lib/auto-refund";
 import { checkPhishingPattern } from "@/lib/phishing";
 import { sendTelegramAlert, escapeHtml } from "@/lib/telegram-alert";
@@ -654,10 +664,55 @@ async function patchRun(
 function errMsg(e: unknown): string {
   if (e instanceof CloudflareError) return `${e.code}: ${e.message}`;
   if (e instanceof BrevoError) return `brevo ${e.code}: ${e.message}`;
+  if (e instanceof PostmarkError) return `postmark ${e.code}: ${e.message}`;
   if (e instanceof SpfMergeHardFail) return `spf_hard_fail: ${e.message}`;
   if (e instanceof DnsUpsertError) return `dns_upsert: ${e.message}`;
   if (e instanceof Error) return e.message;
   return String(e);
+}
+
+function mapPostmarkError(e: unknown): ActionError {
+  if (e instanceof SpfMergeHardFail) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.spf_conflict",
+      details: { message: e.message },
+    };
+  }
+  if (e instanceof DnsUpsertError) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.dns_write_failed",
+      details: { message: e.message },
+    };
+  }
+  if (e instanceof PostmarkError) {
+    const { httpStatus, code } = e;
+    if (httpStatus === 401 || httpStatus === 403) {
+      return {
+        status: "error",
+        errorKey: "setup.errors.postmark_invalid_token",
+      };
+    }
+    if (httpStatus === 429) {
+      return {
+        status: "error",
+        errorKey: "setup.errors.postmark_rate_limited",
+      };
+    }
+    if (httpStatus >= 500) {
+      return { status: "error", errorKey: "setup.errors.postmark_unavailable" };
+    }
+    if (code === 501 || /already exists/i.test(e.message)) {
+      return {
+        status: "error",
+        errorKey: "setup.errors.postmark_domain_taken",
+      };
+    }
+    return { status: "error", errorKey: "setup.errors.postmark_unavailable" };
+  }
+  if (e instanceof CloudflareError) return mapCfError(e);
+  return { status: "error", errorKey: "setup.errors.unexpected" };
 }
 
 /* ------------------------------------------------------------------ *
@@ -684,6 +739,9 @@ const BREVO_ALREADY_DONE = new Set([
 
 const BREVO_VERIFY_POLL_DELAYS_MS = [2000, 4000, 8000] as const;
 const BREVO_SPF_INCLUDE_HOST = "spf.brevo.com";
+
+const POSTMARK_SPF_INCLUDE_HOST = "spf.mtasv.net";
+const POSTMARK_DKIM_VERIFY_POLL_DELAYS_MS = [3000, 5000, 10000] as const;
 
 type BrevoOk = {
   status: "ok";
@@ -804,6 +862,20 @@ export async function continueBrevoSetup(input: {
   const zoneName = row.domain;
   if (!zoneId || !zoneName) {
     return { status: "error", errorKey: "setup.errors.run_corrupt" };
+  }
+
+  // Postmark backend delegation — activated via SMTP_BACKEND=postmark env var.
+  if (process.env.SMTP_BACKEND === "postmark") {
+    const postmarkToken = process.env.POSTMARK_ACCOUNT_TOKEN;
+    if (!postmarkToken) {
+      return {
+        status: "error",
+        errorKey: "setup.errors.postmark_invalid_token",
+      };
+    }
+    const pm = createPostmarkAccountClient(postmarkToken);
+    const cfPm = createCloudflareClient(parsed.data.cfToken);
+    return runPostmarkSetup({ pm, cf: cfPm, admin, row });
   }
 
   const cf = createCloudflareClient(parsed.data.cfToken);
@@ -1051,6 +1123,232 @@ async function patchBrevoState(
     .eq("id", runId);
 }
 
+/* ------------------------------------------------------------------ *
+ * Postmark backend — parallel to Brevo; activated via SMTP_BACKEND=postmark
+ * ------------------------------------------------------------------ */
+
+type PostmarkSetupRow = {
+  id: string;
+  status: string;
+  domain: string;
+  mailbox_local: string;
+  cf_zone_id: string;
+  cf_state: unknown;
+};
+
+async function runPostmarkSetup(args: {
+  pm: PostmarkAccountClient;
+  cf: CloudflareClient;
+  admin: ReturnType<typeof createServiceClient>;
+  row: PostmarkSetupRow;
+}): Promise<BrevoOk | ActionError> {
+  const { pm, cf, admin, row } = args;
+  const zoneId = row.cf_zone_id;
+  const zoneName = row.domain;
+
+  try {
+    let runStatus = row.status;
+    let pmState =
+      ((row.cf_state as Record<string, unknown> | null)?.postmark as
+        | Record<string, unknown>
+        | undefined) ?? {};
+
+    // Step 1: create Postmark Server (one per customer setup run)
+    if (runStatus === "cf_done") {
+      const server = await pm.createServer(row.id);
+      pmState = {
+        ...pmState,
+        server_id: server.id,
+        server_token: server.apiToken,
+      };
+      await patchPostmarkState(admin, row.id, {
+        status: "brevo_sender_created",
+        pmState,
+        step: STEP.brevoCreateSender,
+        postmarkServerId: server.id,
+      });
+      runStatus = "brevo_sender_created";
+    }
+
+    // Step 2: add Postmark Domain + write DNS records to Cloudflare
+    if (runStatus === "brevo_sender_created") {
+      let domain = pmState.domain as PostmarkDomain | null;
+      if (!domain) {
+        domain = await pm.addSenderDomain(zoneName);
+        pmState = { ...pmState, domain, domain_id: domain.id };
+      }
+
+      // DKIM TXT record
+      await upsertDnsByPattern(cf, zoneId, {
+        pattern: "v=dkim1",
+        record: {
+          type: "TXT",
+          name: domain.dkimHost,
+          content: domain.dkimValue,
+          ttl: 1,
+        },
+      });
+      // Return-Path CNAME (pm-bounces.{domain} → pm.mtasv.net)
+      await upsertDnsByPattern(cf, zoneId, {
+        pattern: "pm.mtasv.net",
+        record: {
+          type: "CNAME",
+          name: domain.returnPathHost,
+          content: domain.returnPathCnameValue,
+          ttl: 1,
+        },
+      });
+      // SPF merge + DMARC upsert
+      const { spf: spfRes, dmarc: dmarcRes } = await ensurePostmarkDnsRecords({
+        cf,
+        zoneId,
+        zoneName,
+      });
+
+      pmState = {
+        ...pmState,
+        dns: {
+          dkim_host: domain.dkimHost,
+          return_path_host: domain.returnPathHost,
+          spf: spfRes.id,
+          dmarc: dmarcRes.id,
+        },
+      };
+      await patchPostmarkState(admin, row.id, {
+        status: "brevo_dns_written",
+        pmState,
+        step: STEP.brevoDnsUpsert,
+      });
+      runStatus = "brevo_dns_written";
+    }
+
+    // Step 3: poll DKIM verification
+    if (runStatus === "brevo_dns_written") {
+      const domainId = pmState.domain_id as number | undefined;
+      if (!domainId) throw new Error("postmark domain_id missing from state");
+
+      let attempt = 0;
+      let verified = false;
+      while (attempt <= POSTMARK_DKIM_VERIFY_POLL_DELAYS_MS.length) {
+        const d = await pm.verifyDkim(domainId);
+        if (d.dkimVerified) {
+          verified = true;
+          break;
+        }
+        if (attempt === POSTMARK_DKIM_VERIFY_POLL_DELAYS_MS.length) break;
+        await sleepMs(POSTMARK_DKIM_VERIFY_POLL_DELAYS_MS[attempt]);
+        attempt++;
+      }
+
+      if (!verified) {
+        return {
+          status: "error",
+          errorKey: "setup.errors.postmark_dkim_timeout",
+        };
+      }
+      pmState = { ...pmState, dkim_verified: true };
+      await patchPostmarkState(admin, row.id, {
+        status: "brevo_verified",
+        pmState,
+        step: STEP.brevoVerify,
+      });
+      runStatus = "brevo_verified";
+    }
+
+    // Step 4: finalize
+    if (runStatus === "brevo_verified") {
+      await patchPostmarkState(admin, row.id, {
+        status: "brevo_done",
+        pmState,
+        step: STEP.brevoFinalize,
+      });
+      runStatus = "brevo_done";
+    }
+
+    return {
+      status: "ok",
+      runId: row.id,
+      runStatus: runStatus as BrevoOk["runStatus"],
+    };
+  } catch (e) {
+    await failRun(admin, row.id, STEP.brevoCreateSender, errMsg(e));
+    return mapPostmarkError(e);
+  }
+}
+
+async function ensurePostmarkDnsRecords(args: {
+  cf: CloudflareClient;
+  zoneId: string;
+  zoneName: string;
+}): Promise<{
+  spf: { id: string; action: string };
+  dmarc: { id: string; action: string };
+}> {
+  const { cf, zoneId, zoneName } = args;
+
+  const existingTxt = await cf.listDnsRecords(zoneId, {
+    type: "TXT",
+    name: zoneName,
+  });
+  const existingSpf = existingTxt.find((r) =>
+    r.content.toLowerCase().startsWith("v=spf1"),
+  );
+  const spfContent = existingSpf
+    ? addSpfInclude(existingSpf.content, POSTMARK_SPF_INCLUDE_HOST)
+    : `v=spf1 include:${POSTMARK_SPF_INCLUDE_HOST} ~all`;
+  const spfRes = await upsertDnsByPattern(cf, zoneId, {
+    pattern: "v=spf1",
+    record: { type: "TXT", name: zoneName, content: spfContent, ttl: 1 },
+  });
+
+  const dmarcContent = `v=DMARC1; p=none; rua=mailto:postmaster@${zoneName}`;
+  const dmarcRes = await upsertDnsByPattern(cf, zoneId, {
+    pattern: "v=dmarc1",
+    record: {
+      type: "TXT",
+      name: `_dmarc.${zoneName}`,
+      content: dmarcContent,
+      ttl: 1,
+    },
+  });
+
+  return {
+    spf: { id: spfRes.id, action: spfRes.action },
+    dmarc: { id: dmarcRes.id, action: dmarcRes.action },
+  };
+}
+
+async function patchPostmarkState(
+  admin: ReturnType<typeof createServiceClient>,
+  runId: string,
+  input: {
+    status: string;
+    pmState: Record<string, unknown>;
+    step: Step;
+    postmarkServerId?: number;
+  },
+) {
+  const { data } = await admin
+    .from("setup_runs")
+    .select("cf_state")
+    .eq("id", runId)
+    .maybeSingle();
+  const current = (data?.cf_state as object) ?? {};
+  const nextState = {
+    ...current,
+    last_step: input.step,
+    postmark: input.pmState,
+  };
+  const update: Record<string, unknown> = {
+    status: input.status,
+    cf_state: nextState,
+  };
+  if (input.postmarkServerId !== undefined) {
+    update.postmark_server_id = input.postmarkServerId;
+  }
+  await admin.from("setup_runs").update(update).eq("id", runId);
+}
+
 function sleepMs(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
@@ -1175,17 +1473,10 @@ export async function prepareGmailStep(input: {
     return { status: "error", errorKey: "setup.errors.not_authenticated" };
   }
 
-  let smtp: SmtpDisplay;
-  try {
-    smtp = loadSmtpDisplay();
-  } catch (e) {
-    return mapSmtpConfigError(e);
-  }
-
   const admin = createServiceClient();
   const { data: row } = await admin
     .from("setup_runs")
-    .select("id, user_id, domain, mailbox_local, status, gmail_state")
+    .select("id, user_id, domain, mailbox_local, status, gmail_state, cf_state")
     .eq("id", parsed.data.runId)
     .maybeSingle();
 
@@ -1194,6 +1485,32 @@ export async function prepareGmailStep(input: {
   }
   if (!GMAIL_PREPARE_RESUMABLE.has(row.status)) {
     return { status: "error", errorKey: "setup.errors.run_wrong_state" };
+  }
+
+  // Load per-backend SMTP credentials.
+  let smtp: SmtpDisplay;
+  if (process.env.SMTP_BACKEND === "postmark") {
+    try {
+      const pmState =
+        ((row.cf_state as Record<string, unknown> | null)?.postmark as
+          | Record<string, unknown>
+          | undefined) ?? {};
+      smtp = buildPostmarkSmtpDisplay(
+        (pmState.server_token as string | undefined) ?? "",
+      );
+    } catch (e) {
+      return {
+        status: "error",
+        errorKey: "setup.errors.postmark_smtp_misconfigured",
+        details: { reason: e instanceof Error ? e.message : String(e) },
+      };
+    }
+  } else {
+    try {
+      smtp = loadSmtpDisplay();
+    } catch (e) {
+      return mapSmtpConfigError(e);
+    }
   }
 
   // #ABUSE-3 — phishing pattern check (non-blocking, fire-and-forget)

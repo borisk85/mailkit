@@ -12,7 +12,15 @@
  * window to the Brevo report when fetching.
  */
 
-import type { BrevoAggregatedReport } from "@/lib/integrations/brevo-stats";
+/** Minimal report shape consumed by evaluateDeliverability. Satisfied by both
+ *  BrevoAggregatedReport and the Postmark stats response. */
+export type AggregatedReportInput = {
+  requests: number;
+  hardBounces: number;
+  softBounces: number;
+  spamReports: number;
+  unsubscribed: number;
+};
 
 export type DeliverabilityThresholds = {
   /** Bounce rate above this (%) → suspended. */
@@ -65,10 +73,7 @@ export type DeliverabilityEvaluation = {
  * sent nothing this window, can't be over any threshold.
  */
 export function evaluateDeliverability(
-  report: Pick<
-    BrevoAggregatedReport,
-    "requests" | "hardBounces" | "softBounces" | "spamReports" | "unsubscribed"
-  >,
+  report: AggregatedReportInput,
   thresholds: DeliverabilityThresholds = DEFAULT_DELIVERABILITY_THRESHOLDS,
 ): DeliverabilityEvaluation {
   const requests = Math.max(0, report.requests ?? 0);
