@@ -1,8 +1,7 @@
 /**
- * Canonical refund-guarantee text — EN + RU. Source of truth lives
- * in `docs/GUARANTEE_POLICY.md` "Formal policy — legal-style text"
- * (EN and RU canonical blocks). Architect directive matches the
- * /terms + /privacy posture: copy verbatim, no paraphrase.
+ * Canonical refund-guarantee text — EN only. Source of truth lives
+ * in `docs/GUARANTEE_POLICY.md` "Formal policy" EN canonical block.
+ * Architect directive: copy verbatim, no paraphrase.
  *
  * Required by:
  *   - Hero "(see policy)" link → `/{locale}/guarantee`
@@ -53,47 +52,4 @@ card issuer, typically 3-10 business days.
 
 Fraud note: We track refund requests per account. Multiple refund
 requests from the same account may result in account restriction.
-`;
-
-export const GUARANTEE_RU = `Гарантия MailKit
-
-1. Автоматический возврат при сбое автоматики. Если наша
-автоматическая настройка Cloudflare Email Routing или Postmark SMTP
-не завершается для твоего домена в рамках этой фазы (обычно меньше
-2 минут), мы возвращаем деньги полностью автоматически в течение
-24 часов после сбоя. Тебе ничего делать не надо. Время этой фазы
-измеряется на нашем сервере — с момента старта настройки до
-завершения верификации SMTP. Сбой означает, что наша система
-вернула ошибку и не дошла до шага Gmail-мастера.
-
-2. 30-дневная функциональная гарантия (по запросу). Если в течение
-30 дней с момента покупки ты не можешь отправлять или получать
-email через настройку, которую мы сделали — даже после того, как
-наш support попытался помочь — ты имеешь право на полный возврат.
-Отправь запрос на support@getmailkit.com с описанием проблемы. Мы
-отвечаем в течение 48 часов в рабочие дни.
-
-Что НЕ покрывается гарантией:
-
-- Время, которое ты тратишь на Gmail Send-As шаг. Мы даем
-  пошаговый мастер с готовыми полями для копирования; сами клики
-  происходят в твоем Gmail-аккаунте, в твоем темпе.
-- Сбои, вызванные изменениями DNS-записей, настроек Cloudflare или
-  настроек Gmail-аккаунта, которые ты внес после завершения
-  настройки.
-- Проблемы доставляемости email (письма попадают в спам у
-  получателей, проблемы с репутацией отправителя). Это покрывается
-  нашей опциональной подпиской Deliverability Monitoring ($3/месяц
-  на домен).
-- Сбои из-за истечения срока твоего домена, смены регистратора или
-  блокировки аккаунтов в сторонних сервисах (Cloudflare, Postmark,
-  Google), которые вне нашего контроля.
-
-Как обрабатывается возврат: Деньги возвращаются на ту же карту, с
-которой была оплата, через Lemon Squeezy. Срок зачисления зависит
-от твоего банка, обычно 3-10 рабочих дней.
-
-Антифрод: Мы отслеживаем запросы на возврат по каждому аккаунту.
-Несколько запросов на возврат от одного аккаунта могут привести к
-ограничению доступа.
 `;

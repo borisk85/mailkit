@@ -28,11 +28,9 @@ export default async function LandingPage({
   // copy and structured data.
   const t = await getTranslations({ locale, namespace: "landing.faq" });
   const faqItems = t.raw("items") as FaqItem[];
-  const schemaLocale: "en" | "ru" = locale === "ru" ? "ru" : "en";
-
   return (
     <>
-      <StructuredData data={landingGraph(schemaLocale, faqItems)} />
+      <StructuredData data={landingGraph("en", faqItems)} />
       <AnnouncementBanner />
       <Header />
       <main className="flex flex-1 flex-col">

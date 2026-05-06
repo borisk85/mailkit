@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { GUARANTEE_EN, GUARANTEE_RU } from "./guarantee";
+import { GUARANTEE_EN } from "./guarantee";
 
 /**
  * Smoke checks on the canonical guarantee text. The two clauses
@@ -33,27 +33,5 @@ describe("Guarantee canonical text", () => {
 
   test("EN: support email", () => {
     expect(GUARANTEE_EN).toContain("support@getmailkit.com");
-  });
-
-  test("RU: heading + two numbered clauses", () => {
-    expect(GUARANTEE_RU).toContain("Гарантия MailKit");
-    expect(GUARANTEE_RU).toMatch(
-      /\n1\. Автоматический возврат при сбое автоматики/,
-    );
-    expect(GUARANTEE_RU).toMatch(/\n2\. 30-дневная функциональная гарантия/);
-  });
-
-  test("RU: same time numbers as EN", () => {
-    expect(GUARANTEE_RU).toContain("24 часов");
-    expect(GUARANTEE_RU).toContain("30 дней");
-    expect(GUARANTEE_RU).toContain("3-10 рабочих дней");
-  });
-
-  test("RU: support email same as EN", () => {
-    expect(GUARANTEE_RU).toContain("support@getmailkit.com");
-  });
-
-  test("EN and RU are distinct strings (not aliased)", () => {
-    expect(GUARANTEE_EN).not.toBe(GUARANTEE_RU);
   });
 });

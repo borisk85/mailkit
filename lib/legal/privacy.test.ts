@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { PRIVACY_EN, PRIVACY_RU } from "./privacy";
+import { PRIVACY_EN } from "./privacy";
 
 /**
  * Smoke checks on the canonical Privacy Policy text. Section 11 has
@@ -56,25 +56,7 @@ describe("Privacy canonical text", () => {
     expect(PRIVACY_EN).toMatch(/Payment records: retained for 5 years/);
   });
 
-  test("RU: title + 11 numbered sections", () => {
-    expect(PRIVACY_RU).toContain("MailKit — Политика конфиденциальности");
-    expect(PRIVACY_RU).toContain("Последнее обновление:");
-    for (let i = 1; i <= 11; i++) {
-      expect(PRIVACY_RU).toMatch(new RegExp(`\\n${i}\\. `));
-    }
-  });
-
-  test("RU: section 11 mirrors the Limited Use disclosure structure", () => {
-    expect(PRIVACY_RU).toContain(
-      "соответствует Google API Services User Data Policy, включая\nтребования Limited Use",
-    );
-    expect(PRIVACY_RU).toContain(
-      "Мы не используем и не передаём данные пользователей Google для\n  показа рекламы, включая ретаргетинг",
-    );
-  });
-
-  test("contact email consistent across locales", () => {
+  test("EN: support contact email present", () => {
     expect(PRIVACY_EN).toContain("support@getmailkit.com");
-    expect(PRIVACY_RU).toContain("support@getmailkit.com");
   });
 });

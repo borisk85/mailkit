@@ -4,7 +4,7 @@ import { setRequestLocale } from "next-intl/server";
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
 import { LegalDocLayout } from "@/components/legal/legal-doc-layout";
-import { PRIVACY_EN, PRIVACY_RU } from "@/lib/legal/privacy";
+import { PRIVACY_EN } from "@/lib/legal/privacy";
 
 /**
  * Static Privacy Policy page. Mirrors /terms structure (same Header /
@@ -18,19 +18,7 @@ import { PRIVACY_EN, PRIVACY_RU } from "@/lib/legal/privacy";
  * header for the immutability rule.
  */
 
-export async function generateMetadata({
-  params,
-}: {
-  params: Promise<{ locale: string }>;
-}): Promise<Metadata> {
-  const { locale } = await params;
-  if (locale === "ru") {
-    return {
-      title: "Политика конфиденциальности — MailKit",
-      description:
-        "Как MailKit собирает, использует и защищает информацию о пользователях. Раскрытие Limited Use по Google API Services User Data Policy.",
-    };
-  }
+export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Privacy Policy — MailKit",
     description:
@@ -46,15 +34,11 @@ export default async function PrivacyPage({
   const { locale } = await params;
   setRequestLocale(locale);
 
-  const text = locale === "ru" ? PRIVACY_RU : PRIVACY_EN;
-  const title =
-    locale === "ru" ? "Политика конфиденциальности" : "Privacy Policy";
-  const lastUpdated =
-    locale === "ru" ? "Обновлено 25.04.2026" : "Updated 2026-04-25";
+  const text = PRIVACY_EN;
+  const title = "Privacy Policy";
+  const lastUpdated = "Updated 2026-04-25";
   const lede =
-    locale === "ru"
-      ? "Mailkit собирает минимум: твой email и имя из Google OAuth, домен который настраиваешь, оплату через Lemon Squeezy. Никаких маркетинговых трекеров, никаких рекламных пикселей. Никаких продаж данных третьим лицам. Полный текст — для регуляторов и любителей деталей — ниже."
-      : "Mailkit collects the minimum: your email and name from Google OAuth, the domain you set up, and your Lemon Squeezy purchase record. No marketing trackers, no ad pixels, no data sold to third parties. The formal text below — for regulators and detail-readers — covers everything else.";
+    "Mailkit collects the minimum: your email and name from Google OAuth, the domain you set up, and your Lemon Squeezy purchase record. No marketing trackers, no ad pixels, no data sold to third parties. The formal text below — for regulators and detail-readers — covers everything else.";
 
   return (
     <>
