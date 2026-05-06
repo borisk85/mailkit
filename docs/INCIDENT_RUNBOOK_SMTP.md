@@ -176,6 +176,38 @@ Implemented в `messages/en.json` под ключом `terms.smtpDependency`,
 
 ---
 
+## Auto-suspend behavior (ABUSE-4)
+
+When `flagSuspended` fires (rate_limit or deliverability threshold crossed),
+the system automatically disables the customer's Postmark SMTP server:
+
+**Mechanism:** `postmark.suspendServer(serverId)` → `editServer` with
+`SmtpApiActivated: false` via Postmark Account API. The server continues
+to exist; SMTP auth fails until re-enabled. NOT destructive (≠ delete).
+
+**Outcome logged in `abuse_events.notes`:**
+- `auto_suspend_postmark_server:ok` — server disabled
+- `auto_suspend_postmark_server:skipped` — no `postmark_server_id` in
+  `setup_runs`, or `POSTMARK_ACCOUNT_TOKEN` env not set
+- `auto_suspend_postmark_server:failed=<reason>` — API error; DB
+  suspension still completed, manual Postmark action required
+
+**False-positive risk:** Low. Thresholds (5%+ bounce, 0.1%+ complaint,
+500+ msg/day rate limit) are conservative. A legit sender hitting these
+is already causing deliverability damage. If owner determines false-positive:
+
+**To unsuspend manually:**
+1. Postmark Dashboard → Servers → find server by ID from `setup_runs`
+2. Re-enable SmtpApiActivated (Server Settings → toggle SMTP API)
+3. DB rollback: `UPDATE purchases SET suspended_at = NULL, suspension_reason = NULL WHERE id = '<purchase_id>'`
+4. Notify customer via support email
+
+**POSTMARK_ACCOUNT_TOKEN** must be set in Vercel Production env for
+auto-suspend to execute. Without it, the DB flag still fires but Postmark
+server stays active. Add to env var audit before launch.
+
+---
+
 ## Review cadence
 
 Этот runbook пересматривается:

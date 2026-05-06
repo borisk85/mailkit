@@ -18,7 +18,7 @@
   - Boris подтверждает что хочет именно Telegram, не SMS
 - **#ABUSE-2** Postmark/AWS SES abuse desk response kit: скрипт `scripts/abuse-export.ts <domain>` → ZIP с send logs из CloudWatch, abuse_events, purchase + consent fields, ToS version. Готовый пакет для AWS abuse desk при инцидентах.
 - **#ABUSE-3** Lightweight phishing pattern check на `prepareGmailStep`: blacklist suspicious mailbox names (`noreply`, `support`, `admin`, `paypal`, `apple`, `google`, `bank`, `secure`, `verify`) + domain typosquatting (Levenshtein < 2 от top brands). Match → `purchases.kyc_review_required = true` + alert через #ABUSE-1 канал. НЕ блокирует автоматически — только flags на manual review.
-- **#ABUSE-4** Hard-suspend tenant в AWS SES: при `flagSuspended` → auto pause через SES API (delete email identity либо update sending status). Destructive trade-off, acceptable для abuse cases.
+- **#ABUSE-4** ✅ Hard-suspend tenant в Postmark: при `flagSuspended` → `postmark.suspendServer(serverId)` через Account API (`editServer` с `SmtpApiActivated: false`). Idempotent. Результат логируется в `abuse_events.notes` как `auto_suspend_postmark_server:ok|skipped|failed=<reason>`. Branch: `feat/abuse-4-suspend`.
 
 Существующая anti-abuse инфраструктура (готова, не трогаем):
 - Per-domain rate limits (`lib/send-limits.ts`): 500/day, 50/hour, 5/minute
@@ -260,6 +260,7 @@ Trigger для работы: после merge ветки `feat/smtp-dependency-d
 ## 🐛 Pre-existing bugs (P3, non-blocking)
 - #21 ThemeToggle hydration mismatch — SSR/client aria-label расходится ("светлую" vs "тёмную"). Стандартный next-themes SSR баг. Не ломает функциональность. Fix: `suppressHydrationWarning` на button или `useEffect` для aria-label.
 - #22 gmail.svg image warning — Next.js предупреждает что изменён width или height без второго измерения. Fix: добавить `width="auto"` или `height="auto"` к img тегу. Косметика, не влияет на рендер.
+- **#DASH-FIX-1** `dashboard-data.test.ts` Supabase mock missing `.in()` method — `getDashboardData > happy path` fails with `supabase.from(...).select(...).in is not a function`. Pre-existing since Postmark migration; Supabase mock shape predates `smtp_*` status values. Fix: lift the mock shape to match current query chain (`.select().in()`). Branch: `fix/dashboard-data-test-mock`.
 
 ## 🧹 Tech debt
 
