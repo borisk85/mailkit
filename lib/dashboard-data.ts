@@ -32,10 +32,10 @@ export type SetupStatus =
   | "cf_awaiting_destination_verify"
   | "cf_rule_created"
   | "cf_done"
-  | "brevo_sender_created"
-  | "brevo_dns_written"
-  | "brevo_verified"
-  | "brevo_done"
+  | "smtp_sender_created"
+  | "smtp_dns_written"
+  | "smtp_verified"
+  | "smtp_done"
   | "gmail_instructions_shown"
   | "gmail_smtp_ready"
   | "gmail_send_as_verified"
@@ -270,7 +270,7 @@ async function fetchSendUsage(
  *                     Gmail confirmed)
  *   - awaiting_verification → cf_awaiting_destination_verify (the
  *                     user has to click an email in CF) and the
- *                     brevo_dns_written / brevo_verified plateau
+ *                     smtp_dns_written / smtp_verified plateau
  *                     where the user waits on DNS propagation
  *   - in_progress  → everything else (active backend work + the
  *                     guided Gmail wizard steps)
@@ -284,8 +284,8 @@ export function setupOverallState(setup: {
     case "done":
       return "done";
     case "cf_awaiting_destination_verify":
-    case "brevo_dns_written":
-    case "brevo_verified":
+    case "smtp_dns_written":
+    case "smtp_verified":
     case "gmail_instructions_shown":
     case "gmail_smtp_ready":
     case "gmail_send_as_verified":
@@ -324,13 +324,13 @@ export function setupDetailLabel(status: SetupStatus): string | null {
       return "Cloudflare routing rule created";
     case "cf_done":
       return "Cloudflare phase complete";
-    case "brevo_sender_created":
+    case "smtp_sender_created":
       return "SMTP sender registered";
-    case "brevo_dns_written":
+    case "smtp_dns_written":
       return "Authentication records added — waiting for DNS propagation";
-    case "brevo_verified":
+    case "smtp_verified":
       return "DNS records verified";
-    case "brevo_done":
+    case "smtp_done":
       return "SMTP phase complete";
     case "gmail_instructions_shown":
       return "Open setup to complete the Gmail Send-As step";

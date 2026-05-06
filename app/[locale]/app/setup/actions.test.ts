@@ -548,7 +548,7 @@ describe("prepareGmailStep + confirmGmailSendAs", () => {
       user_id: "u1",
       domain: "ex.com",
       mailbox_local: "hello",
-      status: "brevo_done",
+      status: "smtp_done",
       cf_zone_id: "z1",
       cf_state: {
         postmark: { server_id: 1, server_token: "test-server-token" },
@@ -669,7 +669,7 @@ describe("prepareGmailStep + confirmGmailSendAs", () => {
       if (result.status === "error") {
         expect(result.errorKey).toBe("setup.errors.smtp_misconfigured");
       }
-      expect(admin.rows[0].status).toBe("brevo_done");
+      expect(admin.rows[0].status).toBe("smtp_done");
     });
 
     test("unauthenticated → not_authenticated", async () => {

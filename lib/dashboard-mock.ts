@@ -38,7 +38,7 @@ const ACTIVE: DashboardData = {
       id: "mock-setup-active",
       domain: "founders.example",
       mailboxLocal: "hello",
-      status: "brevo_dns_written",
+      status: "smtp_dns_written",
       errorMsg: null,
       createdAt: YESTERDAY,
       updatedAt: TODAY,

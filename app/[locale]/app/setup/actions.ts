@@ -82,10 +82,10 @@ type StartSetupOk = {
     | "cf_awaiting_destination_verify"
     | "cf_rule_created"
     | "cf_done"
-    | "brevo_sender_created"
-    | "brevo_dns_written"
-    | "brevo_verified"
-    | "brevo_done"
+    | "smtp_sender_created"
+    | "smtp_dns_written"
+    | "smtp_verified"
+    | "smtp_done"
     | "gmail_instructions_shown"
     | "gmail_smtp_ready"
     | "gmail_send_as_verified"
@@ -711,16 +711,16 @@ function mapPostmarkError(e: unknown): ActionError {
 
 const SMTP_RESUMABLE = new Set([
   "cf_done",
-  "brevo_sender_created",
-  "brevo_dns_written",
-  "brevo_verified",
+  "smtp_sender_created",
+  "smtp_dns_written",
+  "smtp_verified",
 ]);
 
-// Statuses past brevo_done — setup already finished, continueSmtpSetup
+// Statuses past smtp_done — setup already finished, continueSmtpSetup
 // is a no-op idempotent "already done" response so a stale click from
 // the CTA does not reject with run_wrong_state.
 const SMTP_ALREADY_DONE = new Set([
-  "brevo_done",
+  "smtp_done",
   "gmail_instructions_shown",
   "gmail_smtp_ready",
   "gmail_send_as_verified",
@@ -734,10 +734,10 @@ type SmtpSetupOk = {
   status: "ok";
   runId: string;
   runStatus:
-    | "brevo_sender_created"
-    | "brevo_dns_written"
-    | "brevo_verified"
-    | "brevo_done";
+    | "smtp_sender_created"
+    | "smtp_dns_written"
+    | "smtp_verified"
+    | "smtp_done";
 };
 
 const smtpContinueSchema = z.object({
@@ -780,7 +780,7 @@ export async function continueSmtpSetup(input: {
   }
 
   if (SMTP_ALREADY_DONE.has(row.status)) {
-    return { status: "ok", runId: row.id, runStatus: "brevo_done" };
+    return { status: "ok", runId: row.id, runStatus: "smtp_done" };
   }
 
   if (!SMTP_RESUMABLE.has(row.status)) {
@@ -837,16 +837,16 @@ async function runPostmarkSetup(args: {
         server_token: server.apiToken,
       };
       await patchPostmarkState(admin, row.id, {
-        status: "brevo_sender_created",
+        status: "smtp_sender_created",
         pmState,
         step: STEP.smtpCreateSender,
         postmarkServerId: server.id,
       });
-      runStatus = "brevo_sender_created";
+      runStatus = "smtp_sender_created";
     }
 
     // Step 2: add Postmark Domain + write DNS records to Cloudflare
-    if (runStatus === "brevo_sender_created") {
+    if (runStatus === "smtp_sender_created") {
       let domain = pmState.domain as PostmarkDomain | null;
       if (!domain) {
         domain = await pm.addSenderDomain(zoneName);
@@ -890,15 +890,15 @@ async function runPostmarkSetup(args: {
         },
       };
       await patchPostmarkState(admin, row.id, {
-        status: "brevo_dns_written",
+        status: "smtp_dns_written",
         pmState,
         step: STEP.smtpDnsUpsert,
       });
-      runStatus = "brevo_dns_written";
+      runStatus = "smtp_dns_written";
     }
 
     // Step 3: poll DKIM verification
-    if (runStatus === "brevo_dns_written") {
+    if (runStatus === "smtp_dns_written") {
       const domainId = pmState.domain_id as number | undefined;
       if (!domainId) throw new Error("postmark domain_id missing from state");
 
@@ -923,21 +923,21 @@ async function runPostmarkSetup(args: {
       }
       pmState = { ...pmState, dkim_verified: true };
       await patchPostmarkState(admin, row.id, {
-        status: "brevo_verified",
+        status: "smtp_verified",
         pmState,
         step: STEP.smtpVerify,
       });
-      runStatus = "brevo_verified";
+      runStatus = "smtp_verified";
     }
 
     // Step 4: finalize
-    if (runStatus === "brevo_verified") {
+    if (runStatus === "smtp_verified") {
       await patchPostmarkState(admin, row.id, {
-        status: "brevo_done",
+        status: "smtp_done",
         pmState,
         step: STEP.smtpFinalize,
       });
-      runStatus = "brevo_done";
+      runStatus = "smtp_done";
     }
 
     return {
@@ -1032,13 +1032,13 @@ function sleepMs(ms: number): Promise<void> {
  * Ticket #6 — Gmail Send-As guided step
  * ------------------------------------------------------------------ */
 
-// prepareGmailStep resumes from brevo_done (first call) or from
+// prepareGmailStep resumes from smtp_done (first call) or from
 // gmail_instructions_shown (user re-opened the wizard) — both return the
 // same display object so the UI is stateless. confirmGmailSendAs accepts
 // the full downstream range so a double-click can't transition a run
 // out of "done".
 const GMAIL_PREPARE_RESUMABLE = new Set([
-  "brevo_done",
+  "smtp_done",
   "gmail_instructions_shown",
 ]);
 const GMAIL_CONFIRM_RESUMABLE = new Set([

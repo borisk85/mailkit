@@ -152,10 +152,10 @@ type MockKey =
   | "awaiting_verify"
   | "done"
   | "failed"
-  | "brevo_sender_created"
-  | "brevo_dns_written"
-  | "brevo_verified"
-  | "brevo_done"
+  | "smtp_sender_created"
+  | "smtp_dns_written"
+  | "smtp_verified"
+  | "smtp_done"
   | "gmail_instructions_shown"
   | "gmail_smtp_ready"
   | "gmail_send_as_verified"
@@ -205,7 +205,7 @@ function mockInitialState(mock: MockKey): WizardState {
         mailboxLocal: "hello",
         destinationEmail: "owner@gmail.com",
       };
-    case "brevo_sender_created":
+    case "smtp_sender_created":
       return {
         kind: "smtp_running",
         runId: "11111111-2222-4333-8444-555555555555",
@@ -215,7 +215,7 @@ function mockInitialState(mock: MockKey): WizardState {
         destinationEmail: "owner@gmail.com",
         reached: "sender",
       };
-    case "brevo_dns_written":
+    case "smtp_dns_written":
       return {
         kind: "smtp_awaiting_retry",
         runId: "11111111-2222-4333-8444-555555555555",
@@ -225,7 +225,7 @@ function mockInitialState(mock: MockKey): WizardState {
         destinationEmail: "owner@gmail.com",
         errorKey: "setup.errors.smtp_verify_timeout",
       };
-    case "brevo_verified":
+    case "smtp_verified":
       return {
         kind: "smtp_running",
         runId: "11111111-2222-4333-8444-555555555555",
@@ -235,7 +235,7 @@ function mockInitialState(mock: MockKey): WizardState {
         destinationEmail: "owner@gmail.com",
         reached: "verify",
       };
-    case "brevo_done":
+    case "smtp_done":
       return {
         kind: "smtp_done",
         runId: "11111111-2222-4333-8444-555555555555",
@@ -408,7 +408,7 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
               // SMTP setup" CTA.
               const zoneName = chosen.name;
               if (
-                result.runStatus === "brevo_done" ||
+                result.runStatus === "smtp_done" ||
                 result.runStatus === "gmail_instructions_shown" ||
                 result.runStatus === "gmail_smtp_ready" ||
                 result.runStatus === "gmail_send_as_verified" ||
@@ -424,14 +424,14 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
                 return;
               }
               if (
-                result.runStatus === "brevo_sender_created" ||
-                result.runStatus === "brevo_dns_written" ||
-                result.runStatus === "brevo_verified"
+                result.runStatus === "smtp_sender_created" ||
+                result.runStatus === "smtp_dns_written" ||
+                result.runStatus === "smtp_verified"
               ) {
                 const reached: "sender" | "dns" | "verify" =
-                  result.runStatus === "brevo_sender_created"
+                  result.runStatus === "smtp_sender_created"
                     ? "sender"
-                    : result.runStatus === "brevo_dns_written"
+                    : result.runStatus === "smtp_dns_written"
                       ? "dns"
                       : "verify";
                 setState({
@@ -1244,7 +1244,7 @@ function handleSmtpResult(
     });
     return;
   }
-  if (result.runStatus === "brevo_done") {
+  if (result.runStatus === "smtp_done") {
     setState({
       kind: "smtp_done",
       runId: snapshot.runId,
@@ -1259,11 +1259,11 @@ function handleSmtpResult(
   // running state at the reported reached step so the progress list reflects
   // the actual backend state.
   const reached: SmtpReached =
-    result.runStatus === "brevo_sender_created"
+    result.runStatus === "smtp_sender_created"
       ? "sender"
-      : result.runStatus === "brevo_dns_written"
+      : result.runStatus === "smtp_dns_written"
         ? "dns"
-        : result.runStatus === "brevo_verified"
+        : result.runStatus === "smtp_verified"
           ? "verify"
           : "done";
   setState({
