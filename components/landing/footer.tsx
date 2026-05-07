@@ -21,7 +21,7 @@ export function Footer() {
 
   return (
     <footer className="w-full border-t border-mk-border-subtle bg-surface-elevated">
-      <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6">
+      <div className="mx-auto max-w-6xl px-4 pb-24 pt-20 sm:px-6 sm:pb-20">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5 lg:gap-8">
           <div className="lg:col-span-2">
             <Link
@@ -64,7 +64,7 @@ export function Footer() {
           </FooterColumn>
 
           <FooterColumn heading={t("contactHeading")}>
-            <FooterLink href="mailto:support@getmailkit.com" external>
+            <FooterLink href="mailto:support@getmailkit.com" external breakAll>
               {t("links.supportEmail")}
             </FooterLink>
             <FooterLink href={GITHUB_URL} external>
@@ -96,17 +96,19 @@ function FooterLink({
   href,
   children,
   external,
+  breakAll,
 }: {
   href: string;
   children: React.ReactNode;
   external?: boolean;
+  breakAll?: boolean;
 }) {
   if (external) {
     return (
       <li>
         <a
           href={href}
-          className="mk-body-small text-mk-text-secondary transition-colors hover:text-mk-text-primary"
+          className={`mk-body-small text-mk-text-secondary transition-colors hover:text-mk-text-primary${breakAll ? " break-all" : ""}`}
         >
           {children}
         </a>
