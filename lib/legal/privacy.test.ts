@@ -34,7 +34,7 @@ describe("Privacy canonical text", () => {
     );
   });
 
-  test("EN: third-party providers list includes the seven we use", () => {
+  test("EN: third-party providers list includes the six we use", () => {
     for (const provider of [
       "Google",
       "Cloudflare",
@@ -42,7 +42,6 @@ describe("Privacy canonical text", () => {
       "Lemon Squeezy",
       "Supabase",
       "Vercel",
-      "Amazon Web Services",
     ]) {
       expect(PRIVACY_EN).toContain(provider);
     }

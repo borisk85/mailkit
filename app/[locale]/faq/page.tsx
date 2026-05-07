@@ -36,7 +36,7 @@ export default async function FaqPage({
       <StructuredData data={faqPageSchema("en", faqItems)} />
       <Header />
       <main className="flex flex-1 flex-col">
-        <FaqSection />
+        <FaqSection compactHeading />
       </main>
       <Footer />
     </>

@@ -81,7 +81,13 @@ export default async function SetupPage({
     }
   }
 
-  return <SetupWizard initialMock={mock} />;
+  return (
+    <div className="flex min-h-[calc(100vh-180px)] items-center justify-center px-4 py-8">
+      <div className="w-full max-w-2xl">
+        <SetupWizard initialMock={mock} />
+      </div>
+    </div>
+  );
 }
 
 function readParam(v: string | string[] | undefined): string | undefined {

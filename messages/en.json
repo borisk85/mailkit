@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "title": "MailKit — Email on your Cloudflare domain in under 10 minutes",
-    "description": "Already on Cloudflare DNS? Automated Email Routing + Amazon SES SMTP setup with guided Gmail Send-As. $5 per mailbox."
+    "title": "MailKit — Email on your Cloudflare domain in 30 minutes",
+    "description": "Already on Cloudflare DNS? Automated Email Routing + Postmark SMTP setup with guided Gmail Send-As. $5 per mailbox."
   },
   "landing": {
     "announcementBanner": {
@@ -68,7 +68,7 @@
       "inclusionsHeading": "What's included",
       "inclusions": [
         "Cloudflare Email Routing setup",
-        "Amazon SES SMTP setup (sender verification, DKIM signature, SPF, DMARC)",
+        "Postmark SMTP setup (sender verification, DKIM signature, SPF, DMARC)",
         "Step-by-step Gmail Send-As walkthrough",
         "Unlimited extra addresses on your domain (no extra charge)",
         "30-day money-back guarantee",
@@ -83,7 +83,7 @@
     "howItWorks": {
       "eyebrow": "How it works",
       "heading": "Four steps. We do three. You do one.",
-      "subheading": "Total time under 10 minutes. Total work on your side: three copy-paste actions in Gmail.",
+      "subheading": "Total time 30 minutes. Total work on your side: three copy-paste actions in Gmail.",
       "automatedBadge": "Automated",
       "manualBadge": "Your turn",
       "step1": {
@@ -92,9 +92,9 @@
         "body": "We turn on email routing for your domain and add the records that let it receive mail."
       },
       "step2": {
-        "title": "Amazon SES SMTP setup",
+        "title": "Postmark SMTP setup",
         "time": "~60 sec",
-        "body": "We configure Amazon SES for your domain and add the signature records that prove your email is yours."
+        "body": "We provision Postmark for your domain. Add the records."
       },
       "step3": {
         "title": "DNS verification",
@@ -113,7 +113,7 @@
       "subhead": "Finding a current guide, navigating three different dashboards, and knowing which field gets what — that's where most people get stuck.",
       "without": {
         "title": "Manual setup",
-        "duration": "~ 1 hour",
+        "duration": "60–90 min manual",
         "steps": [
           "Find an up-to-date guide on email routing",
           "Create accounts and figure out multiple service dashboards",
@@ -124,7 +124,7 @@
       },
       "with": {
         "title": "Automated",
-        "duration": "under 10 min",
+        "duration": "30 min",
         "tokenHint": "How to create your API token in Cloudflare dashboard",
         "steps": [
           "Sign in with Google",
@@ -141,7 +141,7 @@
       "subhead": "Two clear guarantees, written in plain language.",
       "automation": {
         "title": "Automation failure",
-        "body": "If our automated setup fails on our end (Cloudflare or Amazon SES phase) — full refund within 24 hours. Automatic. No request needed.",
+        "body": "If our automated setup fails on our end (Cloudflare or Postmark phase) — full refund within 24 hours. Automatic. No request needed.",
         "badge": "Auto-refund"
       },
       "functional": {
@@ -166,17 +166,17 @@
         {
           "id": "cf-required",
           "q": "Does this work with any domain?",
-          "a": "Right now MailKit only works if your domain uses Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace, or another registrar, you'll need to migrate nameservers to Cloudflare first. Cloudflare DNS is free and migration takes about 30 minutes plus DNS propagation up to 24 hours. After migration, MailKit setup runs in under 10 minutes. Multi-provider support is on our roadmap."
+          "a": "Right now MailKit only works if your domain uses Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace, or another registrar, you'll need to migrate nameservers to Cloudflare first. Cloudflare DNS is free and migration takes about 30 minutes plus DNS propagation up to 24 hours. After migration, MailKit setup runs in about 30 minutes. Multi-provider support is on our roadmap."
         },
         {
           "id": "smtp-dependency",
           "q": "What if MailKit shuts down?",
-          "a": "Your domain, DNS records, Cloudflare Email Routing, and Gmail Send-As are yours forever — they live on your accounts, not ours. The only piece tied to our infrastructure is the SMTP relay (AWS SES). If we ever close, we give you 90 days notice plus a step-by-step guide to migrate the SMTP relay to your own AWS SES or alternative provider account. No lock-in."
+          "a": "Your domain, DNS records, Cloudflare Email Routing, and Gmail Send-As are yours forever — they live on your accounts, not ours. The only piece tied to our infrastructure is the SMTP relay (Postmark). If we ever close, we give you 90 days notice plus a step-by-step guide to migrate the SMTP relay to your own Postmark or alternative provider account. No lock-in."
         },
         {
           "id": "timing",
           "q": "How long does it take?",
-          "a": "10 minutes of active work, then 5-30 minutes while Amazon verifies your domain's DNS. We'll email you when it's ready. Then just 3 minutes to paste four lines into Gmail."
+          "a": "10 minutes of your active work, plus 5–30 minutes of background DKIM verification. Total ~30 minutes from start to first sent email."
         },
         {
           "id": "no-tech-skills",
@@ -191,12 +191,12 @@
         {
           "id": "cost",
           "q": "Do I have to keep paying every month?",
-          "a": "No. MailKit is a one-time $5 fee per mailbox — no subscription, no recurring charges. That covers the full automated setup: Cloudflare Email Routing for receiving, Amazon SES SMTP for sending, and the step-by-step Gmail Send-As walkthrough. Compared to Google Workspace at $6/user/month ($72 a year per mailbox), MailKit is a one-and-done payment."
+          "a": "No. MailKit is a one-time $5 fee per mailbox — no subscription, no recurring charges. That covers the full automated setup: Cloudflare Email Routing for receiving, Postmark SMTP for sending, and the step-by-step Gmail Send-As walkthrough. Compared to Google Workspace at $6/user/month ($72 a year per mailbox), MailKit is a one-and-done payment."
         },
         {
           "id": "duration",
           "q": "Can I do this myself for free?",
-          "a": "Yes — but expect an evening of documentation and wrong turns. You'd navigate Cloudflare Email Routing, Amazon SES SMTP configuration, five DNS records (MX, SPF, DKIM, DMARC, SES domain verification), and the Gmail Send-As setup — each requiring its own guide, its own dashboard, and a wait to see if the change took effect. MailKit automates the Amazon SES piece — the most technically involved part — and guides you step by step through the rest."
+          "a": "Yes — but expect an evening of documentation and wrong turns. You'd navigate Cloudflare Email Routing, Postmark SMTP configuration, five DNS records (MX, SPF, DKIM, DMARC, DKIM verification), and the Gmail Send-As setup — each requiring its own guide, its own dashboard, and a wait to see if the change took effect. MailKit automates the Postmark piece — the most technically involved part — and guides you step by step through the rest."
         },
         {
           "id": "vs-workspace",
@@ -206,12 +206,12 @@
         {
           "id": "fail",
           "q": "What happens if the setup fails halfway?",
-          "a": "If our Cloudflare or Amazon SES automation fails, we issue an automatic full refund within 24 hours. The dashboard shows you which step failed and why. If you'd like to retry once we've fixed our side, we'll let you know — no extra charge if the failure was on our end."
+          "a": "If our Cloudflare or Postmark automation fails, we issue an automatic full refund within 24 hours. The dashboard shows you which step failed and why. If you'd like to retry once we've fixed our side, we'll let you know — no extra charge if the failure was on our end."
         },
         {
           "id": "manual-step",
           "q": "Why doesn't Mailkit fully automate the Gmail step?",
-          "a": "The Gmail API method that adds Send-As entries (gmail.settings.sendAs.create) is blocked on personal @gmail.com accounts — it requires Google Workspace with domain-wide delegation. We made that part a 3-minute guided walkthrough with copy-paste values instead. The other technical parts (Cloudflare + Amazon SES + DNS) are fully automated."
+          "a": "The Gmail API method that adds Send-As entries (gmail.settings.sendAs.create) is blocked on personal @gmail.com accounts — it requires Google Workspace with domain-wide delegation. We made that part a 3-minute guided walkthrough with copy-paste values instead. The other technical parts (Cloudflare + Postmark + DNS) are fully automated."
         },
         {
           "id": "token-safety",
@@ -226,7 +226,7 @@
         {
           "id": "improvmx",
           "q": "How is this different from ImprovMX?",
-          "a": "MailKit replaces the receiving piece (ImprovMX forwarding) with Cloudflare Email Routing and adds outbound sending via Amazon SES SMTP through Gmail Send-As — ImprovMX's free tier doesn't do outbound. You'll need to remove the existing MX records on your domain before setup; our wizard detects conflicts and tells you exactly which records block the run."
+          "a": "MailKit replaces the receiving piece (ImprovMX forwarding) with Cloudflare Email Routing and adds outbound sending via Postmark SMTP through Gmail Send-As — ImprovMX's free tier doesn't do outbound. You'll need to remove the existing MX records on your domain before setup; our wizard detects conflicts and tells you exactly which records block the run."
         },
         {
           "id": "workspace-support",
@@ -242,14 +242,14 @@
     },
     "finalCta": {
       "eyebrow": "Ready",
-      "heading": "Under 10 minutes from now, you'll have email on your Cloudflare domain.",
+      "heading": "30 minutes from now, you'll have email on your Cloudflare domain.",
       "subhead": "Or your money back, automatically. No tickets, no calls, no questions.",
       "primaryCta": "Get your email — $5",
       "secondaryCta": "Read the guarantee first",
       "trustItems": [
         "30-day money-back guarantee",
         "No subscription, ever",
-        "Setup in under 10 minutes",
+        "Setup in 30 minutes",
         "Refund-first policy, no questions asked"
       ]
     }
@@ -267,7 +267,7 @@
     "subtitle": "Manage your domains, view past setups, contact support, or buy another mailbox.",
     "emptyState": {
       "title": "Set up your first domain",
-      "body": "You haven't started a setup yet. It takes under 10 minutes — paste a Cloudflare API token, pick your zone, follow the Gmail wizard.",
+      "body": "You haven't started a setup yet. It takes ~30 minutes — paste a Cloudflare API token, pick your zone, follow the Gmail wizard.",
       "cta": "Start setup"
     },
     "setups": {
@@ -409,7 +409,7 @@
       },
       "done": {
         "title": "Cloudflare is ready",
-        "body": "Your domain now routes {mailbox}@{domain} to Gmail. Next: we set up Amazon SES so you can send from it.",
+        "body": "Your domain now routes {mailbox}@{domain} to Gmail. Next: we set up Postmark so you can send from it.",
         "continueCta": "Continue to SMTP setup"
       },
       "failed": {
@@ -422,7 +422,7 @@
     "errors": {
       "invalid_token": "The API token is invalid or missing required permissions.",
       "zone_not_found": "Zone not found in your Cloudflare account.",
-      "dns_rejected": "Cloudflare rejected a DNS record. Details: {details}",
+      "dns_rejected": "We had trouble configuring DNS on your domain. This usually means your Cloudflare zone has a conflicting record or the API token doesn't have the right permissions. Restart from Step 1, or contact support@getmailkit.com if it keeps failing.",
       "rate_limited": "Too many requests. Try again in a minute.",
       "cloudflare_error": "Cloudflare returned an unexpected error.",
       "cloudflare_unavailable": "Cloudflare is temporarily unavailable. Try again in a few minutes.",
@@ -466,13 +466,13 @@
       },
       "terminal": {
         "title": "Email infrastructure ready",
-        "body": "Amazon SES now handles outbound mail for {mailbox}@{domain}. One step left — Gmail Send-As.",
+        "body": "Postmark now handles outbound mail for {mailbox}@{domain}. One step left — Gmail Send-As.",
         "gmailCta": "Continue to Gmail Send-As →"
       }
     },
     "gmailStep": {
       "title": "Gmail Send-As — coming soon",
-      "body": "Your Cloudflare routing and Amazon SES SMTP are ready. This last step connects your Gmail so you can send from {target}.",
+      "body": "Your Cloudflare routing and Postmark SMTP are ready. This last step connects your Gmail so you can send from {target}.",
       "back": "Back to setup"
     },
     "gmail": {
@@ -544,7 +544,7 @@
     }
   },
   "footer": {
-    "tagline": "Email on your domain. Setup in 10 minutes. Backed by a 30-day guarantee.",
+    "tagline": "Email on your domain. Setup in 30 minutes. Backed by a 30-day guarantee.",
     "copyright": "© 2026 Mailkit. Built by an independent founder.",
     "productHeading": "Product",
     "legalHeading": "Legal",
@@ -570,9 +570,9 @@
   },
   "notFound": {
     "title": "Page not found",
-    "body": "The page you're looking for doesn't exist or has been moved. If you got here from a Mailkit email, support can help.",
+    "body": "The page you're looking for doesn't exist or was moved. Russian-language pages were discontinued — try the home page or check the FAQ.",
     "homeCta": "Back to home",
-    "supportCta": "Email support"
+    "faqCta": "View FAQ"
   },
   "cookieConsent": {
     "body": "We use essential cookies to make this site work.",

@@ -109,8 +109,6 @@ handling of data they receive from us:
 - Lemon Squeezy (payment processing) — lemonsqueezy.com/privacy
 - Supabase (database hosting) — supabase.com/privacy
 - Vercel (web hosting) — vercel.com/legal/privacy-policy
-- Amazon Web Services (backup SMTP, when applicable) — aws.amazon.com/privacy
-
 We share with these providers only the minimum information necessary
 for them to perform their function. We do not share your information
 with any other parties beyond what is required for the Service to

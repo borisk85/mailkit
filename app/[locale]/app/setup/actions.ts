@@ -1226,9 +1226,34 @@ export async function requestEmailOnReady(input: {
   return { ok: true };
 }
 
+const MOCK_RUN_ID = "11111111-2222-4333-8444-555555555555";
+
 export async function prepareGmailStep(input: {
   runId: string;
 }): Promise<GmailPrepareOk | ActionError> {
+  // Dev/preview mock bypass — never runs in production.
+  if (
+    input.runId === MOCK_RUN_ID &&
+    process.env.VERCEL_ENV !== "production" &&
+    !(process.env.NODE_ENV === "production" && !process.env.VERCEL_ENV)
+  ) {
+    return {
+      status: "ok",
+      runId: MOCK_RUN_ID,
+      runStatus: "gmail_instructions_shown",
+      targetEmail: "hello@example.com",
+      displayName: "Hello",
+      smtp: {
+        host: "smtp.postmarkapp.com",
+        port: 587,
+        username: "mock-server-token",
+        password: "mock-server-token",
+        securityMode: "starttls",
+        keyVersion: 1,
+      },
+    };
+  }
+
   const parsed = gmailRunSchema.safeParse(input);
   if (!parsed.success) {
     return {
