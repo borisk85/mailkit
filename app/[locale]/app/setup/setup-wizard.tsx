@@ -706,7 +706,33 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
       ) : null}
 
       {state.kind === "gmail_instructions_shown" ? (
-        <GmailLoadingStep state={state} t={t} />
+        <GmailLoadingStep
+          state={state}
+          t={t}
+          onReady={(result) => {
+            if (result.status === "error") {
+              setState({
+                kind: "smtp_done",
+                runId: state.runId,
+                zoneName: state.zoneName,
+                mailboxLocal: state.mailboxLocal,
+                destinationEmail: state.destinationEmail,
+                errorKey: result.errorKey,
+              });
+              return;
+            }
+            setState({
+              kind: "gmail_smtp_ready",
+              runId: state.runId,
+              zoneName: state.zoneName,
+              mailboxLocal: state.mailboxLocal,
+              destinationEmail: state.destinationEmail,
+              targetEmail: result.targetEmail,
+              displayName: result.displayName,
+              smtp: result.smtp,
+            });
+          }}
+        />
       ) : null}
 
       {state.kind === "gmail_smtp_ready" ? (
@@ -1372,11 +1398,26 @@ function FailedStep({
 function GmailLoadingStep({
   state,
   t,
+  onReady,
 }: {
   state: Extract<WizardState, { kind: "gmail_instructions_shown" }>;
   t: (key: string, values?: Record<string, string>) => string;
+  onReady: (result: Awaited<ReturnType<typeof prepareGmailStep>>) => void;
 }) {
   const targetEmail = `${state.mailboxLocal}@${state.zoneName}`;
+  const runId = state.runId;
+
+  useEffect(() => {
+    let cancelled = false;
+    prepareGmailStep({ runId }).then((result) => {
+      if (!cancelled) onReady(result);
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [runId]);
+
   return (
     <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
       <h2 className="text-lg font-semibold">{t("gmail.intro.title")}</h2>
