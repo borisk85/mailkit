@@ -28,18 +28,40 @@ const RAW_TO_FRIENDLY: Record<string, string> = {
   "setup.errors.cf_dns_conflict":
     "Existing DNS records are blocking setup. Remove conflicting MX or SPF records and retry.",
 
-  // SMTP
+  // SMTP / Postmark
   "setup.errors.smtp_misconfigured":
-    "SMTP credentials aren't configured on our end. Contact support.",
+    "SMTP credentials aren't configured on our end. Contact support@getmailkit.com.",
   "setup.errors.postmark_invalid_token":
-    "SMTP provider rejected the API key. Contact support.",
+    "SMTP provider rejected the API key. Contact support@getmailkit.com.",
   "setup.errors.postmark_unavailable":
-    "SMTP provider is temporarily unavailable. Try again in a few minutes.",
+    "Our SMTP provider is temporarily unavailable. Try again in a few minutes.",
+  "setup.errors.postmark_domain_taken":
+    "Our SMTP provider already knows this domain from a previous run — we picked up the existing setup.",
+  "setup.errors.postmark_rate_limited":
+    "Our SMTP provider throttled our requests. Retrying shortly.",
+  "setup.errors.postmark_dkim_timeout":
+    "Domain verification is taking longer than usual. DNS can be slow to propagate — wait a few minutes and restart from Step 1.",
+  "setup.errors.smtp_dkim_failed":
+    "We had trouble verifying your domain with our SMTP partner. This usually clears up if you wait a few minutes — DNS can take time to propagate. Restart from Step 1, or contact support@getmailkit.com if it keeps failing.",
+  "setup.errors.smtp_server_creation_failed":
+    "We had trouble verifying your domain with our SMTP partner. This usually clears up if you wait a few minutes — DNS can take time to propagate. Restart from Step 1, or contact support@getmailkit.com if it keeps failing.",
 
   // State
   "state.suspended_by_owner":
     "This domain has been suspended. Email support@getmailkit.com.",
 };
+
+const CF_DNS_ERRORS = [
+  "content for MX must be a hostname",
+  "invalid dns record",
+  "Invalid DNS record",
+  "zone not found",
+  "insufficient permissions",
+  "record already exists",
+];
+
+const CF_DNS_FRIENDLY =
+  "We had trouble configuring DNS on your domain. This usually means your Cloudflare zone has a conflicting record or the API token doesn't have the right permissions. Restart from Step 1, or contact support@getmailkit.com if it keeps failing.";
 
 const PATTERN_TO_FRIENDLY: Array<[RegExp, string]> = [
   [
@@ -48,8 +70,11 @@ const PATTERN_TO_FRIENDLY: Array<[RegExp, string]> = [
   ],
   [/rate.?limit/i, "Too many requests. Wait a minute and try again."],
   [/timeout/i, "Request timed out. Check your connection and try again."],
+  [/content for (MX|CNAME|TXT|A) must be/i, CF_DNS_FRIENDLY],
+  [/invalid.{0,10}dns.{0,10}record/i, CF_DNS_FRIENDLY],
   [/dns/i, "DNS update failed. Wait a few minutes for propagation and retry."],
   [/auth/i, "Authentication failed. Sign in again."],
+  [/hostname/i, CF_DNS_FRIENDLY],
 ];
 
 export function friendlyErrorMessage(
@@ -60,17 +85,16 @@ export function friendlyErrorMessage(
   const exact = RAW_TO_FRIENDLY[raw.trim()];
   if (exact) return exact;
 
+  // Check known CF DNS error substrings before pattern matching
+  const lower = raw.toLowerCase();
+  if (CF_DNS_ERRORS.some((e) => lower.includes(e.toLowerCase()))) {
+    return CF_DNS_FRIENDLY;
+  }
+
   for (const [pattern, msg] of PATTERN_TO_FRIENDLY) {
     if (pattern.test(raw)) return msg;
   }
 
-  // Last resort: strip internal codes, keep human fragment if present
-  const stripped = raw
-    .replace(/^(Error|setup\.errors\.|smtp_|postmark_|cf_)[^\s]*/i, "")
-    .replace(/\{[^}]*\}/g, "")
-    .trim();
-
-  return stripped.length > 5
-    ? stripped
-    : "Setup failed. Contact support@getmailkit.com.";
+  // Last resort: strip internal codes, return generic fallback
+  return "Setup hit an unexpected issue. We've logged it for review. Restart from Step 1, or contact support@getmailkit.com.";
 }
