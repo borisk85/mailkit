@@ -8,7 +8,10 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 
-export function FaqSection({ previewCount }: { previewCount?: number } = {}) {
+export function FaqSection({
+  previewCount,
+  compactHeading,
+}: { previewCount?: number; compactHeading?: boolean } = {}) {
   const t = useTranslations("landing.faq");
   const items = t.raw("items") as Array<{ id: string; q: string; a: string }>;
   const displayed =
@@ -22,7 +25,7 @@ export function FaqSection({ previewCount }: { previewCount?: number } = {}) {
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
           <h2
             id="faq-heading"
-            className="mk-display-2 text-balance text-mk-text-primary"
+            className={`${compactHeading ? "mk-heading-1" : "mk-display-2"} text-balance text-mk-text-primary`}
           >
             {t("heading")}
           </h2>
