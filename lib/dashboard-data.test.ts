@@ -134,6 +134,7 @@ describe("getDashboardData", () => {
     setups?: unknown[];
     purchases?: unknown[];
     refunds?: unknown[];
+    sendCounters?: unknown[];
   }) {
     const calls: Array<{ table: string; userId?: string }> = [];
     return {
@@ -145,6 +146,9 @@ describe("getDashboardData", () => {
           },
           eq(col: string, val: unknown) {
             filters.push([col, val]);
+            return api;
+          },
+          in(_col: string, _vals: unknown[]) {
             return api;
           },
           order() {
@@ -161,7 +165,9 @@ describe("getDashboardData", () => {
                 ? init.setups
                 : table === "purchases"
                   ? init.purchases
-                  : init.refunds;
+                  : table === "send_counters"
+                    ? (init.sendCounters ?? [])
+                    : init.refunds;
             return Promise.resolve({ data: data ?? [], error: null }).then(
               resolve,
             );
@@ -210,7 +216,7 @@ describe("getDashboardData", () => {
           currency: "USD",
           reason: "automation_failure",
           triggered_by: "system",
-          notes: "Auto-refund triggered by failed_step=brevo_verify",
+          notes: "Auto-refund triggered by failed_step=smtp_verify",
           created_at: "2026-04-26T11:00:00Z",
         },
       ],
