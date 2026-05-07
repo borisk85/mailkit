@@ -5,16 +5,6 @@ import { ArrowRight } from "lucide-react";
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
 
-/**
- * Locale-scoped 404. Design V2 §8.3 — minimal page:
- *
- *   - Display-2 "404" muted, primary heading + body underneath
- *   - Two CTAs: home link (primary) and support mailto (secondary)
- *
- * Server component — `useTranslations` works because of the parent
- * locale layout's `setRequestLocale`. Header / Footer reused from
- * the landing for visual continuity.
- */
 export default function NotFound() {
   const t = useTranslations("notFound");
   return (
@@ -35,12 +25,12 @@ export default function NotFound() {
               aria-hidden
             />
           </Link>
-          <a
-            href="mailto:support@getmailkit.com"
+          <Link
+            href="/faq"
             className="text-base font-medium text-mk-text-secondary underline-offset-4 transition-colors hover:text-mk-text-primary hover:underline"
           >
-            {t("supportCta")}
-          </a>
+            {t("faqCta")}
+          </Link>
         </div>
       </main>
       <Footer />

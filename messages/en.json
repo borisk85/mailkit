@@ -570,9 +570,9 @@
   },
   "notFound": {
     "title": "Page not found",
-    "body": "The page you're looking for doesn't exist or has been moved. If you got here from a Mailkit email, support can help.",
+    "body": "The page you're looking for doesn't exist or was moved. Russian-language pages were discontinued — try the home page or check the FAQ.",
     "homeCta": "Back to home",
-    "supportCta": "Email support"
+    "faqCta": "View FAQ"
   },
   "cookieConsent": {
     "body": "We use essential cookies to make this site work.",

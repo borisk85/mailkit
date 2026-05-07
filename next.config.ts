@@ -9,7 +9,27 @@ const withBundleAnalyzer = bundleAnalyzer({
   enabled: process.env.ANALYZE === "true",
 });
 
-const nextConfig: NextConfig = {};
+const nextConfig: NextConfig = {
+  async redirects() {
+    return [
+      { source: "/ru", destination: "/en", permanent: true },
+      { source: "/ru/privacy", destination: "/en/privacy", permanent: true },
+      { source: "/ru/terms", destination: "/en/terms", permanent: true },
+      {
+        source: "/ru/guarantee",
+        destination: "/en/guarantee",
+        permanent: true,
+      },
+      { source: "/ru/faq", destination: "/en/faq", permanent: true },
+      { source: "/ru/status", destination: "/en/status", permanent: true },
+      {
+        source: "/ru/app/:path*",
+        destination: "/en/app/:path*",
+        permanent: true,
+      },
+    ];
+  },
+};
 
 const composed = withBundleAnalyzer(withNextIntl(nextConfig));
 
