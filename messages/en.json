@@ -422,7 +422,7 @@
     "errors": {
       "invalid_token": "The API token is invalid or missing required permissions.",
       "zone_not_found": "Zone not found in your Cloudflare account.",
-      "dns_rejected": "Cloudflare rejected a DNS record. Details: {details}",
+      "dns_rejected": "We had trouble configuring DNS on your domain. This usually means your Cloudflare zone has a conflicting record or the API token doesn't have the right permissions. Restart from Step 1, or contact support@getmailkit.com if it keeps failing.",
       "rate_limited": "Too many requests. Try again in a minute.",
       "cloudflare_error": "Cloudflare returned an unexpected error.",
       "cloudflare_unavailable": "Cloudflare is temporarily unavailable. Try again in a few minutes.",

@@ -309,7 +309,6 @@ function mockInitialState(mock: MockKey): WizardState {
       return {
         kind: "failed",
         errorKey: "setup.errors.dns_rejected",
-        errorDetails: "content for MX must be a hostname",
       };
     default:
       return { kind: "token_entry" };
