@@ -78,7 +78,14 @@ const DONE: DashboardData = {
   ],
   purchases: ACTIVE.purchases,
   refunds: [],
-  sendUsage: [],
+  sendUsage: [
+    {
+      domain: "founders.example",
+      day: { count: 42, limit: 500 },
+      hour: { count: 8, limit: 50 },
+      minute: { count: 1, limit: 5 },
+    },
+  ],
 };
 
 const FAILED_REFUNDED: DashboardData = {
@@ -89,7 +96,7 @@ const FAILED_REFUNDED: DashboardData = {
       mailboxLocal: "hello",
       status: "failed",
       errorMsg:
-        "Postmark verification timed out — DKIM record didn't propagate.",
+        "We had trouble verifying your domain with our SMTP partner. This usually clears up if you wait a few minutes — DNS can take time to propagate. Restart from Step 1, or contact support@getmailkit.com if it keeps failing.",
       createdAt: LAST_WEEK,
       updatedAt: YESTERDAY,
     },
@@ -118,11 +125,30 @@ const FAILED_REFUNDED: DashboardData = {
       currency: "USD",
       reason: "automation_failure",
       triggeredBy: "system",
-      notes: "Auto-refund triggered by failed_step=brevo_verify.",
+      notes: "Auto-refund triggered by failed_step=smtp_verify.",
       createdAt: YESTERDAY,
     },
   ],
   sendUsage: [],
+};
+
+// Sending limits near-cap fixture — day 480/500 (amber/red zone)
+const LIMITS_WARNING: DashboardData = {
+  ...DONE,
+  sendUsage: [
+    {
+      domain: "founders.example",
+      day: { count: 480, limit: 500 },
+      hour: { count: 47, limit: 50 },
+      minute: { count: 4, limit: 5 },
+    },
+  ],
+};
+
+// Danger Zone fixture: done setup + purchase, for capturing the
+// account deletion section in its expanded state.
+const DANGER: DashboardData = {
+  ...DONE,
 };
 
 const FIXTURES: Record<string, DashboardData> = {
@@ -131,6 +157,8 @@ const FIXTURES: Record<string, DashboardData> = {
   active: ACTIVE,
   done: DONE,
   failed: FAILED_REFUNDED,
+  "limits-warning": LIMITS_WARNING,
+  danger: DANGER,
 };
 
 export function mockDashboardForFixture(key: string): DashboardMock {
