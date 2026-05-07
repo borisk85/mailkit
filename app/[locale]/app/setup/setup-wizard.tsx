@@ -338,13 +338,38 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
     }
   }
 
+  const phaseSubtitle = (() => {
+    switch (state.kind) {
+      case "cf_done_pending_smtp":
+        return "Cloudflare connected. Setting up your sending infrastructure next.";
+      case "smtp_running":
+        return "Configuring DNS records for sending. This is automatic — takes about 30 seconds.";
+      case "smtp_dkim_polling":
+        return state.mockIsLong
+          ? "Verification is taking longer than usual — still working in the background."
+          : "Verifying your domain with Postmark. This usually takes 5–15 minutes.";
+      case "smtp_awaiting_retry":
+      case "smtp_done":
+        return "Configuring DNS records for sending. This is automatic — takes about 30 seconds.";
+      case "gmail_instructions_shown":
+      case "gmail_smtp_ready":
+        return "Almost done. Add your address to Gmail to start sending.";
+      case "gmail_done":
+        return "All set. You can now send from your domain in Gmail.";
+      case "failed":
+        return "Setup hit a snag. Restart below.";
+      default:
+        return t("subtitle");
+    }
+  })();
+
   return (
     <div className="mx-auto max-w-2xl space-y-8">
       <header>
         <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
           {t("title")}
         </h1>
-        <p className="mt-2 text-sm text-mk-text-secondary">{t("subtitle")}</p>
+        <p className="mt-2 text-sm text-mk-text-secondary">{phaseSubtitle}</p>
       </header>
 
       {state.kind === "token_entry" || state.kind === "token_validating" ? (
