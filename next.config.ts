@@ -10,6 +10,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  devIndicators: false,
   async redirects() {
     return [
       { source: "/ru", destination: "/en", permanent: true },
