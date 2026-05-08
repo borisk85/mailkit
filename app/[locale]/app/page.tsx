@@ -130,7 +130,10 @@ export default async function AppHome({
 
       <ResourcesSection />
 
-      <DangerZoneSection deleteAction={deleteAccountAction} />
+      <DangerZoneSection
+        email={displayEmail}
+        deleteAction={deleteAccountAction}
+      />
     </div>
   );
 }

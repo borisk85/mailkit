@@ -354,6 +354,7 @@
       "deleteConfirm": {
         "title": "Delete your account?",
         "body": "This removes your profile, setup history, and purchase records from MailKit. Your DNS records and Gmail Send-As setup stay unchanged — those live in Cloudflare and Gmail. This cannot be undone.",
+        "emailPrompt": "Type {email} to confirm:",
         "confirmCta": "Delete account",
         "cancel": "Cancel"
       }

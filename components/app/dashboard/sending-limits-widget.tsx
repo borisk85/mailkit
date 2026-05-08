@@ -19,10 +19,7 @@ function LimitBar({
     <div className="space-y-1">
       <div className="flex justify-between text-[11px]">
         <span className="text-mk-text-tertiary">{label}</span>
-        <span
-          className="tabular-nums text-mk-text-secondary"
-          title={`${count} of ${limit} used`}
-        >
+        <span className="tabular-nums text-mk-text-secondary">
           {count.toLocaleString()} / {limit.toLocaleString()}
         </span>
       </div>
@@ -37,12 +34,22 @@ function LimitBar({
 }
 
 export function SendingLimitsWidget({ usage }: { usage: SendUsage }) {
+  const tooltipText = `Today: ${usage.day.count} of ${usage.day.limit} emails · This hour: ${usage.hour.count} of ${usage.hour.limit} · This minute: ${usage.minute.count} of ${usage.minute.limit}`;
+
   return (
     <div className="space-y-2 rounded-lg border border-mk-border-subtle px-3 py-2.5">
       <div className="flex items-center justify-between">
-        <p className="text-[11px] font-medium uppercase tracking-wide text-mk-text-tertiary">
-          Sending usage — {usage.domain}
-        </p>
+        <div className="group relative">
+          <p className="cursor-default text-[11px] font-medium uppercase tracking-wide text-mk-text-tertiary">
+            Sending usage — {usage.domain}
+          </p>
+          <div
+            role="tooltip"
+            className="invisible absolute bottom-full left-0 z-20 mb-1.5 w-max max-w-xs rounded-md bg-surface-elevated-2 px-3 py-2 text-[11px] text-mk-text-primary shadow-lg ring-1 ring-mk-border-subtle group-hover:visible"
+          >
+            {tooltipText}
+          </div>
+        </div>
         <Link
           href="/faq#sending-limits"
           className="text-[11px] text-mk-accent hover:underline"

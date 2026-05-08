@@ -38,7 +38,9 @@ export default async function AppLayout({
       <>
         <IncidentBanner />
         <AppHeader user={MOCK_USER} />
-        <main className="container mx-auto flex-1 px-4 py-8">{children}</main>
+        <main className="container mx-auto flex-1 px-4 pt-8 pb-24 sm:pb-8">
+          {children}
+        </main>
         <AppFooter />
       </>
     );
