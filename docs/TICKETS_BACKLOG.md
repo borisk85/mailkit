@@ -242,6 +242,41 @@ Trigger для работы: после merge ветки `feat/smtp-dependency-d
     Supabase (user_id → setup_runs → status = done, purchase_id),
     decision tree "помогать чинить vs refund сразу".
 
+## 🚨 BLOCKING PRODUCTION LAUNCH — Checkout flow (2026-05-08)
+
+- **#FLOW-1 Sign-in-first checkout with CF prereq validation**
+
+  **Контекст:** текущий hero CTA → LS checkout напрямую (unauth first-buy).
+  Анти-паттерн для MailKit: у продукта жёсткий prereq — домен на Cloudflare
+  DNS. Юзер может заплатить $5, потом узнать что нужна миграция NS → refund
+  fraud-риск + support нагрузка + удар по deliverability метрикам.
+
+  **Целевой флоу:**
+  1. CTA → Sign in through Google (one-tap, ~3 sec)
+  2. → `/app/setup` — форма: domain + mailbox name + CF API token
+  3. Продукт делает NS lookup для домена → проверяет что NS на Cloudflare
+  4. Если домен не на CF → блокируем с объяснением и инструкцией по миграции
+  5. Если домен на CF → показываем "Continue to payment — $5" → LS checkout
+  6. После оплаты → wizard продолжается с того же шага, делает CF setup автоматически
+
+  **Почему блокер:**
+  - Убирает fraud-refunds от юзеров не на CF
+  - Юзер видит до платежа что от него нужно (CF token, mailbox name) → снижает abandonment
+  - NS lookup — server-side, бесплатно, без extra deps
+
+  **Не блокер для:** pre-flight dogfood (обходим через Supabase INSERT напрямую).
+  **Блокер для:** LS Live mode + финального dogfood с реальной картой + Product Hunt launch.
+
+  **Scope:**
+  - Hero CTA + pricing CTA + final CTA: `href` → `/app/setup` вместо LS URL
+  - `/app/setup` wizard step 0: CF prereq check (NS lookup) перед показом
+    формы токена
+  - После CF check pass → кнопка "Buy — $5" → `/api/checkout/start` (уже есть,
+    stamp user_id в LS URL)
+  - LS webhook после оплаты → wizard продолжается (уже есть `paid=1` логика)
+  - Fallback: если юзер уже заплатил (purchase row exists) → skip prereq check,
+    пустить в wizard напрямую
+
 ## 🚫 Post-validation (do NOT build until ≥100 paying users or explicit architect approval)
 - #8 Self-serve diagnostics & re-setup flow
 - #9 Deliverability monitoring subscription
