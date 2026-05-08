@@ -2,7 +2,7 @@ import createMiddleware from "next-intl/middleware";
 import { NextResponse, type NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
-import { routing } from "./i18n/routing";
+import { routing } from "@/i18n/routing";
 
 const intlMiddleware = createMiddleware(routing);
 
@@ -25,7 +25,7 @@ function isMockPreviewAllowed(request: NextRequest): boolean {
   return request.nextUrl.searchParams.has("mock");
 }
 
-export default async function proxy(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   if (!isProtectedAppRoute(pathname)) {
@@ -42,7 +42,9 @@ export default async function proxy(request: NextRequest) {
     return bypass;
   }
 
-  // Refresh session cookies on the response and enforce auth for /{locale}/app/*.
+  // Refresh session cookies on the response and enforce auth for /app/*.
+  // localePrefix: "never" — locale is NOT in the URL, redirect unauthenticated
+  // users to "/" (landing page) rather than trying to extract locale from path.
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -71,8 +73,7 @@ export default async function proxy(request: NextRequest) {
   } = await supabase.auth.getUser();
 
   if (!user) {
-    const locale = pathname.split("/")[1] || routing.defaultLocale;
-    return NextResponse.redirect(new URL(`/${locale}`, request.url));
+    return NextResponse.redirect(new URL("/", request.url));
   }
 
   return response;
