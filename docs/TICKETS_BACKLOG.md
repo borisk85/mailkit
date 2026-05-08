@@ -293,6 +293,13 @@ Trigger для работы: после merge ветки `feat/smtp-dependency-d
 - Cookie consent banner на 768px viewport (tablet portrait) — sentinel-порог появления баннера сейчас 100vh, в момент scroll на этом разрешении баннер перекрывает subhead в hero. Поднять порог до ~130vh чтобы баннер появлялся после первого экрана.
 
 ## 🐛 Pre-existing bugs (P3, non-blocking)
+- **#CRON-FIX-1** Empty-state DKIM cron returns 500 instead of 200.
+  `GET /api/cron/check-dkim-status` with no pending DKIM rows in DB returns 500.
+  Should return `200 { outcome: 'no_pending', checked: 0 }`.
+  **Impact:** Vercel cron dashboard shows red every minute, Sentry catches as
+  unhandled error once DSN is live. Fix: add empty-result early-return before
+  the main loop. **Fix timing:** after Boris's dogfood, before first post-launch day.
+
 - #21 ThemeToggle hydration mismatch — SSR/client aria-label расходится ("светлую" vs "тёмную"). Стандартный next-themes SSR баг. Не ломает функциональность. Fix: `suppressHydrationWarning` на button или `useEffect` для aria-label.
 - #22 gmail.svg image warning — Next.js предупреждает что изменён width или height без второго измерения. Fix: добавить `width="auto"` или `height="auto"` к img тегу. Косметика, не влияет на рендер.
 
