@@ -15,6 +15,11 @@ export async function GET(request: NextRequest) {
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
   if (error || !data.session) {
+    console.error(
+      "[auth/callback] exchangeCodeForSession failed:",
+      error?.message ?? "no session",
+      { code: code?.slice(0, 8) },
+    );
     return NextResponse.redirect(`${origin}?error=oauth_failed`);
   }
 

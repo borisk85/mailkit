@@ -36,16 +36,16 @@ export default async function middleware(request: NextRequest) {
   // the x-mailkit-mock header and renders a stub user instead of calling
   // Supabase auth.getUser() / redirect.
   if (isMockPreviewAllowed(request)) {
-    const bypass = NextResponse.next({ request });
+    const bypass = intlMiddleware(request);
     bypass.headers.set("x-mailkit-mock", "1");
-    request.headers.set("x-mailkit-mock", "1");
     return bypass;
   }
 
-  // Refresh session cookies on the response and enforce auth for /app/*.
-  // localePrefix: "never" — locale is NOT in the URL, redirect unauthenticated
-  // users to "/" (landing page) rather than trying to extract locale from path.
-  let response = NextResponse.next({ request });
+  // Refresh session cookies and enforce auth for /app/*.
+  // localePrefix: "never" — locale is NOT in the URL. After the auth check,
+  // we must still run intlMiddleware so Next.js receives locale headers and
+  // can resolve app/[locale]/app/... routes correctly.
+  let sessionResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -59,9 +59,9 @@ export default async function middleware(request: NextRequest) {
           cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
-          response = NextResponse.next({ request });
+          sessionResponse = NextResponse.next({ request });
           cookiesToSet.forEach(({ name, value, options }) =>
-            response.cookies.set(name, value, options),
+            sessionResponse.cookies.set(name, value, options),
           );
         },
       },
@@ -76,7 +76,13 @@ export default async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 
-  return response;
+  // Authenticated — run intlMiddleware to set locale headers so Next.js can
+  // match app/[locale]/app/... routes. Carry over session-refresh cookies.
+  const intlResponse = intlMiddleware(request);
+  sessionResponse.cookies.getAll().forEach((cookie) => {
+    intlResponse.cookies.set(cookie.name, cookie.value, cookie);
+  });
+  return intlResponse;
 }
 
 export const config = {
