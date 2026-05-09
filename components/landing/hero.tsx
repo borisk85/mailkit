@@ -72,7 +72,6 @@ export function Hero() {
               href="https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/"
               target="_blank"
               rel="noreferrer"
-              title={t("migrationHint")}
               className="group relative inline-flex"
             >
               <HelpCircle
