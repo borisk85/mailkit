@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Check, Shield, Zap } from "lucide-react";
+import { Shield, Zap } from "lucide-react";
 
 /**
  * Trust + guarantees — premium-pass refresh per UI_REVIEW_BRIEF §2.8.
@@ -13,7 +13,6 @@ import { Check, Shield, Zap } from "lucide-react";
  */
 export function TrustSection() {
   const t = useTranslations("landing.trust");
-  const objections = t.raw("objections") as string[];
 
   return (
     <section id="trust" className="w-full" aria-labelledby="trust-heading">
@@ -29,14 +28,6 @@ export function TrustSection() {
           <p className="mk-body-large max-w-xl text-mk-text-secondary">
             {t("subhead")}
           </p>
-          <Link
-            href="/guarantee"
-            className="mk-caption inline-flex items-center gap-2 rounded-full border border-mk-border-strong bg-surface-elevated/60 px-3 py-1 text-mk-text-secondary transition-colors hover:bg-surface-elevated hover:text-mk-text-primary"
-          >
-            <Shield className="size-3" aria-hidden />
-            {t("policyPill")}
-          </Link>
-          <p className="text-xs text-mk-text-tertiary">{t("audienceNote")}</p>
         </div>
 
         <div className="mt-16 grid gap-6 lg:grid-cols-2 lg:gap-8">
@@ -56,22 +47,7 @@ export function TrustSection() {
           />
         </div>
 
-        <ul className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:flex-wrap sm:justify-center">
-          {objections.map((item) => (
-            <li
-              key={item}
-              className="inline-flex items-start gap-2 rounded-full border border-mk-border-subtle bg-surface-elevated/60 px-4 py-2 text-sm text-mk-text-secondary"
-            >
-              <Check
-                className="mt-0.5 size-3.5 shrink-0 text-mk-accent"
-                aria-hidden
-              />
-              {item}
-            </li>
-          ))}
-        </ul>
-
-        <p className="mt-6 text-center">
+        <p className="mt-10 text-center">
           <Link
             href="/guarantee"
             className="mk-body-small font-medium text-mk-accent underline-offset-4 hover:underline"

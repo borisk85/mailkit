@@ -5,7 +5,7 @@
   },
   "landing": {
     "announcementBanner": {
-      "message": "🎁 First 25 setups — FREE with code FIRST100.",
+      "message": "🎁 First 25 setups — FREE. Use code FIRST25 at checkout.",
       "cta": "Claim →",
       "dismiss": "Dismiss banner"
     },
@@ -31,14 +31,11 @@
       "headlineLine1": "Professional email on your domain",
       "headlineLine2": "in 30 minutes — no tech skills needed.",
       "subhead": "Domain on Cloudflare? We automate 80% of the technical setup — you finish in your regular Gmail, guided every step.",
-      "guaranteeNote": "Guaranteed.",
       "guaranteeLink": "see policy",
-      "microcopy": "Cloudflare DNS required. Not on Cloudflare? Free migration takes ~30 min.",
-      "timeSplit": "10 minutes of your time. The rest is on us.",
+      "microcopy": "Requires Cloudflare DNS.",
       "migrationHint": "Open Cloudflare migration guide",
       "primaryCta": "Set up email",
       "secondaryCta": "See how it works",
-      "trustNote": "Free during promo · No subscription required",
       "mockup": {
         "alt": "Gmail Compose window — the From dropdown shows your custom-domain addresses instead of @gmail.com",
         "windowTitle": "New message",
@@ -83,7 +80,7 @@
     "howItWorks": {
       "eyebrow": "How it works",
       "heading": "Four steps. We do three. You do one.",
-      "subheading": "Total time 30 minutes. Total work on your side: three copy-paste actions in Gmail.",
+      "subheading": "Total time 30 minutes. Total work on your side: paste SMTP details into Gmail (3 minutes).",
       "automatedBadge": "Automated",
       "manualBadge": "Your turn",
       "step1": {
@@ -94,7 +91,7 @@
       "step2": {
         "title": "Postmark SMTP setup",
         "time": "~60 sec",
-        "body": "We provision Postmark for your domain. Add the records."
+        "body": "We provision Postmark and add DNS records for you."
       },
       "step3": {
         "title": "DNS verification",
@@ -129,8 +126,8 @@
         "steps": [
           "Sign in with Google",
           "Paste Cloudflare API token",
-          "Watch automation run (~90 sec)",
-          "Copy four lines into Gmail",
+          "Watch automation run (~30 sec)",
+          "Add to Gmail (3 minutes)",
           "Your branded email is ready"
         ]
       }
@@ -149,14 +146,7 @@
         "body": "If within 30 days you can't actually send email through your domain — even after our support — full refund on request. Just email us.",
         "badge": "30-day"
       },
-      "policyPill": "Two policies, plain language, /guarantee",
-      "policyLinkLabel": "Read full policy →",
-      "audienceNote": "Built for Cloudflare DNS users. Free migration guide for users on other registrars.",
-      "objections": [
-        "Don't know DNS, SMTP, or DKIM? You don't need to — we do.",
-        "Worried about breaking something? We offer a full money-back guarantee.",
-        "Don't want to spend your evening on guides and forums? We do it for you."
-      ]
+      "policyLinkLabel": "Read full policy →"
     },
     "faq": {
       "eyebrow": "Common questions",
@@ -245,13 +235,7 @@
       "heading": "30 minutes from now, you'll have email on your Cloudflare domain.",
       "subhead": "Or your money back, automatically. No tickets, no calls, no questions.",
       "primaryCta": "Get your email — $5",
-      "secondaryCta": "Read the guarantee first",
-      "trustItems": [
-        "30-day money-back guarantee",
-        "No subscription, ever",
-        "Setup in 30 minutes",
-        "Refund-first policy, no questions asked"
-      ]
+      "secondaryCta": "Read the guarantee first"
     }
   },
   "auth": {

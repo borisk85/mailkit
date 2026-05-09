@@ -1,8 +1,6 @@
 import { useTranslations } from "next-intl";
 
 import { MailkitIcon } from "@/components/brand/mailkit-icon";
-import { ThemeToggle } from "@/components/theme-toggle";
-
 import { LogoLink } from "./logo-link";
 import { NavAnchor } from "./nav-anchor";
 import { SignInLink } from "./sign-in-link";
@@ -60,8 +58,7 @@ export function Header() {
         </nav>
 
         <div className="flex items-center gap-1 sm:gap-2">
-          <ThemeToggle />
-          <div className="mx-1 h-5 w-px bg-mk-border-subtle sm:mx-2" />
+          {/* ThemeToggle hidden until post-launch light-theme design pass */}
           <SignInLink />
         </div>
       </div>

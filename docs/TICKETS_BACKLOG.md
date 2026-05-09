@@ -287,6 +287,9 @@ Trigger для работы: после merge ветки `feat/smtp-dependency-d
 - #15 Multi-domain dashboard
 
 ## 🎨 Design v2 follow-up cosmetics (post-launch, низкий приоритет)
+
+- **#THEME-1 Light theme full rework** — deferred until v1.1+. Spec: [docs/POST_LAUNCH_LIGHT_THEME_REWORK.md](POST_LAUNCH_LIGHT_THEME_REWORK.md).
+
 Две косметические правки выявленные на V2-approve визуальной ревизии 2026-04-28. Не блокеры запуска — собрать в один мини-PR когда вернёмся к UI/UX iterations.
 
 - MAILKIT pill в hero Gmail-mockup использует uppercase, тогда как фактический wordmark в navbar — `Mailkit` с capital M. Привести pill к согласованному casing'у `Mailkit` для brand consistency.

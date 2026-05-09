@@ -28,7 +28,7 @@ export const LEMON_SQUEEZY_CHECKOUT_URL =
  * so this code is safe to ship before the dashboard configuration
  * lands.
  */
-export const FIRST_100_DISCOUNT_CODE = "FIRST100";
+export const FIRST_100_DISCOUNT_CODE = "FIRST25";
 
 /**
  * Append the first-100 discount code to a Lemon Squeezy checkout URL.
