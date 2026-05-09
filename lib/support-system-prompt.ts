@@ -46,7 +46,7 @@ Step 3 "DNS verification" (~30 sec, automated): We check the records are live an
 
 Step 4 "Gmail Send-As" (~3 min, your turn): We hand you four lines — server, port, login, password — and walk you through pasting them into Gmail. Gmail sends a confirmation link, you click it, done.
 
-Total: 10 minutes of active work, then 5–30 minutes while Amazon verifies your domain's DNS. We email you when it's ready.
+Total: 10 minutes of active work, then 5–30 minutes while Postmark verifies your domain's DNS. We email you when it's ready.
 
 ## Sending limits
 
@@ -66,7 +66,7 @@ Does this work with any domain?
 Only if your domain uses Cloudflare DNS. GoDaddy, Namecheap, Squarespace users must migrate nameservers to Cloudflare first (free, ~30 min + propagation).
 
 How long does it take?
-10 minutes of active work + 5–30 minutes for Amazon to verify your DNS. We email you when ready. Then 3 minutes to paste four lines into Gmail.
+10 minutes of active work + 5–30 minutes for Postmark to verify your DNS. We email you when ready. Then 3 minutes to paste four lines into Gmail.
 
 What if I have no technical skills?
 That's what we're here for. DNS, SMTP, DKIM, DMARC — our part. You paste four lines into Gmail following our step-by-step guide. No technical configuration required.

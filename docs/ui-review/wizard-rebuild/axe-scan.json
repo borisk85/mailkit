@@ -1,0 +1,41 @@
+{
+  "scannedAt": "2026-05-09",
+  "tool": "axe-core 4.9.1",
+  "wcagLevel": "AA",
+  "viewportWidth": 1280,
+  "summary": {
+    "critical": 0,
+    "serious": 1,
+    "moderate": 0,
+    "minor": 0
+  },
+  "note": "1 serious violation is PRE-EXISTING color-contrast issue in dark theme. NOT introduced by wizard-ux-rebuild. Present across all /app/* routes before this branch.",
+  "screens": {
+    "token_entry": {
+      "critical": 0,
+      "serious": 1,
+      "violations": ["color-contrast (16 nodes)"]
+    },
+    "zone_selection": {
+      "critical": 0,
+      "serious": 1,
+      "violations": ["color-contrast (15 nodes)"]
+    },
+    "smtp_dns_written": {
+      "critical": 0,
+      "serious": 1,
+      "violations": ["color-contrast (21 nodes)"]
+    },
+    "smtp_dkim_polling": {
+      "critical": 0,
+      "serious": 1,
+      "violations": ["color-contrast (16 nodes)"]
+    },
+    "gmail_instructions": {
+      "critical": 0,
+      "serious": 1,
+      "violations": ["color-contrast (21 nodes)"]
+    }
+  },
+  "newViolationsIntroduced": 0
+}

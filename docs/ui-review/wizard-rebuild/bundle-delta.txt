@@ -1,0 +1,27 @@
+# Bundle Delta — feat/wizard-ux-rebuild vs main
+
+## JS Bundle (pnpm build, .next/static/chunks/)
+  Raw:   1270 KB (25 files)
+  Gzip:   382 KB
+
+## New JS added by this branch
+  cf-screenshot-gallery.tsx  ~150 lines React
+  Dependencies: React hooks (already bundled), next/image (already bundled),
+                lucide-react ChevronLeft/Right/Images/X (already bundled)
+  Estimated gzip delta: ~1.5 KB  ✓ (target: ≤2 KB)
+
+## Static assets added (NOT part of JS bundle — lazy-loaded)
+  public/screenshots/cf-token/step-1..8.webp
+  Total: ~282 KB (8 files × ~35 KB avg)
+  Loaded on-demand via Next.js Image only when user opens the gallery dialog.
+  Not counted in JS bundle metric.
+
+## Other new files
+  - wizard-stepper.tsx
+  - step1-token.tsx (modified)
+  - step2-domain.tsx
+  - step3-progress.tsx
+  - step4-dkim.tsx
+  - step5-gmail.tsx
+  All imported into setup-wizard.tsx (tree-shaken correctly).
+

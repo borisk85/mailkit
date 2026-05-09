@@ -18,6 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GmailStepSchematic } from "@/components/app/gmail-step-schematic";
 import { cn } from "@/lib/utils";
+import {
+  WizardStepper,
+  WIZARD_STEPS,
+} from "@/components/app/wizard/wizard-stepper";
+import { Step1Token } from "@/components/app/wizard/step1-token";
+import { Step3Progress } from "@/components/app/wizard/step3-progress";
+import { Step4Dkim } from "@/components/app/wizard/step4-dkim";
 
 import {
   checkDomainNS,
@@ -315,6 +322,27 @@ function mockInitialState(mock: MockKey): WizardState {
   }
 }
 
+function getStepperStep(kind: WizardState["kind"]): number {
+  if (kind === "token_entry" || kind === "token_validating") return 1;
+  if (kind === "zone_selection" || kind === "ns_warning") return 2;
+  if (
+    kind === "setup_running" ||
+    kind === "awaiting_verify" ||
+    kind === "cf_done_pending_smtp" ||
+    kind === "smtp_running" ||
+    kind === "smtp_awaiting_retry"
+  )
+    return 3;
+  if (kind === "smtp_done" || kind === "smtp_dkim_polling") return 4;
+  if (
+    kind === "gmail_instructions_shown" ||
+    kind === "gmail_smtp_ready" ||
+    kind === "gmail_done"
+  )
+    return 5;
+  return 1; // failed or unknown
+}
+
 export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
   const t = useTranslations("setup");
   const tErr = useTranslations("setup.errors");
@@ -363,7 +391,7 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
   })();
 
   return (
-    <div className="mx-auto max-w-2xl space-y-8">
+    <div className="mx-auto max-w-4xl space-y-8">
       <header>
         <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
           {t("title")}
@@ -371,8 +399,15 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
         <p className="mt-2 text-sm text-mk-text-secondary">{phaseSubtitle}</p>
       </header>
 
+      {state.kind !== "failed" && state.kind !== "gmail_done" && (
+        <WizardStepper
+          currentStep={getStepperStep(state.kind)}
+          steps={WIZARD_STEPS}
+        />
+      )}
+
       {state.kind === "token_entry" || state.kind === "token_validating" ? (
-        <TokenEntryStep
+        <Step1Token
           isPending={isPending || state.kind === "token_validating"}
           errorKey={state.kind === "token_entry" ? state.errorKey : undefined}
           errorDetails={
@@ -400,7 +435,6 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
               }
             });
           }}
-          t={t}
           translateErr={translateErr}
         />
       ) : null}
@@ -558,13 +592,11 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
       ) : null}
 
       {state.kind === "setup_running" ? (
-        <ProgressStep
-          state="running"
+        <Step3Progress
+          phase="cf"
+          reached={state.reached}
           zoneName={state.zoneName}
           mailboxLocal={state.mailboxLocal}
-          reached={state.reached}
-          tState={tState}
-          tSteps={tSteps}
         />
       ) : null}
 
@@ -636,12 +668,11 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
       ) : null}
 
       {state.kind === "smtp_running" ? (
-        <SmtpRunningStep
-          state={state}
-          t={t}
-          tState={tState}
-          tSteps={tSteps}
-          tSmtp={tSmtp}
+        <Step3Progress
+          phase="smtp"
+          reached={state.reached}
+          zoneName={state.zoneName}
+          mailboxLocal={state.mailboxLocal}
         />
       ) : null}
 
@@ -2067,101 +2098,21 @@ function DkimPollingStep({
     };
   }, [state.runId, state.mockIsLong, onReady, startedAt]);
 
-  const notifyShown = emailSent || state.emailRequested || isLong;
+  const emailRequested = emailSent || Boolean(state.emailRequested);
 
   return (
-    <section className="space-y-6 rounded-2xl border border-mk-border-strong bg-surface-elevated p-8">
-      <h2 className="mk-heading-2 text-mk-text-primary">
-        Setting up your professional email
-      </h2>
-
-      <ol className="space-y-4">
-        {/* Step 1 — DNS records configured */}
-        <li className="flex items-start gap-3">
-          <CheckCircle2
-            className="mt-0.5 size-5 shrink-0 text-green-500"
-            aria-hidden
-          />
-          <div>
-            <p className="font-medium text-mk-text-primary">
-              DNS records configured
-            </p>
-          </div>
-        </li>
-
-        {/* Step 2 — Domain verification (current) */}
-        <li className="flex items-start gap-3">
-          <Loader2
-            className="mt-0.5 size-5 shrink-0 animate-spin text-mk-accent"
-            aria-hidden
-          />
-          <div className="flex-1 space-y-2">
-            <p className="font-medium text-mk-text-primary">
-              Domain verification with email provider
-            </p>
-            <p className="text-sm text-mk-text-secondary">
-              {isLong
-                ? "Taking a bit longer than usual — still verifying in the background."
-                : "Typically 5–15 minutes. We’ll notify when ready."}
-            </p>
-            <div className="h-1.5 w-full overflow-hidden rounded-full bg-mk-border-subtle">
-              <div
-                className={cn(
-                  "h-full rounded-full",
-                  isLong
-                    ? "bg-amber-400"
-                    : "animate-pulse bg-mk-accent opacity-60",
-                )}
-                style={{ width: isLong ? "85%" : "60%" }}
-              />
-            </div>
-          </div>
-        </li>
-
-        {/* Step 3 — Gmail (locked) */}
-        <li className="flex items-start gap-3 opacity-40">
-          <Circle
-            className="mt-0.5 size-5 shrink-0 text-mk-text-tertiary"
-            aria-hidden
-          />
-          <div>
-            <p className="font-medium text-mk-text-primary">
-              Ready for final Gmail step
-            </p>
-          </div>
-        </li>
-      </ol>
-
-      <p className="text-sm text-mk-text-secondary">
-        You can close this page if you wish — we&apos;ll email you when ready.
-        Or stay here and watch the progress.
-      </p>
-
-      {notifyShown ? (
-        <p className="text-sm text-green-600">
-          <Check className="mr-1 inline size-4" aria-hidden />
-          {isLong && !emailSent && !state.emailRequested
-            ? "We’ve sent a link to "
-            : "We’ll email you at "}
-          <span className="font-medium">{state.destinationEmail}</span>
-          {isLong && !emailSent && !state.emailRequested
-            ? " — click it to finish when verification is done."
-            : " when ready."}
-        </p>
-      ) : (
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={async () => {
-            await requestEmailOnReady({ runId: state.runId });
-            setEmailSent(true);
-            onEmailRequested();
-          }}
-        >
-          Email me instead
-        </Button>
-      )}
-    </section>
+    <Step4Dkim
+      zoneName={state.zoneName}
+      mailboxLocal={state.mailboxLocal}
+      destinationEmail={state.destinationEmail}
+      isLongPoll={isLong}
+      emailRequested={emailRequested}
+      onRequestEmail={async () => {
+        await requestEmailOnReady({ runId: state.runId });
+        setEmailSent(true);
+        onEmailRequested();
+      }}
+    />
   );
 }
 

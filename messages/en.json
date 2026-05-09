@@ -543,6 +543,24 @@
         "copyFailed": "Your browser blocked clipboard access. Select the value and copy it by hand.",
         "checkboxRequired": "Please confirm you've added and verified the address in Gmail."
       }
+    },
+    "wizard": {
+      "step1": {
+        "heading": "Create a Cloudflare API Token",
+        "sub": "Takes 2 minutes. You'll paste the token on the right.",
+        "instructionOpenCF": "Open Cloudflare API Tokens →",
+        "permTitle": "Required permissions",
+        "scopeNote": "Limit to one zone — keeps this token scoped to your domain only"
+      },
+      "step2": {
+        "heading": "Your domain and email address",
+        "sub": "We'll configure this exact address on Cloudflare Email Routing.",
+        "domainLabel": "Your Cloudflare domain",
+        "mailboxLabel": "Mailbox name",
+        "mailboxHelp": "Letters and dots only.",
+        "preview": "Your email will be:",
+        "cta": "Start setup →"
+      }
     }
   },
   "footer": {
