@@ -1,6 +1,3 @@
-"use client";
-
-import { useEffect, useRef } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { Check, HelpCircle, Shield } from "lucide-react";
@@ -46,11 +43,7 @@ export function Hero() {
           >
             <span className="block">{t("headlineLine1")}</span>
             <span className="block bg-gradient-to-br from-violet-200 via-violet-400 to-mk-accent bg-clip-text text-transparent">
-              in{" "}
-              <span data-hero-underline className="whitespace-nowrap">
-                30 minutes
-              </span>{" "}
-              — no tech skills needed.
+              in 30 minutes — no tech skills needed.
             </span>
           </h1>
 
@@ -133,93 +126,7 @@ export function Hero() {
       </div>
 
       <div id="hero-end-sentinel" aria-hidden className="h-px" />
-      <HeroUnderline />
     </section>
-  );
-}
-
-// ─── S1: Hand-drawn SVG underline under "30 minutes" ─────────────────────────
-// Positioned via getBoundingClientRect so it lands on the exact text regardless
-// of wrapping. One-shot animation (sessionStorage guard); reduced-motion shows
-// the final drawn state immediately.
-const ANIM_KEY = "mk.hero.underline.v1";
-
-function HeroUnderline() {
-  const pathRef = useRef<SVGPathElement>(null);
-  const svgRef = useRef<SVGSVGElement>(null);
-
-  useEffect(() => {
-    const path = pathRef.current;
-    const svg = svgRef.current;
-    if (!path || !svg) return;
-
-    const position = () => {
-      const target = document.querySelector<HTMLElement>(
-        "[data-hero-underline]",
-      );
-      const section = document.querySelector<HTMLElement>("#top");
-      if (!target || !section) return;
-
-      const tr = target.getBoundingClientRect();
-      const sr = section.getBoundingClientRect();
-
-      svg.style.left = `${tr.left - sr.left}px`;
-      svg.style.top = `${tr.bottom - sr.top - 2}px`;
-      svg.style.width = `${tr.width}px`;
-      svg.style.display = "block";
-    };
-
-    position();
-    window.addEventListener("resize", position);
-
-    const reducedMotion = window.matchMedia(
-      "(prefers-reduced-motion: reduce)",
-    ).matches;
-
-    if (reducedMotion || sessionStorage.getItem(ANIM_KEY)) {
-      path.style.setProperty("transition", "none");
-      path.style.setProperty("stroke-dashoffset", "0");
-    } else {
-      const timer = setTimeout(() => {
-        path.style.setProperty("stroke-dashoffset", "0");
-        sessionStorage.setItem(ANIM_KEY, "1");
-      }, 600);
-      return () => {
-        clearTimeout(timer);
-        window.removeEventListener("resize", position);
-      };
-    }
-
-    return () => window.removeEventListener("resize", position);
-  }, []);
-
-  return (
-    <svg
-      ref={svgRef}
-      aria-hidden
-      focusable="false"
-      className="pointer-events-none absolute overflow-visible"
-      style={{ display: "none", height: 10 }}
-      viewBox="0 0 200 12"
-      preserveAspectRatio="none"
-    >
-      <path
-        ref={pathRef}
-        d="M 2 8 C 38 2, 75 12, 112 6 C 138 2, 164 11, 198 6"
-        fill="none"
-        stroke="var(--mk-accent)"
-        strokeWidth="2.5"
-        vectorEffect="non-scaling-stroke"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-        pathLength="1"
-        style={{
-          strokeDasharray: 1,
-          strokeDashoffset: 1,
-          transition: "stroke-dashoffset 800ms ease-out",
-        }}
-      />
-    </svg>
   );
 }
 
