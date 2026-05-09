@@ -1,6 +1,5 @@
-import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Check, HelpCircle, Shield } from "lucide-react";
+import { Check, HelpCircle } from "lucide-react";
 
 import {
   LEMON_SQUEEZY_CHECKOUT_URL,
@@ -67,8 +66,6 @@ export function Hero() {
             </a>
           </div>
 
-          <p className="text-xs text-mk-text-tertiary">{t("timeSplit")}</p>
-
           <p className="inline-flex items-center gap-1 text-xs text-mk-text-tertiary">
             {t("microcopy")}
             <a
@@ -87,37 +84,6 @@ export function Hero() {
               </span>
             </a>
           </p>
-
-          <ul className="mt-2 flex flex-wrap gap-2">
-            {t("trustNote")
-              .split(" · ")
-              .map((item) => (
-                <li
-                  key={item}
-                  className="inline-flex items-center gap-1.5 rounded-full border border-mk-border-subtle bg-surface-elevated/60 px-3 py-1 text-xs font-medium text-mk-text-secondary"
-                >
-                  <Check
-                    className="size-3.5 text-mk-accent"
-                    aria-hidden
-                    strokeWidth={2.5}
-                  />
-                  {item}
-                </li>
-              ))}
-            <li>
-              <Link
-                href="/guarantee"
-                className="inline-flex items-center gap-1.5 rounded-full border border-mk-border-subtle bg-surface-elevated/60 px-3 py-1 text-xs font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
-              >
-                <Shield
-                  className="size-3.5 text-mk-accent"
-                  aria-hidden
-                  strokeWidth={2.5}
-                />
-                {t("guaranteeNote")}
-              </Link>
-            </li>
-          </ul>
         </div>
 
         <div className="md:col-span-5">
