@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Check } from "lucide-react";
 
 import {
   LEMON_SQUEEZY_CHECKOUT_URL,
@@ -21,7 +20,6 @@ import {
  */
 export function FinalCtaSection() {
   const t = useTranslations("landing.finalCta");
-  const trustItems = t.raw("trustItems") as string[];
 
   return (
     <section className="relative w-full overflow-hidden">
@@ -61,18 +59,6 @@ export function FinalCtaSection() {
             </span>
           </Link>
         </div>
-
-        <ul className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-mk-text-tertiary">
-          {trustItems.map((item) => (
-            <li
-              key={item}
-              className="mk-caption inline-flex items-center gap-1.5"
-            >
-              <Check className="size-3.5 text-mk-success" aria-hidden />
-              {item}
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );

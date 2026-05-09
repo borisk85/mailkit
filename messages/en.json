@@ -242,13 +242,7 @@
       "heading": "30 minutes from now, you'll have email on your Cloudflare domain.",
       "subhead": "Or your money back, automatically. No tickets, no calls, no questions.",
       "primaryCta": "Get your email — $5",
-      "secondaryCta": "Read the guarantee first",
-      "trustItems": [
-        "30-day money-back guarantee",
-        "No subscription, ever",
-        "Setup in 30 minutes",
-        "Refund-first policy, no questions asked"
-      ]
+      "secondaryCta": "Read the guarantee first"
     }
   },
   "auth": {
