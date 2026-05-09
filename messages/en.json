@@ -146,14 +146,7 @@
         "body": "If within 30 days you can't actually send email through your domain — even after our support — full refund on request. Just email us.",
         "badge": "30-day"
       },
-      "policyPill": "Two policies, plain language, /guarantee",
-      "policyLinkLabel": "Read full policy →",
-      "audienceNote": "Built for Cloudflare DNS users. Free migration guide for users on other registrars.",
-      "objections": [
-        "Don't know DNS, SMTP, or DKIM? You don't need to — we do.",
-        "Worried about breaking something? We offer a full money-back guarantee.",
-        "Don't want to spend your evening on guides and forums? We do it for you."
-      ]
+      "policyLinkLabel": "Read full policy →"
     },
     "faq": {
       "eyebrow": "Common questions",
