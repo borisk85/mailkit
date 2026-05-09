@@ -11,6 +11,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(`${origin}?error=no_code`);
   }
 
+  // Diagnostic: log which auth-related cookies are present so we can
+  // confirm code_verifier arrived at the server-side handler.
+  const { cookies: getCookies } = await import("next/headers");
+  const reqCookieStore = await getCookies();
+  const authCookieNames = reqCookieStore
+    .getAll()
+    .map((c) => c.name)
+    .filter((n) => n.startsWith("sb-"));
+  console.info("[auth/callback] sb-* cookies on request:", authCookieNames);
+
   const supabase = await createClient();
   const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 
@@ -18,7 +28,8 @@ export async function GET(request: NextRequest) {
     console.error(
       "[auth/callback] exchangeCodeForSession failed:",
       error?.message ?? "no session",
-      { code: code?.slice(0, 8) },
+      error?.status ?? "",
+      { code: code?.slice(0, 8), authCookieNames },
     );
     return NextResponse.redirect(`${origin}?error=oauth_failed`);
   }
