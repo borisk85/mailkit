@@ -80,7 +80,7 @@
     "howItWorks": {
       "eyebrow": "How it works",
       "heading": "Four steps. We do three. You do one.",
-      "subheading": "Total time 30 minutes. Total work on your side: three copy-paste actions in Gmail.",
+      "subheading": "Total time 30 minutes. Total work on your side: paste SMTP details into Gmail (3 minutes).",
       "automatedBadge": "Automated",
       "manualBadge": "Your turn",
       "step1": {
@@ -91,7 +91,7 @@
       "step2": {
         "title": "Postmark SMTP setup",
         "time": "~60 sec",
-        "body": "We provision Postmark for your domain. Add the records."
+        "body": "We provision Postmark and add DNS records for you."
       },
       "step3": {
         "title": "DNS verification",
@@ -126,8 +126,8 @@
         "steps": [
           "Sign in with Google",
           "Paste Cloudflare API token",
-          "Watch automation run (~90 sec)",
-          "Copy four lines into Gmail",
+          "Watch automation run (~30 sec)",
+          "Add to Gmail (3 minutes)",
           "Your branded email is ready"
         ]
       }
