@@ -35,13 +35,7 @@ export async function GET(request: Request) {
     return new NextResponse("Unauthorized", { status: 401 });
   }
 
-  const postmarkToken = process.env.POSTMARK_ACCOUNT_TOKEN;
-  if (!postmarkToken) {
-    return new NextResponse("POSTMARK_ACCOUNT_TOKEN not set", { status: 500 });
-  }
-
   const admin = createServiceClient();
-  const pm = createPostmarkAccountClient(postmarkToken);
   const now = Date.now();
 
   const { data: rows, error } = await admin
@@ -56,9 +50,17 @@ export async function GET(request: Request) {
     return new NextResponse("DB error", { status: 500 });
   }
 
+  // Early exit — nothing to do, no Postmark token needed.
   if (!rows || rows.length === 0) {
     return NextResponse.json({ checked: 0 });
   }
+
+  const postmarkToken = process.env.POSTMARK_ACCOUNT_TOKEN;
+  if (!postmarkToken) {
+    return new NextResponse("POSTMARK_ACCOUNT_TOKEN not set", { status: 500 });
+  }
+
+  const pm = createPostmarkAccountClient(postmarkToken);
 
   const outcomes = await Promise.allSettled(
     rows.map(async (row) => {
