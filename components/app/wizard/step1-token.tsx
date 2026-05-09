@@ -13,6 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import { CfScreenshotGallery } from "./cf-screenshot-gallery";
 
 // ─── Permission checklist data ──────────────────────────────────────────────
 
@@ -167,15 +168,18 @@ export function Step1Token({
         >
           <InstructionStep number={1}>
             <span>Go to Cloudflare → Profile → API Tokens</span>
-            <a
-              href="https://dash.cloudflare.com/profile/api-tokens"
-              target="_blank"
-              rel="noreferrer noopener"
-              className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium text-mk-accent underline underline-offset-2 hover:text-mk-accent-hover"
-            >
-              {t("instructionOpenCF")}
-              <ExternalLink className="size-3" aria-hidden />
-            </a>
+            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <a
+                href="https://dash.cloudflare.com/profile/api-tokens"
+                target="_blank"
+                rel="noreferrer noopener"
+                className="inline-flex items-center gap-1 text-xs font-medium text-mk-accent underline underline-offset-2 hover:text-mk-accent-hover"
+              >
+                {t("instructionOpenCF")}
+                <ExternalLink className="size-3" aria-hidden />
+              </a>
+              <CfScreenshotGallery />
+            </div>
           </InstructionStep>
 
           <InstructionStep number={2}>
