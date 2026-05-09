@@ -35,7 +35,7 @@ export function AppHeader({ user }: { user: User }) {
     <header className="border-b border-mk-border-subtle bg-surface-base/70 backdrop-blur-md supports-[backdrop-filter]:bg-surface-base/60">
       <div className="mx-auto flex h-14 max-w-6xl items-center justify-between gap-4 px-4 sm:px-6">
         <Link
-          href="/app"
+          href="/"
           className="flex items-center gap-2.5 text-base font-semibold tracking-tight text-mk-text-primary"
           aria-label={tBrand("logo")}
         >

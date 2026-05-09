@@ -87,7 +87,8 @@ export default async function AppHome({
     data = await getDashboardData(supabase, user.id);
   }
 
-  const isEmpty = data.setups.length === 0 && data.purchases.length === 0;
+  // First-time: no setups yet. Show onboarding card instead of empty setups table.
+  const isFirstTimeSetup = data.setups.length === 0;
 
   // In mock-preview the destructive action is a server-side no-op so
   // the modal flow is exercisable in Playwright snapshots without
@@ -105,26 +106,29 @@ export default async function AppHome({
       <header className="space-y-3">
         <p className="mk-eyebrow text-mk-accent">{t("eyebrow")}</p>
         <h1 className="mk-heading-1 text-mk-text-primary">
-          {t("title", { name: displayName })}
+          {isFirstTimeSetup
+            ? t("titleFirstTime", { name: displayName })
+            : t("title", { name: displayName })}
         </h1>
         <p className="mk-body max-w-prose text-mk-text-secondary">
           {t("subtitle")}
         </p>
       </header>
 
-      {isEmpty ? (
+      {isFirstTimeSetup ? (
         <DashboardEmptyState />
       ) : (
-        <>
-          <SetupsSection
-            setups={data.setups}
-            sendUsage={data.sendUsage}
-            deleteSetupAction={deleteFailedSetup}
-          />
-          <PurchasesSection purchases={data.purchases} refunds={data.refunds} />
-          <RefundsSection refunds={data.refunds} />
-        </>
+        <SetupsSection
+          setups={data.setups}
+          sendUsage={data.sendUsage}
+          deleteSetupAction={deleteFailedSetup}
+        />
       )}
+
+      {data.purchases.length > 0 && (
+        <PurchasesSection purchases={data.purchases} refunds={data.refunds} />
+      )}
+      {data.refunds.length > 0 && <RefundsSection refunds={data.refunds} />}
 
       <AccountSection email={displayEmail} fullName={fullName} />
 

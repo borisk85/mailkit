@@ -358,7 +358,8 @@
         "confirmCta": "Delete account",
         "cancel": "Cancel"
       }
-    }
+    },
+    "titleFirstTime": "Welcome to MailKit, {name}."
   },
   "setup": {
     "nsWarning": {
