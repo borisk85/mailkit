@@ -97,4 +97,8 @@ filter: drop-shadow(0 0 12px rgba(var(--accent-purple-500), 0.3));
 
 ---
 
+---
+
+**Light theme rework** — see [docs/POST_LAUNCH_LIGHT_THEME_REWORK.md](POST_LAUNCH_LIGHT_THEME_REWORK.md) (separate higher-priority track, tracked as #THEME-1).
+
 *Last updated: 2026-05-09. Triggered by motion audit after wizard-ux-rebuild merge.*
