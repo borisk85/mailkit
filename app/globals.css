@@ -388,4 +388,69 @@ html {
       animation: none;
     }
   }
+
+  /* ── M5: Pulsing accent dot in announcement banner ──────────────────────── */
+  @keyframes mk-pulse-dot {
+    0%,
+    100% {
+      transform: scale(1);
+      opacity: 1;
+    }
+    50% {
+      transform: scale(1.4);
+      opacity: 0.7;
+    }
+  }
+  .mk-pulse-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+    animation: mk-pulse-dot 2s ease-in-out infinite;
+  }
+  /* Reduced-motion: softer pulse (Boris: don't disable, just calm it) */
+  @media (prefers-reduced-motion: reduce) {
+    .mk-pulse-dot {
+      animation: mk-pulse-dot 4s ease-in-out infinite;
+      /* Amplitude 0.6: scale 1 → 1.15 */
+      @keyframes mk-pulse-dot {
+        0%,
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.15);
+          opacity: 0.85;
+        }
+      }
+    }
+  }
+
+  /* ── M8: Hover lift — all interactive landing elements ───────────────────── */
+  .mk-hover-lift {
+    transition: transform 200ms ease-out;
+  }
+  .mk-hover-lift:hover {
+    transform: translateY(-1px);
+  }
+  .mk-hover-lift:active {
+    transform: translateY(0) scale(0.98);
+  }
+  /* Reduced-motion: instant, no translate — but keep visual hover feedback */
+  @media (prefers-reduced-motion: reduce) {
+    .mk-hover-lift {
+      transition: none;
+    }
+    .mk-hover-lift:hover {
+      transform: none;
+      outline: 2px solid var(--mk-accent);
+      outline-offset: 2px;
+    }
+    .mk-hover-lift:active {
+      transform: none;
+    }
+  }
 }

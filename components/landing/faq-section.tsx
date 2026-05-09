@@ -36,7 +36,7 @@ export function FaqSection({
             <AccordionItem
               key={item.id}
               value={item.id}
-              className="mk-faq-item rounded-xl border border-mk-border-subtle bg-surface-elevated px-6 py-1 transition-colors hover:bg-surface-elevated/60"
+              className="mk-hover-lift mk-faq-item rounded-xl border border-mk-border-subtle bg-surface-elevated px-6 py-1 transition-colors hover:bg-surface-elevated/60"
             >
               <AccordionTrigger className="mk-heading-3 text-left text-mk-text-primary">
                 {item.q}

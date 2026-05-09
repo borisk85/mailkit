@@ -48,7 +48,7 @@ export function FinalCtaSection() {
             href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
             target="_blank"
             rel="noreferrer"
-            className="mk-cta-shadow group inline-flex h-[60px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-9 text-lg font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+            className="mk-cta-shadow mk-hover-lift group inline-flex h-[60px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-9 text-lg font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
           >
             {t("primaryCta")}
           </a>

@@ -108,7 +108,7 @@ function FooterLink({
       <li>
         <a
           href={href}
-          className={`mk-body-small text-mk-text-secondary transition-colors hover:text-mk-text-primary${breakAll ? " break-all" : ""}`}
+          className={`mk-hover-lift mk-body-small text-mk-text-secondary transition-colors hover:text-mk-text-primary${breakAll ? " break-all" : ""}`}
         >
           {children}
         </a>
@@ -119,7 +119,7 @@ function FooterLink({
     <li>
       <Link
         href={href}
-        className="mk-body-small text-mk-text-secondary transition-colors hover:text-mk-text-primary"
+        className="mk-hover-lift mk-body-small text-mk-text-secondary transition-colors hover:text-mk-text-primary"
       >
         {children}
       </Link>
