@@ -250,7 +250,7 @@
   "dashboard": {
     "eyebrow": "Your account",
     "title": "Welcome back, {name}.",
-    "subtitle": "Your domain email setups and account.",
+    "subtitle": "Domain setups, sending limits, and support.",
     "addAnother": {
       "title": "Set up another mailbox",
       "body": "Another domain or address — $5 one-time.",
