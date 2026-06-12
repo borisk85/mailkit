@@ -3,7 +3,7 @@ import { useTranslations } from "next-intl";
 import { MailkitIcon } from "@/components/brand/mailkit-icon";
 import { LogoLink } from "./logo-link";
 import { NavAnchor } from "./nav-anchor";
-import { SignInLink } from "./sign-in-link";
+import { UserMenu } from "./user-menu";
 
 /**
  * Landing header — premium-pass refresh per UI_REVIEW_BRIEF §2.2 + §7.5,
@@ -59,7 +59,7 @@ export function Header() {
 
         <div className="flex items-center gap-1 sm:gap-2">
           {/* ThemeToggle hidden until post-launch light-theme design pass */}
-          <SignInLink />
+          <UserMenu />
         </div>
       </div>
     </header>

@@ -17,6 +17,7 @@
         "faq": "FAQ"
       },
       "signIn": "Sign in",
+      "dashboard": "Dashboard",
       "languageSwitcher": {
         "label": "Language",
         "en": "English",
@@ -579,8 +580,9 @@
     "faqCta": "View FAQ"
   },
   "cookieConsent": {
-    "body": "We use essential cookies to make this site work.",
+    "body": "We use analytics cookies to understand how this site is used.",
     "details": "Privacy",
-    "accept": "Got it"
+    "accept": "Accept",
+    "decline": "Decline"
   }
 }
