@@ -400,10 +400,12 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
       </header>
 
       {state.kind !== "failed" && state.kind !== "gmail_done" && (
-        <WizardStepper
-          currentStep={getStepperStep(state.kind)}
-          steps={WIZARD_STEPS}
-        />
+        <div className="pb-4">
+          <WizardStepper
+            currentStep={getStepperStep(state.kind)}
+            steps={WIZARD_STEPS}
+          />
+        </div>
       )}
 
       {state.kind === "token_entry" || state.kind === "token_validating" ? (
