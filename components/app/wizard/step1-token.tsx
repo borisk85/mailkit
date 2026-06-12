@@ -142,9 +142,9 @@ export function Step1Token({
   };
 
   return (
-    <div className="space-y-8">
-      {/* ── Instructions ─────────────────────────────────────────────────── */}
-      <div className="space-y-5">
+    <div className="grid gap-0 md:grid-cols-2">
+      {/* ── Left column: instructions ─────────────────────────────────────── */}
+      <div className="space-y-5 pr-8 md:border-r md:border-mk-border-subtle">
         <div>
           <h2 className="mk-heading-3 text-mk-text-primary">{t("heading")}</h2>
           <p className="mt-1.5 mk-body-small text-mk-text-secondary">
@@ -210,8 +210,8 @@ export function Step1Token({
         </ol>
       </div>
 
-      {/* ── Token input ──────────────────────────────────────────────────── */}
-      <div className="rounded-xl border border-mk-border-subtle bg-surface-elevated p-6 mk-card-shadow max-w-lg">
+      {/* ── Right column: token input ─────────────────────────────────────── */}
+      <div className="rounded-xl border border-mk-border-subtle bg-surface-elevated p-6 mk-card-shadow self-start md:ml-8">
         <form className="space-y-4" onSubmit={handleSubmit} noValidate>
           <div className="space-y-1.5">
             <label
