@@ -146,7 +146,9 @@ export function Step1Token({
       {/* ── Left column: instructions ─────────────────────────────────────── */}
       <div className="space-y-5 pr-8 md:border-r md:border-mk-border-subtle">
         <div>
-          <h2 className="mk-heading-3 text-mk-text-primary">{t("heading")}</h2>
+          <h2 className="text-xl font-semibold text-mk-text-primary">
+            {t("heading")}
+          </h2>
           <p className="mt-1.5 mk-body-small text-mk-text-secondary">
             {t("sub")}
           </p>
