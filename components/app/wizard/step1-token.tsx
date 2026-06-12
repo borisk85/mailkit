@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   CheckSquare,
+  ChevronDown,
   ExternalLink,
   Eye,
   EyeOff,
@@ -44,55 +45,44 @@ function InlineError({ message }: { message: string }) {
 
 function PermissionChecklist() {
   const t = useTranslations("setup.wizard.step1");
+  const [open, setOpen] = useState(false);
 
   return (
-    <div className="rounded-lg border border-mk-border-subtle bg-surface-elevated-2 p-4">
-      <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-mk-text-tertiary">
-        {t("permTitle")}
-      </p>
-
-      {/* Zone resources */}
-      <div className="mb-3">
-        <p className="mb-1.5 text-xs font-medium text-mk-text-secondary">
-          Zone resources
-        </p>
-        <ul className="space-y-1.5">
-          {ZONE_PERMS.map((perm) => (
-            <li key={perm} className="flex items-center gap-2">
-              <CheckSquare
-                className="size-4 shrink-0 text-mk-accent"
-                aria-hidden
-              />
-              <code className="text-xs text-mk-text-primary">{perm}</code>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Account resources */}
-      <div className="mb-3">
-        <p className="mb-1.5 text-xs font-medium text-mk-text-secondary">
-          Account resources
-        </p>
-        <ul className="space-y-1.5">
-          {ACCOUNT_PERMS.map((perm) => (
-            <li key={perm} className="flex items-center gap-2">
-              <CheckSquare
-                className="size-4 shrink-0 text-mk-accent"
-                aria-hidden
-              />
-              <code className="text-xs text-mk-text-primary">{perm}</code>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Zone scope note */}
-      <div className="mt-3 flex items-start gap-2 rounded-md bg-mk-accent/8 px-3 py-2">
-        <span className="mt-px text-xs leading-snug text-mk-text-secondary">
-          {t("scopeNote")}
+    <div className="rounded-lg border border-mk-border-subtle bg-surface-elevated-2 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-mk-border-subtle/20 transition-colors"
+      >
+        <span className="text-xs font-semibold text-mk-text-secondary">
+          {t("permTitle")}
         </span>
-      </div>
+        <ChevronDown
+          className={`size-4 text-mk-text-tertiary transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          aria-hidden
+        />
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4 pt-1 border-t border-mk-border-subtle">
+          <ul className="space-y-1.5">
+            {[...ZONE_PERMS, ...ACCOUNT_PERMS].map((perm) => (
+              <li key={perm} className="flex items-center gap-2">
+                <CheckSquare
+                  className="size-4 shrink-0 text-mk-accent"
+                  aria-hidden
+                />
+                <code className="text-xs text-mk-text-primary">{perm}</code>
+              </li>
+            ))}
+          </ul>
+          <div className="mt-3 rounded-md bg-mk-accent/8 px-3 py-2">
+            <span className="text-xs leading-snug text-mk-text-secondary">
+              {t("scopeNote")}
+            </span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
