@@ -360,7 +360,7 @@
       "cancelBtn": "I'll migrate first"
     },
     "title": "Connect your domain",
-    "subtitle": "Three steps: paste your Cloudflare token, pick the zone, watch us wire it up.",
+    "subtitle": "Paste your Cloudflare token, pick the zone — we handle the rest.",
     "step1": {
       "title": "Step 1 — Paste your Cloudflare API token",
       "tokenLabel": "Cloudflare API token",
