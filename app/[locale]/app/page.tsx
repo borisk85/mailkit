@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
 import { AccountSection } from "@/components/app/dashboard/account-section";
+import { AddAnotherCard } from "@/components/app/dashboard/add-another-card";
 import { DangerZoneSection } from "@/components/app/dashboard/danger-zone-section";
 import { DashboardEmptyState } from "@/components/app/dashboard/empty-state";
 import { PurchasesSection } from "@/components/app/dashboard/purchases-section";
@@ -118,11 +119,14 @@ export default async function AppHome({
       {isFirstTimeSetup ? (
         <DashboardEmptyState />
       ) : (
-        <SetupsSection
-          setups={data.setups}
-          sendUsage={data.sendUsage}
-          deleteSetupAction={deleteFailedSetup}
-        />
+        <>
+          <SetupsSection
+            setups={data.setups}
+            sendUsage={data.sendUsage}
+            deleteSetupAction={deleteFailedSetup}
+          />
+          <AddAnotherCard locale={locale} />
+        </>
       )}
 
       {data.purchases.length > 0 && (

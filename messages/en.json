@@ -250,7 +250,12 @@
   "dashboard": {
     "eyebrow": "Your account",
     "title": "Welcome back, {name}.",
-    "subtitle": "Manage your domains, view past setups, contact support, or buy another mailbox.",
+    "subtitle": "View your setups, check sending limits, contact support, or buy another mailbox.",
+    "addAnother": {
+      "title": "Set up another mailbox",
+      "body": "Another domain or address — $5 one-time.",
+      "cta": "Buy — $5"
+    },
     "emptyState": {
       "title": "Set up your first domain",
       "body": "You haven't started a setup yet. It takes ~30 minutes — paste a Cloudflare API token, pick your zone, follow the Gmail wizard.",
