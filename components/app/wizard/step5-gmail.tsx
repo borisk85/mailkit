@@ -28,7 +28,7 @@ export function Step5Gmail({
         <h2 className="mk-heading-3 text-mk-text-primary">
           Final step: Gmail Send-As
         </h2>
-        <p className="mk-body-small text-mk-text-secondary">
+        <p className="text-xs text-mk-text-tertiary">
           3 minutes. Copy 4 values into Gmail settings — we&apos;ll guide you.
         </p>
         <p className="text-xs font-mono text-mk-text-tertiary">

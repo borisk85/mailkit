@@ -44,7 +44,7 @@ export function Step4Dkim({
             <h2 className="mk-heading-3 text-mk-text-primary">
               Verifying your domain
             </h2>
-            <p className="mk-body-small text-mk-text-secondary">
+            <p className="text-xs text-mk-text-tertiary">
               Postmark domain verification typically takes 5–15 minutes,
               sometimes up to 30 min.
             </p>

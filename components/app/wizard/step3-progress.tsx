@@ -120,7 +120,7 @@ export function Step3Progress({
         {/* Header */}
         <div className="space-y-2">
           <h2 className="mk-heading-3 text-mk-text-primary">{heading}</h2>
-          <p className="mk-body-small text-mk-text-secondary">
+          <p className="text-xs text-mk-text-tertiary">
             This takes about 30–90 seconds. Stay on this page.
           </p>
           <p className="text-xs text-mk-text-tertiary font-mono">

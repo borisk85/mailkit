@@ -106,9 +106,7 @@ export function Step2Domain({
     <div className="space-y-6">
       <div>
         <h2 className="mk-heading-3 text-mk-text-primary">{t("heading")}</h2>
-        <p className="mt-1.5 mk-body-small text-mk-text-secondary">
-          {t("sub")}
-        </p>
+        <p className="mt-1.5 text-xs text-mk-text-tertiary">{t("sub")}</p>
       </div>
 
       <form
