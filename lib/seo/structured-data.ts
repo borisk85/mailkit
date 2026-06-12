@@ -31,6 +31,28 @@ function abs(path: string): string {
 
 export type FaqItem = { id: string; q: string; a: string };
 
+export function websiteSchema(): Record<string, unknown> {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${siteUrl()}/#website`,
+    url: siteUrl(),
+    name: "MailKit",
+    description:
+      "Automated email setup for custom domains on Cloudflare DNS. Postmark SMTP + Gmail Send-As wizard. $5 one-time.",
+    publisher: { "@id": `${siteUrl()}/#organization` },
+    inLanguage: "en",
+    potentialAction: {
+      "@type": "SearchAction",
+      target: {
+        "@type": "EntryPoint",
+        urlTemplate: `${siteUrl()}/blog?q={search_term_string}`,
+      },
+      "query-input": "required name=search_term_string",
+    },
+  };
+}
+
 export function organizationSchema(): Record<string, unknown> {
   return {
     "@context": "https://schema.org",
@@ -126,6 +148,7 @@ export function landingGraph(
   return {
     "@context": "https://schema.org",
     "@graph": [
+      websiteSchema(),
       organizationSchema(),
       softwareApplicationSchema(),
       productSchema(),

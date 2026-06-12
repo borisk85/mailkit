@@ -32,6 +32,8 @@ export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
+
 export async function generateMetadata({
   params,
 }: {
@@ -39,9 +41,25 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "metadata" });
+  const title = t("title");
+  const description = t("description");
   return {
-    title: t("title"),
-    description: t("description"),
+    metadataBase: new URL(SITE_URL),
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: SITE_URL,
+      siteName: "MailKit",
+      type: "website",
+      locale: "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+    },
     icons: {
       icon: [
         { url: "/favicon/favicon-16.png", sizes: "16x16", type: "image/png" },
