@@ -389,7 +389,7 @@ export function Step1Token({
           <div className="space-y-1.5">
             <label
               htmlFor="cf-token"
-              className="block text-sm font-semibold text-mk-text-primary"
+              className="block w-fit text-sm font-semibold text-mk-text-primary"
             >
               Paste your token
             </label>
