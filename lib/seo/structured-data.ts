@@ -102,13 +102,53 @@ export function productSchema(): Record<string, unknown> {
     name: "MailKit — custom domain email setup",
     description:
       "One-time custom domain email setup in 5 minutes. Includes Cloudflare Email Routing, Postmark SMTP authentication, and guided Gmail Send-As wizard. Money-back guarantee on automation failure.",
-    brand: { "@id": `${siteUrl()}/#organization` },
+    image: abs("/opengraph-image.png"),
+    brand: {
+      "@type": "Brand",
+      name: "MailKit",
+    },
     offers: {
       "@type": "Offer",
       price: "5.00",
       priceCurrency: "USD",
       availability: "https://schema.org/InStock",
       url: `${siteUrl()}/#pricing`,
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: "0",
+          currency: "USD",
+        },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: {
+            "@type": "QuantitativeValue",
+            minValue: 0,
+            maxValue: 0,
+            unitCode: "DAY",
+          },
+          transitTime: {
+            "@type": "QuantitativeValue",
+            minValue: 0,
+            maxValue: 0,
+            unitCode: "DAY",
+          },
+        },
+        shippingDestination: {
+          "@type": "DefinedRegion",
+          addressCountry: "US",
+        },
+      },
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "US",
+        returnPolicyCategory:
+          "https://schema.org/MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 30,
+        returnMethod: "https://schema.org/ReturnByMail",
+        returnFees: "https://schema.org/FreeReturn",
+      },
     },
   };
 }
