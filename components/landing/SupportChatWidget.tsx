@@ -99,14 +99,6 @@ export default function SupportChatWidget() {
       initialized.current = true;
       setMessages(loadHistory());
     }
-    // #DASH-6 — ResourcesSection triggers this event to open the widget
-    function handleOpenSupport() {
-      setOpen(true);
-      setView("chat");
-    }
-    window.addEventListener("mailkit:open-support", handleOpenSupport);
-    return () =>
-      window.removeEventListener("mailkit:open-support", handleOpenSupport);
   }, []);
 
   useEffect(() => {

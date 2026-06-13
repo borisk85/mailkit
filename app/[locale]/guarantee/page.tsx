@@ -20,8 +20,6 @@ import { GUARANTEE_EN } from "@/lib/legal/guarantee";
  *   - components/landing/hero.tsx — "(see policy)" tagline link
  *   - public/llms.txt manifest entry
  *   - lib/seo/structured-data.ts SoftwareApplication description
- *   - components/app/dashboard/resources-section.tsx workaround on
- *     `/terms#section-3` can move to `/guarantee` in a follow-up
  */
 
 export async function generateMetadata(): Promise<Metadata> {

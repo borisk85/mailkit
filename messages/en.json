@@ -334,14 +334,6 @@
         "cancel": "Cancel"
       }
     },
-    "resources": {
-      "title": "Resources",
-      "terms": "Terms of Service",
-      "privacy": "Privacy Policy",
-      "guarantee": "Refund guarantee",
-      "support": "Email support",
-      "supportAddress": "support@getmailkit.com"
-    },
     "dangerZone": {
       "title": "Danger zone",
       "description": "Permanently delete your account and all associated data.",

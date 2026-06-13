@@ -8,7 +8,6 @@ import { DangerZoneSection } from "@/components/app/dashboard/danger-zone-sectio
 import { DashboardEmptyState } from "@/components/app/dashboard/empty-state";
 import { PurchasesSection } from "@/components/app/dashboard/purchases-section";
 import { RefundsSection } from "@/components/app/dashboard/refunds-section";
-import { ResourcesSection } from "@/components/app/dashboard/resources-section";
 import { SetupsSection } from "@/components/app/dashboard/setups-section";
 import { getDashboardData, type DashboardData } from "@/lib/dashboard-data";
 import { createClient } from "@/lib/supabase/server";
@@ -26,11 +25,12 @@ import { deleteAccount, deleteFailedSetup } from "./account-actions";
  *   - Purchases (hidden if 0)
  *   - Refunds (hidden if 0)
  *   - Account (always visible — profile + delete)
- *   - Resources (always visible — legal links + support)
+ *
+ * Legal links live in the shared AppFooter; support is the chat
+ * widget bubble — so the dashboard has no separate Resources block.
  *
  * If both Setups and Purchases are empty, we show the friendly
- * empty-state CTA above Account/Resources instead of a sea of empty
- * sections.
+ * empty-state CTA above Account instead of a sea of empty sections.
  */
 export default async function AppHome({
   params,
@@ -130,8 +130,6 @@ export default async function AppHome({
       {data.refunds.length > 0 && <RefundsSection refunds={data.refunds} />}
 
       <AccountSection email={displayEmail} fullName={fullName} />
-
-      <ResourcesSection />
 
       <DangerZoneSection
         email={displayEmail}
