@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { Sparkles } from "lucide-react";
+import { Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -24,7 +24,7 @@ export function DashboardEmptyState() {
         }}
       />
       <div className="relative mx-auto mb-6 inline-flex size-12 items-center justify-center rounded-full bg-mk-accent/10">
-        <Sparkles className="size-6 text-mk-accent" aria-hidden />
+        <Mail className="size-6 text-mk-accent" aria-hidden />
       </div>
       <h2 className="mk-heading-2 text-mk-text-primary">{t("title")}</h2>
       <p className="mx-auto mt-3 max-w-md mk-body text-mk-text-secondary">
