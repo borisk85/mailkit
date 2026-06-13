@@ -50,17 +50,17 @@ export function DangerZoneSection({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold text-red-600 dark:text-red-500">
+      <h2 className="text-lg font-semibold text-mk-text-primary">
         {t("title")}
       </h2>
-      <div className="rounded-lg border border-red-200 p-4 dark:border-red-900/60">
+      <div className="rounded-lg border border-mk-border-subtle p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-mk-text-secondary">{t("description")}</p>
           <Button
             variant="outline"
             size="sm"
             onClick={() => handleOpen(true)}
-            className="shrink-0 border-red-200 text-red-700 hover:bg-red-50 hover:text-red-900 dark:border-red-900/60 dark:text-red-400 dark:hover:bg-red-950/40 dark:hover:text-red-200"
+            className="shrink-0 border-red-300/60 text-red-600 hover:bg-red-50 hover:text-red-700 dark:border-red-900/50 dark:text-red-400 dark:hover:bg-red-950/30 dark:hover:text-red-300"
           >
             {t("deleteCta")}
           </Button>

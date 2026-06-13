@@ -1,6 +1,9 @@
 import { setRequestLocale } from "next-intl/server";
 
-import { linkOrphanPurchase } from "@/lib/checkout-link";
+import {
+  linkOrphanPurchase,
+  reclaimPurchaseByEmail,
+} from "@/lib/checkout-link";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 import { SetupWizard } from "./setup-wizard";
@@ -91,6 +94,17 @@ export default async function SetupPage({
 
     if (!mock) {
       try {
+        // Account-recovery: if this user owns no purchase yet but a
+        // paid orphan exists under their (Google-verified) email —
+        // e.g. they deleted their account and signed back in — re-link
+        // it so they don't hit the payment gate a second time.
+        const admin = createServiceClient();
+        await reclaimPurchaseByEmail({
+          admin,
+          userId: user.id,
+          userEmail: user.email ?? "",
+        });
+
         const [runsResult, purchaseResult] = await Promise.all([
           supabase
             .from("setup_runs")

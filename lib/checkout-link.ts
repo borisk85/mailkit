@@ -113,3 +113,72 @@ function matchesEmail(a: string | null | undefined, b: string): boolean {
   if (!a) return false;
   return a.trim().toLowerCase() === b.trim().toLowerCase();
 }
+
+/**
+ * Account-recovery reclaim. Runs on every authenticated /app/setup
+ * load (not just the LS thank-you redirect) so a buyer who deleted
+ * their account — accidentally or not — and signs back in with the
+ * same Google email re-inherits their paid purchase instead of
+ * hitting the payment gate a second time.
+ *
+ * Why this is safe without a recency window (unlike linkOrphanPurchase):
+ *   - It only fires when the user has ZERO purchases of their own, so
+ *     it can never steal a row from a repeat buyer's history.
+ *   - The match is on the Google-verified account email, which equals
+ *     the email LS captured at checkout. A different person cannot log
+ *     in with someone else's verified Google address.
+ *
+ * Account deletion sets purchases.user_id → NULL but keeps the row
+ * (financial audit trail). After deletion the user re-authenticates
+ * with a brand-new auth.users id; this links the surviving orphan to
+ * that new id. setup_runs are gone (CASCADE) — they redo setup — but
+ * the payment is recognised and they are not charged twice.
+ */
+export async function reclaimPurchaseByEmail(args: {
+  admin: AdminClient;
+  userId: string;
+  userEmail: string;
+}): Promise<{ reclaimed: boolean; purchaseId?: string }> {
+  const { admin, userId, userEmail } = args;
+  if (!userEmail) return { reclaimed: false };
+
+  // Guard: only reclaim for users who own no purchase yet. Prevents
+  // touching a repeat buyer's linked rows.
+  const { data: own } = await admin
+    .from("purchases")
+    .select("id")
+    .eq("user_id", userId)
+    .limit(1)
+    .maybeSingle();
+  if (own) return { reclaimed: false };
+
+  const { data: candidates } = await admin
+    .from("purchases")
+    .select("id, user_email")
+    .is("user_id", null)
+    .eq("status", "paid")
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  if (!candidates || candidates.length === 0) return { reclaimed: false };
+
+  const match = candidates.find((p) => matchesEmail(p.user_email, userEmail));
+  if (!match) return { reclaimed: false };
+
+  const { error } = await admin
+    .from("purchases")
+    .update({ user_id: userId })
+    .eq("id", match.id);
+
+  if (error) {
+    console.error(
+      `[checkout-link] reclaim failed for purchase ${match.id}: ${error.message}`,
+    );
+    return { reclaimed: false };
+  }
+
+  console.info(
+    `[checkout-link] reclaimed orphan purchase ${match.id} to user ${userId} via account-recovery email match`,
+  );
+  return { reclaimed: true, purchaseId: match.id };
+}

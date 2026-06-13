@@ -262,7 +262,7 @@
     },
     "emptyState": {
       "title": "Set up your first domain",
-      "body": "You haven't started a setup yet. It takes ~30 minutes — paste a Cloudflare API token, pick your zone, follow the Gmail wizard.",
+      "body": "You haven't started a setup yet. It takes ~30 minutes.",
       "cta": "Start setup"
     },
     "setups": {
@@ -335,12 +335,12 @@
       }
     },
     "dangerZone": {
-      "title": "Danger zone",
-      "description": "Permanently delete your account and all associated data.",
-      "deleteCta": "Delete account",
+      "title": "Delete account",
+      "description": "Permanently delete your account and setup history. This can't be undone.",
+      "deleteCta": "Delete my account",
       "deleteConfirm": {
         "title": "Delete your account?",
-        "body": "This removes your profile, setup history, and purchase records from MailKit. Your DNS records and Gmail Send-As setup stay unchanged — those live in Cloudflare and Gmail. This cannot be undone.",
+        "body": "This deletes your profile and setup history from MailKit. Your DNS records and Gmail Send-As setup stay unchanged — those live in Cloudflare and Gmail. If you already paid, signing back in with the same Google account restores your purchase.",
         "emailPrompt": "Type {email} to confirm:",
         "confirmCta": "Delete account",
         "cancel": "Cancel"
