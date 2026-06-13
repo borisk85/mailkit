@@ -9,6 +9,8 @@ import {
   Eye,
   EyeOff,
   AlertCircle,
+  Check,
+  ArrowRight,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -87,25 +89,76 @@ function PermissionChecklist() {
   );
 }
 
-// ─── Instruction steps ────────────────────────────────────────────────────────
+// ─── Completed step row ───────────────────────────────────────────────────────
 
-function InstructionStep({
+function CompletedStepRow({
   number,
-  children,
+  label,
 }: {
   number: number;
-  children: React.ReactNode;
+  label: string;
 }) {
   return (
-    <li className="flex items-start gap-3">
+    <li className="flex items-center gap-3 py-1">
       <span
         aria-hidden
-        className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-mk-accent/12 text-[11px] font-semibold text-mk-accent"
+        className="flex size-5 shrink-0 items-center justify-center rounded-full bg-mk-accent/15 text-mk-accent"
       >
-        {number}
+        <Check className="size-3" />
       </span>
-      <div className="flex-1 text-sm leading-snug text-mk-text-secondary">
-        {children}
+      <span className="text-xs text-mk-text-tertiary">
+        {number}. {label}
+      </span>
+    </li>
+  );
+}
+
+// ─── Active instruction step ─────────────────────────────────────────────────
+
+function ActiveStep({
+  number,
+  total,
+  children,
+  onNext,
+  isLast,
+}: {
+  number: number;
+  total: number;
+  children: React.ReactNode;
+  onNext: () => void;
+  isLast: boolean;
+}) {
+  return (
+    <li className="space-y-3">
+      <div className="flex items-center gap-2">
+        <span
+          aria-hidden
+          className="flex size-5 shrink-0 items-center justify-center rounded-full bg-mk-accent/12 text-[11px] font-semibold text-mk-accent"
+        >
+          {number}
+        </span>
+        <span className="text-xs font-medium text-mk-text-tertiary">
+          Step {number} of {total}
+        </span>
+      </div>
+
+      <div className="pl-8 space-y-3">
+        <div className="text-sm leading-snug text-mk-text-secondary">
+          {children}
+        </div>
+
+        {!isLast && (
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="gap-1.5 text-xs"
+            onClick={onNext}
+          >
+            Done
+            <ArrowRight className="size-3" aria-hidden />
+          </Button>
+        )}
       </div>
     </li>
   );
@@ -133,6 +186,9 @@ export function Step1Token({
 
   const [token, setToken] = useState("");
   const [showToken, setShowToken] = useState(false);
+  const [activeInstruction, setActiveInstruction] = useState(1);
+
+  const TOTAL = 5;
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,6 +196,14 @@ export function Step1Token({
     if (!trimmed) return;
     onSubmit(trimmed);
   };
+
+  const stepLabels = [
+    "Go to Cloudflare → Profile → API Tokens",
+    "Click Create Token → Custom Token",
+    "Add permissions",
+    "Set Zone Resource → your domain",
+    "Create Token → Copy the token",
+  ];
 
   return (
     <div className="grid gap-0 md:grid-cols-2">
@@ -153,60 +217,104 @@ export function Step1Token({
         </div>
 
         <ol
-          className="space-y-4"
+          className="space-y-2"
           aria-label="Steps to create a Cloudflare API token"
         >
-          <InstructionStep number={1}>
-            <span>Go to Cloudflare → Profile → API Tokens</span>
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1.5">
-              <a
-                href="https://dash.cloudflare.com/profile/api-tokens"
-                target="_blank"
-                rel="noreferrer noopener"
-                className="inline-flex items-center gap-1 text-xs font-medium text-mk-accent underline underline-offset-2 hover:text-mk-accent-hover"
-              >
-                {t("instructionOpenCF")}
-                <ExternalLink className="size-3" aria-hidden />
-              </a>
-              <CfScreenshotGallery />
-            </div>
-          </InstructionStep>
+          {/* Completed steps */}
+          {activeInstruction > 1 &&
+            stepLabels
+              .slice(0, activeInstruction - 1)
+              .map((label, i) => (
+                <CompletedStepRow key={i + 1} number={i + 1} label={label} />
+              ))}
 
-          <InstructionStep number={2}>
-            Click{" "}
-            <strong className="font-semibold text-mk-text-primary">
-              Create Token
-            </strong>{" "}
-            → Use template{" "}
-            <strong className="font-semibold text-mk-text-primary">
-              Custom Token
-            </strong>
-          </InstructionStep>
+          {/* Active step */}
+          {activeInstruction === 1 && (
+            <ActiveStep
+              number={1}
+              total={TOTAL}
+              onNext={() => setActiveInstruction(2)}
+              isLast={false}
+            >
+              <span>Go to Cloudflare → Profile → API Tokens</span>
+              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+                <a
+                  href="https://dash.cloudflare.com/profile/api-tokens"
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="inline-flex items-center gap-1 text-xs font-medium text-mk-accent underline underline-offset-2 hover:text-mk-accent-hover"
+                >
+                  {t("instructionOpenCF")}
+                  <ExternalLink className="size-3" aria-hidden />
+                </a>
+                <CfScreenshotGallery />
+              </div>
+            </ActiveStep>
+          )}
 
-          <InstructionStep number={3}>
-            <span className="block mb-2">Add these permissions:</span>
-            <PermissionChecklist />
-          </InstructionStep>
+          {activeInstruction === 2 && (
+            <ActiveStep
+              number={2}
+              total={TOTAL}
+              onNext={() => setActiveInstruction(3)}
+              isLast={false}
+            >
+              Click{" "}
+              <strong className="font-semibold text-mk-text-primary">
+                Create Token
+              </strong>{" "}
+              → Use template{" "}
+              <strong className="font-semibold text-mk-text-primary">
+                Custom Token
+              </strong>
+            </ActiveStep>
+          )}
 
-          <InstructionStep number={4}>
-            Set{" "}
-            <strong className="font-semibold text-mk-text-primary">
-              Zone Resource
-            </strong>{" "}
-            → Specific zone → your domain
-          </InstructionStep>
+          {activeInstruction === 3 && (
+            <ActiveStep
+              number={3}
+              total={TOTAL}
+              onNext={() => setActiveInstruction(4)}
+              isLast={false}
+            >
+              <span className="block mb-2">Add these permissions:</span>
+              <PermissionChecklist />
+            </ActiveStep>
+          )}
 
-          <InstructionStep number={5}>
-            Click{" "}
-            <strong className="font-semibold text-mk-text-primary">
-              Continue to summary
-            </strong>{" "}
-            →{" "}
-            <strong className="font-semibold text-mk-text-primary">
-              Create Token
-            </strong>{" "}
-            → Copy the token
-          </InstructionStep>
+          {activeInstruction === 4 && (
+            <ActiveStep
+              number={4}
+              total={TOTAL}
+              onNext={() => setActiveInstruction(5)}
+              isLast={false}
+            >
+              Set{" "}
+              <strong className="font-semibold text-mk-text-primary">
+                Zone Resource
+              </strong>{" "}
+              → Specific zone → your domain
+            </ActiveStep>
+          )}
+
+          {activeInstruction === 5 && (
+            <ActiveStep
+              number={5}
+              total={TOTAL}
+              onNext={() => {}}
+              isLast={true}
+            >
+              Click{" "}
+              <strong className="font-semibold text-mk-text-primary">
+                Continue to summary
+              </strong>{" "}
+              →{" "}
+              <strong className="font-semibold text-mk-text-primary">
+                Create Token
+              </strong>{" "}
+              → Copy the token and paste it on the right
+            </ActiveStep>
+          )}
         </ol>
       </div>
 
