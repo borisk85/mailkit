@@ -185,6 +185,7 @@ export function Step1Token({
   const [token, setToken] = useState("");
   const [showToken, setShowToken] = useState(false);
   const [activeInstruction, setActiveInstruction] = useState(1);
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     try {
@@ -193,6 +194,8 @@ export function Step1Token({
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (n >= 2 && n <= 5) setActiveInstruction(n);
     } catch {}
+     
+    setMounted(true);
   }, []);
 
   function advanceInstruction(n: number) {
@@ -230,111 +233,114 @@ export function Step1Token({
           <p className="mt-1.5 text-xs text-mk-text-tertiary">{t("sub")}</p>
         </div>
 
-        <ol
-          className="space-y-2"
-          aria-label="Steps to create a Cloudflare API token"
-        >
-          {/* Completed steps */}
-          {activeInstruction > 1 &&
-            stepLabels
-              .slice(0, activeInstruction - 1)
-              .map((label, i) => (
-                <CompletedStepRow key={i + 1} label={label} />
-              ))}
+        {mounted && (
+          <ol
+            className="space-y-2"
+            aria-label="Steps to create a Cloudflare API token"
+          >
+            {/* Completed steps */}
+            {activeInstruction > 1 &&
+              stepLabels
+                .slice(0, activeInstruction - 1)
+                .map((label, i) => (
+                  <CompletedStepRow key={i + 1} label={label} />
+                ))}
 
-          {/* Active step */}
-          {activeInstruction === 1 && (
-            <ActiveStep
-              number={1}
-              total={TOTAL}
-              onNext={() => advanceInstruction(2)}
-              isLast={false}
-            >
-              <span>
-                Go to Cloudflare → Profile → <UiLabel>API Tokens</UiLabel>
-              </span>
-              <div className="mt-3 flex flex-wrap items-center gap-3">
-                <a
-                  href="https://dash.cloudflare.com/profile/api-tokens"
-                  target="_blank"
-                  rel="noreferrer noopener"
-                  className="inline-flex"
-                >
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="gap-1.5 text-xs"
+            {/* Active step */}
+            {activeInstruction === 1 && (
+              <ActiveStep
+                number={1}
+                total={TOTAL}
+                onNext={() => advanceInstruction(2)}
+                isLast={false}
+              >
+                <span>
+                  Go to Cloudflare → Profile → <UiLabel>API Tokens</UiLabel>
+                </span>
+                <div className="mt-3 flex flex-wrap items-center gap-3">
+                  <a
+                    href="https://dash.cloudflare.com/profile/api-tokens"
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex"
                   >
-                    {t("instructionOpenCF")}
-                  </Button>
-                </a>
-                <CfScreenshotGallery from={0} to={1} />
-              </div>
-            </ActiveStep>
-          )}
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="gap-1.5 text-xs"
+                    >
+                      {t("instructionOpenCF")}
+                    </Button>
+                  </a>
+                  <CfScreenshotGallery from={0} to={1} />
+                </div>
+              </ActiveStep>
+            )}
 
-          {activeInstruction === 2 && (
-            <ActiveStep
-              number={2}
-              total={TOTAL}
-              onNext={() => advanceInstruction(3)}
-              isLast={false}
-            >
-              Click <UiLabel>Create Token</UiLabel> → find{" "}
-              <UiLabel>Create Custom Token</UiLabel> → click{" "}
-              <UiLabel>Get started</UiLabel>
-              <div className="mt-2">
-                <CfScreenshotGallery from={2} to={3} />
-              </div>
-            </ActiveStep>
-          )}
+            {activeInstruction === 2 && (
+              <ActiveStep
+                number={2}
+                total={TOTAL}
+                onNext={() => advanceInstruction(3)}
+                isLast={false}
+              >
+                Click <UiLabel>Create Token</UiLabel> → find{" "}
+                <UiLabel>Create Custom Token</UiLabel> → click{" "}
+                <UiLabel>Get started</UiLabel>
+                <div className="mt-2">
+                  <CfScreenshotGallery from={2} to={3} />
+                </div>
+              </ActiveStep>
+            )}
 
-          {activeInstruction === 3 && (
-            <ActiveStep
-              number={3}
-              total={TOTAL}
-              onNext={() => advanceInstruction(4)}
-              isLast={false}
-            >
-              <span className="block mb-2">Add these permissions:</span>
-              <PermissionChecklist />
-              <div className="mt-2">
-                <CfScreenshotGallery from={4} to={4} />
-              </div>
-            </ActiveStep>
-          )}
+            {activeInstruction === 3 && (
+              <ActiveStep
+                number={3}
+                total={TOTAL}
+                onNext={() => advanceInstruction(4)}
+                isLast={false}
+              >
+                <span className="block mb-2">Add these permissions:</span>
+                <PermissionChecklist />
+                <div className="mt-2">
+                  <CfScreenshotGallery from={4} to={4} />
+                </div>
+              </ActiveStep>
+            )}
 
-          {activeInstruction === 4 && (
-            <ActiveStep
-              number={4}
-              total={TOTAL}
-              onNext={() => advanceInstruction(5)}
-              isLast={false}
-            >
-              Set <UiLabel>Zone Resource</UiLabel> → Specific zone → your domain
-              <div className="mt-2">
-                <CfScreenshotGallery from={5} to={5} />
-              </div>
-            </ActiveStep>
-          )}
+            {activeInstruction === 4 && (
+              <ActiveStep
+                number={4}
+                total={TOTAL}
+                onNext={() => advanceInstruction(5)}
+                isLast={false}
+              >
+                Set <UiLabel>Zone Resource</UiLabel> → Specific zone → your
+                domain
+                <div className="mt-2">
+                  <CfScreenshotGallery from={5} to={5} />
+                </div>
+              </ActiveStep>
+            )}
 
-          {activeInstruction === 5 && (
-            <ActiveStep
-              number={5}
-              total={TOTAL}
-              onNext={() => {}}
-              isLast={true}
-            >
-              Click <UiLabel>Continue to summary</UiLabel> →{" "}
-              <UiLabel>Create Token</UiLabel> → Copy the token and paste it on
-              the right
-              <div className="mt-2">
-                <CfScreenshotGallery from={6} to={7} />
-              </div>
-            </ActiveStep>
-          )}
-        </ol>
+            {activeInstruction === 5 && (
+              <ActiveStep
+                number={5}
+                total={TOTAL}
+                onNext={() => {}}
+                isLast={true}
+              >
+                Click <UiLabel>Continue to summary</UiLabel> →{" "}
+                <UiLabel>Create Token</UiLabel> → Copy the token and paste it on
+                the right
+                <div className="mt-2">
+                  <CfScreenshotGallery from={6} to={7} />
+                </div>
+              </ActiveStep>
+            )}
+          </ol>
+        )}
       </div>
 
       {/* ── Right column: token input ─────────────────────────────────────── */}
