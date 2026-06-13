@@ -322,18 +322,6 @@
         "user_dispute": "User dispute"
       }
     },
-    "account": {
-      "title": "Account",
-      "emailLabel": "Email",
-      "nameLabel": "Name",
-      "deleteCta": "Delete my account",
-      "deleteConfirm": {
-        "title": "Delete your MailKit account?",
-        "body": "This removes your profile, setup runs, and purchase records from MailKit. Your domain's DNS records and Gmail Send-As config stay where they are — those live in Cloudflare and Gmail. This can't be undone.",
-        "confirmCta": "Yes, delete my account",
-        "cancel": "Cancel"
-      }
-    },
     "dangerZone": {
       "title": "Delete account",
       "description": "Permanently delete your account and setup history. This can't be undone.",

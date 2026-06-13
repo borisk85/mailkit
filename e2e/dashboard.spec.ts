@@ -39,9 +39,9 @@ test.describe("Dashboard EN", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: /Purchases/ }),
     ).toHaveCount(0);
-    // Account always visible
+    // Delete account section always visible
     await expect(
-      page.getByRole("heading", { level: 2, name: /^Account$/ }),
+      page.getByRole("heading", { level: 2, name: /^Delete account$/ }),
     ).toBeVisible();
   });
 
@@ -109,11 +109,11 @@ test.describe("Dashboard EN", () => {
     await page.goto("/en/app?mock=empty");
     await page.getByRole("button", { name: /Delete my account/ }).click();
     await expect(
-      page.getByRole("heading", { name: /Delete your MailKit account\?/ }),
+      page.getByRole("heading", { name: /Delete your account\?/ }),
     ).toBeVisible();
     await page.getByRole("button", { name: /^Cancel$/ }).click();
     await expect(
-      page.getByRole("heading", { name: /Delete your MailKit account\?/ }),
+      page.getByRole("heading", { name: /Delete your account\?/ }),
     ).toHaveCount(0);
     // Still on dashboard.
     await expect(

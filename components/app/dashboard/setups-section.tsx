@@ -13,7 +13,6 @@ import {
   type SetupOverallState,
 } from "@/lib/dashboard-types";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 
 import { DeleteSetupButton } from "./delete-setup-button";
 import { SendingLimitsWidget } from "./sending-limits-widget";
@@ -75,7 +74,7 @@ export function SetupsSection({
           ))}
         </div>
       )}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="space-y-3">
         {visible.map((setup) => {
           const state = setupOverallState(setup);
           const tone = stateTone[state];
@@ -83,74 +82,68 @@ export function SetupsSection({
           return (
             <div
               key={setup.id}
-              className={`transition-all duration-350 ${isFading ? "opacity-0 scale-95" : "opacity-100"}`}
+              className={`space-y-3 rounded-xl border border-mk-border-subtle bg-surface-elevated p-4 transition-all duration-350 ${isFading ? "opacity-0 scale-95" : "opacity-100"}`}
             >
-              <Card>
-                <CardContent className="space-y-3 p-4">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <p className="truncate font-medium text-mk-text-primary">
-                        {setup.mailboxLocal}@{setup.domain}
-                      </p>
-                      <p className="mt-0.5 text-xs text-mk-text-tertiary">
-                        {t("createdLabel")}:{" "}
-                        <time dateTime={setup.createdAt}>
-                          {new Date(setup.createdAt).toLocaleDateString("en")}
-                        </time>
-                      </p>
-                      {setupDetailLabel(setup.status) ? (
-                        <p className="mt-1 text-xs text-mk-text-secondary">
-                          {setupDetailLabel(setup.status)}
-                        </p>
-                      ) : null}
-                    </div>
-                    <StatusBadge tone={tone}>
-                      {t(`status.${state}`)}
-                    </StatusBadge>
-                  </div>
-                  {setup.errorMsg ? (
-                    <p
-                      className="rounded-md px-3 py-2 text-xs"
-                      style={{
-                        backgroundColor: "rgba(239, 68, 68, 0.08)",
-                        color: "var(--mk-danger)",
-                      }}
-                    >
-                      <span className="font-medium">{t("errorLabel")}:</span>{" "}
-                      {setup.errorMsg}
+              <div className="flex items-start justify-between gap-3">
+                <div className="min-w-0">
+                  <p className="truncate font-medium text-mk-text-primary">
+                    {setup.mailboxLocal}@{setup.domain}
+                  </p>
+                  <p className="mt-0.5 text-xs text-mk-text-tertiary">
+                    {t("createdLabel")}:{" "}
+                    <time dateTime={setup.createdAt}>
+                      {new Date(setup.createdAt).toLocaleDateString("en")}
+                    </time>
+                  </p>
+                  {setupDetailLabel(setup.status) ? (
+                    <p className="mt-1 text-xs text-mk-text-secondary">
+                      {setupDetailLabel(setup.status)}
                     </p>
                   ) : null}
-                  <div className="flex items-center gap-2">
-                    {isSetupReSetupEligible(setup) ? (
-                      <>
-                        <Link href="/app/setup">
-                          <Button size="sm" variant="default">
-                            {t("actions.reSetup")}
-                          </Button>
-                        </Link>
-                        <DeleteSetupButton
-                          runId={setup.id}
-                          domain={setup.domain}
-                          deleteAction={deleteSetupAction}
-                          onSuccess={() => handleDeleteSuccess(setup.id)}
-                        />
-                      </>
-                    ) : state === "done" ? (
-                      <Link href="/app/setup">
-                        <Button size="sm" variant="outline">
-                          {t("actions.open")}
-                        </Button>
-                      </Link>
-                    ) : (
-                      <Link href="/app/setup">
-                        <Button size="sm" variant="default">
-                          {t("actions.continue")}
-                        </Button>
-                      </Link>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
+                </div>
+                <StatusBadge tone={tone}>{t(`status.${state}`)}</StatusBadge>
+              </div>
+              {setup.errorMsg ? (
+                <p
+                  className="rounded-md px-3 py-2 text-xs"
+                  style={{
+                    backgroundColor: "rgba(239, 68, 68, 0.08)",
+                    color: "var(--mk-danger)",
+                  }}
+                >
+                  <span className="font-medium">{t("errorLabel")}:</span>{" "}
+                  {setup.errorMsg}
+                </p>
+              ) : null}
+              <div className="flex items-center gap-2">
+                {isSetupReSetupEligible(setup) ? (
+                  <>
+                    <Link href="/app/setup">
+                      <Button size="sm" variant="default">
+                        {t("actions.reSetup")}
+                      </Button>
+                    </Link>
+                    <DeleteSetupButton
+                      runId={setup.id}
+                      domain={setup.domain}
+                      deleteAction={deleteSetupAction}
+                      onSuccess={() => handleDeleteSuccess(setup.id)}
+                    />
+                  </>
+                ) : state === "done" ? (
+                  <Link href="/app/setup">
+                    <Button size="sm" variant="outline">
+                      {t("actions.open")}
+                    </Button>
+                  </Link>
+                ) : (
+                  <Link href="/app/setup">
+                    <Button size="sm" variant="default">
+                      {t("actions.continue")}
+                    </Button>
+                  </Link>
+                )}
+              </div>
             </div>
           );
         })}

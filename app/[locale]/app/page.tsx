@@ -2,7 +2,6 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 
-import { AccountSection } from "@/components/app/dashboard/account-section";
 import { AddAnotherCard } from "@/components/app/dashboard/add-another-card";
 import { DangerZoneSection } from "@/components/app/dashboard/danger-zone-section";
 import { DashboardEmptyState } from "@/components/app/dashboard/empty-state";
@@ -18,20 +17,22 @@ import { deleteAccount, deleteFailedSetup } from "./account-actions";
 /**
  * /app dashboard. Server component — all reads happen here, sections
  * render server-side, only the delete-confirm modal escapes to a
- * client island in AccountSection.
+ * client island in DangerZoneSection.
  *
  * Sections:
  *   - Setups (hidden if 0)
  *   - Purchases (hidden if 0)
  *   - Refunds (hidden if 0)
- *   - Account (always visible — profile + delete)
+ *   - Delete account (always visible)
  *
- * No dashboard footer: support is the chat widget bubble, and legal
- * links surface where they matter — Terms/Refund next to the payment
- * gate in the setup wizard, and in the landing footer.
+ * No Account section: email is already in the header, and there's
+ * nothing editable. No dashboard footer either: support is the chat
+ * widget bubble, and legal links surface where they matter —
+ * Terms/Refund next to the payment gate, and in the landing footer.
  *
  * If both Setups and Purchases are empty, we show the friendly
- * empty-state CTA above Account instead of a sea of empty sections.
+ * empty-state CTA above Delete account instead of a sea of empty
+ * sections.
  */
 export default async function AppHome({
   params,
@@ -56,7 +57,6 @@ export default async function AppHome({
 
   let displayName: string;
   let displayEmail: string;
-  let fullName: string | null;
   let data: DashboardData;
 
   if (isMockPreview) {
@@ -64,7 +64,6 @@ export default async function AppHome({
     const mock = mockDashboardForFixture(fixtureKey);
     displayName = mock.profile.fullName ?? tAuth("friendFallback");
     displayEmail = mock.profile.email;
-    fullName = mock.profile.fullName;
     data = mock.data;
   } else {
     const supabase = await createClient();
@@ -85,7 +84,6 @@ export default async function AppHome({
 
     displayName = profile?.full_name ?? tAuth("friendFallback");
     displayEmail = profile?.email ?? user.email ?? "";
-    fullName = profile?.full_name ?? null;
     data = await getDashboardData(supabase, user.id);
   }
 
@@ -129,8 +127,6 @@ export default async function AppHome({
         <PurchasesSection purchases={data.purchases} refunds={data.refunds} />
       )}
       {data.refunds.length > 0 && <RefundsSection refunds={data.refunds} />}
-
-      <AccountSection email={displayEmail} fullName={fullName} />
 
       <DangerZoneSection
         email={displayEmail}
