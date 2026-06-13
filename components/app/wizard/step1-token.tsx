@@ -236,6 +236,9 @@ export function Step1Token({
               isLast={false}
             >
               <span>Go to Cloudflare → Profile → API Tokens</span>
+              <p className="mt-1 text-xs text-mk-text-tertiary">
+                You&apos;ll need to be logged in to your Cloudflare account.
+              </p>
               <div className="mt-2 space-y-2">
                 <a
                   href="https://dash.cloudflare.com/profile/api-tokens"
