@@ -191,7 +191,7 @@ export function Step1Token({
 
   useEffect(() => {
     try {
-      const saved = sessionStorage.getItem("mk_instruction_step");
+      const saved = localStorage.getItem("mk_instruction_step");
       const n = saved ? parseInt(saved, 10) : 1;
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (n >= 2 && n <= 5) setActiveInstruction(n);
@@ -202,7 +202,7 @@ export function Step1Token({
 
   function advanceInstruction(n: number) {
     try {
-      sessionStorage.setItem("mk_instruction_step", String(n));
+      localStorage.setItem("mk_instruction_step", String(n));
     } catch {}
     setActiveInstruction(n);
   }
