@@ -142,7 +142,7 @@ function ActiveStep({
       </div>
 
       <div className="pl-8 space-y-3">
-        <div className="text-sm leading-snug text-mk-text-secondary">
+        <div className="text-sm leading-snug text-mk-text-primary">
           {children}
         </div>
 
@@ -236,21 +236,23 @@ export function Step1Token({
               isLast={false}
             >
               <span>Go to Cloudflare → Profile → API Tokens</span>
-              <p className="mt-1 text-xs text-mk-text-tertiary">
-                You&apos;ll need to be logged in to your Cloudflare account.
-              </p>
-              <div className="mt-2 space-y-2">
+              <div className="mt-3 flex flex-wrap items-center gap-3">
                 <a
                   href="https://dash.cloudflare.com/profile/api-tokens"
                   target="_blank"
                   rel="noreferrer noopener"
-                  className="inline-flex items-center gap-1 text-xs font-medium text-mk-accent underline underline-offset-2 hover:text-mk-accent-hover"
+                  className="inline-flex"
                 >
-                  {t("instructionOpenCF")}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="gap-1.5 text-xs"
+                  >
+                    {t("instructionOpenCF")}
+                  </Button>
                 </a>
-                <div>
-                  <CfScreenshotGallery from={0} to={1} />
-                </div>
+                <CfScreenshotGallery from={0} to={1} />
               </div>
             </ActiveStep>
           )}
