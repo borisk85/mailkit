@@ -265,6 +265,14 @@
       "body": "It takes about 30 minutes.",
       "cta": "Start setup"
     },
+    "onboarding": {
+      "getTitle": "What you'll get",
+      "getBody": "A professional address you send and receive from — right inside your existing Gmail.",
+      "needTitle": "What you need",
+      "needBody": "A domain on Cloudflare DNS.",
+      "needLinkPrefix": "Not on Cloudflare yet?",
+      "needLink": "Migration guide"
+    },
     "setups": {
       "title": "Domain setups",
       "domainLabel": "Domain",

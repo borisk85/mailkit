@@ -5,6 +5,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { AddAnotherCard } from "@/components/app/dashboard/add-another-card";
 import { DangerZoneSection } from "@/components/app/dashboard/danger-zone-section";
 import { DashboardEmptyState } from "@/components/app/dashboard/empty-state";
+import { OnboardingInfo } from "@/components/app/dashboard/onboarding-info";
 import { PurchasesSection } from "@/components/app/dashboard/purchases-section";
 import { RefundsSection } from "@/components/app/dashboard/refunds-section";
 import { SetupsSection } from "@/components/app/dashboard/setups-section";
@@ -111,7 +112,10 @@ export default async function AppHome({
       </header>
 
       {isFirstTimeSetup ? (
-        <DashboardEmptyState />
+        <>
+          <DashboardEmptyState />
+          {data.purchases.length === 0 ? <OnboardingInfo /> : null}
+        </>
       ) : (
         <>
           <SetupsSection
