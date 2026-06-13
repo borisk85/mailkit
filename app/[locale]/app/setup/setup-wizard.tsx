@@ -380,14 +380,14 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
       case "cf_done_pending_smtp":
         return "Cloudflare connected. Setting up your sending infrastructure next.";
       case "smtp_running":
-        return "Configuring DNS records for sending. This is automatic — takes about 30 seconds.";
+        return "Configuring DNS records for sending. This is automatic — takes ~30 seconds.";
       case "smtp_dkim_polling":
         return state.mockIsLong
           ? "Verification is taking longer than usual — still working in the background."
-          : "Verifying your domain with Postmark. This usually takes 5–15 minutes.";
+          : "Verifying your domain with Postmark. This usually takes ~5–15 minutes.";
       case "smtp_awaiting_retry":
       case "smtp_done":
-        return "Configuring DNS records for sending. This is automatic — takes about 30 seconds.";
+        return "Configuring DNS records for sending. This is automatic — takes ~30 seconds.";
       case "gmail_instructions_shown":
       case "gmail_smtp_ready":
         return "Almost done. Add your address to Gmail to start sending.";

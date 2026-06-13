@@ -121,7 +121,7 @@ export function Step3Progress({
         <div className="space-y-2">
           <h2 className="mk-heading-3 text-mk-text-primary">{heading}</h2>
           <p className="text-xs text-mk-text-tertiary">
-            This takes about 30–90 seconds. Stay on this page.
+            This takes ~30–90 seconds. Stay on this page.
           </p>
           <p className="text-xs text-mk-text-tertiary font-mono">
             {mailboxLocal}@{zoneName}

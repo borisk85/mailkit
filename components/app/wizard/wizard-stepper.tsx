@@ -185,5 +185,5 @@ export const WIZARD_STEPS: WizardStep[] = [
   { label: "Your domain", sublabel: "Pick zone & mailbox" },
   { label: "Automation", sublabel: "We configure DNS" },
   { label: "DKIM verify", sublabel: "5–30 min async" },
-  { label: "Gmail Send-As", sublabel: "Final 3-min step" },
+  { label: "Gmail Send-As", sublabel: "Final ~3 min" },
 ];
