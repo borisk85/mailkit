@@ -65,10 +65,10 @@ export function CfScreenshotGallery({
           setIdx(from);
           setOpen(true);
         }}
-        className="inline-flex items-center gap-1.5 text-xs font-medium text-mk-accent hover:text-mk-accent-hover underline underline-offset-2 transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs text-mk-text-tertiary hover:text-mk-text-secondary underline underline-offset-2 transition-colors"
       >
-        <Images className="size-3.5" aria-hidden />
-        View step-by-step screenshots
+        View screenshots
+        <Images className="size-3" aria-hidden />
       </button>
 
       {/* Native dialog for a11y / focus trap / Escape handling */}

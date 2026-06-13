@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import {
   CheckSquare,
   ChevronDown,
-  ExternalLink,
   Eye,
   EyeOff,
   AlertCircle,
@@ -237,7 +236,7 @@ export function Step1Token({
               isLast={false}
             >
               <span>Go to Cloudflare → Profile → API Tokens</span>
-              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1.5">
+              <div className="mt-2 space-y-2">
                 <a
                   href="https://dash.cloudflare.com/profile/api-tokens"
                   target="_blank"
@@ -245,9 +244,10 @@ export function Step1Token({
                   className="inline-flex items-center gap-1 text-xs font-medium text-mk-accent underline underline-offset-2 hover:text-mk-accent-hover"
                 >
                   {t("instructionOpenCF")}
-                  <ExternalLink className="size-3" aria-hidden />
                 </a>
-                <CfScreenshotGallery from={0} to={1} />
+                <div>
+                  <CfScreenshotGallery from={0} to={1} />
+                </div>
               </div>
             </ActiveStep>
           )}

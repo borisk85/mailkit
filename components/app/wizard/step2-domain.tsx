@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, ExternalLink, Globe } from "lucide-react";
+import { AlertTriangle, Globe } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +36,6 @@ function NsWarningCard({ domain }: { domain: string }) {
           className="inline-flex items-center gap-1 text-sm font-medium text-mk-warning underline underline-offset-2 hover:opacity-80 transition-opacity"
         >
           Migrate to Cloudflare DNS →
-          <ExternalLink className="size-3" aria-hidden />
         </a>
       </div>
     </div>
