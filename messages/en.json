@@ -19,7 +19,7 @@
       "signIn": "Sign in with Google",
       "signUp": "Sign up",
       "dashboard": "Dashboard",
-      "cta": "Get your email",
+      "cta": "Set up email",
       "myAccount": "My account",
       "languageSwitcher": {
         "label": "Language",
@@ -38,7 +38,7 @@
       "guaranteeLink": "see policy",
       "microcopy": "Requires Cloudflare DNS.",
       "migrationHint": "Open Cloudflare migration guide",
-      "primaryCta": "Get your email",
+      "primaryCta": "Set up email",
       "secondaryCta": "See how it works",
       "mockup": {
         "alt": "Gmail Compose window — the From dropdown shows your custom-domain addresses instead of @gmail.com",
@@ -75,7 +75,7 @@
         "30-day money-back guarantee",
         "Automatic refund if our setup fails"
       ],
-      "cta": "Get your email",
+      "cta": "Set up email",
       "paymentNote": "Powered by Lemon Squeezy. Stripe, Apple Pay, Google Pay accepted.",
       "compareLabel": "Compare per year",
       "compare": "Compare: Google Workspace $6/user/mo. ImprovMX $9/mo. Mailkit $5 once.",
@@ -238,7 +238,7 @@
       "eyebrow": "Ready",
       "heading": "30 minutes from now, you'll have email on your Cloudflare domain.",
       "subhead": "Or your money back, automatically. No tickets, no calls, no questions.",
-      "primaryCta": "Get your email",
+      "primaryCta": "Set up email",
       "secondaryCta": "Read the guarantee first"
     },
     "ctaButton": {
@@ -258,7 +258,7 @@
     "addAnother": {
       "title": "Set up another mailbox",
       "body": "Another domain or address — $5 one-time.",
-      "cta": "Get your email"
+      "cta": "Set up email"
     },
     "emptyState": {
       "title": "Set up your first domain",
