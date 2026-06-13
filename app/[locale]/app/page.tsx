@@ -23,7 +23,7 @@ import { deleteAccount, deleteFailedSetup } from "./account-actions";
  *   - Setups (hidden if 0)
  *   - Purchases (hidden if 0)
  *   - Refunds (hidden if 0)
- *   - Delete account (always visible)
+ *   - Delete account (only once there are setups/purchases to delete)
  *
  * No Account section: email is already in the header, and there's
  * nothing editable. No dashboard footer either: support is the chat
@@ -128,10 +128,12 @@ export default async function AppHome({
       )}
       {data.refunds.length > 0 && <RefundsSection refunds={data.refunds} />}
 
-      <DangerZoneSection
-        email={displayEmail}
-        deleteAction={deleteAccountAction}
-      />
+      {data.setups.length > 0 || data.purchases.length > 0 ? (
+        <DangerZoneSection
+          email={displayEmail}
+          deleteAction={deleteAccountAction}
+        />
+      ) : null}
     </div>
   );
 }

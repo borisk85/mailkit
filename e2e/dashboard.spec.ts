@@ -39,10 +39,10 @@ test.describe("Dashboard EN", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: /Purchases/ }),
     ).toHaveCount(0);
-    // Delete account section always visible
+    // Delete account hidden when there's nothing to delete (no setups/purchases)
     await expect(
       page.getByRole("heading", { level: 2, name: /^Delete account$/ }),
-    ).toBeVisible();
+    ).toHaveCount(0);
   });
 
   test("active fixture: setup card + paid purchase, no refunds section", async ({
@@ -106,7 +106,7 @@ test.describe("Dashboard EN", () => {
   test("delete-account modal: Cancel keeps user on dashboard", async ({
     page,
   }) => {
-    await page.goto("/en/app?mock=empty");
+    await page.goto("/en/app?mock=active");
     await page.getByRole("button", { name: /Delete my account/ }).click();
     await expect(
       page.getByRole("heading", { name: /Delete your account\?/ }),
