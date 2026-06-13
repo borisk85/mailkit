@@ -194,7 +194,7 @@ export function Step1Token({
       // eslint-disable-next-line react-hooks/set-state-in-effect
       if (n >= 2 && n <= 5) setActiveInstruction(n);
     } catch {}
-     
+
     setMounted(true);
   }, []);
 
@@ -232,6 +232,20 @@ export function Step1Token({
           </h2>
           <p className="mt-1.5 text-xs text-mk-text-tertiary">{t("sub")}</p>
         </div>
+
+        {!mounted && (
+          <div className="space-y-3" aria-hidden>
+            {["75%", "60%", "45%"].map((w) => (
+              <div key={w} className="flex items-center gap-2">
+                <div className="size-5 shrink-0 rounded-full bg-mk-border-subtle animate-pulse" />
+                <div
+                  className="h-3 rounded bg-mk-border-subtle animate-pulse"
+                  style={{ width: w }}
+                />
+              </div>
+            ))}
+          </div>
+        )}
 
         {mounted && (
           <ol
@@ -285,8 +299,8 @@ export function Step1Token({
                 onNext={() => advanceInstruction(3)}
                 isLast={false}
               >
-                Click <UiLabel>Create Token</UiLabel> → find{" "}
-                <UiLabel>Create Custom Token</UiLabel> → click{" "}
+                Click <UiLabel>Create Token</UiLabel> →{" "}
+                <UiLabel>Create Custom Token</UiLabel> →{" "}
                 <UiLabel>Get started</UiLabel>
                 <div className="mt-2">
                   <CfScreenshotGallery from={2} to={3} />
