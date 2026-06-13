@@ -1261,21 +1261,6 @@ function CfDonePendingSmtpStep({
             >
               Complete setup — $5 one-time
             </a>
-            <p className="text-xs text-mk-text-tertiary">
-              <Link
-                href="/terms"
-                className="hover:text-mk-text-secondary hover:underline"
-              >
-                Terms
-              </Link>
-              {" · "}
-              <Link
-                href="/guarantee"
-                className="hover:text-mk-text-secondary hover:underline"
-              >
-                Refund guarantee
-              </Link>
-            </p>
           </div>
         )}
       </div>
