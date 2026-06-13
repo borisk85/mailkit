@@ -261,7 +261,7 @@
       "cta": "Set up email"
     },
     "emptyState": {
-      "title": "Set up your first domain",
+      "title": "Set up email on your domain",
       "body": "You haven't started a setup yet. It takes ~30 minutes.",
       "cta": "Start setup"
     },

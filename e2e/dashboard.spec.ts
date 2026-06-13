@@ -26,7 +26,10 @@ test.describe("Dashboard EN", () => {
       page.getByRole("heading", { level: 1, name: /Welcome back/ }),
     ).toBeVisible();
     await expect(
-      page.getByRole("heading", { level: 2, name: /Set up your first domain/ }),
+      page.getByRole("heading", {
+        level: 2,
+        name: /Set up email on your domain/,
+      }),
     ).toBeVisible();
     await expect(page.getByRole("link", { name: /Start setup/ })).toBeVisible();
     // Setup/Purchases/Refunds sections hidden when empty
