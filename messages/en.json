@@ -257,7 +257,7 @@
     "title": "Welcome back, {name}.",
     "addAnother": {
       "title": "Set up another mailbox",
-      "body": "Another domain or address — $5 one-time.",
+      "body": "One more email address on your domain.",
       "cta": "Set up email"
     },
     "emptyState": {
