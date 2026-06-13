@@ -15,9 +15,19 @@ const STEPS = [
   { label: "Copy your token" },
 ] as const;
 
-export function CfScreenshotGallery() {
+interface CfScreenshotGalleryProps {
+  /** 0-based inclusive start index into STEPS */
+  from?: number;
+  /** 0-based inclusive end index into STEPS */
+  to?: number;
+}
+
+export function CfScreenshotGallery({
+  from = 0,
+  to = STEPS.length - 1,
+}: CfScreenshotGalleryProps) {
   const [open, setOpen] = useState(false);
-  const [idx, setIdx] = useState(0);
+  const [idx, setIdx] = useState(from);
   const dialogRef = useRef<HTMLDialogElement>(null);
 
   // open/close native dialog
@@ -40,9 +50,8 @@ export function CfScreenshotGallery() {
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight")
-        setIdx((i) => Math.min(i + 1, STEPS.length - 1));
-      if (e.key === "ArrowLeft") setIdx((i) => Math.max(i - 1, 0));
+      if (e.key === "ArrowRight") setIdx((i) => Math.min(i + 1, to));
+      if (e.key === "ArrowLeft") setIdx((i) => Math.max(i - 1, from));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -53,7 +62,7 @@ export function CfScreenshotGallery() {
       <button
         type="button"
         onClick={() => {
-          setIdx(0);
+          setIdx(from);
           setOpen(true);
         }}
         className="inline-flex items-center gap-1.5 text-xs font-medium text-mk-accent hover:text-mk-accent-hover underline underline-offset-2 transition-colors"
@@ -75,7 +84,7 @@ export function CfScreenshotGallery() {
             <div className="flex items-center justify-between border-b border-mk-border-subtle px-5 py-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-mk-text-tertiary">
-                  Step {idx + 1} of {STEPS.length}
+                  Step {idx - from + 1} of {to - from + 1}
                 </p>
                 <p className="text-sm font-medium text-mk-text-primary">
                   {STEPS[idx].label}
@@ -107,14 +116,14 @@ export function CfScreenshotGallery() {
             <div className="flex items-center justify-between border-t border-mk-border-subtle px-5 py-3">
               {/* Step dots */}
               <div className="flex gap-1.5">
-                {STEPS.map((_, i) => (
+                {STEPS.slice(from, to + 1).map((_, i) => (
                   <button
-                    key={i}
+                    key={from + i}
                     type="button"
-                    onClick={() => setIdx(i)}
+                    onClick={() => setIdx(from + i)}
                     aria-label={`Go to step ${i + 1}`}
                     className={`size-2 rounded-full transition-colors ${
-                      i === idx
+                      from + i === idx
                         ? "bg-mk-accent"
                         : "bg-mk-border-subtle hover:bg-mk-text-tertiary"
                     }`}
@@ -126,8 +135,8 @@ export function CfScreenshotGallery() {
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setIdx((i) => Math.max(i - 1, 0))}
-                  disabled={idx === 0}
+                  onClick={() => setIdx((i) => Math.max(i - 1, from))}
+                  disabled={idx === from}
                   className="rounded-md border border-mk-border-subtle p-1.5 text-mk-text-secondary transition-colors hover:bg-mk-border-subtle disabled:opacity-30"
                   aria-label="Previous screenshot"
                 >
@@ -135,10 +144,8 @@ export function CfScreenshotGallery() {
                 </button>
                 <button
                   type="button"
-                  onClick={() =>
-                    setIdx((i) => Math.min(i + 1, STEPS.length - 1))
-                  }
-                  disabled={idx === STEPS.length - 1}
+                  onClick={() => setIdx((i) => Math.min(i + 1, to))}
+                  disabled={idx === to}
                   className="rounded-md border border-mk-border-subtle p-1.5 text-mk-text-secondary transition-colors hover:bg-mk-border-subtle disabled:opacity-30"
                   aria-label="Next screenshot"
                 >

@@ -247,7 +247,7 @@ export function Step1Token({
                   {t("instructionOpenCF")}
                   <ExternalLink className="size-3" aria-hidden />
                 </a>
-                <CfScreenshotGallery />
+                <CfScreenshotGallery from={0} to={1} />
               </div>
             </ActiveStep>
           )}
@@ -267,6 +267,9 @@ export function Step1Token({
               <strong className="font-semibold text-mk-text-primary">
                 Custom Token
               </strong>
+              <div className="mt-2">
+                <CfScreenshotGallery from={2} to={3} />
+              </div>
             </ActiveStep>
           )}
 
@@ -279,6 +282,9 @@ export function Step1Token({
             >
               <span className="block mb-2">Add these permissions:</span>
               <PermissionChecklist />
+              <div className="mt-2">
+                <CfScreenshotGallery from={4} to={4} />
+              </div>
             </ActiveStep>
           )}
 
@@ -294,6 +300,9 @@ export function Step1Token({
                 Zone Resource
               </strong>{" "}
               → Specific zone → your domain
+              <div className="mt-2">
+                <CfScreenshotGallery from={5} to={5} />
+              </div>
             </ActiveStep>
           )}
 
@@ -313,6 +322,9 @@ export function Step1Token({
                 Create Token
               </strong>{" "}
               → Copy the token and paste it on the right
+              <div className="mt-2">
+                <CfScreenshotGallery from={6} to={7} />
+              </div>
             </ActiveStep>
           )}
         </ol>
