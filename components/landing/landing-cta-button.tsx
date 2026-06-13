@@ -5,7 +5,6 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import { createClient } from "@/lib/supabase/client";
-import { Button, buttonVariants } from "@/components/ui/button";
 
 async function startOAuth() {
   const supabase = createClient();
@@ -19,8 +18,13 @@ async function startOAuth() {
   });
 }
 
-export function UserMenu() {
-  const t = useTranslations("landing.header");
+interface LandingCtaButtonProps {
+  label: string;
+  className?: string;
+}
+
+export function LandingCtaButton({ label, className }: LandingCtaButtonProps) {
+  const t = useTranslations("landing.ctaButton");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
   useEffect(() => {
@@ -36,22 +40,25 @@ export function UserMenu() {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  // Pending hydration — reserve space to avoid layout shift
   if (isLoggedIn === null) {
-    return <span className="inline-block w-32 h-8" aria-hidden />;
+    return (
+      <span className={className} style={{ visibility: "hidden" }} aria-hidden>
+        {label}
+      </span>
+    );
   }
 
   if (isLoggedIn) {
     return (
-      <Link href="/app" className={buttonVariants({ size: "sm" })}>
+      <Link href="/app" className={className}>
         {t("myAccount")}
       </Link>
     );
   }
 
   return (
-    <Button size="sm" onClick={startOAuth}>
-      {t("cta")}
-    </Button>
+    <button type="button" onClick={startOAuth} className={className}>
+      {label}
+    </button>
   );
 }

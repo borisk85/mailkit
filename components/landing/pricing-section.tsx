@@ -1,10 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
 
-import {
-  LEMON_SQUEEZY_CHECKOUT_URL,
-  withFirst100Discount,
-} from "@/lib/constants/lemon-squeezy";
+import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 
 /**
  * Pricing — Design V2 §4.7 polish on top of the V1 single-card layout.
@@ -73,14 +70,10 @@ export function PricingSection() {
               ))}
             </ul>
 
-            <a
-              href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
-              target="_blank"
-              rel="noreferrer"
+            <LandingCtaButton
+              label={t("cta")}
               className="mk-cta-shadow mk-hover-lift inline-flex h-[52px] w-full items-center justify-center rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
-            >
-              {t("cta")}
-            </a>
+            />
 
             <p className="mk-caption text-center text-mk-text-tertiary">
               {t("paymentNote")}

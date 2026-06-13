@@ -1,10 +1,7 @@
 import { useTranslations } from "next-intl";
 import { Check, HelpCircle } from "lucide-react";
 
-import {
-  LEMON_SQUEEZY_CHECKOUT_URL,
-  withFirst100Discount,
-} from "@/lib/constants/lemon-squeezy";
+import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 
 /**
  * Landing hero — asymmetric 7/5 grid (left content / right mockup).
@@ -49,15 +46,10 @@ export function Hero() {
           <p className="mk-body-large text-mk-text-secondary">{t("subhead")}</p>
 
           <div className="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-x-6">
-            <a
-              href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
-              target="_blank"
-              rel="noreferrer"
+            <LandingCtaButton
+              label={t("primaryCta")}
               className="mk-cta-shadow mk-hover-lift group inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
-              style={{ minHeight: 52 }}
-            >
-              {t("primaryCta")}
-            </a>
+            />
             <a
               href="#how-it-works"
               className="mk-hover-lift inline-flex h-[52px] items-center gap-1.5 rounded-[10px] border border-mk-border-strong px-7 text-base font-medium text-mk-text-secondary transition-colors hover:bg-surface-elevated hover:text-mk-text-primary"

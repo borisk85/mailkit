@@ -1,10 +1,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-import {
-  LEMON_SQUEEZY_CHECKOUT_URL,
-  withFirst100Discount,
-} from "@/lib/constants/lemon-squeezy";
+import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 
 /**
  * Final CTA — premium-pass refresh per UI_REVIEW_BRIEF §2.10. Bigger
@@ -42,14 +39,10 @@ export function FinalCtaSection() {
         </p>
 
         <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
-          <a
-            href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
-            target="_blank"
-            rel="noreferrer"
+          <LandingCtaButton
+            label={t("primaryCta")}
             className="mk-cta-shadow mk-hover-lift group inline-flex h-[60px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-9 text-lg font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
-          >
-            {t("primaryCta")}
-          </a>
+          />
           <Link
             href="/guarantee"
             className="group inline-flex items-center gap-1.5 text-base font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"

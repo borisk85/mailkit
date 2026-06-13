@@ -19,6 +19,10 @@ import { Input } from "@/components/ui/input";
 import { GmailStepSchematic } from "@/components/app/gmail-step-schematic";
 import { cn } from "@/lib/utils";
 import {
+  LEMON_SQUEEZY_CHECKOUT_URL,
+  withFirst100Discount,
+} from "@/lib/constants/lemon-squeezy";
+import {
   WizardStepper,
   WIZARD_STEPS,
 } from "@/components/app/wizard/wizard-stepper";
@@ -346,6 +350,7 @@ function getStepperStep(kind: WizardState["kind"]): number {
 export function SetupWizard({
   initialMock,
   activeRun,
+  hasPurchase,
 }: {
   initialMock: MockKey;
   activeRun?: {
@@ -354,6 +359,7 @@ export function SetupWizard({
     mailboxLocal: string;
     status: string;
   } | null;
+  hasPurchase?: boolean;
 }) {
   const t = useTranslations("setup");
   const tErr = useTranslations("setup.errors");
@@ -682,6 +688,7 @@ export function SetupWizard({
         <CfDonePendingSmtpStep
           state={state}
           isPending={isPending}
+          hasPurchase={!!hasPurchase}
           t={t}
           tState={tState}
           tSteps={tSteps}
@@ -1202,6 +1209,7 @@ function SmtpProgressList({
 function CfDonePendingSmtpStep({
   state,
   isPending,
+  hasPurchase,
   t,
   tState,
   tSteps,
@@ -1210,6 +1218,7 @@ function CfDonePendingSmtpStep({
 }: {
   state: Extract<WizardState, { kind: "cf_done_pending_smtp" }>;
   isPending: boolean;
+  hasPurchase: boolean;
   t: (key: string, values?: Record<string, string>) => string;
   tState: (key: string) => string;
   tSteps: (key: string) => string;
@@ -1233,9 +1242,27 @@ function CfDonePendingSmtpStep({
             domain: state.zoneName,
           })}
         </p>
-        <Button className="mt-3" onClick={onContinue} disabled={isPending}>
-          {isPending ? t("smtp.continueCtaLoading") : t("smtp.continueCta")}
-        </Button>
+
+        {hasPurchase ? (
+          <Button className="mt-3" onClick={onContinue} disabled={isPending}>
+            {isPending ? t("smtp.continueCtaLoading") : t("smtp.continueCta")}
+          </Button>
+        ) : (
+          <div className="mt-3 space-y-2">
+            <p className="text-xs text-emerald-800 dark:text-emerald-200">
+              One-time payment unlocks SMTP sending, DKIM signing, and Gmail
+              Send-As setup.
+            </p>
+            <a
+              href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
+              target="_blank"
+              rel="noreferrer"
+              className="mk-cta-shadow inline-flex h-10 items-center justify-center rounded-[8px] bg-mk-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
+            >
+              Complete setup — $5 one-time
+            </a>
+          </div>
+        )}
       </div>
       {state.errorKey ? (
         <InlineError message={translateErr(state.errorKey)} />

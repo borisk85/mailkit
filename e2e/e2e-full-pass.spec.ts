@@ -157,24 +157,16 @@ test("/app unauthenticated → redirects to landing page /", async ({ page }) =>
 
 // ---------------------------------------------------------------------------
 // Hero CTA (unauthenticated)
-// [design] Clicking "Set up email" navigates to Lemon Squeezy checkout.
-// This is intentional pre-#FLOW-1 — the CTA bypasses the auth gate and
-// goes straight to LS. Will change when the proper funnel is implemented.
+// CTA is now a button that triggers Google OAuth — no longer an LS link.
 // ---------------------------------------------------------------------------
 
-test("[design] / hero CTA 'Set up email' → href points to velabot.lemonsqueezy.com", async ({
+test("/ hero CTA 'Get your email' is visible and triggers auth flow", async ({
   page,
 }) => {
   await page.goto("/");
 
-  // The CTA is an <a target="_blank"> so we check the href attribute directly
-  // rather than following navigation (which would open a new tab and hang).
-  const cta = page.getByRole("link", { name: /Set up email/i }).first();
+  const cta = page.getByRole("button", { name: /Get your email/i }).first();
   await expect(cta).toBeVisible();
-  const href = await cta.getAttribute("href");
-  expect(href, "hero CTA href should point to LS checkout").toContain(
-    "velabot.lemonsqueezy.com",
-  );
 
   const count = await resourceCount(page);
   console.info(`[perf] hero CTA resource entries: ${count}`);
@@ -211,8 +203,7 @@ test("mobile 390×844: / loads, header visible, no layout overflow", async ({
   if (bubbleCount > 0) {
     // If it exists it must be visible and not overlap the hero CTA.
     const heroBox = await page
-      .getByRole("link", { name: /Set up email/i })
-      .or(page.getByRole("button", { name: /Set up email/i }))
+      .getByRole("button", { name: /Get your email/i })
       .first()
       .boundingBox();
     const bubbleBox = await bubble.boundingBox();
@@ -238,8 +229,7 @@ test("mobile 390×844: / loads, header visible, no layout overflow", async ({
 // Dashboard (authenticated) — skipped; covered by unit tests + mock e2e
 // ---------------------------------------------------------------------------
 
-test.skip("dashboard authenticated — covered by e2e/dashboard.spec.ts mock tests", // Steps 11-17 from the full-pass plan (inbox view, setup flow, account
-// section, refund history, etc.) are exercised by e2e/dashboard.spec.ts
+test.skip("dashboard authenticated — covered by e2e/dashboard.spec.ts mock tests", // section, refund history, etc.) are exercised by e2e/dashboard.spec.ts // Steps 11-17 from the full-pass plan (inbox view, setup flow, account
 // which uses the x-mailkit-mock=1 bypass header to inject fixture data
 // without a real Supabase session. Duplicating them here against prod
 // would require real session injection which is not available in CI.

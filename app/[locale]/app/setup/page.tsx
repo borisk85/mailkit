@@ -66,6 +66,7 @@ export default async function SetupPage({
     mailboxLocal: string;
     status: string;
   } | null = null;
+  let hasPurchase = false;
 
   const supabase = await createClient();
   const {
@@ -90,23 +91,33 @@ export default async function SetupPage({
 
     if (!mock) {
       try {
-        const { data } = await supabase
-          .from("setup_runs")
-          .select("id, domain, mailbox_local, status")
-          .eq("user_id", user.id)
-          .not("status", "in", '("done","failed")')
-          .order("created_at", { ascending: false })
-          .limit(1)
-          .maybeSingle();
+        const [runsResult, purchaseResult] = await Promise.all([
+          supabase
+            .from("setup_runs")
+            .select("id, domain, mailbox_local, status")
+            .eq("user_id", user.id)
+            .not("status", "in", '("done","failed")')
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle(),
+          supabase
+            .from("purchases")
+            .select("id")
+            .eq("user_id", user.id)
+            .eq("status", "paid")
+            .limit(1)
+            .maybeSingle(),
+        ]);
 
-        if (data) {
+        if (runsResult.data) {
           activeRun = {
-            id: data.id,
-            domain: data.domain as string,
-            mailboxLocal: data.mailbox_local as string,
-            status: data.status as string,
+            id: runsResult.data.id,
+            domain: runsResult.data.domain as string,
+            mailboxLocal: runsResult.data.mailbox_local as string,
+            status: runsResult.data.status as string,
           };
         }
+        hasPurchase = !!purchaseResult.data;
       } catch {
         // best-effort; don't block wizard load
       }
@@ -116,7 +127,11 @@ export default async function SetupPage({
   return (
     <div className="flex min-h-[calc(100vh-180px)] items-start justify-center px-4 py-12">
       <div className="w-full max-w-4xl">
-        <SetupWizard initialMock={mock} activeRun={activeRun} />
+        <SetupWizard
+          initialMock={mock}
+          activeRun={activeRun}
+          hasPurchase={hasPurchase}
+        />
       </div>
     </div>
   );

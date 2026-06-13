@@ -19,6 +19,8 @@
       "signIn": "Sign in with Google",
       "signUp": "Sign up",
       "dashboard": "Dashboard",
+      "cta": "Get your email",
+      "myAccount": "My account",
       "languageSwitcher": {
         "label": "Language",
         "en": "English",
@@ -36,7 +38,7 @@
       "guaranteeLink": "see policy",
       "microcopy": "Requires Cloudflare DNS.",
       "migrationHint": "Open Cloudflare migration guide",
-      "primaryCta": "Set up email",
+      "primaryCta": "Get your email",
       "secondaryCta": "See how it works",
       "mockup": {
         "alt": "Gmail Compose window — the From dropdown shows your custom-domain addresses instead of @gmail.com",
@@ -238,6 +240,9 @@
       "subhead": "Or your money back, automatically. No tickets, no calls, no questions.",
       "primaryCta": "Get your email",
       "secondaryCta": "Read the guarantee first"
+    },
+    "ctaButton": {
+      "myAccount": "My account"
     }
   },
   "auth": {

@@ -82,9 +82,24 @@ export function CookieConsent() {
         STORAGE_KEY,
         JSON.stringify({ acceptedAt: new Date().toISOString() }),
       );
+      (window as Window & { gtag?: (...args: unknown[]) => void }).gtag?.(
+        "consent",
+        "update",
+        { analytics_storage: "granted" },
+      );
     } catch {
       // Same fallback — proceed with hide even if persistence fails.
     }
+    setShouldShow(false);
+  };
+
+  const handleDecline = () => {
+    try {
+      window.localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({ declinedAt: new Date().toISOString() }),
+      );
+    } catch {}
     setShouldShow(false);
   };
 
@@ -100,6 +115,14 @@ export function CookieConsent() {
       <div className="flex items-center gap-3">
         <Button onClick={handleAccept} size="sm" className="shrink-0">
           {t("accept")}
+        </Button>
+        <Button
+          onClick={handleDecline}
+          size="sm"
+          variant="outline"
+          className="shrink-0"
+        >
+          {t("decline")}
         </Button>
         <Link
           href="/privacy"
