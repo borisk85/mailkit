@@ -367,6 +367,16 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
 
   const phaseSubtitle = (() => {
     switch (state.kind) {
+      case "token_entry":
+      case "token_validating":
+        return t("subtitle");
+      case "zone_selection":
+        return "Pick the domain and mailbox name for your new email address.";
+      case "ns_warning":
+        return "This domain's DNS is not on Cloudflare yet — migration required before setup.";
+      case "setup_running":
+      case "awaiting_verify":
+        return "Configuring Cloudflare Email Routing for your domain.";
       case "cf_done_pending_smtp":
         return "Cloudflare connected. Setting up your sending infrastructure next.";
       case "smtp_running":
