@@ -292,7 +292,8 @@ export function Step1Token({
                 isLast={false}
               >
                 <span>
-                  Go to Cloudflare → Profile → <UiLabel>API Tokens</UiLabel>
+                  Go to Cloudflare → <UiLabel>Profile</UiLabel> →{" "}
+                  <UiLabel>API Tokens</UiLabel>
                 </span>
                 <div className="mt-3 flex flex-wrap items-center gap-3">
                   <a
