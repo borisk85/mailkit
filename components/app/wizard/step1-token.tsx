@@ -133,34 +133,30 @@ function ActiveStep({
 }) {
   return (
     <li className="space-y-3">
-      <div className="flex items-center gap-2">
+      <div className="flex items-start gap-2">
         <span
           aria-hidden
-          className="flex size-5 shrink-0 items-center justify-center rounded-full bg-mk-accent/12 text-[11px] font-semibold text-mk-accent"
+          className="mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full bg-mk-accent/12 text-[11px] font-semibold text-mk-accent"
         >
           {number}
         </span>
-        <span className="text-xs font-medium text-mk-text-tertiary">
-          of {total}
-        </span>
-      </div>
+        <div className="space-y-3 flex-1">
+          <div className="text-sm leading-snug text-mk-text-primary">
+            {children}
+          </div>
 
-      <div className="pl-8 space-y-3">
-        <div className="text-sm leading-snug text-mk-text-primary">
-          {children}
+          {!isLast && (
+            <Button
+              type="button"
+              size="sm"
+              className="gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover"
+              onClick={onNext}
+            >
+              Done
+              <ArrowRight className="size-3" aria-hidden />
+            </Button>
+          )}
         </div>
-
-        {!isLast && (
-          <Button
-            type="button"
-            size="sm"
-            className="gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover"
-            onClick={onNext}
-          >
-            Done
-            <ArrowRight className="size-3" aria-hidden />
-          </Button>
-        )}
       </div>
     </li>
   );
