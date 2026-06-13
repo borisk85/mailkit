@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
   AlertCircle,
+  ArrowUpRight,
   Check,
   CheckCircle2,
   Circle,
@@ -616,9 +617,10 @@ export function SetupWizard({
               href="https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/"
               target="_blank"
               rel="noreferrer"
-              className="underline underline-offset-2 hover:text-mk-text-secondary"
+              className="inline-flex items-center gap-1 font-medium text-mk-accent underline-offset-2 hover:underline"
             >
               {t("nsWarning.guideLink")}
+              <ArrowUpRight className="size-3.5" aria-hidden />
             </a>
           </p>
           <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">

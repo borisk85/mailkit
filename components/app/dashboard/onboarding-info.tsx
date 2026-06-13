@@ -63,7 +63,7 @@ export function OnboardingInfo() {
           href={CF_MIGRATION_URL}
           target="_blank"
           rel="noreferrer"
-          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-mk-accent hover:underline"
+          className="mt-2 inline-flex items-center gap-1 text-xs font-medium text-mk-accent underline-offset-2 hover:underline"
         >
           {t("needLinkPrefix")} {t("needLink")}
           <ArrowUpRight className="size-3.5" aria-hidden />

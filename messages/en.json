@@ -348,7 +348,7 @@
     "nsWarning": {
       "heading": "{domain} doesn't appear to use Cloudflare DNS",
       "body": "MailKit currently requires Cloudflare DNS. Migrate your nameservers to Cloudflare first (free, about 30 minutes). After migration, run setup again.",
-      "guideLink": "Read Cloudflare migration guide →",
+      "guideLink": "Read Cloudflare migration guide",
       "cancelBtn": "I'll migrate first"
     },
     "title": "Connect your domain",

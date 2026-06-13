@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { AlertTriangle, Globe } from "lucide-react";
+import { AlertTriangle, ArrowUpRight, Globe } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -33,9 +33,10 @@ function NsWarningCard({ domain }: { domain: string }) {
           href="https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/"
           target="_blank"
           rel="noreferrer noopener"
-          className="inline-flex items-center gap-1 text-sm font-medium text-mk-warning underline underline-offset-2 hover:opacity-80 transition-opacity"
+          className="inline-flex items-center gap-1 text-sm font-medium text-mk-accent underline-offset-2 hover:underline"
         >
-          Migrate to Cloudflare DNS →
+          Migrate to Cloudflare DNS
+          <ArrowUpRight className="size-3.5" aria-hidden />
         </a>
       </div>
     </div>
