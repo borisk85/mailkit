@@ -531,7 +531,7 @@
       "step1": {
         "heading": "Create a Cloudflare API Token",
         "sub": "Takes ~2 minutes.",
-        "instructionOpenCF": "Open Cloudflare API Tokens →",
+        "instructionOpenCF": "Open Cloudflare API Tokens",
         "permTitle": "Required permissions",
         "scopeNote": "Limit to one zone — keeps this token scoped to your domain only"
       },

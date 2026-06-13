@@ -10,6 +10,7 @@ import {
   AlertCircle,
   Check,
   ArrowRight,
+  ArrowUpRight,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -309,6 +310,7 @@ export function Step1Token({
                       className="gap-1.5 text-xs"
                     >
                       {t("instructionOpenCF")}
+                      <ArrowUpRight className="size-3.5" aria-hidden />
                     </Button>
                   </a>
                   <CfScreenshotGallery from={0} to={1} />
