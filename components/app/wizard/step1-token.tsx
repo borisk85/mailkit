@@ -105,8 +105,8 @@ function CompletedStepRow({
       >
         <Check className="size-3" />
       </span>
-      <span className="text-xs text-mk-text-tertiary">
-        {number}. {label}
+      <span className="text-xs text-mk-text-tertiary line-through">
+        {label}
       </span>
     </li>
   );
