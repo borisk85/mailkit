@@ -387,12 +387,12 @@ export function Step1Token({
       <div className="rounded-xl border border-mk-border-subtle bg-surface-elevated p-6 mk-card-shadow self-start md:ml-8">
         <form className="space-y-4" onSubmit={handleSubmit} noValidate>
           <div className="space-y-1.5">
-            <label
-              htmlFor="cf-token"
-              className="block w-fit text-sm font-semibold text-mk-text-primary"
+            <span
+              id="cf-token-label"
+              className="block text-sm font-semibold text-mk-text-primary"
             >
               Paste your token
-            </label>
+            </span>
             <p className="text-xs text-mk-text-tertiary">
               Cloudflare tokens start with{" "}
               <code className="rounded bg-mk-border-subtle/60 px-1 py-0.5 font-mono text-[11px]">
@@ -412,6 +412,7 @@ export function Step1Token({
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
                 disabled={isPending}
+                aria-labelledby="cf-token-label"
                 aria-describedby="cf-token-help"
               />
               <button
