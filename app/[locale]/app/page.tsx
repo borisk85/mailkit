@@ -107,13 +107,8 @@ export default async function AppHome({
       <header className="space-y-3">
         <p className="mk-eyebrow text-mk-accent">{t("eyebrow")}</p>
         <h1 className="mk-heading-1 text-mk-text-primary">
-          {isFirstTimeSetup
-            ? t("titleFirstTime", { name: displayName })
-            : t("title", { name: displayName })}
+          {t("title", { name: displayName })}
         </h1>
-        <p className="mk-body max-w-prose text-mk-text-secondary">
-          {t("subtitle")}
-        </p>
       </header>
 
       {isFirstTimeSetup ? (

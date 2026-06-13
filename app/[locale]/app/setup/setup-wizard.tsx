@@ -343,7 +343,18 @@ function getStepperStep(kind: WizardState["kind"]): number {
   return 1; // failed or unknown
 }
 
-export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
+export function SetupWizard({
+  initialMock,
+  activeRun,
+}: {
+  initialMock: MockKey;
+  activeRun?: {
+    id: string;
+    domain: string;
+    mailboxLocal: string;
+    status: string;
+  } | null;
+}) {
   const t = useTranslations("setup");
   const tErr = useTranslations("setup.errors");
   const tState = useTranslations("setup.step3.state");
@@ -353,6 +364,83 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
     mockInitialState(initialMock),
   );
   const [isPending, startTransition] = useTransition();
+
+  async function handleStartSetup(
+    token: string,
+    zoneId: string,
+    zoneName: string,
+    mailboxLocal: string,
+  ) {
+    setState({
+      kind: "setup_running",
+      token,
+      zoneName,
+      mailboxLocal,
+      reached: "routing",
+    });
+    const result = await startSetupRun({ token, zoneId, mailboxLocal });
+    if (result.status === "error") {
+      setState({
+        kind: "failed",
+        source: "cf",
+        errorKey: result.errorKey,
+        errorDetails:
+          typeof result.details === "string" ? result.details : undefined,
+      });
+      return;
+    }
+    if (result.runStatus === "cf_awaiting_destination_verify") {
+      setState({
+        kind: "awaiting_verify",
+        token,
+        runId: result.runId,
+        destinationEmail: result.destinationEmail,
+        zoneName,
+        mailboxLocal,
+      });
+      return;
+    }
+    if (
+      result.runStatus === "smtp_done" ||
+      result.runStatus === "gmail_instructions_shown" ||
+      result.runStatus === "gmail_smtp_ready" ||
+      result.runStatus === "gmail_send_as_verified" ||
+      result.runStatus === "done"
+    ) {
+      setState({
+        kind: "smtp_done",
+        runId: result.runId,
+        zoneName,
+        mailboxLocal,
+        destinationEmail: result.destinationEmail,
+      });
+      return;
+    }
+    if (
+      result.runStatus === "smtp_sender_created" ||
+      result.runStatus === "smtp_dns_written" ||
+      result.runStatus === "smtp_verified"
+    ) {
+      setState({
+        kind: "smtp_awaiting_retry",
+        runId: result.runId,
+        cfToken: token,
+        zoneName,
+        mailboxLocal,
+        destinationEmail: result.destinationEmail,
+        errorKey: "setup.errors.smtp_verify_timeout",
+      });
+      return;
+    }
+    setState({
+      kind: "cf_done_pending_smtp",
+      runId: result.runId,
+      cfToken: token,
+      zoneName,
+      mailboxLocal,
+      destinationEmail: result.destinationEmail,
+    });
+  }
 
   function translateErr(key: string, details?: string): string {
     const short = key.replace(/^setup\.errors\./, "");
@@ -430,6 +518,20 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
             startTransition(async () => {
               const result = await verifyCloudflareToken({ token });
               if (result.status === "ok") {
+                if (activeRun) {
+                  const matchingZone = result.zones.find(
+                    (z) => z.name === activeRun.domain,
+                  );
+                  if (matchingZone) {
+                    await handleStartSetup(
+                      token,
+                      matchingZone.id,
+                      matchingZone.name,
+                      activeRun.mailboxLocal,
+                    );
+                    return;
+                  }
+                }
                 setState({
                   kind: "zone_selection",
                   zones: result.zones,
@@ -447,6 +549,14 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
               }
             });
           }}
+          resumeFor={
+            activeRun
+              ? {
+                  domain: activeRun.domain,
+                  mailboxLocal: activeRun.mailboxLocal,
+                }
+              : undefined
+          }
           translateErr={translateErr}
         />
       ) : null}
@@ -471,93 +581,12 @@ export function SetupWizard({ initialMock }: { initialMock: MockKey }) {
                 });
                 return;
               }
-              setState({
-                kind: "setup_running",
-                token: state.token,
-                zoneName: chosen.name,
-                mailboxLocal,
-                reached: "routing",
-              });
-              const result = await startSetupRun({
-                token: state.token,
+              await handleStartSetup(
+                state.token,
                 zoneId,
+                chosen.name,
                 mailboxLocal,
-              });
-              if (result.status === "error") {
-                setState({
-                  kind: "failed",
-                  source: "cf",
-                  errorKey: result.errorKey,
-                  errorDetails:
-                    typeof result.details === "string"
-                      ? result.details
-                      : undefined,
-                });
-                return;
-              }
-              if (result.runStatus === "cf_awaiting_destination_verify") {
-                setState({
-                  kind: "awaiting_verify",
-                  token: state.token,
-                  runId: result.runId,
-                  destinationEmail: result.destinationEmail,
-                  zoneName: chosen.name,
-                  mailboxLocal,
-                });
-                return;
-              }
-              // Resume path: existing run may already be past the SMTP setup or
-              // deep into the Gmail wizard. Route the UI to the matching
-              // kind instead of always dropping onto the "Continue to
-              // SMTP setup" CTA.
-              const zoneName = chosen.name;
-              if (
-                result.runStatus === "smtp_done" ||
-                result.runStatus === "gmail_instructions_shown" ||
-                result.runStatus === "gmail_smtp_ready" ||
-                result.runStatus === "gmail_send_as_verified" ||
-                result.runStatus === "done"
-              ) {
-                setState({
-                  kind: "smtp_done",
-                  runId: result.runId,
-                  zoneName,
-                  mailboxLocal,
-                  destinationEmail: result.destinationEmail,
-                });
-                return;
-              }
-              if (
-                result.runStatus === "smtp_sender_created" ||
-                result.runStatus === "smtp_dns_written" ||
-                result.runStatus === "smtp_verified"
-              ) {
-                const reached: "sender" | "dns" | "verify" =
-                  result.runStatus === "smtp_sender_created"
-                    ? "sender"
-                    : result.runStatus === "smtp_dns_written"
-                      ? "dns"
-                      : "verify";
-                setState({
-                  kind: "smtp_awaiting_retry",
-                  runId: result.runId,
-                  cfToken: state.token,
-                  zoneName,
-                  mailboxLocal,
-                  destinationEmail: result.destinationEmail,
-                  errorKey: "setup.errors.smtp_verify_timeout",
-                });
-                void reached;
-                return;
-              }
-              setState({
-                kind: "cf_done_pending_smtp",
-                runId: result.runId,
-                cfToken: state.token,
-                zoneName,
-                mailboxLocal,
-                destinationEmail: result.destinationEmail,
-              });
+              );
             });
           }}
           t={t}

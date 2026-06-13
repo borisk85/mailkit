@@ -168,6 +168,7 @@ interface Step1TokenProps {
   isPending: boolean;
   errorKey?: string;
   errorDetails?: string;
+  resumeFor?: { domain: string; mailboxLocal: string };
   onSubmit: (token: string) => void;
   translateErr: (key: string, details?: string) => string;
 }
@@ -176,6 +177,7 @@ export function Step1Token({
   isPending,
   errorKey,
   errorDetails,
+  resumeFor,
   onSubmit,
   translateErr,
 }: Step1TokenProps) {
@@ -232,6 +234,27 @@ export function Step1Token({
           </h2>
           <p className="mt-1.5 text-xs text-mk-text-tertiary">{t("sub")}</p>
         </div>
+
+        {resumeFor && (
+          <div className="flex items-start gap-3 rounded-lg border border-mk-accent/25 bg-mk-accent/8 px-4 py-3">
+            <ArrowRight
+              className="mt-0.5 size-4 shrink-0 text-mk-accent"
+              aria-hidden
+            />
+            <div>
+              <p className="text-sm font-medium text-mk-text-primary">
+                Resuming setup for{" "}
+                <span className="font-mono">
+                  {resumeFor.mailboxLocal}@{resumeFor.domain}
+                </span>
+              </p>
+              <p className="mt-0.5 text-xs text-mk-text-secondary">
+                Paste your Cloudflare token on the right to continue where you
+                left off.
+              </p>
+            </div>
+          </div>
+        )}
 
         {!mounted && (
           <div className="space-y-3" aria-hidden>

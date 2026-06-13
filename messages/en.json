@@ -248,9 +248,8 @@
     "redirecting": "Redirecting..."
   },
   "dashboard": {
-    "eyebrow": "Your account",
+    "eyebrow": "My account",
     "title": "Welcome back, {name}.",
-    "subtitle": "Domain setups, sending limits, and support.",
     "addAnother": {
       "title": "Set up another mailbox",
       "body": "Another domain or address — $5 one-time.",

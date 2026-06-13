@@ -60,31 +60,63 @@ export default async function SetupPage({
   // if they paid from the landing CTA (unauth first-buy). Stamp the
   // link now so subsequent queries (auto-refund lookup, /app
   // dashboard) find it. Best-effort — errors don't block the wizard.
-  if (readParam(sp.paid) === "1") {
-    try {
-      const supabase = await createClient();
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      if (user?.email) {
+  let activeRun: {
+    id: string;
+    domain: string;
+    mailboxLocal: string;
+    status: string;
+  } | null = null;
+
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (user) {
+    if (readParam(sp.paid) === "1") {
+      try {
         const admin = createServiceClient();
         await linkOrphanPurchase({
           admin,
           userId: user.id,
-          userEmail: user.email,
+          userEmail: user.email ?? "",
           lsOrderIdentifier: readParam(sp.order_id) ?? null,
         });
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.error(`[setup-page] thank-you link attempt failed: ${msg}`);
       }
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : String(e);
-      console.error(`[setup-page] thank-you link attempt failed: ${msg}`);
+    }
+
+    if (!mock) {
+      try {
+        const { data } = await supabase
+          .from("setup_runs")
+          .select("id, domain, mailbox_local, status")
+          .eq("user_id", user.id)
+          .not("status", "in", '("done","failed")')
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle();
+
+        if (data) {
+          activeRun = {
+            id: data.id,
+            domain: data.domain as string,
+            mailboxLocal: data.mailbox_local as string,
+            status: data.status as string,
+          };
+        }
+      } catch {
+        // best-effort; don't block wizard load
+      }
     }
   }
 
   return (
     <div className="flex min-h-[calc(100vh-180px)] items-start justify-center px-4 py-12">
       <div className="w-full max-w-4xl">
-        <SetupWizard initialMock={mock} />
+        <SetupWizard initialMock={mock} activeRun={activeRun} />
       </div>
     </div>
   );
