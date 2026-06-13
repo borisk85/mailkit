@@ -1,6 +1,6 @@
 import { useTranslations } from "next-intl";
-import { AtSign, ArrowUpRight } from "lucide-react";
-import { SiCloudflare } from "react-icons/si";
+import { ArrowUpRight } from "lucide-react";
+import { SiCloudflare, SiGmail } from "react-icons/si";
 
 const CF_MIGRATION_URL =
   "https://developers.cloudflare.com/dns/zone-setups/full-setup/setup/";
@@ -20,25 +20,22 @@ export function OnboardingInfo() {
   return (
     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
       {/* What you'll get */}
-      <div className="group relative overflow-hidden rounded-xl border border-mk-border-subtle bg-surface-elevated p-5 transition-colors hover:border-mk-accent/40">
+      <div className="group relative overflow-hidden rounded-xl border border-mk-border-subtle bg-surface-elevated p-5 transition-colors hover:border-[#EA4335]/40">
         <div
           aria-hidden
           className="pointer-events-none absolute -right-6 -top-6 size-24 rounded-full opacity-60"
           style={{
             background:
-              "radial-gradient(circle, rgba(124,92,255,0.14), transparent 70%)",
+              "radial-gradient(circle, rgba(234,67,53,0.14), transparent 70%)",
           }}
         />
-        <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg bg-mk-accent/12 text-mk-accent">
-          <AtSign className="size-5" aria-hidden />
+        <div className="mb-3 inline-flex size-9 items-center justify-center rounded-lg bg-[#EA4335]/12 text-[#EA4335]">
+          <SiGmail className="size-5" aria-hidden />
         </div>
         <h3 className="text-sm font-semibold text-mk-text-primary">
           {t("getTitle")}
         </h3>
-        <p className="mt-1.5 inline-flex rounded-md bg-mk-accent/10 px-2 py-0.5 font-mono text-xs text-mk-accent">
-          you@yourdomain.com
-        </p>
-        <p className="mt-2 text-sm leading-snug text-mk-text-secondary">
+        <p className="mt-1.5 text-sm leading-snug text-mk-text-secondary">
           {t("getBody")}
         </p>
       </div>
