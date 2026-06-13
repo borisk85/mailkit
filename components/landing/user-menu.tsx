@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { LayoutDashboard } from "lucide-react";
+import { SiGoogle } from "react-icons/si";
 
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -55,7 +56,8 @@ export function UserMenu() {
   }
 
   return (
-    <Button size="sm" onClick={startOAuth}>
+    <Button size="sm" onClick={startOAuth} className="gap-2">
+      <SiGoogle className="size-3.5" aria-hidden />
       {t("signIn")}
     </Button>
   );
