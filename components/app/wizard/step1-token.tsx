@@ -141,7 +141,7 @@ function ActiveStep({
           {number}
         </span>
         <span className="text-xs font-medium text-mk-text-tertiary">
-          Step {number} of {total}
+          of {total}
         </span>
       </div>
 
