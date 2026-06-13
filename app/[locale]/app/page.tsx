@@ -26,8 +26,9 @@ import { deleteAccount, deleteFailedSetup } from "./account-actions";
  *   - Refunds (hidden if 0)
  *   - Account (always visible — profile + delete)
  *
- * Legal links live in the shared AppFooter; support is the chat
- * widget bubble — so the dashboard has no separate Resources block.
+ * No dashboard footer: support is the chat widget bubble, and legal
+ * links surface where they matter — Terms/Refund next to the payment
+ * gate in the setup wizard, and in the landing footer.
  *
  * If both Setups and Purchases are empty, we show the friendly
  * empty-state CTA above Account instead of a sea of empty sections.

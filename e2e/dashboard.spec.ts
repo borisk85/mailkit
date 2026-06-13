@@ -18,7 +18,7 @@ import { expect, test } from "@playwright/test";
  */
 
 test.describe("Dashboard EN", () => {
-  test("empty fixture: greeting + emptyState CTA + Account/Resources", async ({
+  test("empty fixture: greeting + emptyState CTA + Account", async ({
     page,
   }) => {
     await page.goto("/en/app?mock=empty");
@@ -39,12 +39,9 @@ test.describe("Dashboard EN", () => {
     await expect(
       page.getByRole("heading", { level: 2, name: /Purchases/ }),
     ).toHaveCount(0);
-    // Account + Resources always visible
+    // Account always visible
     await expect(
       page.getByRole("heading", { level: 2, name: /^Account$/ }),
-    ).toBeVisible();
-    await expect(
-      page.getByRole("heading", { level: 2, name: /^Resources$/ }),
     ).toBeVisible();
   });
 

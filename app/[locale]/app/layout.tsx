@@ -3,10 +3,10 @@ import { redirect } from "next/navigation";
 import { setRequestLocale } from "next-intl/server";
 import type { User } from "@supabase/supabase-js";
 
-import { AppFooter } from "@/components/app/app-footer";
 import { AppHeader } from "@/components/app/app-header";
 import { IncidentBanner } from "@/components/app/incident-banner";
-import { createClient } from "@/lib/supabase/server";
+import { reactivateIfPendingDeletion } from "@/lib/account-lifecycle";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 const MOCK_USER: User = {
   id: "00000000-0000-0000-0000-000000000000",
@@ -41,7 +41,6 @@ export default async function AppLayout({
         <main className="container mx-auto flex-1 px-4 pt-8 pb-24 sm:pb-8">
           {children}
         </main>
-        <AppFooter />
       </>
     );
   }
@@ -55,6 +54,14 @@ export default async function AppLayout({
     redirect("/");
   }
 
+  // A returning user with a pending soft-delete is undoing it — clear
+  // the flag so the purge cron leaves their account alone. Best-effort.
+  try {
+    await reactivateIfPendingDeletion(createServiceClient(), user.id);
+  } catch {
+    // Don't block the dashboard on a reactivation hiccup.
+  }
+
   return (
     <>
       <IncidentBanner />
@@ -62,7 +69,6 @@ export default async function AppLayout({
       <main className="container mx-auto flex-1 px-4 pt-8 pb-28 sm:pb-8">
         {children}
       </main>
-      <AppFooter />
     </>
   );
 }

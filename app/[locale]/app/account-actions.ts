@@ -13,20 +13,20 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
  */
 
 /**
- * Permanently delete the calling user's account. Cascades from
- * auth.users:
- *   - profiles.id REFERENCES auth.users ON DELETE CASCADE → row gone
- *   - setup_runs.user_id REFERENCES auth.users ON DELETE CASCADE
- *     → all setup_runs rows + nested cf_state / gmail_state gone
- *   - purchases.user_id REFERENCES auth.users ON DELETE SET NULL
- *     → orphan purchase rows survive on purpose (financial audit
- *       trail; we never delete revenue records). user_email + the
- *       refunds rows attached to those purchases also survive.
- *   - refunds.run_id ON DELETE SET NULL → kept for the trail.
+ * Soft-delete the calling user's account (Google-style grace period).
+ *
+ * Instead of hard-deleting auth.users immediately, we stamp
+ * profiles.deleted_at and sign the user out. Nothing is destroyed yet:
+ *   - Signing back in clears deleted_at (see reactivateIfPendingDeletion
+ *     in the /app layout) — an accidental delete is fully reversible.
+ *   - The purge cron (/api/cron/purge-deleted) hard-deletes profiles
+ *     whose deleted_at is older than DELETION_GRACE_DAYS, which cascades
+ *     auth.users → setup_runs and SET NULLs the surviving purchase rows
+ *     (financial audit trail; revenue records are never destroyed).
  *
  * The user-session client first verifies "yes, the caller really is
- * the user they claim to be" — service-role bypasses RLS so we
- * MUST not trust the caller-provided id.
+ * the user they claim to be" — service-role bypasses RLS so we MUST
+ * not trust a caller-provided id.
  */
 export async function deleteAccount(): Promise<void> {
   const supabase = await createClient();
@@ -40,19 +40,21 @@ export async function deleteAccount(): Promise<void> {
   }
 
   const admin = createServiceClient();
-  const { error } = await admin.auth.admin.deleteUser(user.id);
+  const { error } = await admin
+    .from("profiles")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", user.id);
   if (error) {
     throw new Error(`Account deletion failed: ${error.message}`);
   }
 
-  // Sign-out is best-effort: the auth.users row is gone, so the next
-  // request would fail to refresh the session anyway. We still try
-  // to clear the local cookie so the immediate redirect works
-  // cleanly without a flash of "Welcome back, Boris" on the way out.
+  // Sign the user out so the account immediately appears gone. The
+  // profiles row + their data stay in place until the grace period
+  // elapses; a fresh sign-in reactivates everything.
   try {
     await supabase.auth.signOut();
   } catch {
-    // Ignore — session is already invalid server-side.
+    // Ignore — redirect to landing happens client-side regardless.
   }
 }
 

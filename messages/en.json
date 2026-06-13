@@ -262,7 +262,7 @@
     },
     "emptyState": {
       "title": "Set up email on your domain",
-      "body": "You haven't started a setup yet. It takes ~30 minutes.",
+      "body": "It takes about 30 minutes.",
       "cta": "Start setup"
     },
     "setups": {
