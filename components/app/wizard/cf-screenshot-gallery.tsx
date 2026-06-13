@@ -76,7 +76,7 @@ export function CfScreenshotGallery({
         ref={dialogRef}
         onClick={handleDialogClick}
         onClose={() => setOpen(false)}
-        className="m-auto max-w-3xl w-[90vw] rounded-xl border border-mk-border-subtle bg-surface-base p-0 shadow-2xl backdrop:bg-black/60 backdrop:backdrop-blur-sm"
+        className="m-auto max-w-3xl w-[90vw] rounded-xl border border-mk-border-subtle bg-surface-base p-0 shadow-2xl overflow-hidden backdrop:bg-black/60 backdrop:backdrop-blur-sm"
       >
         {open && (
           <div className="flex flex-col">
