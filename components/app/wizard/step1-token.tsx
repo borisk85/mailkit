@@ -110,9 +110,9 @@ function CompletedStepRow({ label }: { label: string }) {
 
 function UiLabel({ children }: { children: React.ReactNode }) {
   return (
-    <kbd className="inline-flex items-center rounded border border-mk-border-subtle bg-surface-elevated-2 px-1.5 py-0.5 font-sans text-[12px] font-semibold text-mk-text-primary not-italic leading-none">
+    <span className="inline-flex items-center rounded px-1.5 py-0.5 text-[12px] font-semibold bg-mk-accent/15 text-mk-accent leading-none">
       {children}
-    </kbd>
+    </span>
   );
 }
 
