@@ -407,7 +407,7 @@ export function Step1Token({
                 autoComplete="off"
                 autoCorrect="off"
                 spellCheck={false}
-                className="font-mono pr-10"
+                className="font-mono pr-10 placeholder:text-mk-text-tertiary/55 focus-visible:ring-1 focus:placeholder:text-transparent"
                 placeholder={tSetup("tokenPlaceholder")}
                 value={token}
                 onChange={(e) => setToken(e.target.value)}
