@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
   CheckSquare,
@@ -90,13 +90,7 @@ function PermissionChecklist() {
 
 // ─── Completed step row ───────────────────────────────────────────────────────
 
-function CompletedStepRow({
-  number,
-  label,
-}: {
-  number: number;
-  label: string;
-}) {
+function CompletedStepRow({ label }: { label: string }) {
   return (
     <li className="flex items-center gap-3 py-1">
       <span
@@ -109,6 +103,16 @@ function CompletedStepRow({
         {label}
       </span>
     </li>
+  );
+}
+
+// ─── UI element label (kbd chip) ─────────────────────────────────────────────
+
+function UiLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <kbd className="inline-flex items-center rounded border border-mk-border-subtle bg-surface-elevated-2 px-1.5 py-0.5 font-sans text-[12px] font-semibold text-mk-text-primary not-italic leading-none">
+      {children}
+    </kbd>
   );
 }
 
@@ -186,6 +190,22 @@ export function Step1Token({
   const [showToken, setShowToken] = useState(false);
   const [activeInstruction, setActiveInstruction] = useState(1);
 
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem("mk_instruction_step");
+      const n = saved ? parseInt(saved, 10) : 1;
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      if (n >= 2 && n <= 5) setActiveInstruction(n);
+    } catch {}
+  }, []);
+
+  function advanceInstruction(n: number) {
+    try {
+      sessionStorage.setItem("mk_instruction_step", String(n));
+    } catch {}
+    setActiveInstruction(n);
+  }
+
   const TOTAL = 5;
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -223,7 +243,7 @@ export function Step1Token({
             stepLabels
               .slice(0, activeInstruction - 1)
               .map((label, i) => (
-                <CompletedStepRow key={i + 1} number={i + 1} label={label} />
+                <CompletedStepRow key={i + 1} label={label} />
               ))}
 
           {/* Active step */}
@@ -231,10 +251,12 @@ export function Step1Token({
             <ActiveStep
               number={1}
               total={TOTAL}
-              onNext={() => setActiveInstruction(2)}
+              onNext={() => advanceInstruction(2)}
               isLast={false}
             >
-              <span>Go to Cloudflare → Profile → API Tokens</span>
+              <span>
+                Go to Cloudflare → Profile → <UiLabel>API Tokens</UiLabel>
+              </span>
               <div className="mt-3 flex flex-wrap items-center gap-3">
                 <a
                   href="https://dash.cloudflare.com/profile/api-tokens"
@@ -260,17 +282,12 @@ export function Step1Token({
             <ActiveStep
               number={2}
               total={TOTAL}
-              onNext={() => setActiveInstruction(3)}
+              onNext={() => advanceInstruction(3)}
               isLast={false}
             >
-              Click{" "}
-              <strong className="font-semibold text-mk-text-primary">
-                Create Token
-              </strong>{" "}
-              → Use template{" "}
-              <strong className="font-semibold text-mk-text-primary">
-                Custom Token
-              </strong>
+              Click <UiLabel>Create Token</UiLabel> → find{" "}
+              <UiLabel>Create Custom Token</UiLabel> → click{" "}
+              <UiLabel>Get started</UiLabel>
               <div className="mt-2">
                 <CfScreenshotGallery from={2} to={3} />
               </div>
@@ -281,7 +298,7 @@ export function Step1Token({
             <ActiveStep
               number={3}
               total={TOTAL}
-              onNext={() => setActiveInstruction(4)}
+              onNext={() => advanceInstruction(4)}
               isLast={false}
             >
               <span className="block mb-2">Add these permissions:</span>
@@ -296,14 +313,10 @@ export function Step1Token({
             <ActiveStep
               number={4}
               total={TOTAL}
-              onNext={() => setActiveInstruction(5)}
+              onNext={() => advanceInstruction(5)}
               isLast={false}
             >
-              Set{" "}
-              <strong className="font-semibold text-mk-text-primary">
-                Zone Resource
-              </strong>{" "}
-              → Specific zone → your domain
+              Set <UiLabel>Zone Resource</UiLabel> → Specific zone → your domain
               <div className="mt-2">
                 <CfScreenshotGallery from={5} to={5} />
               </div>
@@ -317,15 +330,9 @@ export function Step1Token({
               onNext={() => {}}
               isLast={true}
             >
-              Click{" "}
-              <strong className="font-semibold text-mk-text-primary">
-                Continue to summary
-              </strong>{" "}
-              →{" "}
-              <strong className="font-semibold text-mk-text-primary">
-                Create Token
-              </strong>{" "}
-              → Copy the token and paste it on the right
+              Click <UiLabel>Continue to summary</UiLabel> →{" "}
+              <UiLabel>Create Token</UiLabel> → Copy the token and paste it on
+              the right
               <div className="mt-2">
                 <CfScreenshotGallery from={6} to={7} />
               </div>
