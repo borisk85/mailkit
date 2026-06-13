@@ -55,17 +55,8 @@ export function UserMenu() {
   }
 
   return (
-    <div className="flex items-center gap-3">
-      <button
-        type="button"
-        onClick={startOAuth}
-        className="text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary focus:outline-none focus-visible:underline focus-visible:underline-offset-4"
-      >
-        {t("signIn")}
-      </button>
-      <Button size="sm" onClick={startOAuth}>
-        {t("signUp")}
-      </Button>
-    </div>
+    <Button size="sm" onClick={startOAuth}>
+      {t("signIn")}
+    </Button>
   );
 }
