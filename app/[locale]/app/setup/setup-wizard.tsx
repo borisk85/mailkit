@@ -397,7 +397,7 @@ export function SetupWizard({
         });
       }
     } catch {}
-     
+
     setHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -1199,9 +1199,18 @@ function ZoneSelectionStep({
           <Input
             className="h-9 font-mono focus-visible:ring-1"
             value={mailboxLocal}
-            onChange={(e) => setMailboxLocal(e.target.value.toLowerCase())}
+            onChange={(e) =>
+              setMailboxLocal(
+                e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""),
+              )
+            }
             disabled={isPending}
+            placeholder="hello"
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
             pattern="[a-z0-9._-]{1,64}"
+            maxLength={64}
             required
           />
         </div>
@@ -1210,7 +1219,7 @@ function ZoneSelectionStep({
 
         <Button
           type="submit"
-          disabled={isPending}
+          disabled={isPending || !mailboxLocal}
           className="bg-mk-accent text-white hover:bg-mk-accent-hover"
         >
           {isPending ? t("step2.ctaLoading") : t("step2.cta")}
