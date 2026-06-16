@@ -499,7 +499,7 @@ export function SetupWizard({
       case "token_validating":
         return t("subtitle");
       case "zone_selection":
-        return "Pick the domain and mailbox name for your new email address.";
+        return "Pick the mailbox name for your new email address.";
       case "ns_warning":
         return "This domain's DNS is not on Cloudflare yet — migration required before setup.";
       case "setup_running":
