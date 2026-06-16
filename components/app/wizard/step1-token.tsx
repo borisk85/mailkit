@@ -335,7 +335,9 @@ export function Step1Token({
                 onNext={() => advanceInstruction(4)}
                 isLast={false}
               >
-                <span className="block mb-2">Add these permissions:</span>
+                <span className="block mb-2">
+                  Give your API token a name and add these permissions:
+                </span>
                 <PermissionChecklist />
                 <div className="mt-2">
                   <CfScreenshotGallery from={4} to={4} />
