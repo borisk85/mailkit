@@ -75,6 +75,15 @@ function PermissionChecklist() {
               </li>
             ))}
           </ul>
+          <div className="mt-3 rounded-md bg-mk-accent/8 px-3 py-2">
+            <span className="text-xs leading-snug text-mk-text-secondary">
+              Click{" "}
+              <span className="font-medium text-mk-text-primary">
+                + Add more
+              </span>{" "}
+              to add a new row for each additional permission.
+            </span>
+          </div>
         </div>
       )}
     </div>
@@ -336,15 +345,6 @@ export function Step1Token({
                   Give your API token a name and add these permissions:
                 </span>
                 <PermissionChecklist />
-                <div className="mt-2 rounded-md bg-mk-accent/8 px-3 py-2">
-                  <span className="text-xs leading-snug text-mk-text-secondary">
-                    Click{" "}
-                    <span className="font-medium text-mk-text-primary">
-                      + Add more
-                    </span>{" "}
-                    to add a new row for each additional permission.
-                  </span>
-                </div>
                 <div className="mt-2">
                   <CfScreenshotGallery from={4} to={4} />
                 </div>
