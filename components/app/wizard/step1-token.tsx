@@ -10,6 +10,7 @@ import {
   Check,
   ArrowRight,
   ArrowUpRight,
+  ShieldCheck,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -251,6 +252,18 @@ export function Step1Token({
 
   const TOTAL = 5;
 
+  // Step 5 is the last instruction and has no "Done" button — strike it through
+  // when the token is being validated, so it's consistent with steps 1-4.
+  useEffect(() => {
+    if (isPending && activeInstruction === 5) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setActiveInstruction(6);
+    } else if (errorKey && activeInstruction === 6) {
+       
+      setActiveInstruction(5);
+    }
+  }, [isPending, errorKey, activeInstruction]);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const trimmed = token.trim();
@@ -438,10 +451,8 @@ export function Step1Token({
               Paste your token
             </span>
             <p className="text-xs text-mk-text-tertiary">
-              It starts with{" "}
-              <code className="rounded bg-mk-border-subtle/60 px-1 py-0.5 font-mono text-[11px]">
-                cfut_
-              </code>
+              Save a copy of this token for yourself — Cloudflare shows it only
+              once and we can&apos;t show it again.
             </p>
 
             <div className="relative">
@@ -492,6 +503,14 @@ export function Step1Token({
           {errorKey && (
             <InlineError message={translateErr(errorKey, errorDetails)} />
           )}
+
+          <div className="flex items-start gap-1.5 text-[11px] leading-snug text-mk-text-tertiary">
+            <ShieldCheck className="mt-px size-3.5 shrink-0" aria-hidden />
+            <span>
+              Used only during setup, then discarded — we never store your token
+              or use it for anything else.
+            </span>
+          </div>
         </form>
       </div>
     </div>
