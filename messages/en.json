@@ -368,6 +368,7 @@
       "zonePlaceholder": "Select a domain",
       "mailboxLabel": "Mailbox name",
       "mailboxHint": "This becomes {local}@{domain} — lowercase letters, digits, dot, dash, underscore.",
+      "mailboxHintEmpty": "Lowercase letters, digits, dot, dash, underscore.",
       "cta": "Start setup",
       "ctaLoading": "Starting…"
     },
