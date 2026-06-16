@@ -90,7 +90,7 @@ html {
   --mk-text-tertiary: #6e6c67; /* muted label gray */
   --mk-accent: #6b4fe6; /* slightly deeper purple — pops on light */
   --mk-accent-hover: #5a40cc;
-  --mk-success: #16a34a; /* deeper green — readable on light */
+  --mk-success: #3f855d; /* muted green — readable on light */
   --mk-warning: #d97706;
   --mk-danger: #dc2626;
 
@@ -144,7 +144,7 @@ html {
   --mk-text-tertiary: #71717a;
   --mk-accent: #7c5cff;
   --mk-accent-hover: #8b6fff;
-  --mk-success: #22c55e;
+  --mk-success: #5b9d7a; /* muted green */
   --mk-warning: #f59e0b;
   --mk-danger: #ef4444;
 
