@@ -242,24 +242,37 @@ export function Step1Token({
   const [token, setToken] = useState("");
   const [showToken, setShowToken] = useState(false);
   const [activeInstruction, setActiveInstruction] = useState(1);
+  const [maxStep, setMaxStep] = useState(1);
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     try {
       const saved = localStorage.getItem("mk_instruction_step");
       const n = saved ? parseInt(saved, 10) : 1;
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (n >= 2 && n <= 5) setActiveInstruction(n);
+      if (n >= 2 && n <= 5) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setActiveInstruction(n);
+         
+        setMaxStep(n);
+      }
     } catch {}
 
     setMounted(true);
   }, []);
 
   function advanceInstruction(n: number) {
-    try {
-      localStorage.setItem("mk_instruction_step", String(n));
-    } catch {}
     setActiveInstruction(n);
+    setMaxStep((m) => Math.max(m, n));
+    try {
+      const saved = parseInt(
+        localStorage.getItem("mk_instruction_step") || "1",
+        10,
+      );
+      localStorage.setItem(
+        "mk_instruction_step",
+        String(Math.max(Number.isNaN(saved) ? 1 : saved, n)),
+      );
+    } catch {}
   }
 
   const TOTAL = 5;
@@ -341,7 +354,7 @@ export function Step1Token({
             className="space-y-2"
             aria-label="Steps to create a Cloudflare API token"
           >
-            {/* Completed steps */}
+            {/* Completed steps above the open one */}
             {activeInstruction > 1 &&
               stepLabels
                 .slice(0, activeInstruction - 1)
@@ -451,6 +464,20 @@ export function Step1Token({
                 </div>
               </ActiveStep>
             )}
+
+            {/* Completed steps below the open one (already reached) */}
+            {maxStep > activeInstruction &&
+              stepLabels
+                .slice(activeInstruction, maxStep)
+                .map((label, i) => (
+                  <CompletedStepRow
+                    key={activeInstruction + 1 + i}
+                    label={label}
+                    onClick={() =>
+                      advanceInstruction(activeInstruction + 1 + i)
+                    }
+                  />
+                ))}
           </ol>
         )}
       </div>
