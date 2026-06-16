@@ -380,24 +380,52 @@ export function SetupWizard({
   const [isPending, startTransition] = useTransition();
   const [hydrated, setHydrated] = useState(false);
 
-  // Survive a refresh on the zone-selection step (before "Start setup"
-  // creates a server-side run). The validated token lives only in this
-  // tab's sessionStorage — never on our servers — cleared on Start / tab close.
+  // Survive a refresh anywhere in the flow: restore the saved step (or
+  // resume an in-progress run) so the user isn't sent back to re-paste the
+  // token. The token lives only in this browser tab — never on our servers —
+  // and clears on restart, token error, or tab close.
   useEffect(() => {
-    if (activeRun) return;
+    let saved: { token?: string; zones?: Zone[] } | null = null;
     try {
       const raw = sessionStorage.getItem(SETUP_SESSION_KEY);
-      const saved = raw ? JSON.parse(raw) : null;
-      if (saved?.token && Array.isArray(saved.zones) && saved.zones.length) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setState({
-          kind: "zone_selection",
-          zones: saved.zones,
-          token: saved.token,
-        });
-      }
+      saved = raw ? JSON.parse(raw) : null;
     } catch {}
 
+    if (activeRun) {
+      const zone = saved?.zones?.find((z) => z.name === activeRun.domain);
+      if (saved?.token && zone) {
+        // Resume an in-progress run without forcing a token re-paste.
+        const tok = saved.token;
+        startTransition(async () => {
+          const result = await verifyCloudflareToken({ token: tok });
+          if (result.status === "ok") {
+            await handleStartSetup(
+              tok,
+              zone.id,
+              zone.name,
+              activeRun.mailboxLocal,
+            );
+          } else {
+            setState({ kind: "token_entry", errorKey: result.errorKey });
+          }
+          setHydrated(true);
+        });
+      } else {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setHydrated(true);
+      }
+      return;
+    }
+
+    if (saved?.token && Array.isArray(saved.zones) && saved.zones.length) {
+       
+      setState({
+        kind: "zone_selection",
+        zones: saved.zones,
+        token: saved.token,
+      });
+    }
+     
     setHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -408,9 +436,6 @@ export function SetupWizard({
     zoneName: string,
     mailboxLocal: string,
   ) {
-    try {
-      sessionStorage.removeItem(SETUP_SESSION_KEY);
-    } catch {}
     setState({
       kind: "setup_running",
       token,
@@ -530,7 +555,7 @@ export function SetupWizard({
 
   // Don't flash step 1 on a refresh while we restore a passed step from the
   // browser session — show a neutral loader until we've decided.
-  if (!hydrated && !activeRun) {
+  if (!hydrated) {
     return (
       <div className="mx-auto flex min-h-[400px] max-w-4xl items-center justify-center">
         <Loader2
@@ -938,7 +963,12 @@ export function SetupWizard({
       {state.kind === "failed" ? (
         <FailedStep
           state={state}
-          onRestart={() => setState({ kind: "token_entry" })}
+          onRestart={() => {
+            try {
+              sessionStorage.removeItem(SETUP_SESSION_KEY);
+            } catch {}
+            setState({ kind: "token_entry" });
+          }}
           t={t}
           translateErr={translateErr}
         />
