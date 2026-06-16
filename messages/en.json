@@ -363,9 +363,9 @@
       "tokenHelpLink": "Open Cloudflare API Tokens"
     },
     "step2": {
-      "title": "Step 2 — Pick the zone and mailbox",
+      "title": "Step 2 — Pick the domain and mailbox",
       "zoneLabel": "Domain",
-      "zonePlaceholder": "Select a zone",
+      "zonePlaceholder": "Select a domain",
       "mailboxLabel": "Mailbox name",
       "mailboxHint": "This becomes {local}@{domain} — lowercase letters, digits, dot, dash, underscore.",
       "cta": "Start setup",
