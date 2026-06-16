@@ -129,6 +129,7 @@ function mapCfError(e: unknown): ActionError {
   const knownZone = code === 7003;
   const knownDns = code === 1001 || code === 1003;
   const knownRate = code === 10013 || http === 429;
+  const knownPerms = code === 9109 || http === 403;
   if (knownInvalid) {
     return { status: "error", errorKey: "setup.errors.invalid_token" };
   }
@@ -144,6 +145,12 @@ function mapCfError(e: unknown): ActionError {
   }
   if (knownRate) {
     return { status: "error", errorKey: "setup.errors.rate_limited" };
+  }
+  if (knownPerms) {
+    return {
+      status: "error",
+      errorKey: "setup.errors.token_missing_permissions",
+    };
   }
   if (http >= 500) {
     return { status: "error", errorKey: "setup.errors.cloudflare_unavailable" };

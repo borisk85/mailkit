@@ -406,6 +406,7 @@
     },
     "errors": {
       "invalid_token": "Token doesn't look right. Please try again.",
+      "token_missing_permissions": "Your token is missing required permissions. Add the ones listed in step 3 and try again.",
       "zone_not_found": "Zone not found in your Cloudflare account.",
       "dns_rejected": "We had trouble configuring DNS on your domain. This usually means your Cloudflare zone has a conflicting record or the API token doesn't have the right permissions. Restart from Step 1, or contact support@getmailkit.com if it keeps failing.",
       "rate_limited": "Too many requests. Try again in a minute.",
