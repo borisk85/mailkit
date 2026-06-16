@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
@@ -8,6 +9,7 @@ import {
   ArrowUpRight,
   Check,
   CheckCircle2,
+  ChevronDown,
   Circle,
   Copy,
   Eye,
@@ -991,6 +993,137 @@ function TokenEntryStep({
   );
 }
 
+// Smooth, MailKit-styled domain picker (replaces the native <select> that
+// flashed and drifted on mobile). Used only when a token can see 2+ domains.
+function DomainSelect({
+  zones,
+  value,
+  onChange,
+  disabled,
+  placeholder,
+}: {
+  zones: Zone[];
+  value: string;
+  onChange: (v: string) => void;
+  disabled?: boolean;
+  placeholder: string;
+}) {
+  const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const [pos, setPos] = useState<{
+    top: number;
+    left: number;
+    width: number;
+  } | null>(null);
+  const wrapRef = useRef<HTMLDivElement>(null);
+  const btnRef = useRef<HTMLButtonElement>(null);
+  const dropRef = useRef<HTMLDivElement>(null);
+  const selected = zones.find((z) => z.id === value);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+    const onDown = (e: MouseEvent | TouchEvent) => {
+      const tgt = e.target as Node;
+      if (
+        wrapRef.current &&
+        !wrapRef.current.contains(tgt) &&
+        (!dropRef.current || !dropRef.current.contains(tgt))
+      ) {
+        setOpen(false);
+      }
+    };
+    const onScroll = (e: Event) => {
+      if (dropRef.current && dropRef.current.contains(e.target as Node)) return;
+      setOpen(false);
+    };
+    const onResize = () => setOpen(false);
+    document.addEventListener("mousedown", onDown);
+    document.addEventListener("touchstart", onDown);
+    window.addEventListener("scroll", onScroll, true);
+    window.addEventListener("resize", onResize);
+    return () => {
+      document.removeEventListener("mousedown", onDown);
+      document.removeEventListener("touchstart", onDown);
+      window.removeEventListener("scroll", onScroll, true);
+      window.removeEventListener("resize", onResize);
+    };
+  }, []);
+
+  const toggle = () => {
+    if (disabled) return;
+    if (!open && btnRef.current) {
+      const r = btnRef.current.getBoundingClientRect();
+      setPos({ top: r.bottom + 6, left: r.left, width: r.width });
+    }
+    setOpen((o) => !o);
+  };
+
+  const menu =
+    open && pos && mounted
+      ? createPortal(
+          <div
+            ref={dropRef}
+            style={{
+              position: "fixed",
+              top: pos.top,
+              left: pos.left,
+              width: pos.width,
+              zIndex: 9999,
+            }}
+            className="max-h-60 origin-top animate-in overflow-y-auto rounded-lg border border-mk-border-subtle bg-surface-elevated p-1 shadow-xl ring-1 ring-black/5 duration-100 fade-in-0 zoom-in-95"
+          >
+            {zones.map((z) => (
+              <button
+                key={z.id}
+                type="button"
+                onClick={() => {
+                  onChange(z.id);
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex w-full items-center justify-between rounded-md px-3 py-2 text-left font-mono text-sm transition-colors",
+                  z.id === value
+                    ? "bg-mk-accent/10 text-mk-accent"
+                    : "text-mk-text-primary hover:bg-mk-border-subtle/40",
+                )}
+              >
+                {z.name}
+                {z.id === value && <Check className="size-4" aria-hidden />}
+              </button>
+            ))}
+          </div>,
+          document.body,
+        )
+      : null;
+
+  return (
+    <div ref={wrapRef} className="relative">
+      <button
+        ref={btnRef}
+        type="button"
+        onClick={toggle}
+        disabled={disabled}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        className="flex h-9 w-full items-center justify-between rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 font-mono text-sm text-mk-text-primary transition-colors hover:border-mk-border-strong focus-visible:border-mk-accent focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        <span className={selected ? "" : "font-sans text-mk-text-tertiary"}>
+          {selected ? selected.name : placeholder}
+        </span>
+        <ChevronDown
+          className={cn(
+            "size-4 shrink-0 text-mk-text-tertiary transition-transform duration-200",
+            open && "rotate-180",
+          )}
+          aria-hidden
+        />
+      </button>
+      {menu}
+    </div>
+  );
+}
+
 function ZoneSelectionStep({
   zones,
   isPending,
@@ -1013,53 +1146,58 @@ function ZoneSelectionStep({
     [mailboxLocal, domain, t],
   );
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
-      <h2 className="text-lg font-semibold">{t("step2.title")}</h2>
+    <section className="rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
+      <h2 className="text-lg font-semibold text-mk-text-primary">
+        {t("step2.title")}
+      </h2>
       <form
-        className="space-y-3"
+        className="mt-5 max-w-sm space-y-4"
         onSubmit={(e) => {
           e.preventDefault();
           if (!zoneId || !mailboxLocal) return;
           onSubmit(zoneId, mailboxLocal);
         }}
       >
-        <label className="block text-sm font-medium">
-          {t("step2.zoneLabel")}
+        <div className="space-y-1.5">
+          <span className="block text-sm font-medium text-mk-text-primary">
+            {t("step2.zoneLabel")}
+          </span>
           {zones.length > 1 ? (
-            <select
-              className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+            <DomainSelect
+              zones={zones}
               value={zoneId}
-              onChange={(e) => setZoneId(e.target.value)}
+              onChange={setZoneId}
               disabled={isPending}
-            >
-              <option value="" disabled>
-                {t("step2.zonePlaceholder")}
-              </option>
-              {zones.map((z) => (
-                <option key={z.id} value={z.id}>
-                  {z.name}
-                </option>
-              ))}
-            </select>
+              placeholder={t("step2.zonePlaceholder")}
+            />
           ) : (
-            <p className="mt-1 font-mono text-sm font-normal text-mk-text-primary">
+            <div className="flex h-9 w-full items-center rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 font-mono text-sm text-mk-text-primary">
               {zones[0]?.name}
-            </p>
+            </div>
           )}
-        </label>
-        <label className="block text-sm font-medium">
-          {t("step2.mailboxLabel")}
+        </div>
+
+        <div className="space-y-1.5">
+          <span className="block text-sm font-medium text-mk-text-primary">
+            {t("step2.mailboxLabel")}
+          </span>
           <Input
-            className="mt-1 font-mono focus-visible:ring-1"
+            className="h-9 font-mono focus-visible:ring-1"
             value={mailboxLocal}
             onChange={(e) => setMailboxLocal(e.target.value.toLowerCase())}
             disabled={isPending}
             pattern="[a-z0-9._-]{1,64}"
             required
           />
-        </label>
+        </div>
+
         <p className="text-xs text-mk-text-tertiary">{hint}</p>
-        <Button type="submit" disabled={isPending}>
+
+        <Button
+          type="submit"
+          disabled={isPending}
+          className="bg-mk-accent text-white hover:bg-mk-accent-hover"
+        >
           {isPending ? t("step2.ctaLoading") : t("step2.cta")}
         </Button>
       </form>
