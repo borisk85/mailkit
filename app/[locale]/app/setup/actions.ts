@@ -169,7 +169,7 @@ export async function verifyCloudflareToken(input: {
   if (!parsed.success) {
     return {
       status: "error",
-      errorKey: "setup.errors.invalid_input",
+      errorKey: "setup.errors.invalid_token",
       details: parsed.error.flatten(),
     };
   }

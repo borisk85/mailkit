@@ -545,14 +545,22 @@ export function SetupWizard({
                   token,
                 });
               } else {
+                const errKey = result.errorKey;
                 setState({
                   kind: "token_entry",
-                  errorKey: result.errorKey,
+                  errorKey: errKey,
                   errorDetails:
                     typeof result.details === "string"
                       ? result.details
                       : undefined,
                 });
+                setTimeout(() => {
+                  setState((prev) =>
+                    prev.kind === "token_entry" && prev.errorKey === errKey
+                      ? { kind: "token_entry" }
+                      : prev,
+                  );
+                }, 5000);
               }
             });
           }}
