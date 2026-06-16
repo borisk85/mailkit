@@ -137,10 +137,17 @@ export async function sendAutoRefundEmail(args: {
     "— MailKit support",
   ].join("\n");
 
+  const branded = brandedEmailContent({
+    title: subject,
+    textContent,
+    preheader: "Your $5 setup couldn't complete — full refund issued",
+  });
+
   await sendTransactionalEmail({
     to: { email: toEmail, name: toName },
     subject,
-    textContent,
+    textContent: branded.textContent,
+    htmlContent: branded.htmlContent,
   });
 }
 
