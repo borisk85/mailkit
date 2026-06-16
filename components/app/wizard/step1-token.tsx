@@ -419,7 +419,7 @@ export function Step1Token({
                 <UiLabel>Create Token</UiLabel> → Copy the token and paste it on
                 the right
                 <div className="mt-2">
-                  <CfScreenshotGallery from={6} to={7} />
+                  <CfScreenshotGallery from={6} to={8} />
                 </div>
               </ActiveStep>
             )}

@@ -11,6 +11,7 @@ const STEPS = [
   { label: "Choose Custom token" },
   { label: "Add permissions" },
   { label: "Set Zone Resource" },
+  { label: "Continue to summary" },
   { label: "Review summary" },
   { label: "Copy your token" },
 ] as const;
