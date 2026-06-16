@@ -252,7 +252,7 @@ export function Step1Token({
       if (n >= 2 && n <= 5) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setActiveInstruction(n);
-         
+
         setMaxStep(n);
       }
     } catch {}
@@ -273,6 +273,12 @@ export function Step1Token({
         String(Math.max(Number.isNaN(saved) ? 1 : saved, n)),
       );
     } catch {}
+  }
+
+  // Done on a step: if a previously completed step is being re-edited, jump
+  // back to the furthest reached step; otherwise advance to the next one.
+  function handleDone(currentStep: number) {
+    advanceInstruction(currentStep < maxStep ? maxStep : currentStep + 1);
   }
 
   const TOTAL = 5;
@@ -371,7 +377,7 @@ export function Step1Token({
               <ActiveStep
                 number={1}
                 total={TOTAL}
-                onNext={() => advanceInstruction(2)}
+                onNext={() => handleDone(1)}
                 isLast={false}
               >
                 <span>
@@ -404,7 +410,7 @@ export function Step1Token({
               <ActiveStep
                 number={2}
                 total={TOTAL}
-                onNext={() => advanceInstruction(3)}
+                onNext={() => handleDone(2)}
                 isLast={false}
               >
                 Click <UiLabel>Create Token</UiLabel> →{" "}
@@ -419,7 +425,7 @@ export function Step1Token({
               <ActiveStep
                 number={3}
                 total={TOTAL}
-                onNext={() => advanceInstruction(4)}
+                onNext={() => handleDone(3)}
                 isLast={false}
               >
                 <span className="block mb-2">
@@ -436,7 +442,7 @@ export function Step1Token({
               <ActiveStep
                 number={4}
                 total={TOTAL}
-                onNext={() => advanceInstruction(5)}
+                onNext={() => handleDone(4)}
                 isLast={false}
               >
                 <span className="block mb-2">
