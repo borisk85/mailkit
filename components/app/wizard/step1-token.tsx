@@ -325,8 +325,8 @@ export function Step1Token({
                 onNext={() => advanceInstruction(3)}
                 isLast={false}
               >
-                Click <UiLabel>Create Token</UiLabel>, then{" "}
-                <UiLabel>Get started</UiLabel> in the Create Custom Token row
+                Click <UiLabel>Create Token</UiLabel> →{" "}
+                <UiLabel>Get started</UiLabel>
                 <div className="mt-2">
                   <CfScreenshotGallery from={2} to={3} />
                 </div>
