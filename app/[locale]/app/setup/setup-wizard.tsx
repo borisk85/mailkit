@@ -1002,7 +1002,7 @@ function ZoneSelectionStep({
         <label className="block text-sm font-medium">
           {t("step2.mailboxLabel")}
           <Input
-            className="mt-1 font-mono"
+            className="mt-1 font-mono focus-visible:ring-1"
             value={mailboxLocal}
             onChange={(e) => setMailboxLocal(e.target.value.toLowerCase())}
             disabled={isPending}
