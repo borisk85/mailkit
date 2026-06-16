@@ -348,6 +348,11 @@ function getStepperStep(kind: WizardState["kind"]): number {
   return 1; // failed or unknown
 }
 
+// CF token is persisted ONLY in this browser tab's sessionStorage so a
+// refresh on the zone-selection step doesn't force re-entering it. It never
+// reaches our servers and is cleared on Start setup / tab close.
+const SETUP_SESSION_KEY = "mk_setup_token_session";
+
 export function SetupWizard({
   initialMock,
   activeRun,
@@ -372,12 +377,36 @@ export function SetupWizard({
   );
   const [isPending, startTransition] = useTransition();
 
+  // Survive a refresh on the zone-selection step (before "Start setup"
+  // creates a server-side run). The validated token lives only in this
+  // tab's sessionStorage — never on our servers — cleared on Start / tab close.
+  useEffect(() => {
+    if (activeRun) return;
+    try {
+      const raw = sessionStorage.getItem(SETUP_SESSION_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw);
+      if (saved?.token && Array.isArray(saved.zones) && saved.zones.length) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setState({
+          kind: "zone_selection",
+          zones: saved.zones,
+          token: saved.token,
+        });
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   async function handleStartSetup(
     token: string,
     zoneId: string,
     zoneName: string,
     mailboxLocal: string,
   ) {
+    try {
+      sessionStorage.removeItem(SETUP_SESSION_KEY);
+    } catch {}
     setState({
       kind: "setup_running",
       token,
@@ -539,12 +568,21 @@ export function SetupWizard({
                     return;
                   }
                 }
+                try {
+                  sessionStorage.setItem(
+                    SETUP_SESSION_KEY,
+                    JSON.stringify({ token, zones: result.zones }),
+                  );
+                } catch {}
                 setState({
                   kind: "zone_selection",
                   zones: result.zones,
                   token,
                 });
               } else {
+                try {
+                  sessionStorage.removeItem(SETUP_SESSION_KEY);
+                } catch {}
                 const errKey = result.errorKey;
                 setState({
                   kind: "token_entry",
