@@ -503,7 +503,7 @@ export function Step1Token({
             <InlineError message={translateErr(errorKey, errorDetails)} />
           )}
 
-          <div className="flex items-start gap-1.5 text-[11px] leading-snug text-mk-text-tertiary">
+          <div className="flex items-start gap-1.5 text-[11px] leading-snug text-mk-success">
             <ShieldCheck className="mt-px size-3.5 shrink-0" aria-hidden />
             <span>
               Used only during setup, then discarded — we never store your token
