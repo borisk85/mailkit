@@ -78,11 +78,6 @@ function PermissionChecklist() {
               </li>
             ))}
           </ul>
-          <div className="mt-3 rounded-md bg-mk-accent/8 px-3 py-2">
-            <span className="text-xs leading-snug text-mk-text-secondary">
-              {t("scopeNote")}
-            </span>
-          </div>
         </div>
       )}
     </div>
@@ -357,6 +352,11 @@ export function Step1Token({
               >
                 Set <UiLabel>Zone Resource</UiLabel> → Specific zone → your
                 domain
+                <div className="mt-3 rounded-md bg-mk-accent/8 px-3 py-2">
+                  <span className="text-xs leading-snug text-mk-text-secondary">
+                    {t("scopeNote")}
+                  </span>
+                </div>
                 <div className="mt-2">
                   <CfScreenshotGallery from={5} to={5} />
                 </div>
