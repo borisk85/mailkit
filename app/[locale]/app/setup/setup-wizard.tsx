@@ -523,28 +523,28 @@ export function SetupWizard({
       case "token_validating":
         return t("subtitle");
       case "zone_selection":
-        return "Pick the mailbox name for your new email address.";
+        return "Pick the name before the @ — your domain's already set.";
       case "ns_warning":
         return "This domain's DNS is not on Cloudflare yet — migration required before setup.";
       case "setup_running":
       case "awaiting_verify":
-        return "Configuring Cloudflare Email Routing for your domain.";
+        return "Configuring Cloudflare Email Routing to receive mail.";
       case "cf_done_pending_smtp":
-        return "Cloudflare connected. Setting up your sending infrastructure next.";
+        return "Receiving is ready — sending comes next.";
       case "smtp_running":
         return "Configuring DNS records for sending. This is automatic — takes ~30 seconds.";
       case "smtp_dkim_polling":
         return state.mockIsLong
-          ? "Verification is taking longer than usual — still working in the background."
-          : "Verifying your domain with Postmark. This usually takes ~5–15 minutes.";
+          ? "This is taking longer than usual — still working in the background."
+          : "Postmark is checking DKIM on your DNS — usually 5–15 minutes.";
       case "smtp_awaiting_retry":
       case "smtp_done":
         return "Configuring DNS records for sending. This is automatic — takes ~30 seconds.";
       case "gmail_instructions_shown":
       case "gmail_smtp_ready":
-        return "Almost done. Add your address to Gmail to start sending.";
+        return "Almost done — add the address as Send-As to send from it.";
       case "gmail_done":
-        return "All set. You can now send from your domain in Gmail.";
+        return "All set — you can now send from your domain.";
       case "failed":
         return "Setup hit a snag. Restart below.";
       default:
