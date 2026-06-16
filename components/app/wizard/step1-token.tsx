@@ -259,7 +259,6 @@ export function Step1Token({
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setActiveInstruction(6);
     } else if (errorKey && activeInstruction === 6) {
-       
       setActiveInstruction(5);
     }
   }, [isPending, errorKey, activeInstruction]);
@@ -455,7 +454,7 @@ export function Step1Token({
               once and we can&apos;t show it again.
             </p>
 
-            <div className="relative">
+            <div className="relative mt-3">
               <Input
                 id="cf-token"
                 type={showToken ? "text" : "password"}
