@@ -133,18 +133,30 @@ function ZoneResourceCard() {
 
 // ─── Completed step row ───────────────────────────────────────────────────────
 
-function CompletedStepRow({ label }: { label: string }) {
+function CompletedStepRow({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
   return (
-    <li className="flex items-center gap-3 py-1">
-      <span
-        aria-hidden
-        className="flex size-5 shrink-0 items-center justify-center rounded-full bg-mk-accent/15 text-mk-accent"
+    <li>
+      <button
+        type="button"
+        onClick={onClick}
+        className="group flex w-full items-center gap-3 py-1 text-left"
       >
-        <Check className="size-3" />
-      </span>
-      <span className="text-xs text-mk-text-tertiary line-through">
-        {label}
-      </span>
+        <span
+          aria-hidden
+          className="flex size-5 shrink-0 items-center justify-center rounded-full bg-mk-accent/15 text-mk-accent"
+        >
+          <Check className="size-3" />
+        </span>
+        <span className="text-xs text-mk-text-tertiary line-through transition-colors group-hover:text-mk-text-secondary group-hover:no-underline">
+          {label}
+        </span>
+      </button>
     </li>
   );
 }
@@ -334,7 +346,11 @@ export function Step1Token({
               stepLabels
                 .slice(0, activeInstruction - 1)
                 .map((label, i) => (
-                  <CompletedStepRow key={i + 1} label={label} />
+                  <CompletedStepRow
+                    key={i + 1}
+                    label={label}
+                    onClick={() => advanceInstruction(i + 1)}
+                  />
                 ))}
 
             {/* Active step */}
