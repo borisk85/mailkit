@@ -357,7 +357,7 @@
       "title": "Step 1 — Paste your Cloudflare API token",
       "tokenLabel": "Cloudflare API token",
       "tokenPlaceholder": "Paste the token here",
-      "cta": "Validate token",
+      "cta": "Validate",
       "ctaLoading": "Validating…",
       "tokenHelp": "Create at https://dash.cloudflare.com/profile/api-tokens — template Custom token, scopes: Zone:Zone:Read, Zone:DNS:Edit, Zone:Zone Settings:Edit, Zone:Email Routing Rules:Edit (all four zone-scoped; set Zone Resource to the specific zone) + Account:Email Routing Addresses:Edit (account-scoped).",
       "tokenHelpLink": "Open Cloudflare API Tokens"

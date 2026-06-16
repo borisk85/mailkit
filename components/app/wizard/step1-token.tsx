@@ -394,7 +394,7 @@ export function Step1Token({
               Paste your token
             </span>
             <p className="text-xs text-mk-text-tertiary">
-              Cloudflare tokens start with{" "}
+              It starts with{" "}
               <code className="rounded bg-mk-border-subtle/60 px-1 py-0.5 font-mono text-[11px]">
                 cfut_
               </code>

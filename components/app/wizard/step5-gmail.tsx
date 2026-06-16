@@ -29,7 +29,7 @@ export function Step5Gmail({
           Final step: Gmail Send-As
         </h2>
         <p className="text-xs text-mk-text-tertiary">
-          ~3 minutes. Copy 4 values into Gmail settings — we&apos;ll guide you.
+          Copy 4 values into Gmail settings — step-by-step.
         </p>
         <p className="text-xs font-mono text-mk-text-tertiary">
           {mailboxLocal}@{zoneName}

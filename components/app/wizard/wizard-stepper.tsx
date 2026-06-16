@@ -182,8 +182,8 @@ export function WizardStepper({ currentStep, steps }: WizardStepperProps) {
 /** Canonical 5-step definition for the setup wizard. */
 export const WIZARD_STEPS: WizardStep[] = [
   { label: "API Token", sublabel: "Cloudflare credentials" },
-  { label: "Your domain", sublabel: "Pick zone & mailbox" },
-  { label: "Automation", sublabel: "We configure DNS" },
-  { label: "DKIM verify", sublabel: "5–30 min async" },
-  { label: "Gmail Send-As", sublabel: "Final ~3 min" },
+  { label: "Your domain", sublabel: "Zone & mailbox" },
+  { label: "Automation", sublabel: "DNS configuration" },
+  { label: "DKIM verify", sublabel: "Domain verification" },
+  { label: "Gmail Send-As", sublabel: "Gmail setup" },
 ];
