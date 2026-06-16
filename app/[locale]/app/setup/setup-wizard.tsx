@@ -966,9 +966,13 @@ function ZoneSelectionStep({
 }) {
   const [zoneId, setZoneId] = useState(zones[0]?.id ?? "");
   const [mailboxLocal, setMailboxLocal] = useState("hello");
+  const domain = useMemo(
+    () => zones.find((z) => z.id === zoneId)?.name ?? "your-domain",
+    [zones, zoneId],
+  );
   const hint = useMemo(
-    () => t("step2.mailboxHint", { local: mailboxLocal || "hello" }),
-    [mailboxLocal, t],
+    () => t("step2.mailboxHint", { local: mailboxLocal || "hello", domain }),
+    [mailboxLocal, domain, t],
   );
   return (
     <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
