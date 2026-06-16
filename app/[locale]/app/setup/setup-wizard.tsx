@@ -1157,10 +1157,7 @@ function ZoneSelectionStep({
     [zones, zoneId],
   );
   const hint = useMemo(
-    () =>
-      mailboxLocal
-        ? t("step2.mailboxHint", { local: mailboxLocal, domain })
-        : t("step2.mailboxHintEmpty"),
+    () => t("step2.mailboxHint", { local: mailboxLocal, domain }),
     [mailboxLocal, domain, t],
   );
   return (
