@@ -1201,7 +1201,11 @@ function ZoneSelectionStep({
             value={mailboxLocal}
             onChange={(e) =>
               setMailboxLocal(
-                e.target.value.toLowerCase().replace(/[^a-z0-9._-]/g, ""),
+                e.target.value
+                  .toLowerCase()
+                  .replace(/[^a-z0-9._-]/g, "")
+                  .replace(/^[._-]+/, "")
+                  .replace(/\.{2,}/g, "."),
               )
             }
             disabled={isPending}
