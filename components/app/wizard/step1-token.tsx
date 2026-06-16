@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import {
-  CheckSquare,
   ChevronDown,
   Eye,
   EyeOff,
@@ -67,14 +66,12 @@ function PermissionChecklist() {
 
       {open && (
         <div className="px-4 pb-4 pt-1 border-t border-mk-border-subtle">
-          <ul className="space-y-1.5">
+          <ul className="space-y-1.5 border-l-2 border-mk-accent/30 pl-3">
             {[...ZONE_PERMS, ...ACCOUNT_PERMS].map((perm) => (
-              <li key={perm} className="flex items-center gap-2">
-                <CheckSquare
-                  className="size-4 shrink-0 text-mk-accent"
-                  aria-hidden
-                />
-                <code className="text-xs text-mk-text-primary">{perm}</code>
+              <li key={perm}>
+                <code className="text-xs text-mk-text-primary">
+                  {perm.replace(/:/g, " : ")}
+                </code>
               </li>
             ))}
           </ul>
