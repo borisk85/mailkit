@@ -378,6 +378,7 @@ export function SetupWizard({
     mockInitialState(initialMock),
   );
   const [isPending, startTransition] = useTransition();
+  const [hydrated, setHydrated] = useState(false);
 
   // Survive a refresh on the zone-selection step (before "Start setup"
   // creates a server-side run). The validated token lives only in this
@@ -386,8 +387,7 @@ export function SetupWizard({
     if (activeRun) return;
     try {
       const raw = sessionStorage.getItem(SETUP_SESSION_KEY);
-      if (!raw) return;
-      const saved = JSON.parse(raw);
+      const saved = raw ? JSON.parse(raw) : null;
       if (saved?.token && Array.isArray(saved.zones) && saved.zones.length) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setState({
@@ -397,6 +397,8 @@ export function SetupWizard({
         });
       }
     } catch {}
+     
+    setHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -525,6 +527,19 @@ export function SetupWizard({
         return t("subtitle");
     }
   })();
+
+  // Don't flash step 1 on a refresh while we restore a passed step from the
+  // browser session — show a neutral loader until we've decided.
+  if (!hydrated && !activeRun) {
+    return (
+      <div className="mx-auto flex min-h-[400px] max-w-4xl items-center justify-center">
+        <Loader2
+          className="size-6 animate-spin text-mk-text-tertiary"
+          aria-hidden
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
