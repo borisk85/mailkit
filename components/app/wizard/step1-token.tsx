@@ -90,6 +90,45 @@ function PermissionChecklist() {
   );
 }
 
+function ZoneResourceCard() {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="rounded-lg border border-mk-border-subtle bg-surface-elevated-2 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="flex w-full items-center justify-between px-4 py-3 text-left hover:bg-mk-border-subtle/20 transition-colors"
+      >
+        <span className="text-xs font-semibold text-mk-text-secondary">
+          Zone resource
+        </span>
+        <ChevronDown
+          className={`size-4 text-mk-text-tertiary transition-transform duration-200 ${open ? "rotate-180" : ""}`}
+          aria-hidden
+        />
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4 pt-1 border-t border-mk-border-subtle">
+          <ul className="space-y-1.5 border-l-2 border-mk-accent/30 pl-3">
+            <li>
+              <code className="text-xs text-mk-text-primary">
+                Include : Specific zone : your domain
+              </code>
+            </li>
+          </ul>
+          <div className="mt-3 rounded-md bg-mk-accent/8 px-3 py-2">
+            <span className="text-xs leading-snug text-mk-text-secondary">
+              Pick the domain this token is for.
+            </span>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ─── Completed step row ───────────────────────────────────────────────────────
 
 function CompletedStepRow({ label }: { label: string }) {
@@ -358,13 +397,10 @@ export function Step1Token({
                 onNext={() => advanceInstruction(5)}
                 isLast={false}
               >
-                Set <UiLabel>Zone Resource</UiLabel> → Specific zone → your
-                domain
-                <div className="mt-3 rounded-md bg-mk-accent/8 px-3 py-2">
-                  <span className="text-xs leading-snug text-mk-text-secondary">
-                    {t("scopeNote")}
-                  </span>
-                </div>
+                <span className="block mb-2">
+                  Limit the token to your domain:
+                </span>
+                <ZoneResourceCard />
                 <div className="mt-2">
                   <CfScreenshotGallery from={5} to={5} />
                 </div>
