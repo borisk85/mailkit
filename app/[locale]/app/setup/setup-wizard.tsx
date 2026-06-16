@@ -1025,21 +1025,27 @@ function ZoneSelectionStep({
       >
         <label className="block text-sm font-medium">
           {t("step2.zoneLabel")}
-          <select
-            className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
-            value={zoneId}
-            onChange={(e) => setZoneId(e.target.value)}
-            disabled={isPending}
-          >
-            <option value="" disabled>
-              {t("step2.zonePlaceholder")}
-            </option>
-            {zones.map((z) => (
-              <option key={z.id} value={z.id}>
-                {z.name}
+          {zones.length > 1 ? (
+            <select
+              className="mt-1 block w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm dark:border-zinc-700 dark:bg-zinc-900"
+              value={zoneId}
+              onChange={(e) => setZoneId(e.target.value)}
+              disabled={isPending}
+            >
+              <option value="" disabled>
+                {t("step2.zonePlaceholder")}
               </option>
-            ))}
-          </select>
+              {zones.map((z) => (
+                <option key={z.id} value={z.id}>
+                  {z.name}
+                </option>
+              ))}
+            </select>
+          ) : (
+            <p className="mt-1 font-mono text-sm font-normal text-mk-text-primary">
+              {zones[0]?.name}
+            </p>
+          )}
         </label>
         <label className="block text-sm font-medium">
           {t("step2.mailboxLabel")}
