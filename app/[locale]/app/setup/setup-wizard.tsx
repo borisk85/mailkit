@@ -418,14 +418,13 @@ export function SetupWizard({
     }
 
     if (saved?.token && Array.isArray(saved.zones) && saved.zones.length) {
-       
       setState({
         kind: "zone_selection",
         zones: saved.zones,
         token: saved.token,
       });
     }
-     
+
     setHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -553,6 +552,21 @@ export function SetupWizard({
     }
   })();
 
+  const phaseTitle = (() => {
+    switch (getStepperStep(state.kind)) {
+      case 2:
+        return "Choose your email address";
+      case 3:
+        return "Setting up your domain";
+      case 4:
+        return "Verifying your domain";
+      case 5:
+        return "Finish in Gmail";
+      default:
+        return t("title");
+    }
+  })();
+
   // Don't flash step 1 on a refresh while we restore a passed step from the
   // browser session — show a neutral loader until we've decided.
   if (!hydrated) {
@@ -570,7 +584,7 @@ export function SetupWizard({
     <div className="mx-auto max-w-4xl space-y-8">
       <header>
         <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
-          {t("title")}
+          {phaseTitle}
         </h1>
         <p className="mt-2 text-sm text-mk-text-secondary">{phaseSubtitle}</p>
       </header>
