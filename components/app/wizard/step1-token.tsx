@@ -153,7 +153,7 @@ function CompletedStepRow({
         >
           <Check className="size-3" />
         </span>
-        <span className="text-xs text-mk-text-tertiary line-through transition-colors group-hover:text-mk-text-secondary group-hover:no-underline">
+        <span className="text-xs text-mk-text-tertiary line-through transition-colors group-hover:text-mk-text-secondary">
           {label}
         </span>
       </button>
