@@ -114,7 +114,8 @@ function ZoneResourceCard() {
           <ul className="space-y-1.5 border-l-2 border-mk-accent/30 pl-3">
             <li>
               <code className="text-xs text-mk-text-primary">
-                Include : Specific zone : your domain
+                Include : Specific zone :{" "}
+                <span className="text-mk-accent">your domain</span>
               </code>
             </li>
           </ul>
