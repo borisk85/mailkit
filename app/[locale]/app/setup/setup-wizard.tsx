@@ -352,15 +352,19 @@ function getStepperStep(kind: WizardState["kind"]): number {
   return 1; // failed or unknown
 }
 
-// CF token is persisted ONLY in this browser tab's sessionStorage so a
-// refresh on the zone-selection step doesn't force re-entering it. It never
-// reaches our servers and is cleared on Start setup / tab close.
+// CF token in this browser tab's sessionStorage keeps a refresh on the
+// zone-selection step from forcing a re-paste. The token is ALSO stored
+// encrypted-at-rest on the run server-side (migration 0013) so a paid
+// setup can resume in a session that has no sessionStorage — surfaced back
+// as the `initialToken` prop. Tab copy clears on token error / Restart /
+// tab close; the server copy is deleted the moment setup completes.
 const SETUP_SESSION_KEY = "mk_setup_token_session";
 
 export function SetupWizard({
   initialMock,
   activeRun,
   hasPurchase,
+  initialToken,
 }: {
   initialMock: MockKey;
   activeRun?: {
@@ -370,6 +374,13 @@ export function SetupWizard({
     status: string;
   } | null;
   hasPurchase?: boolean;
+  /**
+   * CF token decrypted server-side for the run's owner. Lets a paid setup
+   * resume the SMTP step in a session that has no sessionStorage token
+   * (fresh tab / different device / after sign-out) without dropping the
+   * user back to step 1.
+   */
+  initialToken?: string | null;
 }) {
   const t = useTranslations("setup");
   const tErr = useTranslations("setup.errors");
@@ -407,6 +418,31 @@ export function SetupWizard({
               zone.name,
               activeRun.mailboxLocal,
             );
+          } else {
+            setState({ kind: "token_entry", errorKey: result.errorKey });
+          }
+          setHydrated(true);
+        });
+      } else if (initialToken) {
+        // Server-provided token (paid run, fresh session with no
+        // sessionStorage) — resume the remaining steps without dropping
+        // the user back to step 1.
+        const tok = initialToken;
+        startTransition(async () => {
+          const result = await verifyCloudflareToken({ token: tok });
+          if (result.status === "ok") {
+            const z = result.zones.find((zz) => zz.name === activeRun.domain);
+            if (z) {
+              try {
+                sessionStorage.setItem(
+                  SETUP_SESSION_KEY,
+                  JSON.stringify({ token: tok, zones: result.zones }),
+                );
+              } catch {}
+              await handleStartSetup(tok, z.id, z.name, activeRun.mailboxLocal);
+            } else {
+              setState({ kind: "token_entry" });
+            }
           } else {
             setState({ kind: "token_entry", errorKey: result.errorKey });
           }

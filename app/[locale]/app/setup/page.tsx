@@ -4,6 +4,7 @@ import {
   linkOrphanPurchase,
   reclaimPurchaseByEmail,
 } from "@/lib/checkout-link";
+import { decryptToken } from "@/lib/crypto/token-cipher";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 import { SetupWizard } from "./setup-wizard";
@@ -69,6 +70,11 @@ export default async function SetupPage({
     mailboxLocal: string;
     status: string;
   } | null = null;
+  // Decrypted CF token for the run's owner, so a paid setup resumes the
+  // SMTP step in any session (fresh tab / different device / after
+  // sign-out) without sending the user back to step 1. Only ever reaches
+  // the authenticated owner of the run.
+  let initialToken: string | null = null;
   let hasPurchase = false;
 
   const supabase = await createClient();
@@ -108,7 +114,7 @@ export default async function SetupPage({
         const [runsResult, purchaseResult] = await Promise.all([
           supabase
             .from("setup_runs")
-            .select("id, domain, mailbox_local, status")
+            .select("id, domain, mailbox_local, status, cf_token_enc")
             .eq("user_id", user.id)
             .not("status", "in", '("done","failed")')
             .order("created_at", { ascending: false })
@@ -130,6 +136,9 @@ export default async function SetupPage({
             mailboxLocal: runsResult.data.mailbox_local as string,
             status: runsResult.data.status as string,
           };
+          initialToken = decryptToken(
+            runsResult.data.cf_token_enc as string | null,
+          );
         }
         hasPurchase = !!purchaseResult.data;
       } catch {
@@ -145,6 +154,7 @@ export default async function SetupPage({
           initialMock={mock}
           activeRun={activeRun}
           hasPurchase={hasPurchase}
+          initialToken={initialToken}
         />
       </div>
     </div>

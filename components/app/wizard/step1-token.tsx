@@ -555,8 +555,8 @@ export function Step1Token({
           <div className="flex items-start gap-1.5 text-[11px] leading-snug text-mk-success">
             <ShieldCheck className="mt-px size-3.5 shrink-0" aria-hidden />
             <span>
-              Used only during setup, then discarded — we never store your token
-              or use it for anything else.
+              Encrypted while your setup runs, deleted when it finishes — never
+              used for anything else.
             </span>
           </div>
         </form>

@@ -65,12 +65,21 @@ returning if it becomes necessary.
 
 ## Cloudflare token handling (Ticket #4a)
 
-- User pastes their own zone-scoped token once per setup run; we keep
-  it in memory for the duration of the server action and never persist.
-- If the setup run fails mid-flight, the resume flow
-  (`resumeDestinationVerify`) requires the user to paste the token
-  again. We do not store or encrypt-at-rest; the token is short-lived
-  to the request handler.
-- Scope enforcement is on the user (creating the token) — see
-  `setup.step1.tokenHelp` in `messages/{en,ru}.json` for the minimal
-  scope list.
+- User pastes their own zone-scoped token once per setup run.
+- We store it **encrypted at rest** (AES-256-GCM,
+  `lib/crypto/token-cipher.ts`, key `CF_TOKEN_ENC_KEY`) on the
+  `setup_runs.cf_token_enc` column (migration 0013) **only while the
+  setup is in progress**. This lets a paid run resume the SMTP/DKIM
+  step in any session — fresh tab, different device, after sign-out —
+  without forcing a step-1 re-paste. On page load the ciphertext is
+  decrypted server-side and handed only to the authenticated owner of
+  the run.
+- **Retention is minimised:** the column is nulled the moment the run
+  reaches `smtp_done`, and stale (>30 min) non-terminal runs are
+  marked failed with the token wiped. So the at-rest window is
+  minutes/hours, never indefinite. Plaintext is never written (per
+  Cloudflare's own guidance).
+- The token is zone-scoped, bounding blast radius if a row ever leaks;
+  the user can revoke it in Cloudflare at any time. Scope enforcement
+  is on the user (creating the token) — see `setup.step1.tokenHelp` in
+  `messages/en.json` for the minimal scope list.

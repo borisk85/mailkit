@@ -146,8 +146,8 @@ export function Step3Progress({ phase, reached }: Step3ProgressProps) {
             aria-hidden
           />
           <p className="text-xs leading-snug text-mk-text-tertiary">
-            Your Cloudflare credentials are used only for this setup and are
-            never stored.
+            Your Cloudflare token is encrypted while this setup runs and deleted
+            as soon as it finishes.
           </p>
         </div>
       </div>

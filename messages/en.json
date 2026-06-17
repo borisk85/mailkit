@@ -210,7 +210,7 @@
         {
           "id": "token-safety",
           "q": "Is my Cloudflare API token safe with you?",
-          "a": "We use the token only during the active setup session and discard it from memory afterwards. We do not persist it in our database. The token can be scoped to the minimum permissions our wizard documents (Zone:DNS:Edit + Email Routing edits on the specific zone) and can be revoked from your Cloudflare dashboard at any time."
+          "a": "While your setup is in progress we store the token encrypted at rest (AES-256) so you can resume from any device or browser without re-entering it. We delete it the moment the setup finishes, so it is never kept beyond your active setup, and it is never stored in plain text. The token can be scoped to the minimum permissions our wizard documents (Zone:DNS:Edit + Email Routing edits on the specific zone) and can be revoked from your Cloudflare dashboard at any time."
         },
         {
           "id": "spam",

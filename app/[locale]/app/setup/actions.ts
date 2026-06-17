@@ -25,6 +25,7 @@ import {
   type SmtpDisplay,
 } from "@/lib/integrations/postmark-smtp";
 import { triggerAutoRefund } from "@/lib/auto-refund";
+import { encryptToken } from "@/lib/crypto/token-cipher";
 import { checkPhishingPattern } from "@/lib/phishing";
 import { sendTelegramAlert, escapeHtml } from "@/lib/telegram-alert";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
@@ -274,6 +275,11 @@ export async function startSetupRun(input: {
       r.mailbox_local === parsed.data.mailboxLocal,
   );
   if (activeRow) {
+    // Refresh the stored token so a later cross-session resume still has it.
+    await admin
+      .from("setup_runs")
+      .update({ cf_token_enc: encryptToken(parsed.data.token) })
+      .eq("id", activeRow.id);
     return {
       status: "ok",
       runId: activeRow.id,
@@ -290,6 +296,7 @@ export async function startSetupRun(input: {
         .update({
           status: "failed",
           error_msg: "stale: superseded by newer run",
+          cf_token_enc: null,
         })
         .eq("id", r.id);
     }
@@ -318,6 +325,9 @@ export async function startSetupRun(input: {
       status: "started",
       cf_zone_id: parsed.data.zoneId,
       cf_state: { account_id: accountId, last_step: STEP.start },
+      // Encrypted-at-rest so a paid run can resume the SMTP step in any
+      // session without re-pasting the token. Nulled on completion/failure.
+      cf_token_enc: encryptToken(parsed.data.token),
     })
     .select("id")
     .single();
@@ -1023,6 +1033,11 @@ async function patchPostmarkState(
   };
   if (input.postmarkServerId !== undefined) {
     update.postmark_server_id = input.postmarkServerId;
+  }
+  if (input.status === "smtp_done") {
+    // SMTP DNS already written — the CF token is no longer needed. Wipe it
+    // to minimise retention (shortest possible at-rest window).
+    update.cf_token_enc = null;
   }
   await admin.from("setup_runs").update(update).eq("id", runId);
 }

@@ -87,7 +87,7 @@ What happens if the setup fails halfway?
 If our automation fails, we issue an automatic full refund within 24 hours. The dashboard shows which step failed and why.
 
 Is my Cloudflare API token safe?
-We use it only during the active setup session and discard it afterward. We do not persist it in our database. You can scope it to minimum permissions and revoke it from Cloudflare at any time.
+While your setup is in progress we store it encrypted at rest (AES-256) so you can resume from any device without re-entering it, and we delete it as soon as the setup finishes — it is never stored in plain text. You can scope it to minimum permissions and revoke it from Cloudflare at any time.
 
 Why might my emails go to spam?
 MailKit configures SPF, DKIM, and DMARC correctly. Whether email lands in inbox depends on sender reputation, content, and the recipient's policies — outside our control. Practical advice: send 10–20 emails per day in the first week from a fresh domain, then ramp up gradually.
