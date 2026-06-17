@@ -76,5 +76,10 @@ export async function GET() {
     url.searchParams.set("checkout[discount_code]", FIRST_100_DISCOUNT_CODE);
   }
 
-  return NextResponse.redirect(url.toString(), { status: 303 });
+  // no-store so the browser never reuses a stale redirect target (e.g. a
+  // previous deploy's checkout host) — every click re-runs this handler.
+  return NextResponse.redirect(url.toString(), {
+    status: 303,
+    headers: { "Cache-Control": "no-store, max-age=0" },
+  });
 }
