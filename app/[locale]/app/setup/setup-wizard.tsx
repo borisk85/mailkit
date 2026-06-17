@@ -1573,11 +1573,16 @@ function CfDonePendingSmtpStep({
           </Button>
         ) : (
           <div className="mt-3">
-            {/* Full navigation to an API route that 303-redirects to Lemon
-                Squeezy — must be a real <a>, not next/link client routing. */}
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+            {/* Opens checkout in a NEW tab so the wizard tab stays put — the
+                pay route 303-redirects, and a redirect in this tab's history
+                makes Back bounce past /app/setup to /app. New tab avoids that;
+                the CF token is now stored server-side, so the new tab resumes
+                fine after payment. Real <a> (API route), not next/link. */}
+            { }
             <a
               href="/api/checkout/start"
+              target="_blank"
+              rel="noopener noreferrer"
               className="mk-cta-shadow inline-flex h-10 items-center justify-center rounded-[8px] bg-mk-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
             >
               Complete setup — $5
