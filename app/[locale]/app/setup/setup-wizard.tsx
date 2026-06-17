@@ -1277,7 +1277,7 @@ function ZoneSelectionStep({
 
         {/* Right: live address — the hero of this step */}
         <div className="flex flex-col items-center justify-center gap-4 md:-translate-y-14">
-          <TbMailFilled className="size-20 text-mk-accent" aria-hidden />
+          <TbMailFilled className="size-20 text-mk-accent/60" aria-hidden />
           <p className="break-all text-center font-mono text-2xl font-semibold leading-tight">
             <span className="text-mk-text-primary">{mailboxLocal}</span>
             <span className="text-mk-text-tertiary">@{domain}</span>
