@@ -333,13 +333,13 @@ V1 styling stands. Two copy fixes:
 ```json
 // messages/en.json — landing.announcementBanner
 {
-  "message": "Launch week — first 100 setups free with promo FIRST100",
+  "message": "Launch week — first 100 setups free with promo FIRST25",
   "cta": "How it works →",        // was "See how →"
   "dismiss": "Dismiss banner"
 }
 // messages/ru.json
 {
-  "message": "Старт продаж — первые 100 настроек бесплатно по промокоду FIRST100",
+  "message": "Старт продаж — первые 100 настроек бесплатно по промокоду FIRST25",
   "cta": "Подробнее →",            // was "Как →" — orphaned word
   "dismiss": "Закрыть баннер"
 }

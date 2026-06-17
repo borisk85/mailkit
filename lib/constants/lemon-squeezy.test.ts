@@ -15,16 +15,16 @@ describe("LEMON_SQUEEZY_CHECKOUT_URL", () => {
 });
 
 describe("FIRST_100_DISCOUNT_CODE", () => {
-  test("is 'FIRST100' (the code Boris will create in LS dashboard)", () => {
-    expect(FIRST_100_DISCOUNT_CODE).toBe("FIRST100");
+  test("is 'FIRST25' (the code Boris will create in LS dashboard)", () => {
+    expect(FIRST_100_DISCOUNT_CODE).toBe("FIRST25");
   });
 });
 
 describe("withFirst100Discount", () => {
-  test("appends checkout[discount_code]=FIRST100 to a clean URL", () => {
+  test("appends checkout[discount_code]=FIRST25 to a clean URL", () => {
     const out = withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL);
     const parsed = new URL(out);
-    expect(parsed.searchParams.get("checkout[discount_code]")).toBe("FIRST100");
+    expect(parsed.searchParams.get("checkout[discount_code]")).toBe("FIRST25");
   });
 
   test("preserves existing query params", () => {
@@ -33,7 +33,7 @@ describe("withFirst100Discount", () => {
     );
     const parsed = new URL(out);
     expect(parsed.searchParams.get("aff")).toBe("boris");
-    expect(parsed.searchParams.get("checkout[discount_code]")).toBe("FIRST100");
+    expect(parsed.searchParams.get("checkout[discount_code]")).toBe("FIRST25");
   });
 
   test("idempotent — second call leaves an already-coded URL unchanged", () => {

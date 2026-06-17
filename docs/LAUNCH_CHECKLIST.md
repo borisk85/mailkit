@@ -42,9 +42,9 @@ If AWS approval is still pending on launch eve: launch with Brevo only. Migratio
 - LS Settings → API → "Create API key"
 - Copy the value once — LS doesn't show it again
 
-**Create the FIRST100 discount code (#33):**
+**Create the FIRST25 discount code (#33):**
 - LS dashboard (Live mode) → Discounts → New
-- Code: `FIRST100`
+- Code: `FIRST25`
 - Type: 100% off
 - Max redemptions: 25
 - Apply to: MailKit Email Setup product
@@ -128,7 +128,7 @@ If anything in this sequence fails — abort launch, debug, retry. The sandbox f
 Once verified by Google + first 10 customers landed cleanly:
 - [ ] Delete `docs/TICKET_36_OAUTH_SUBMISSION.md` (handoff served its purpose)
 - [ ] Delete `docs/LAUNCH_CHECKLIST.md` (this file) — keep the project clean post-launch
-- [ ] Bump `mailkit.announcement.v2` storage key when retiring or rotating the FIRST100 banner
+- [ ] Bump `mailkit.announcement.v2` storage key when retiring or rotating the FIRST25 banner
 
 ## What's already done (for context)
 

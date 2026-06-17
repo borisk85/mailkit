@@ -2,7 +2,7 @@
 
 Checklist for Boris to validate the full customer flow end-to-end using
 Postmark Free plan (100 emails/month). Run this before enabling Platform
-$18/mo and opening the FIRST100 launch promo.
+$18/mo and opening the FIRST25 launch promo.
 
 ---
 
@@ -160,7 +160,7 @@ After verifying all steps work cleanly:
 
 1. **Fix any bugs found** — open issues in conversation, fix before launch
 2. **Upgrade Postmark** to Platform $18/mo (Settings → Billing)
-3. **Create FIRST100 discount** in Lemon Squeezy (100% off, 25 uses)
+3. **Create FIRST25 discount** in Lemon Squeezy (100% off, 25 uses)
 4. **Open launch promo** — the announcement banner is already live
 5. **Configure Postmark webhook** in dashboard (if not done yet):
    - Servers → MailKit Transactional → Webhooks → Add

@@ -23,7 +23,7 @@ export const LEMON_SQUEEZY_CHECKOUT_URL =
  * First-100 launch promo (#33). The discount code itself is created
  * by the owner in the Lemon Squeezy dashboard ahead of launch — set
  * to 100% off, capped at 100 uses. Until the code exists in LS, the
- * `?checkout[discount_code]=FIRST100` query param simply has no
+ * `?checkout[discount_code]=FIRST25` query param simply has no
  * effect (LS surfaces "code not found" inline on the checkout page),
  * so this code is safe to ship before the dashboard configuration
  * lands.
