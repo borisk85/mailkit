@@ -15,8 +15,8 @@ import {
   Eye,
   EyeOff,
   Loader2,
-  Mail,
 } from "lucide-react";
+import { IoMail } from "react-icons/io5";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -1277,11 +1277,7 @@ function ZoneSelectionStep({
 
         {/* Right: live address — the hero of this step */}
         <div className="flex flex-col items-center justify-center gap-4 md:-translate-y-14">
-          <Mail
-            className="size-20 text-mk-accent"
-            strokeWidth={1.5}
-            aria-hidden
-          />
+          <IoMail className="size-20 text-mk-accent" aria-hidden />
           <p className="break-all text-center font-mono text-2xl font-semibold leading-tight">
             <span className="text-mk-text-primary">{mailboxLocal}</span>
             <span className="text-mk-text-tertiary">@{domain}</span>
