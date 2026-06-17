@@ -258,48 +258,45 @@ export async function startSetupRun(input: {
   const admin = createServiceClient();
   const cf = createCloudflareClient(parsed.data.token);
 
-  // Anti-double-click: recent non-terminal run → resume idempotently.
-  const thirtyMinAgo = new Date(Date.now() - 30 * 60_000).toISOString();
-  const { data: recent } = await admin
+  // Reuse an existing run for this exact user+zone+mailbox instead of
+  // spawning a duplicate. CRITICAL: this MUST include cf_done / SMTP-phase
+  // runs (not only <30min ones) — otherwise every resume after the CF phase
+  // created a brand-new run and the dashboard filled up with copies. Older
+  // duplicates for the same key are collapsed to 'failed' so the account
+  // self-heals on the next start/resume.
+  const { data: priors } = await admin
     .from("setup_runs")
-    .select("id, status, created_at, cf_zone_id, mailbox_local")
+    .select("id, status")
     .eq("user_id", user.id)
-    .not("status", "in", "(cf_done,failed)")
-    .order("created_at", { ascending: false })
-    .limit(5);
+    .eq("cf_zone_id", parsed.data.zoneId)
+    .eq("mailbox_local", parsed.data.mailboxLocal)
+    .neq("status", "failed")
+    .order("created_at", { ascending: false });
 
-  const activeRow = (recent ?? []).find(
-    (r) =>
-      r.created_at >= thirtyMinAgo &&
-      r.cf_zone_id === parsed.data.zoneId &&
-      r.mailbox_local === parsed.data.mailboxLocal,
-  );
-  if (activeRow) {
-    // Refresh the stored token so a later cross-session resume still has it.
-    await admin
-      .from("setup_runs")
-      .update({ cf_token_enc: encryptToken(parsed.data.token) })
-      .eq("id", activeRow.id);
-    return {
-      status: "ok",
-      runId: activeRow.id,
-      runStatus: activeRow.status as StartSetupOk["runStatus"],
-      destinationEmail,
-    };
-  }
-
-  // Mark stale (>30min) non-terminal runs as failed so we don't keep re-hitting them.
-  for (const r of recent ?? []) {
-    if (r.created_at < thirtyMinAgo) {
+  if (priors && priors.length > 0) {
+    const keep = priors[0];
+    const dupeIds = priors.slice(1).map((r) => r.id);
+    if (dupeIds.length > 0) {
       await admin
         .from("setup_runs")
         .update({
           status: "failed",
-          error_msg: "stale: superseded by newer run",
+          error_msg: "duplicate: collapsed into newer run",
           cf_token_enc: null,
         })
-        .eq("id", r.id);
+        .in("id", dupeIds);
     }
+    // Refresh the stored token on the run we keep (cross-session resume).
+    await admin
+      .from("setup_runs")
+      .update({ cf_token_enc: encryptToken(parsed.data.token) })
+      .eq("id", keep.id);
+    return {
+      status: "ok",
+      runId: keep.id,
+      runStatus: keep.status as StartSetupOk["runStatus"],
+      destinationEmail,
+    };
   }
 
   let zoneName = "";
