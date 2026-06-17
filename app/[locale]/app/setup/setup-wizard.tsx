@@ -1524,7 +1524,7 @@ function CfDonePendingSmtpStep({
 }) {
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-      <h2 className="text-lg font-semibold text-mk-text-primary">
+      <h2 className="pb-2 text-lg font-semibold text-mk-text-primary">
         {state.mailboxLocal}@{state.zoneName}
       </h2>
       <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
@@ -2395,11 +2395,11 @@ function ProgressRow({
 }) {
   const icon =
     status === "ok" ? (
-      <CheckCircle2 className="size-4 text-emerald-600" aria-hidden />
+      <CheckCircle2 className="size-4 text-mk-success" aria-hidden />
     ) : status === "error" ? (
-      <AlertCircle className="size-4 text-red-600" aria-hidden />
+      <AlertCircle className="size-4 text-mk-danger" aria-hidden />
     ) : status === "running" ? (
-      <Loader2 className="size-4 animate-spin text-zinc-600" aria-hidden />
+      <Loader2 className="size-4 animate-spin text-mk-accent" aria-hidden />
     ) : (
       <span
         className="inline-block size-4 rounded-full border border-mk-border-strong"
@@ -2407,12 +2407,14 @@ function ProgressRow({
       />
     );
   return (
-    <li className="flex items-center justify-between rounded-md border border-zinc-200 px-3 py-2 text-sm dark:border-zinc-800">
+    <li className="flex items-center justify-between rounded-lg border border-mk-border-subtle px-3 py-2 text-sm text-mk-text-secondary">
       <span className="flex items-center gap-2">
         {icon}
         {label}
       </span>
-      <span className="text-xs text-mk-text-tertiary">{stateLabel}</span>
+      {status !== "ok" ? (
+        <span className="text-xs text-mk-text-tertiary">{stateLabel}</span>
+      ) : null}
     </li>
   );
 }
