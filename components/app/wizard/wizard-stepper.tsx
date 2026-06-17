@@ -46,7 +46,7 @@ export function WizardStepper({ currentStep, steps }: WizardStepperProps) {
                   aria-hidden
                   className={cn(
                     "absolute top-4 left-1/2 w-full h-px",
-                    isCompleted ? "bg-mk-accent" : "bg-mk-border-subtle",
+                    isCompleted ? "bg-mk-border-strong" : "bg-mk-border-subtle",
                   )}
                 />
               )}
@@ -55,8 +55,9 @@ export function WizardStepper({ currentStep, steps }: WizardStepperProps) {
               <div
                 className={cn(
                   "relative z-10 flex size-8 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                  isCompleted && "border-mk-accent bg-mk-accent text-white",
-                  isActive && "border-mk-accent bg-mk-accent text-white",
+                  isCompleted &&
+                    "border-mk-border-strong bg-mk-border-subtle text-mk-text-secondary",
+                  isActive && "border-mk-accent/70 bg-mk-accent/80 text-white",
                   isFuture &&
                     "border-mk-border-subtle bg-surface-elevated text-mk-text-tertiary",
                 )}
@@ -121,8 +122,10 @@ export function WizardStepper({ currentStep, steps }: WizardStepperProps) {
                 <div
                   className={cn(
                     "flex size-7 shrink-0 items-center justify-center rounded-full border-2 transition-colors",
-                    isCompleted && "border-mk-accent bg-mk-accent text-white",
-                    isActive && "border-mk-accent bg-mk-accent text-white",
+                    isCompleted &&
+                      "border-mk-border-strong bg-mk-border-subtle text-mk-text-secondary",
+                    isActive &&
+                      "border-mk-accent/70 bg-mk-accent/80 text-white",
                     isFuture &&
                       "border-mk-border-subtle bg-surface-elevated text-mk-text-tertiary",
                   )}
@@ -148,7 +151,9 @@ export function WizardStepper({ currentStep, steps }: WizardStepperProps) {
                     aria-hidden
                     className={cn(
                       "mt-1 w-px flex-1 min-h-[16px]",
-                      isCompleted ? "bg-mk-accent" : "bg-mk-border-subtle",
+                      isCompleted
+                        ? "bg-mk-border-strong"
+                        : "bg-mk-border-subtle",
                     )}
                   />
                 )}
