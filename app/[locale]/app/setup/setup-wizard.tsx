@@ -1551,7 +1551,7 @@ function CfDonePendingSmtpStep({
             </a>
             <p className="mt-2 text-xs text-mk-text-tertiary">
               One-time payment — lets you{" "}
-              <span className="text-mk-text-primary">
+              <span className="underline underline-offset-2">
                 send from this address
               </span>
               , not just receive.
