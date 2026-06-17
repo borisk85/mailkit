@@ -443,7 +443,24 @@ export function SetupWizard({
       mailboxLocal,
       reached: "routing",
     });
+    // Advance the substep circles in their real order while the server works
+    // (the pipeline runs them in this sequence but returns in one response).
+    const cfSubsteps = ["routing", "dns", "destination", "rule"] as const;
+    let cfIdx = 0;
+    const cfTimer = setInterval(() => {
+      cfIdx += 1;
+      if (cfIdx >= cfSubsteps.length) {
+        clearInterval(cfTimer);
+        return;
+      }
+      setState((prev) =>
+        prev.kind === "setup_running"
+          ? { ...prev, reached: cfSubsteps[cfIdx] }
+          : prev,
+      );
+    }, 1100);
     const result = await startSetupRun({ token, zoneId, mailboxLocal });
+    clearInterval(cfTimer);
     if (result.status === "error") {
       setState({
         kind: "failed",
