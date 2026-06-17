@@ -1525,7 +1525,7 @@ function CfDonePendingSmtpStep({
 }) {
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-      <h2 className="pb-2 font-mono text-[1.375rem] font-semibold text-mk-text-primary">
+      <h2 className="pb-2 font-mono text-[1.3125rem] font-semibold text-mk-text-primary">
         {state.mailboxLocal}@{state.zoneName}
       </h2>
       <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
