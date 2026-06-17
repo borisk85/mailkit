@@ -25,7 +25,7 @@ function makeAuthStub(opts: {
 beforeEach(() => {
   vi.clearAllMocks();
   process.env.LEMONSQUEEZY_CHECKOUT_URL =
-    "https://velabot.lemonsqueezy.com/buy/test-variant-uuid";
+    "https://vibecraftstudio.lemonsqueezy.com/buy/test-variant-uuid";
 });
 
 afterEach(() => {
@@ -43,7 +43,7 @@ describe("GET /api/checkout/start", () => {
     const res = await GET();
     expect(res.status).toBe(303);
     const outUrl = new URL(res.headers.get("Location")!);
-    expect(outUrl.host).toBe("velabot.lemonsqueezy.com");
+    expect(outUrl.host).toBe("vibecraftstudio.lemonsqueezy.com");
     expect(outUrl.searchParams.get("checkout[custom][user_id]")).toBe(
       "user-abc",
     );
@@ -83,7 +83,7 @@ describe("GET /api/checkout/start", () => {
     expect(loc).toBeTruthy();
     const outUrl = new URL(loc!);
     expect(outUrl.origin + outUrl.pathname).toBe(
-      "https://velabot.lemonsqueezy.com/buy/test-variant-uuid",
+      "https://vibecraftstudio.lemonsqueezy.com/buy/test-variant-uuid",
     );
     expect(outUrl.searchParams.get("checkout[custom][user_id]")).toBe(
       "user-abc",
@@ -111,7 +111,7 @@ describe("GET /api/checkout/start", () => {
 
   test("checkout URL with pre-existing query params → preserved + our params added", async () => {
     process.env.LEMONSQUEEZY_CHECKOUT_URL =
-      "https://velabot.lemonsqueezy.com/buy/test-variant-uuid?discount=LAUNCH20&aff=boris";
+      "https://vibecraftstudio.lemonsqueezy.com/buy/test-variant-uuid?discount=LAUNCH20&aff=boris";
     vi.mocked(sbModule.createClient).mockResolvedValue(
       makeAuthStub({
         user: { id: "user-abc", email: "buyer@example.com" },
@@ -144,7 +144,7 @@ describe("GET /api/checkout/start", () => {
 
   test("existing checkout[custom][user_id] in env URL → overwritten by session user.id", async () => {
     process.env.LEMONSQUEEZY_CHECKOUT_URL =
-      "https://velabot.lemonsqueezy.com/buy/test-variant-uuid?checkout%5Bcustom%5D%5Buser_id%5D=stale";
+      "https://vibecraftstudio.lemonsqueezy.com/buy/test-variant-uuid?checkout%5Bcustom%5D%5Buser_id%5D=stale";
     vi.mocked(sbModule.createClient).mockResolvedValue(
       makeAuthStub({
         user: { id: "user-fresh", email: "buyer@example.com" },

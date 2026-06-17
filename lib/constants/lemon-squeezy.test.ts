@@ -7,9 +7,9 @@ import {
 } from "./lemon-squeezy";
 
 describe("LEMON_SQUEEZY_CHECKOUT_URL", () => {
-  test("targets the velabot store /checkout/buy/<uuid> path", () => {
+  test("targets the vibecraftstudio store /checkout/buy/<uuid> path", () => {
     expect(LEMON_SQUEEZY_CHECKOUT_URL).toMatch(
-      /^https:\/\/velabot\.lemonsqueezy\.com\/checkout\/buy\/[0-9a-f-]+$/,
+      /^https:\/\/vibecraftstudio\.lemonsqueezy\.com\/checkout\/buy\/[0-9a-f-]+$/,
     );
   });
 });
@@ -29,7 +29,7 @@ describe("withFirst100Discount", () => {
 
   test("preserves existing query params", () => {
     const out = withFirst100Discount(
-      "https://velabot.lemonsqueezy.com/checkout/buy/abc?aff=boris",
+      "https://vibecraftstudio.lemonsqueezy.com/checkout/buy/abc?aff=boris",
     );
     const parsed = new URL(out);
     expect(parsed.searchParams.get("aff")).toBe("boris");
@@ -44,7 +44,7 @@ describe("withFirst100Discount", () => {
 
   test("does NOT overwrite a different existing discount code", () => {
     const out = withFirst100Discount(
-      "https://velabot.lemonsqueezy.com/checkout/buy/abc?checkout%5Bdiscount_code%5D=LAUNCH50",
+      "https://vibecraftstudio.lemonsqueezy.com/checkout/buy/abc?checkout%5Bdiscount_code%5D=LAUNCH50",
     );
     const parsed = new URL(out);
     expect(parsed.searchParams.get("checkout[discount_code]")).toBe("LAUNCH50");
