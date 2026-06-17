@@ -15,6 +15,7 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  Mail,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -1200,79 +1201,92 @@ function ZoneSelectionStep({
     () => zones.find((z) => z.id === zoneId)?.name ?? "your-domain",
     [zones, zoneId],
   );
-  const hint = useMemo(
-    () => t("step2.mailboxHint", { local: mailboxLocal, domain }),
-    [mailboxLocal, domain, t],
-  );
   return (
     <section className="rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <h2 className="text-lg font-semibold text-mk-text-primary">
         {t("step2.title")}
       </h2>
-      <form
-        className="mt-5 max-w-sm space-y-4"
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!zoneId || !mailboxLocal) return;
-          onSubmit(zoneId, mailboxLocal);
-        }}
-      >
-        <div className="space-y-1.5">
-          <span className="block text-sm font-medium text-mk-text-primary">
-            {t("step2.zoneLabel")}
-          </span>
-          {zones.length > 1 ? (
-            <DomainSelect
-              zones={zones}
-              value={zoneId}
-              onChange={setZoneId}
-              disabled={isPending}
-              placeholder={t("step2.zonePlaceholder")}
-            />
-          ) : (
-            <div className="flex h-9 w-full items-center rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 font-mono text-sm text-mk-text-primary">
-              {zones[0]?.name}
-            </div>
-          )}
-        </div>
 
-        <div className="space-y-1.5">
-          <span className="block text-sm font-medium text-mk-text-primary">
-            {t("step2.mailboxLabel")}
-          </span>
-          <Input
-            className="h-9 font-mono focus-visible:ring-1"
-            value={mailboxLocal}
-            onChange={(e) =>
-              setMailboxLocal(
-                e.target.value
-                  .toLowerCase()
-                  .replace(/[^a-z0-9._-]/g, "")
-                  .replace(/^[._-]+/, "")
-                  .replace(/\.{2,}/g, "."),
-              )
-            }
-            disabled={isPending}
-            placeholder="hello"
-            autoCapitalize="none"
-            autoCorrect="off"
-            spellCheck={false}
-            pattern="[a-z0-9._-]{1,64}"
-            maxLength={64}
-            required
-          />
-        </div>
-
-        <p className="text-xs text-mk-text-tertiary">{hint}</p>
-
-        <Button
-          type="submit"
-          disabled={isPending || !mailboxLocal}
-          className="bg-mk-accent text-white hover:bg-mk-accent-hover"
+      <div className="mt-6 grid items-center gap-8 md:grid-cols-2">
+        {/* Left: form */}
+        <form
+          className="space-y-4"
+          onSubmit={(e) => {
+            e.preventDefault();
+            if (!zoneId || !mailboxLocal) return;
+            onSubmit(zoneId, mailboxLocal);
+          }}
         >
-          {isPending ? t("step2.ctaLoading") : t("step2.cta")}
-        </Button>
-      </form>
+          <div className="space-y-1.5">
+            <span className="block text-sm font-medium text-mk-text-primary">
+              {t("step2.zoneLabel")}
+            </span>
+            {zones.length > 1 ? (
+              <DomainSelect
+                zones={zones}
+                value={zoneId}
+                onChange={setZoneId}
+                disabled={isPending}
+                placeholder={t("step2.zonePlaceholder")}
+              />
+            ) : (
+              <div className="flex h-9 w-full items-center rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 font-mono text-sm text-mk-text-primary">
+                {zones[0]?.name}
+              </div>
+            )}
+          </div>
+
+          <div className="space-y-1.5">
+            <span className="block text-sm font-medium text-mk-text-primary">
+              {t("step2.mailboxLabel")}
+            </span>
+            <Input
+              className="h-9 font-mono focus-visible:ring-1"
+              value={mailboxLocal}
+              onChange={(e) =>
+                setMailboxLocal(
+                  e.target.value
+                    .toLowerCase()
+                    .replace(/[^a-z0-9._-]/g, "")
+                    .replace(/^[._-]+/, "")
+                    .replace(/\.{2,}/g, "."),
+                )
+              }
+              disabled={isPending}
+              placeholder="hello"
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              pattern="[a-z0-9._-]{1,64}"
+              maxLength={64}
+              required
+            />
+          </div>
+
+          <p className="text-xs text-mk-text-tertiary">
+            {t("step2.mailboxRules")}
+          </p>
+
+          <Button
+            type="submit"
+            disabled={isPending || !mailboxLocal}
+            className="bg-mk-accent text-white hover:bg-mk-accent-hover"
+          >
+            {isPending ? t("step2.ctaLoading") : t("step2.cta")}
+          </Button>
+        </form>
+
+        {/* Right: live address — the hero of this step */}
+        <div className="flex flex-col items-center justify-center gap-5 py-6">
+          <div className="flex size-14 items-center justify-center rounded-2xl bg-mk-accent/10">
+            <Mail className="size-7 text-mk-accent" aria-hidden />
+          </div>
+          <p className="break-all text-center font-mono text-2xl font-semibold leading-tight">
+            <span className="text-mk-text-primary">{mailboxLocal}</span>
+            <span className="text-mk-text-tertiary">@{domain}</span>
+          </p>
+        </div>
+      </div>
     </section>
   );
 }
