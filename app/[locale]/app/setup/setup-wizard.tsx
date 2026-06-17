@@ -1543,8 +1543,6 @@ function CfDonePendingSmtpStep({
           <div className="mt-3">
             <a
               href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
-              target="_blank"
-              rel="noreferrer"
               className="mk-cta-shadow inline-flex h-10 items-center justify-center rounded-[8px] bg-mk-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
             >
               Complete setup — $5
