@@ -277,14 +277,10 @@ export async function startSetupRun(input: {
     const keep = priors[0];
     const dupeIds = priors.slice(1).map((r) => r.id);
     if (dupeIds.length > 0) {
-      await admin
-        .from("setup_runs")
-        .update({
-          status: "failed",
-          error_msg: "duplicate: collapsed into newer run",
-          cf_token_enc: null,
-        })
-        .in("id", dupeIds);
+      // DELETE the older duplicates outright (not mark failed) — a failed
+      // row renders as a scary red "Setup hit an issue" card on the
+      // dashboard. True duplicates have no value, so remove them.
+      await admin.from("setup_runs").delete().in("id", dupeIds);
     }
     // Refresh the stored token on the run we keep (cross-session resume).
     await admin
@@ -330,6 +326,28 @@ export async function startSetupRun(input: {
     .single();
 
   if (insertError || !inserted) {
+    // Race with a concurrent start: the DB partial-unique index (migration
+    // 0014) guarantees ONE active run per user+zone+mailbox, so a parallel
+    // double-submit hits a unique violation here. Re-fetch the winning run
+    // and resume it — the user never sees a failure NOR a duplicate card.
+    const { data: raced } = await admin
+      .from("setup_runs")
+      .select("id, status")
+      .eq("user_id", user.id)
+      .eq("cf_zone_id", parsed.data.zoneId)
+      .eq("mailbox_local", parsed.data.mailboxLocal)
+      .neq("status", "failed")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (raced) {
+      return {
+        status: "ok",
+        runId: raced.id,
+        runStatus: raced.status as StartSetupOk["runStatus"],
+        destinationEmail,
+      };
+    }
     return { status: "error", errorKey: "setup.errors.db_insert_failed" };
   }
   const runId = inserted.id;
