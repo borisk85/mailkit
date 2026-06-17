@@ -1545,11 +1545,7 @@ function CfDonePendingSmtpStep({
             {isPending ? t("smtp.continueCtaLoading") : t("smtp.continueCta")}
           </Button>
         ) : (
-          <div className="mt-3 space-y-2">
-            <p className="text-xs text-mk-text-tertiary">
-              One-time payment unlocks SMTP sending, DKIM signing, and Gmail
-              Send-As setup.
-            </p>
+          <div className="mt-3">
             <a
               href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
               target="_blank"
@@ -1558,6 +1554,10 @@ function CfDonePendingSmtpStep({
             >
               Complete setup — $5 one-time
             </a>
+            <p className="mt-2 text-xs text-mk-text-tertiary">
+              One-time payment — lets you send from this address, not just
+              receive.
+            </p>
           </div>
         )}
       </div>
