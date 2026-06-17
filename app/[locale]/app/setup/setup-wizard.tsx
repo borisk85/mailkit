@@ -1261,11 +1261,10 @@ function ZoneSelectionStep({
               maxLength={64}
               required
             />
+            <p className="text-xs text-mk-text-tertiary">
+              {t("step2.mailboxRules")}
+            </p>
           </div>
-
-          <p className="text-xs text-mk-text-tertiary">
-            {t("step2.mailboxRules")}
-          </p>
 
           <Button
             type="submit"
@@ -1277,10 +1276,12 @@ function ZoneSelectionStep({
         </form>
 
         {/* Right: live address — the hero of this step */}
-        <div className="flex flex-col items-center justify-center gap-5 py-6">
-          <div className="flex size-14 items-center justify-center rounded-2xl bg-mk-accent/10">
-            <Mail className="size-7 text-mk-accent" aria-hidden />
-          </div>
+        <div className="flex flex-col items-center justify-center gap-4 md:-translate-y-14">
+          <Mail
+            className="size-20 text-mk-accent"
+            strokeWidth={1.5}
+            aria-hidden
+          />
           <p className="break-all text-center font-mono text-2xl font-semibold leading-tight">
             <span className="text-mk-text-primary">{mailboxLocal}</span>
             <span className="text-mk-text-tertiary">@{domain}</span>
