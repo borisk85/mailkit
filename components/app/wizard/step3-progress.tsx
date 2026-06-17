@@ -103,12 +103,7 @@ function SubstepRow({
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export function Step3Progress({
-  phase,
-  reached,
-  zoneName,
-  mailboxLocal,
-}: Step3ProgressProps) {
+export function Step3Progress({ phase, reached }: Step3ProgressProps) {
   const heading =
     phase === "cf"
       ? "We're configuring your email"
@@ -122,9 +117,6 @@ export function Step3Progress({
           <h2 className="mk-heading-3 text-mk-text-primary">{heading}</h2>
           <p className="text-xs text-mk-text-tertiary">
             This takes ~30–90 seconds. Stay on this page.
-          </p>
-          <p className="text-xs text-mk-text-tertiary font-mono">
-            {mailboxLocal}@{zoneName}
           </p>
         </div>
 
