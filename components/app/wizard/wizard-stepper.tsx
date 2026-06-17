@@ -188,7 +188,7 @@ export function WizardStepper({ currentStep, steps }: WizardStepperProps) {
 export const WIZARD_STEPS: WizardStep[] = [
   { label: "API Token", sublabel: "Cloudflare credentials" },
   { label: "Email address", sublabel: "Domain & mailbox" },
-  { label: "Automation", sublabel: "DNS configuration" },
+  { label: "Mail routing", sublabel: "DNS configuration" },
   { label: "DKIM verify", sublabel: "Domain verification" },
   { label: "Gmail Send-As", sublabel: "Gmail setup" },
 ];
