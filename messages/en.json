@@ -394,8 +394,8 @@
         "ctaLoading": "Checking…"
       },
       "done": {
-        "title": "Cloudflare is ready",
-        "body": "Your domain now routes {mailbox}@{domain} to Gmail. Next: we set up Postmark so you can send from it.",
+        "title": "You can now receive mail",
+        "body": "Emails to {mailbox}@{domain} now land in your Gmail.",
         "continueCta": "Continue to SMTP setup"
       },
       "failed": {
