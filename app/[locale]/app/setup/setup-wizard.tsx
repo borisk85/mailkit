@@ -571,6 +571,7 @@ export function SetupWizard({
   })();
 
   const phaseTitle = (() => {
+    if (state.kind === "cf_done_pending_smtp") return "Almost there";
     switch (getStepperStep(state.kind)) {
       case 2:
         return "Choose your email address";
@@ -1522,17 +1523,17 @@ function CfDonePendingSmtpStep({
   onContinue: () => void;
 }) {
   return (
-    <section className="space-y-4 rounded-lg border border-emerald-200 p-6 dark:border-emerald-900">
-      <h2 className="text-lg font-semibold">
-        {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
+      <h2 className="text-lg font-semibold text-mk-text-primary">
+        {state.mailboxLocal}@{state.zoneName}
       </h2>
       <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
-      <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-900 dark:bg-emerald-950">
-        <div className="flex items-center gap-2 font-medium text-emerald-900 dark:text-emerald-100">
+      <div className="rounded-lg border border-mk-success/30 bg-mk-success/10 p-4 text-sm">
+        <div className="flex items-center gap-2 font-medium text-mk-success">
           <CheckCircle2 className="size-5" aria-hidden />
           {t("step3.done.title")}
         </div>
-        <p className="mt-1 text-emerald-900 dark:text-emerald-100">
+        <p className="mt-1 text-mk-text-secondary">
           {t("step3.done.body", {
             mailbox: state.mailboxLocal,
             domain: state.zoneName,
@@ -1545,7 +1546,7 @@ function CfDonePendingSmtpStep({
           </Button>
         ) : (
           <div className="mt-3 space-y-2">
-            <p className="text-xs text-emerald-800 dark:text-emerald-200">
+            <p className="text-xs text-mk-text-tertiary">
               One-time payment unlocks SMTP sending, DKIM signing, and Gmail
               Send-As setup.
             </p>

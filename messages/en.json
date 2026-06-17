@@ -376,7 +376,7 @@
       "title": "Step 3 — Cloudflare pipeline",
       "steps": {
         "routing": "Email Routing enabled",
-        "dns": "DNS records written (MX, SPF, DMARC)",
+        "dns": "DNS records written (SPF, DMARC)",
         "destination": "Destination verified in Gmail",
         "rule": "Routing rule created"
       },
