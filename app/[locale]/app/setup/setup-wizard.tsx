@@ -356,6 +356,36 @@ function getStepperStep(kind: WizardState["kind"]): number {
 // tab close; the server copy is deleted the moment setup completes.
 const SETUP_SESSION_KEY = "mk_setup_token_session";
 
+/** Coarse URL token per wizard phase — drives browser Back/Forward. */
+function stepForKind(kind: WizardState["kind"]): string {
+  switch (kind) {
+    case "token_entry":
+    case "token_validating":
+      return "token";
+    case "zone_selection":
+    case "ns_warning":
+      return "domain";
+    case "setup_running":
+    case "awaiting_verify":
+      return "setup";
+    case "cf_done_pending_smtp":
+      return "pay";
+    case "smtp_running":
+    case "smtp_awaiting_retry":
+    case "smtp_done":
+    case "smtp_dkim_polling":
+      return "smtp";
+    case "gmail_instructions_shown":
+    case "gmail_smtp_ready":
+    case "gmail_done":
+      return "gmail";
+    case "failed":
+      return "failed";
+    default:
+      return "token";
+  }
+}
+
 export function SetupWizard({
   initialMock,
   activeRun,
@@ -461,6 +491,65 @@ export function SetupWizard({
 
     setHydrated(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // ── Browser Back/Forward = move between wizard steps ───────────────────
+  // The wizard lives on one URL as client state, so without this Back would
+  // exit to /app instead of going to the previous step. Push a history entry
+  // per step; on Back, restore: 'token' → token entry; any later step → the
+  // domain step (rebuilt from this tab's saved token+zones), from which Start
+  // resumes the SAME run (deduped). Back from 'token' leaves to /app (it's
+  // the first step). Never dumps the user out mid-wizard.
+  const poppingRef = useRef(false);
+  const prevStepRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!hydrated) return;
+    const step = stepForKind(state.kind);
+    if (poppingRef.current) {
+      poppingRef.current = false;
+      prevStepRef.current = step;
+      return;
+    }
+    try {
+      if (prevStepRef.current === null) {
+        window.history.replaceState({ wizStep: step }, "", `?step=${step}`);
+      } else if (prevStepRef.current !== step) {
+        window.history.pushState({ wizStep: step }, "", `?step=${step}`);
+      }
+    } catch {
+      // history API unavailable — degrade silently, wizard still works
+    }
+    prevStepRef.current = step;
+  }, [state.kind, hydrated]);
+
+  useEffect(() => {
+    const onPop = () => {
+      const target =
+        new URLSearchParams(window.location.search).get("step") ?? "token";
+      poppingRef.current = true;
+      if (target === "token") {
+        setState({ kind: "token_entry" });
+        return;
+      }
+      let saved: { token?: string; zones?: Zone[] } | null = null;
+      try {
+        const raw = sessionStorage.getItem(SETUP_SESSION_KEY);
+        saved = raw ? JSON.parse(raw) : null;
+      } catch {}
+      if (saved?.token && Array.isArray(saved.zones) && saved.zones.length) {
+        setState({
+          kind: "zone_selection",
+          zones: saved.zones,
+          token: saved.token,
+        });
+      } else {
+        setState({ kind: "token_entry" });
+      }
+    };
+    window.addEventListener("popstate", onPop);
+    return () => window.removeEventListener("popstate", onPop);
+     
   }, []);
 
   async function handleStartSetup(
@@ -1578,7 +1667,7 @@ function CfDonePendingSmtpStep({
                 makes Back bounce past /app/setup to /app. New tab avoids that;
                 the CF token is now stored server-side, so the new tab resumes
                 fine after payment. Real <a> (API route), not next/link. */}
-            { }
+            {}
             <a
               href="/api/checkout/start"
               target="_blank"
