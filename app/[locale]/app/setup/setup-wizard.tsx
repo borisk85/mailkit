@@ -15,6 +15,7 @@ import {
   Eye,
   EyeOff,
   Loader2,
+  Rocket,
 } from "lucide-react";
 import { TbMailFilled } from "react-icons/tb";
 
@@ -1530,7 +1531,7 @@ function CfDonePendingSmtpStep({
       <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
       <div className="rounded-lg border border-mk-success/30 bg-mk-success/10 p-4 text-sm">
         <div className="flex items-center gap-2 font-medium text-mk-success">
-          <CheckCircle2 className="size-5" aria-hidden />
+          <Rocket className="size-5" aria-hidden />
           {t("step3.done.title")}
         </div>
         <p className="mt-1 text-mk-text-secondary">
