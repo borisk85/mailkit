@@ -1550,8 +1550,11 @@ function CfDonePendingSmtpStep({
               Complete setup — $5
             </a>
             <p className="mt-2 text-xs text-mk-text-tertiary">
-              One-time payment — lets you send from this address, not just
-              receive.
+              One-time payment — lets you{" "}
+              <span className="text-mk-text-primary">
+                send from this address
+              </span>
+              , not just receive.
             </p>
           </div>
         )}
