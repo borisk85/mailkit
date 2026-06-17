@@ -1,5 +1,9 @@
 import { NextResponse } from "next/server";
 
+import {
+  FIRST_100_DISCOUNT_CODE,
+  LEMON_SQUEEZY_CHECKOUT_URL,
+} from "@/lib/constants/lemon-squeezy";
 import { createClient } from "@/lib/supabase/server";
 
 /**
@@ -32,11 +36,11 @@ import { createClient } from "@/lib/supabase/server";
  * row is written by the LS webhook after the user pays.
  */
 export async function GET() {
-  const checkoutUrl = process.env.LEMONSQUEEZY_CHECKOUT_URL;
-  if (!checkoutUrl) {
-    console.error("[checkout-start] LEMONSQUEEZY_CHECKOUT_URL not set");
-    return new NextResponse("Checkout URL not configured", { status: 500 });
-  }
+  // Prefer the env override (lets the owner bake promo/affiliate params
+  // into the URL without a deploy); fall back to the hardcoded product URL
+  // so an empty/missing env can never 500 the paid flow.
+  const checkoutUrl =
+    process.env.LEMONSQUEEZY_CHECKOUT_URL || LEMON_SQUEEZY_CHECKOUT_URL;
 
   const supabase = await createClient();
   const {
@@ -62,7 +66,14 @@ export async function GET() {
   // the brackets as %5B / %5D — LS accepts both encoded and raw.
   url.searchParams.set("checkout[custom][user_id]", user.id);
   if (user.email) {
+    // Pre-fill only — the buyer can still pay with any email; linking is
+    // by user_id custom_data, so a different payment email no longer
+    // strands the purchase.
     url.searchParams.set("checkout[email]", user.email);
+  }
+  // Keep the launch promo applied (no-op if the code isn't in LS yet).
+  if (!url.searchParams.has("checkout[discount_code]")) {
+    url.searchParams.set("checkout[discount_code]", FIRST_100_DISCOUNT_CODE);
   }
 
   return NextResponse.redirect(url.toString(), { status: 303 });

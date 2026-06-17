@@ -24,10 +24,6 @@ import { Input } from "@/components/ui/input";
 import { GmailStepSchematic } from "@/components/app/gmail-step-schematic";
 import { cn } from "@/lib/utils";
 import {
-  LEMON_SQUEEZY_CHECKOUT_URL,
-  withFirst100Discount,
-} from "@/lib/constants/lemon-squeezy";
-import {
   WizardStepper,
   WIZARD_STEPS,
 } from "@/components/app/wizard/wizard-stepper";
@@ -1577,8 +1573,11 @@ function CfDonePendingSmtpStep({
           </Button>
         ) : (
           <div className="mt-3">
+            {/* Full navigation to an API route that 303-redirects to Lemon
+                Squeezy — must be a real <a>, not next/link client routing. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
-              href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
+              href="/api/checkout/start"
               className="mk-cta-shadow inline-flex h-10 items-center justify-center rounded-[8px] bg-mk-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
             >
               Complete setup — $5

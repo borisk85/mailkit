@@ -33,11 +33,20 @@ afterEach(() => {
 });
 
 describe("GET /api/checkout/start", () => {
-  test("missing LEMONSQUEEZY_CHECKOUT_URL → 500", async () => {
+  test("missing LEMONSQUEEZY_CHECKOUT_URL → falls back to hardcoded product URL (303, never 500)", async () => {
     delete process.env.LEMONSQUEEZY_CHECKOUT_URL;
+    vi.mocked(sbModule.createClient).mockResolvedValue(
+      makeAuthStub({
+        user: { id: "user-abc", email: "buyer@example.com" },
+      }) as unknown as Awaited<ReturnType<typeof sbModule.createClient>>,
+    );
     const res = await GET();
-    expect(res.status).toBe(500);
-    expect(await res.text()).toContain("Checkout URL not configured");
+    expect(res.status).toBe(303);
+    const outUrl = new URL(res.headers.get("Location")!);
+    expect(outUrl.host).toBe("velabot.lemonsqueezy.com");
+    expect(outUrl.searchParams.get("checkout[custom][user_id]")).toBe(
+      "user-abc",
+    );
   });
 
   test("no auth session → 401", async () => {
@@ -82,6 +91,7 @@ describe("GET /api/checkout/start", () => {
     expect(outUrl.searchParams.get("checkout[email]")).toBe(
       "buyer@example.com",
     );
+    expect(outUrl.searchParams.get("checkout[discount_code]")).toBe("FIRST25");
   });
 
   test("user without email → no checkout[email] param but user_id still set", async () => {
