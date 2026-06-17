@@ -270,7 +270,7 @@ export async function startSetupRun(input: {
     .eq("user_id", user.id)
     .eq("cf_zone_id", parsed.data.zoneId)
     .eq("mailbox_local", parsed.data.mailboxLocal)
-    .neq("status", "failed")
+    .not("status", "eq", "failed")
     .order("created_at", { ascending: false });
 
   if (priors && priors.length > 0) {
@@ -336,7 +336,7 @@ export async function startSetupRun(input: {
       .eq("user_id", user.id)
       .eq("cf_zone_id", parsed.data.zoneId)
       .eq("mailbox_local", parsed.data.mailboxLocal)
-      .neq("status", "failed")
+      .not("status", "eq", "failed")
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
