@@ -394,7 +394,7 @@
         "ctaLoading": "Checking…"
       },
       "done": {
-        "title": "You can now receive mail",
+        "title": "You can now receive mail!",
         "body": "Emails to {mailbox}@{domain} now land in your Gmail.",
         "continueCta": "Continue to SMTP setup"
       },

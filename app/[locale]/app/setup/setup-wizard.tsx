@@ -1534,12 +1534,6 @@ function CfDonePendingSmtpStep({
           <Rocket className="size-5" aria-hidden />
           {t("step3.done.title")}
         </div>
-        <p className="mt-1 text-mk-text-secondary">
-          {t("step3.done.body", {
-            mailbox: state.mailboxLocal,
-            domain: state.zoneName,
-          })}
-        </p>
 
         {hasPurchase ? (
           <Button className="mt-3" onClick={onContinue} disabled={isPending}>
@@ -1553,7 +1547,7 @@ function CfDonePendingSmtpStep({
               rel="noreferrer"
               className="mk-cta-shadow inline-flex h-10 items-center justify-center rounded-[8px] bg-mk-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
             >
-              Complete setup — $5 one-time
+              Complete setup — $5
             </a>
             <p className="mt-2 text-xs text-mk-text-tertiary">
               One-time payment — lets you send from this address, not just
