@@ -54,7 +54,7 @@ export function Step4Dkim({
 
         {/* Long-poll warning */}
         {isLongPoll && (
-          <div className="rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-4 py-3 text-sm text-mk-text-tertiary">
+          <div className="rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-4 py-3 text-center text-sm text-mk-text-tertiary">
             Taking longer than usual. This can happen with some DNS providers —
             it&apos;s normal.
           </div>
