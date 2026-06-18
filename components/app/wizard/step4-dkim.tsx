@@ -41,24 +41,23 @@ export function Step4Dkim({
           </div>
         </div>
 
-        {/* Status badge — live focal point */}
-        <div className="flex items-center justify-center gap-2 rounded-lg border border-mk-accent/30 bg-mk-accent/5 px-4 py-2.5">
-          <Loader2
-            className="size-4 shrink-0 animate-spin text-mk-accent"
-            aria-hidden
-          />
-          <span className="text-sm font-medium text-mk-text-primary">
-            Checking every 30 seconds...
-          </span>
-        </div>
-
-        {/* Long-poll warning */}
-        {isLongPoll && (
-          <div className="rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-4 py-3 text-center text-sm text-mk-text-tertiary">
-            Taking longer than usual. This can happen with some DNS providers —
-            it&apos;s normal.
+        {/* Status badge — live focal point + long-poll note right under it */}
+        <div className="space-y-2">
+          <div className="flex items-center justify-center gap-2 rounded-lg border border-mk-accent/30 bg-mk-accent/5 px-4 py-2.5">
+            <Loader2
+              className="size-4 shrink-0 animate-spin text-mk-accent"
+              aria-hidden
+            />
+            <span className="text-sm font-medium text-mk-text-primary">
+              Checking every 30 seconds...
+            </span>
           </div>
-        )}
+          {isLongPoll && (
+            <p className="text-center text-sm font-medium text-mk-accent">
+              Taking longer than usual — it&apos;s normal.
+            </p>
+          )}
+        </div>
 
         {/* Close-tab reassurance */}
         <div className="text-center">
