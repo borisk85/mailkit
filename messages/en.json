@@ -121,7 +121,7 @@
           "Copy and paste the right credentials into the right fields",
           "Set up Gmail Send-As without mistakes",
           "Hit a wall at any point and start over",
-          "And even then, your mail can land in spam"
+          "Mail often ends up in spam, not the inbox"
         ]
       },
       "with": {
@@ -133,7 +133,7 @@
           "Paste Cloudflare API token",
           "Watch automation run (~30 sec)",
           "Add to Gmail (3 minutes)",
-          "Set up so your mail reaches the inbox, not spam",
+          "Built to land in the inbox, not the spam folder",
           "Your branded email is ready"
         ]
       }
