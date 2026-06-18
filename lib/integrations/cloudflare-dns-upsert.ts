@@ -22,6 +22,7 @@
  * (finding #1 from the #4a smoke).
  */
 
+import { CloudflareError } from "./cloudflare";
 import type { CloudflareClient, DnsRecord, DnsRecordInput } from "./cloudflare";
 
 export type UpsertByPatternInput = {
@@ -88,8 +89,31 @@ export async function upsertDnsByPattern(
   const match = findByContentPrefix(existing, input.pattern);
 
   if (!match) {
-    const created = await cf.createDnsRecord(zoneId, input.record);
-    return { action: "created", id: created.id, record: created };
+    try {
+      const created = await cf.createDnsRecord(zoneId, input.record);
+      return { action: "created", id: created.id, record: created };
+    } catch (e) {
+      // CF 81058 — "An identical record already exists." A prior run left
+      // this exact record and our content-prefix match missed it (e.g. a
+      // Postmark DKIM value that doesn't begin with "v=DKIM1"). Re-fetch,
+      // return the existing identical record, and keep the re-run idempotent.
+      if (e instanceof CloudflareError && e.code === 81058) {
+        const after = await cf.listDnsRecords(zoneId, {
+          type: input.record.type,
+          name: input.record.name,
+        });
+        const dup = after.find((r) => r.content === input.record.content);
+        if (dup) {
+          return {
+            action: "skipped",
+            id: dup.id,
+            record: dup,
+            reason: "exact_match",
+          };
+        }
+      }
+      throw e;
+    }
   }
 
   if (match.content === input.record.content) {
