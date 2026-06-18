@@ -16,6 +16,7 @@
   - Telegram bot **`@MailKitOwnerAlerts`** (создать заранее, токен в env vars) — push notification на phone owner'а в реальном времени
   - Содержание уведомления: domain клиента, event_type (rate_limit / bounce_threshold / complaint_threshold / phishing_pattern), observed values, direct link на abuse_events row в админке
   - Boris подтверждает что хочет именно Telegram, не SMS
+  - **DEBT (2026-06-18):** отдельный бот `@MailKitOwnerAlerts` ещё НЕ создан, поэтому `TELEGRAM_BOT_TOKEN`/`TELEGRAM_CHAT_ID` в Vercel-проекте MailKit указывают на чужой бот «vibecraft leads» — #ABUSE-3 phishing-флаги и support-фидбэк падают туда. Создать выделенного MailKit-бота и перенаправить env. До этого алерты идут не в тот бот.
 - **#ABUSE-2** Postmark/AWS SES abuse desk response kit: скрипт `scripts/abuse-export.ts <domain>` → ZIP с send logs из CloudWatch, abuse_events, purchase + consent fields, ToS version. Готовый пакет для AWS abuse desk при инцидентах.
 - **#ABUSE-3** Lightweight phishing pattern check на `prepareGmailStep`: blacklist suspicious mailbox names (`noreply`, `support`, `admin`, `paypal`, `apple`, `google`, `bank`, `secure`, `verify`) + domain typosquatting (Levenshtein < 2 от top brands). Match → `purchases.kyc_review_required = true` + alert через #ABUSE-1 канал. НЕ блокирует автоматически — только flags на manual review.
 - **#ABUSE-4** Hard-suspend tenant в AWS SES: при `flagSuspended` → auto pause через SES API (delete email identity либо update sending status). Destructive trade-off, acceptable для abuse cases.

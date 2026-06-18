@@ -476,7 +476,6 @@
       "intro": {
         "title": "Last step — Gmail Send-As",
         "subtitle": "About 3 minutes of copying and pasting.",
-        "account": "Do this in the Gmail inbox you'll send from.",
         "startCta": "Start Gmail setup",
         "startCtaLoading": "Opening Gmail setup…"
       },

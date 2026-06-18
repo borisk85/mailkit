@@ -2143,9 +2143,6 @@ function GmailWizard({
       <p className="text-sm text-mk-text-secondary">
         {t("gmail.intro.subtitle", { target: state.targetEmail })}
       </p>
-      <p className="text-xs font-medium text-mk-text-tertiary">
-        {t("gmail.intro.account")}
-      </p>
 
       <ol className="space-y-3">
         {GMAIL_STEP_IDS.map((id, idx) => {
