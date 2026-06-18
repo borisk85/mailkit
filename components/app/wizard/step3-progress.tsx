@@ -112,9 +112,7 @@ export function Step3Progress({ phase, reached }: Step3ProgressProps) {
         {/* Header */}
         <div className="space-y-2">
           <h2 className="mk-heading-3 text-mk-text-primary">{heading}</h2>
-          <p className="text-xs text-mk-text-tertiary">
-            This takes ~30–90 seconds. Stay on this page.
-          </p>
+          <p className="text-xs text-mk-text-tertiary">Stay on this page.</p>
         </div>
 
         {/* Substep list */}
