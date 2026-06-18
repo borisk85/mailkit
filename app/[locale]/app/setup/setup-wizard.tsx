@@ -441,11 +441,29 @@ export function SetupWizard({
       destinationEmail: snapshot.destinationEmail,
       reached: "sender",
     });
+    // Advance the SMTP substep circles in their real order while the server
+    // works — continueSmtpSetup runs sender → dns → verify in one response,
+    // so without this only the first circle would ever spin.
+    const smtpSubsteps = ["sender", "dns", "verify"] as const;
+    let sIdx = 0;
+    const smtpTimer = setInterval(() => {
+      sIdx += 1;
+      if (sIdx >= smtpSubsteps.length) {
+        clearInterval(smtpTimer);
+        return;
+      }
+      setState((prev) =>
+        prev.kind === "smtp_running"
+          ? { ...prev, reached: smtpSubsteps[sIdx] }
+          : prev,
+      );
+    }, 1100);
     startTransition(async () => {
       const result = await continueSmtpSetup({
         runId: snapshot.runId,
         cfToken: snapshot.cfToken,
       });
+      clearInterval(smtpTimer);
       handleSmtpResult(result, snapshot, setState);
     });
   }

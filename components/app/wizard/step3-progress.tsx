@@ -89,8 +89,7 @@ function SubstepRow({
       <span
         className={cn(
           "text-sm leading-snug",
-          status === "done" &&
-            "text-mk-text-secondary line-through decoration-mk-text-tertiary",
+          status === "done" && "text-mk-text-secondary",
           status === "running" && "font-medium text-mk-text-primary",
           status === "pending" && "text-mk-text-tertiary",
         )}
