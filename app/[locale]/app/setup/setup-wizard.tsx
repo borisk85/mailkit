@@ -2328,7 +2328,6 @@ function GmailStepBody({
   if (id === "openSettings") {
     return (
       <>
-        <GmailStepSchematic id="openSettings" />
         <p className="text-sm">{t("gmail.steps.openSettings.body")}</p>
         <div className="flex flex-wrap gap-2">
           <a
