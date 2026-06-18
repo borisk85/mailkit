@@ -765,8 +765,9 @@ export function SetupWizard({
           ? "This is taking longer than usual — still working in the background."
           : "Postmark is checking DKIM on your DNS — usually 5–30 minutes.";
       case "smtp_awaiting_retry":
-      case "smtp_done":
         return "Configuring DNS records for sending. This is automatic — takes ~30 seconds.";
+      case "smtp_done":
+        return "One last step — connect it to your Gmail.";
       case "gmail_instructions_shown":
       case "gmail_smtp_ready":
         return "Almost done — add the address as Send-As to send from it.";
@@ -781,6 +782,7 @@ export function SetupWizard({
 
   const phaseTitle = (() => {
     if (state.kind === "cf_done_pending_smtp") return "Almost there";
+    if (state.kind === "smtp_done") return "Sending is set up";
     if (state.kind === "failed") return t("step3.failed.title");
     switch (getStepperStep(state.kind)) {
       case 2:
@@ -1087,9 +1089,6 @@ export function SetupWizard({
           state={state}
           isPending={isPending}
           t={t}
-          tState={tState}
-          tSteps={tSteps}
-          tSmtp={tSmtp}
           translateErr={translateErr}
           onContinue={() => {
             const snapshot = state;
@@ -1855,45 +1854,31 @@ function SmtpDoneStep({
   state,
   isPending,
   t,
-  tState,
-  tSteps,
-  tSmtp,
   translateErr,
   onContinue,
 }: {
   state: Extract<WizardState, { kind: "smtp_done" }>;
   isPending: boolean;
   t: (key: string, values?: Record<string, string>) => string;
-  tState: (key: string) => string;
-  tSteps: (key: string) => string;
-  tSmtp: (key: string) => string;
   translateErr: (key: string, details?: string) => string;
   onContinue: () => void;
 }) {
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-      <h2 className="text-lg font-semibold">
-        {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
-      </h2>
-      <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
-      <SmtpProgressList
-        overall="done"
-        reached="done"
-        tState={tState}
-        tSmtp={tSmtp}
-      />
-      <div className="rounded-md border border-mk-success/30 bg-mk-success/10 p-4 text-sm">
-        <div className="flex items-center gap-2 font-medium text-mk-success">
-          <CheckCircle2 className="size-5" aria-hidden />
-          {t("smtp.terminal.title")}
-        </div>
-        <p className="mt-1 text-mk-text-secondary">
-          {t("smtp.terminal.body", {
-            mailbox: state.mailboxLocal,
-            domain: state.zoneName,
-          })}
+      <div className="rounded-lg border border-mk-success/30 bg-mk-success/10 p-4">
+        <p className="flex items-start gap-2 text-sm text-mk-text-secondary">
+          <CheckCircle2
+            className="mt-0.5 size-5 shrink-0 text-mk-success"
+            aria-hidden
+          />
+          <span>
+            {t("smtp.terminal.body", {
+              mailbox: state.mailboxLocal,
+              domain: state.zoneName,
+            })}
+          </span>
         </p>
-        <Button className="mt-3" onClick={onContinue} disabled={isPending}>
+        <Button className="mt-4" onClick={onContinue} disabled={isPending}>
           {isPending
             ? t("gmail.intro.startCtaLoading")
             : t("smtp.terminal.gmailCta")}

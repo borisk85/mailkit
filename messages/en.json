@@ -463,7 +463,7 @@
       },
       "terminal": {
         "title": "Email infrastructure ready",
-        "body": "Postmark now handles outbound mail for {mailbox}@{domain}. One step left — Gmail Send-As.",
+        "body": "{mailbox}@{domain} can now send and receive.",
         "gmailCta": "Continue to Gmail Send-As →"
       }
     },
