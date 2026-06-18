@@ -1,8 +1,7 @@
 "use client";
 
-import { Check, Clock, Loader2 } from "lucide-react";
+import { Clock, Loader2 } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 // ─── Props ────────────────────────────────────────────────────────────────────
@@ -10,8 +9,6 @@ import { cn } from "@/lib/utils";
 export interface Step4DkimProps {
   destinationEmail: string;
   isLongPoll?: boolean;
-  emailRequested?: boolean;
-  onRequestEmail: () => void;
 }
 
 // ─── Main component ───────────────────────────────────────────────────────────
@@ -19,8 +16,6 @@ export interface Step4DkimProps {
 export function Step4Dkim({
   destinationEmail,
   isLongPoll = false,
-  emailRequested = false,
-  onRequestEmail,
 }: Step4DkimProps) {
   return (
     <div className="flex justify-center">
@@ -65,19 +60,8 @@ export function Step4Dkim({
           </div>
         )}
 
-        {/* Email CTA */}
-        <div className="space-y-3 text-center">
-          {emailRequested ? (
-            <div className="inline-flex items-center gap-1.5 rounded-full border border-mk-border-subtle bg-surface-elevated px-4 py-1.5 text-sm text-mk-text-secondary">
-              <Check className="size-4 text-mk-success" aria-hidden />
-              We&apos;ll email you when ready
-            </div>
-          ) : (
-            <Button variant="outline" size="sm" onClick={onRequestEmail}>
-              Email me when ready
-            </Button>
-          )}
-
+        {/* Close-tab reassurance */}
+        <div className="text-center">
           <p className="text-xs leading-snug text-mk-text-tertiary">
             You can safely close this tab. We&apos;ll email{" "}
             <span className="font-mono font-medium">{destinationEmail}</span>{" "}

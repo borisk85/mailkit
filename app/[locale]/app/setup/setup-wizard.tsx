@@ -38,7 +38,6 @@ import {
   continueSmtpSetup,
   pollDkimStatus,
   prepareGmailStep,
-  requestEmailOnReady,
   resumeDestinationVerify,
   startSetupRun,
   verifyCloudflareToken,
@@ -1076,7 +1075,6 @@ export function SetupWizard({
               destinationEmail: state.destinationEmail,
             })
           }
-          onEmailRequested={() => setState({ ...state, emailRequested: true })}
         />
       ) : null}
 
@@ -2631,13 +2629,10 @@ const DKIM_LONG_THRESHOLD_MS = 15 * 60 * 1000;
 function DkimPollingStep({
   state,
   onReady,
-  onEmailRequested,
 }: {
   state: Extract<WizardState, { kind: "smtp_dkim_polling" }>;
   onReady: () => void;
-  onEmailRequested: () => void;
 }) {
-  const [emailSent, setEmailSent] = useState(false);
   const [isLong, setIsLong] = useState(state.mockIsLong ?? false);
   // eslint-disable-next-line react-hooks/purity -- one-time timestamp, not used in render
   const startedAt = useMemo(() => Date.now(), []);
@@ -2672,19 +2667,8 @@ function DkimPollingStep({
     };
   }, [state.runId, state.mockIsLong, onReady, startedAt]);
 
-  const emailRequested = emailSent || Boolean(state.emailRequested);
-
   return (
-    <Step4Dkim
-      destinationEmail={state.destinationEmail}
-      isLongPoll={isLong}
-      emailRequested={emailRequested}
-      onRequestEmail={async () => {
-        await requestEmailOnReady({ runId: state.runId });
-        setEmailSent(true);
-        onEmailRequested();
-      }}
-    />
+    <Step4Dkim destinationEmail={state.destinationEmail} isLongPoll={isLong} />
   );
 }
 
