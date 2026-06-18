@@ -1865,6 +1865,9 @@ function SmtpDoneStep({
 }) {
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
+      <h2 className="pb-2 font-mono text-[1.3125rem] font-semibold text-mk-text-primary">
+        {state.mailboxLocal}@{state.zoneName}
+      </h2>
       <div className="rounded-lg border border-mk-success/30 bg-mk-success/10 p-4">
         <p className="flex items-start gap-2 text-sm text-mk-text-secondary">
           <CheckCircle2
