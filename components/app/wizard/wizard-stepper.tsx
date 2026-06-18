@@ -190,5 +190,5 @@ export const WIZARD_STEPS: WizardStep[] = [
   { label: "Email address", sublabel: "Domain & mailbox" },
   { label: "Mail routing", sublabel: "DNS configuration" },
   { label: "DKIM verify", sublabel: "Domain verification" },
-  { label: "Gmail Send-As", sublabel: "Gmail setup" },
+  { label: "Gmail Send-As", sublabel: "Send from your address" },
 ];
