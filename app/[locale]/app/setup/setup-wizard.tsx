@@ -2115,12 +2115,6 @@ function GmailWizard({
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">{t("gmail.intro.title")}</h2>
-        <span className="text-xs font-medium text-mk-text-tertiary">
-          {t("gmail.progress", {
-            current: String(currentIdx + 1),
-            total: String(total),
-          })}
-        </span>
       </div>
       <p className="text-sm text-mk-text-secondary">
         {t("gmail.intro.subtitle", { target: state.targetEmail })}
