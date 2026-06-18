@@ -714,9 +714,21 @@ export function SetupWizard({
       });
       return;
     }
+    if (result.runStatus === "gmail_instructions_shown") {
+      // The run is already in the Gmail step — resume straight there. The
+      // loader re-fetches the SMTP creds (prepareGmailStep) and lands the user
+      // on step 5 instead of dropping them back to smtp_done (step 4).
+      setState({
+        kind: "gmail_instructions_shown",
+        runId: result.runId,
+        zoneName,
+        mailboxLocal,
+        destinationEmail: result.destinationEmail,
+      });
+      return;
+    }
     if (
       result.runStatus === "smtp_done" ||
-      result.runStatus === "gmail_instructions_shown" ||
       result.runStatus === "gmail_smtp_ready" ||
       result.runStatus === "gmail_send_as_verified" ||
       result.runStatus === "done"
