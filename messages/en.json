@@ -403,7 +403,7 @@
       "done": {
         "title": "You can now receive mail!",
         "body": "Emails to {mailbox}@{domain} now land in your Gmail.",
-        "continueCta": "Continue to SMTP setup"
+        "continueCta": "Continue"
       },
       "failed": {
         "title": "Setup didn't finish",
@@ -453,7 +453,7 @@
       "done": "SMTP ready for your mailbox"
     },
     "smtp": {
-      "continueCta": "Continue to SMTP setup",
+      "continueCta": "Continue",
       "continueCtaLoading": "Starting SMTP setup…",
       "recheck": {
         "title": "Waiting for DNS verification",
