@@ -4,10 +4,11 @@ export function HowItWorksSection() {
   const t = useTranslations("landing.howItWorks");
 
   const steps = [
-    { key: "step1", number: "01", automated: true },
-    { key: "step2", number: "02", automated: true },
-    { key: "step3", number: "03", automated: true },
-    { key: "step4", number: "04", automated: false },
+    { key: "stepToken", number: "01", automated: false },
+    { key: "step1", number: "02", automated: true },
+    { key: "step2", number: "03", automated: true },
+    { key: "step3", number: "04", automated: true },
+    { key: "step4", number: "05", automated: false },
   ] as const;
 
   return (
@@ -30,52 +31,20 @@ export function HowItWorksSection() {
           </p>
         </div>
 
-        <div className="relative mt-16">
-          <div
-            aria-hidden
-            className="pointer-events-none absolute left-12 right-[28%] top-12 hidden h-px lg:block"
-            style={{
-              background:
-                "linear-gradient(to right, rgba(124,92,255,0.5), rgba(124,92,255,0.1))",
-            }}
-          />
-
-          <ol className="relative grid gap-6 lg:grid-cols-[repeat(3,minmax(0,1fr))_8px_minmax(0,1fr)] lg:gap-8">
-            {steps.slice(0, 3).map(({ key, number, automated }) => (
-              <StepCard
-                key={key}
-                number={number}
-                title={t(`${key}.title`)}
-                time={t(`${key}.time`)}
-                body={t(`${key}.body`)}
-                automated={automated}
-                automatedLabel={t("automatedBadge")}
-                manualLabel={t("manualBadge")}
-              />
-            ))}
-
-            <div
-              aria-hidden
-              className="hidden lg:block self-stretch w-px bg-mk-border-strong mx-1"
+        <ol className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
+          {steps.map(({ key, number, automated }) => (
+            <StepCard
+              key={key}
+              number={number}
+              title={t(`${key}.title`)}
+              time={t(`${key}.time`)}
+              body={t(`${key}.body`)}
+              automated={automated}
+              automatedLabel={t("automatedBadge")}
+              manualLabel={t("manualBadge")}
             />
-
-            {(() => {
-              const s = steps[3];
-              return (
-                <StepCard
-                  key={s.key}
-                  number={s.number}
-                  title={t(`${s.key}.title`)}
-                  time={t(`${s.key}.time`)}
-                  body={t(`${s.key}.body`)}
-                  automated={s.automated}
-                  automatedLabel={t("automatedBadge")}
-                  manualLabel={t("manualBadge")}
-                />
-              );
-            })()}
-          </ol>
-        </div>
+          ))}
+        </ol>
       </div>
     </section>
   );

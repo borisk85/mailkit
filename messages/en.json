@@ -83,10 +83,15 @@
     },
     "howItWorks": {
       "eyebrow": "How it works",
-      "heading": "Four steps. We automate the technical three.",
+      "heading": "Five steps. Two are yours, three run themselves.",
       "subheading": "Total time about 30 minutes. Your part: create and paste your Cloudflare token at the start, and add the SMTP details to Gmail at the end — both guided, a few minutes each.",
       "automatedBadge": "Automated",
       "manualBadge": "Your turn",
+      "stepToken": {
+        "title": "Paste your Cloudflare token",
+        "time": "~5 min",
+        "body": "You create a scoped API token in Cloudflare — we show you exactly how — and paste it in. That's what lets us set up your domain."
+      },
       "step1": {
         "title": "Cloudflare Email Routing",
         "time": "~15 sec",
