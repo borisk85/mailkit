@@ -183,7 +183,11 @@ export async function checkPurchaseStatus(): Promise<{ paid: boolean }> {
     data: { user },
   } = await sb.auth.getUser();
   if (!user) return { paid: false };
-  const { data } = await sb
+  // purchases has RLS enabled but no user-facing SELECT policy, so a
+  // user-scoped client sees zero rows here. Read via the service client,
+  // strictly scoped to the caller's own id from the verified session.
+  const admin = createServiceClient();
+  const { data } = await admin
     .from("purchases")
     .select("id")
     .eq("user_id", user.id)

@@ -120,7 +120,10 @@ export default async function SetupPage({
             .order("created_at", { ascending: false })
             .limit(1)
             .maybeSingle(),
-          supabase
+          // purchases has RLS enabled but no user-facing SELECT policy, so
+          // the user-scoped client sees zero rows — read via the service
+          // client, scoped to this verified user's id.
+          admin
             .from("purchases")
             .select("id")
             .eq("user_id", user.id)
