@@ -424,13 +424,17 @@ export function SetupWizard({
   // flips this true on its own, then auto-advances to SMTP. No reload, no
   // stale tab, no manual "Continue".
   const [purchaseConfirmed, setPurchaseConfirmed] = useState(!!hasPurchase);
-  const continuedRef = useRef(false);
+  // Guards the cf_done → SMTP hand-off against a double-fire (auto-advance
+  // effect + button) for ONE run, but keyed by runId so a fresh run after a
+  // restart can advance again — a plain boolean stayed true forever and left
+  // the Continue button dead on the next run.
+  const advancedRunIdRef = useRef<string | null>(null);
 
   function runContinueToSmtp(
     snapshot: Extract<WizardState, { kind: "cf_done_pending_smtp" }>,
   ) {
-    if (continuedRef.current) return;
-    continuedRef.current = true;
+    if (advancedRunIdRef.current === snapshot.runId) return;
+    advancedRunIdRef.current = snapshot.runId;
     setState({
       kind: "smtp_running",
       runId: snapshot.runId,
@@ -626,8 +630,8 @@ export function SetupWizard({
   }, [state.kind, purchaseConfirmed]);
 
   // Purchase confirmed while on the post-CF step → go straight to SMTP.
-  // Fires once (continuedRef). Covers both the just-paid return and a
-  // returning paid user — either way the next real action is SMTP.
+  // Fires once per run (advancedRunIdRef). Covers both the just-paid return
+  // and a returning paid user — either way the next real action is SMTP.
   useEffect(() => {
     if (state.kind === "cf_done_pending_smtp" && purchaseConfirmed) {
       runContinueToSmtp(state);
