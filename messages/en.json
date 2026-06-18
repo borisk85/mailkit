@@ -475,7 +475,7 @@
     "gmail": {
       "intro": {
         "title": "Last step — Gmail Send-As",
-        "subtitle": "About 3 minutes of copy-paste. You'll add {target} to Gmail so you can send from it like a regular address.",
+        "subtitle": "About 3 minutes of copying and pasting. You'll add {target} to Gmail so you can send from it like a regular address.",
         "startCta": "Start Gmail setup",
         "startCtaLoading": "Opening Gmail setup…"
       },
