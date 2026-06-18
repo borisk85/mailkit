@@ -33,7 +33,7 @@ export function Step4Dkim({
               !isLongPoll && "animate-pulse",
             )}
           >
-            <Clock className="size-8 text-mk-text-secondary" aria-hidden />
+            <Clock className="size-8 text-mk-accent" aria-hidden />
           </div>
 
           <div className="space-y-1.5">
