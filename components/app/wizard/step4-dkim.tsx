@@ -8,8 +8,6 @@ import { cn } from "@/lib/utils";
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 export interface Step4DkimProps {
-  zoneName: string;
-  mailboxLocal: string;
   destinationEmail: string;
   isLongPoll?: boolean;
   emailRequested?: boolean;
@@ -19,8 +17,6 @@ export interface Step4DkimProps {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export function Step4Dkim({
-  zoneName,
-  mailboxLocal,
   destinationEmail,
   isLongPoll = false,
   emailRequested = false,
@@ -46,9 +42,6 @@ export function Step4Dkim({
             </h2>
             <p className="text-xs text-mk-text-tertiary">
               Runs automatically in the background — no action needed.
-            </p>
-            <p className="text-xs font-mono text-mk-text-tertiary">
-              {mailboxLocal}@{zoneName}
             </p>
           </div>
         </div>

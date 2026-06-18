@@ -760,7 +760,7 @@ export function SetupWizard({
       case "smtp_dkim_polling":
         return state.mockIsLong
           ? "This is taking longer than usual — still working in the background."
-          : "Postmark is checking DKIM on your DNS — usually 5–15 minutes.";
+          : "Postmark is checking DKIM on your DNS — usually 5–30 minutes.";
       case "smtp_awaiting_retry":
       case "smtp_done":
         return "Configuring DNS records for sending. This is automatic — takes ~30 seconds.";
@@ -808,14 +808,18 @@ export function SetupWizard({
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
-      {state.kind !== "failed" && (
-        <header>
-          <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
-            {phaseTitle}
-          </h1>
-          <p className="mt-2 text-sm text-mk-text-secondary">{phaseSubtitle}</p>
-        </header>
-      )}
+      {state.kind !== "failed" &&
+        state.kind !== "setup_running" &&
+        state.kind !== "smtp_running" && (
+          <header>
+            <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
+              {phaseTitle}
+            </h1>
+            <p className="mt-2 text-sm text-mk-text-secondary">
+              {phaseSubtitle}
+            </p>
+          </header>
+        )}
 
       {state.kind !== "failed" && state.kind !== "gmail_done" && (
         <div className="rounded-xl border border-mk-border-subtle bg-surface-elevated px-6 py-5">
@@ -2675,8 +2679,6 @@ function DkimPollingStep({
 
   return (
     <Step4Dkim
-      zoneName={state.zoneName}
-      mailboxLocal={state.mailboxLocal}
       destinationEmail={state.destinationEmail}
       isLongPoll={isLong}
       emailRequested={emailRequested}

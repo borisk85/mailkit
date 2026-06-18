@@ -32,7 +32,7 @@ const CF_LABELS: Record<(typeof CF_SUBSTEPS)[number], string> = {
 };
 
 const SMTP_LABELS: Record<(typeof SMTP_SUBSTEPS)[number], string> = {
-  sender: "Creating email sender",
+  sender: "Setting up the sender",
   dns: "Adding DNS records",
   verify: "Verifying DKIM signature",
 };
@@ -104,9 +104,7 @@ function SubstepRow({
 
 export function Step3Progress({ phase, reached }: Step3ProgressProps) {
   const heading =
-    phase === "cf"
-      ? "We're configuring your email"
-      : "Setting up your email sender";
+    phase === "cf" ? "Setting up incoming email" : "Setting up outgoing email";
 
   return (
     <div className="flex justify-center">
