@@ -104,7 +104,7 @@ function SubstepRow({
 
 export function Step3Progress({ phase, reached }: Step3ProgressProps) {
   const heading =
-    phase === "cf" ? "Setting up incoming email" : "Setting up outgoing email";
+    phase === "cf" ? "Setting up incoming email" : "Preparing outgoing email";
 
   return (
     <div className="flex justify-center">
