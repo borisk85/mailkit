@@ -600,6 +600,13 @@ export function SetupWizard({
         setState({ kind: "token_entry" });
         return;
       }
+      // A run that's already underway: Back used to collapse the user to the
+      // domain step (step 2), which is jarring from a later step. Re-resume
+      // from the server so Back lands the user back on their real step instead.
+      if (activeRun) {
+        window.location.reload();
+        return;
+      }
       let saved: { token?: string; zones?: Zone[] } | null = null;
       try {
         const raw = sessionStorage.getItem(SETUP_SESSION_KEY);
@@ -617,7 +624,8 @@ export function SetupWizard({
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
-  }, []);
+     
+  }, [activeRun]);
 
   // ── Payment lands → leave the pay step on its own ─────────────────────
   // While parked on the post-CF pay step without a confirmed purchase,
@@ -766,7 +774,7 @@ export function SetupWizard({
       case "token_validating":
         return t("subtitle");
       case "zone_selection":
-        return "Pick the name before the @ — your domain's already set.";
+        return "Pick the name for your new mailbox — your domain's already set.";
       case "ns_warning":
         return "This domain's DNS is not on Cloudflare yet — migration required before setup.";
       case "setup_running":
