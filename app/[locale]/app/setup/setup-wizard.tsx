@@ -752,7 +752,7 @@ export function SetupWizard({
       case "gmail_done":
         return "All set — you can now send from your domain.";
       case "failed":
-        return "Setup hit a snag. Restart below.";
+        return "Something went wrong partway through. Restart below to try again.";
       default:
         return t("subtitle");
     }
@@ -760,6 +760,7 @@ export function SetupWizard({
 
   const phaseTitle = (() => {
     if (state.kind === "cf_done_pending_smtp") return "Almost there";
+    if (state.kind === "failed") return t("step3.failed.title");
     switch (getStepperStep(state.kind)) {
       case 2:
         return "Choose your email address";
@@ -789,12 +790,14 @@ export function SetupWizard({
 
   return (
     <div className="mx-auto max-w-4xl space-y-8">
-      <header>
-        <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
-          {phaseTitle}
-        </h1>
-        <p className="mt-2 text-sm text-mk-text-secondary">{phaseSubtitle}</p>
-      </header>
+      {state.kind !== "failed" && (
+        <header>
+          <h1 className="text-3xl font-bold tracking-tight text-mk-text-primary">
+            {phaseTitle}
+          </h1>
+          <p className="mt-2 text-sm text-mk-text-secondary">{phaseSubtitle}</p>
+        </header>
+      )}
 
       {state.kind !== "failed" && state.kind !== "gmail_done" && (
         <div className="rounded-xl border border-mk-border-subtle bg-surface-elevated px-6 py-5">
@@ -1173,7 +1176,6 @@ export function SetupWizard({
             setState({ kind: "token_entry" });
           }}
           t={t}
-          translateErr={translateErr}
         />
       ) : null}
     </div>
@@ -1197,7 +1199,7 @@ function TokenEntryStep({
 }) {
   const [token, setToken] = useState("");
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <h2 className="text-lg font-semibold">{t("step1.title")}</h2>
       <form
         className="space-y-3"
@@ -1515,7 +1517,7 @@ function ProgressStep({
   tSteps: (key: string) => string;
 }) {
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <h2 className="text-lg font-semibold">
         {zoneName} · {mailboxLocal}@{zoneName}
       </h2>
@@ -1554,7 +1556,7 @@ function AwaitingVerifyStep({
   onRetry: () => void;
 }) {
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <h2 className="text-lg font-semibold">
         {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
       </h2>
@@ -1572,14 +1574,17 @@ function AwaitingVerifyStep({
         })}
       </ol>
       <div
-        className="rounded-md border border-amber-400 bg-amber-50 p-5 text-sm dark:border-amber-600 dark:bg-amber-950"
-        style={{ borderLeftWidth: "4px", borderLeftColor: "rgb(245 158 11)" }}
+        className="rounded-md border border-mk-warning/40 bg-mk-warning/10 p-5 text-sm"
+        style={{ borderLeftWidth: "4px", borderLeftColor: "var(--mk-warning)" }}
       >
-        <div className="flex items-center gap-2 text-base font-semibold text-amber-900 dark:text-amber-100">
-          <AlertCircle className="size-5 shrink-0" aria-hidden />
+        <div className="flex items-center gap-2 text-base font-semibold text-mk-text-primary">
+          <AlertCircle
+            className="size-5 shrink-0 text-mk-warning"
+            aria-hidden
+          />
           {t("step3.awaitingVerify.title")}
         </div>
-        <p className="mt-2 text-amber-900 dark:text-amber-100">
+        <p className="mt-2 text-mk-text-secondary">
           {t("step3.awaitingVerify.body", { email: state.destinationEmail })}
         </p>
         <Button
@@ -1753,7 +1758,7 @@ function SmtpRunningStep({
 }) {
   void _t;
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <h2 className="text-lg font-semibold">
         {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
       </h2>
@@ -1788,7 +1793,7 @@ function SmtpAwaitingRetryStep({
   onRetry: () => void;
 }) {
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <h2 className="text-lg font-semibold">
         {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
       </h2>
@@ -1799,13 +1804,11 @@ function SmtpAwaitingRetryStep({
         tState={tState}
         tSmtp={tSmtp}
       />
-      <div className="rounded-md border border-amber-200 bg-amber-50 p-4 text-sm dark:border-amber-900 dark:bg-amber-950">
-        <div className="font-medium text-amber-900 dark:text-amber-100">
+      <div className="rounded-md border border-mk-warning/40 bg-mk-warning/10 p-4 text-sm">
+        <div className="font-medium text-mk-text-primary">
           {t("smtp.recheck.title")}
         </div>
-        <p className="mt-1 text-amber-900 dark:text-amber-100">
-          {t("smtp.recheck.body")}
-        </p>
+        <p className="mt-1 text-mk-text-secondary">{t("smtp.recheck.body")}</p>
         <Button
           className="mt-3"
           onClick={onRetry}
@@ -1844,7 +1847,7 @@ function SmtpDoneStep({
   onContinue: () => void;
 }) {
   return (
-    <section className="space-y-4 rounded-lg border border-emerald-200 p-6 dark:border-emerald-900">
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <h2 className="text-lg font-semibold">
         {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
       </h2>
@@ -1855,12 +1858,12 @@ function SmtpDoneStep({
         tState={tState}
         tSmtp={tSmtp}
       />
-      <div className="rounded-md border border-emerald-200 bg-emerald-50 p-4 text-sm dark:border-emerald-900 dark:bg-emerald-950">
-        <div className="flex items-center gap-2 font-medium text-emerald-900 dark:text-emerald-100">
+      <div className="rounded-md border border-mk-success/30 bg-mk-success/10 p-4 text-sm">
+        <div className="flex items-center gap-2 font-medium text-mk-success">
           <CheckCircle2 className="size-5" aria-hidden />
           {t("smtp.terminal.title")}
         </div>
-        <p className="mt-1 text-emerald-900 dark:text-emerald-100">
+        <p className="mt-1 text-mk-text-secondary">
           {t("smtp.terminal.body", {
             mailbox: state.mailboxLocal,
             domain: state.zoneName,
@@ -1954,30 +1957,45 @@ function FailedStep({
   state,
   onRestart,
   t,
-  translateErr,
 }: {
   state: Extract<WizardState, { kind: "failed" }>;
   onRestart: () => void;
   t: (key: string) => string;
-  translateErr: (key: string, details?: string) => string;
 }) {
+  const bodyKey =
+    state.source === "cf"
+      ? "step3.failed.bodyCf"
+      : state.source === "smtp"
+        ? "step3.failed.bodySmtp"
+        : state.source === "gmail"
+          ? "step3.failed.bodyGmail"
+          : "step3.failed.body";
   return (
-    <section className="space-y-4 rounded-lg border border-red-200 p-6 dark:border-red-900">
-      <h2 className="text-lg font-semibold text-red-900 dark:text-red-100">
+    <div className="mx-auto flex max-w-md flex-col items-center px-4 py-12 text-center sm:py-16">
+      <div className="flex size-14 items-center justify-center rounded-full bg-mk-danger/10 ring-1 ring-mk-danger/25">
+        <AlertCircle className="size-7 text-mk-danger" aria-hidden />
+      </div>
+      <h1 className="mt-6 text-2xl font-bold tracking-tight text-mk-text-primary">
         {t("step3.failed.title")}
-      </h2>
-      <p className="text-sm text-red-900 dark:text-red-100">
-        {t(
-          state.source === "smtp"
-            ? "step3.failed.bodySmtp"
-            : "step3.failed.body",
-        )}
+      </h1>
+      <p className="mt-3 text-[15px] leading-relaxed text-mk-text-secondary">
+        {t(bodyKey)}
       </p>
-      <InlineError message={translateErr(state.errorKey, state.errorDetails)} />
-      <Button onClick={onRestart} variant="outline">
-        {t("step3.failed.restartCta")}
-      </Button>
-    </section>
+      <p className="mt-2 text-sm leading-relaxed text-mk-text-tertiary">
+        {t("step3.failed.reassure")}
+      </p>
+      <div className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
+        <Button onClick={onRestart} className="w-full sm:w-auto">
+          {t("step3.failed.restartCta")}
+        </Button>
+        <a
+          href="mailto:support@getmailkit.com"
+          className="inline-flex h-10 w-full items-center justify-center rounded-[8px] border border-mk-border-strong px-5 text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary sm:w-auto"
+        >
+          {t("step3.failed.supportCta")}
+        </a>
+      </div>
+    </div>
   );
 }
 
@@ -2009,7 +2027,7 @@ function GmailLoadingStep({
   }, [runId]);
 
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <h2 className="text-lg font-semibold">{t("gmail.intro.title")}</h2>
       <p className="text-sm text-mk-text-secondary">
         {t("gmail.intro.subtitle", { target: targetEmail })}
@@ -2055,7 +2073,7 @@ function GmailWizard({
   }
 
   return (
-    <section className="space-y-4 rounded-lg border border-zinc-200 p-6 dark:border-zinc-800">
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-lg font-semibold">{t("gmail.intro.title")}</h2>
         <span className="text-xs font-medium text-mk-text-tertiary">
@@ -2312,7 +2330,7 @@ function GmailStepBody({
           value={state.smtp.password}
           t={t}
         />
-        <div className="rounded-md bg-amber-50 p-3 text-xs text-amber-900 dark:bg-amber-950 dark:text-amber-100">
+        <div className="rounded-md border border-mk-warning/30 bg-mk-warning/10 p-3 text-xs text-mk-text-secondary">
           {t("gmail.steps.smtpSettings.passwordWarning")}
         </div>
         <div className="space-y-1 text-sm">
@@ -2506,7 +2524,7 @@ function CopyButton({
       size="sm"
       onClick={onCopy}
       aria-label={copied ? t("gmail.common.copied") : t("gmail.common.copy")}
-      className={cn("min-h-11 sm:min-h-10", error && "border-red-400")}
+      className={cn("min-h-11 sm:min-h-10", error && "border-mk-danger")}
     >
       {copied ? (
         <Check className="size-4" aria-hidden />
@@ -2532,17 +2550,17 @@ function GmailDoneStep({
   t: (key: string, values?: Record<string, string>) => string;
 }) {
   return (
-    <section className="space-y-4 rounded-lg border border-emerald-200 p-6 dark:border-emerald-900">
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <div className="flex items-center gap-2">
-        <CheckCircle2 className="size-6 text-emerald-600" aria-hidden />
-        <h2 className="text-lg font-semibold text-emerald-900 dark:text-emerald-100">
+        <CheckCircle2 className="size-6 text-mk-success" aria-hidden />
+        <h2 className="text-lg font-semibold text-mk-text-primary">
           {t("gmail.steps.done.title")}
         </h2>
       </div>
-      <p className="text-sm text-emerald-900 dark:text-emerald-100">
+      <p className="text-sm text-mk-text-secondary">
         {t("gmail.steps.done.body", { target: state.targetEmail })}
       </p>
-      <p className="rounded-md border border-emerald-200/60 bg-emerald-50/40 px-3 py-2 text-xs leading-5 text-emerald-900/80 dark:border-emerald-900/60 dark:bg-emerald-950/30 dark:text-emerald-100/80">
+      <p className="rounded-md border border-mk-success/30 bg-mk-success/10 px-3 py-2 text-xs leading-5 text-mk-text-secondary">
         {t("gmail.steps.done.warmupTip")}
       </p>
       <Link href="/app" className="inline-flex">
@@ -2657,10 +2675,10 @@ function InlineError({ message }: { message: string }) {
   return (
     <div
       role="alert"
-      className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-900 dark:border-red-900 dark:bg-red-950 dark:text-red-100"
+      className="rounded-md border border-mk-danger/30 bg-mk-danger/10 px-3 py-2 text-sm text-mk-text-primary"
     >
       <span className="flex items-center gap-2">
-        <AlertCircle className="size-4 shrink-0" aria-hidden />
+        <AlertCircle className="size-4 shrink-0 text-mk-danger" aria-hidden />
         {message}
       </span>
     </div>

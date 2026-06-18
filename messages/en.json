@@ -406,10 +406,14 @@
         "continueCta": "Continue to SMTP setup"
       },
       "failed": {
-        "title": "Setup failed",
-        "body": "We couldn't finish the Cloudflare step. Fix the issue below and restart from Step 1.",
-        "bodySmtp": "We couldn't finish the SMTP setup step. Fix the issue below and restart from Step 1.",
-        "restartCta": "Restart from Step 1"
+        "title": "Setup didn't finish",
+        "body": "We ran into a problem finishing your setup.",
+        "bodyCf": "We ran into a problem setting up Cloudflare email routing.",
+        "bodySmtp": "We ran into a problem setting up sending for your domain.",
+        "bodyGmail": "We ran into a problem on the Gmail step.",
+        "reassure": "It's nothing you did — a restart clears it almost every time. If it doesn't, we'll finish the setup for you.",
+        "restartCta": "Restart from Step 1",
+        "supportCta": "Email support"
       }
     },
     "errors": {

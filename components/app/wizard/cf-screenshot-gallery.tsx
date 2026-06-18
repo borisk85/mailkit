@@ -102,7 +102,7 @@ export function CfScreenshotGallery({
             </div>
 
             {/* Image */}
-            <div className="relative bg-zinc-50">
+            <div className="relative bg-surface-elevated-2">
               <Image
                 src={`/screenshots/cf-token/step-${idx + 1}.webp`}
                 alt={STEPS[idx].label}

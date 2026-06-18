@@ -77,7 +77,7 @@ function SubstepRow({
   return (
     <li className="flex items-center gap-3">
       {status === "done" ? (
-        <CheckCircle2 className="size-5 shrink-0 text-green-500" aria-hidden />
+        <CheckCircle2 className="size-5 shrink-0 text-mk-success" aria-hidden />
       ) : status === "running" ? (
         <Loader2
           className="size-5 shrink-0 animate-spin text-mk-accent"

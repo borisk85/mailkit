@@ -66,7 +66,7 @@ export function Step4Dkim({
 
         {/* Long-poll warning */}
         {isLongPoll && (
-          <div className="rounded-lg border border-amber-300/50 bg-amber-50/60 px-4 py-3 text-sm text-amber-900">
+          <div className="rounded-lg border border-mk-warning/40 bg-mk-warning/10 px-4 py-3 text-sm text-mk-text-secondary">
             Taking longer than usual. This can happen with some DNS providers —
             it&apos;s normal.
           </div>
@@ -76,7 +76,7 @@ export function Step4Dkim({
         <div className="space-y-3 text-center">
           {emailRequested ? (
             <div className="inline-flex items-center gap-1.5 rounded-full border border-mk-border-subtle bg-surface-elevated px-4 py-1.5 text-sm text-mk-text-secondary">
-              <Check className="size-4 text-green-500" aria-hidden />
+              <Check className="size-4 text-mk-success" aria-hidden />
               We&apos;ll email you when ready
             </div>
           ) : (
