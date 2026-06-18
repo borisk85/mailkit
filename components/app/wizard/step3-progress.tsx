@@ -137,7 +137,7 @@ export function Step3Progress({ phase, reached }: Step3ProgressProps) {
         </ol>
 
         {/* Security note — same trust line as step 1 */}
-        <div className="flex items-start gap-1.5 text-[11px] leading-snug text-mk-success">
+        <div className="flex items-start gap-1.5 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2.5 text-[11px] leading-snug text-mk-success">
           <ShieldCheck className="mt-px size-3.5 shrink-0" aria-hidden />
           <span>
             Your Cloudflare token is encrypted while this setup runs and deleted
