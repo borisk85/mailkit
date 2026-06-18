@@ -1240,12 +1240,19 @@ async function flagPhishingPurchase(
     // Flag the most recent paid purchase for this user
     const { data: purchase } = await admin
       .from("purchases")
-      .select("id")
+      .select("id, kyc_review_required")
       .eq("user_id", userId)
       .eq("status", "paid")
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle();
+
+    // Idempotent: if this purchase is already flagged, don't re-flag and don't
+    // re-alert. prepareGmailStep can run many times for one purchase (resume,
+    // retries) — without this guard every run fired another identical alert.
+    if (purchase?.kyc_review_required) {
+      return;
+    }
 
     if (purchase) {
       await admin

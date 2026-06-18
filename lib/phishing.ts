@@ -14,6 +14,10 @@ export type PhishingCheckResult =
   | { flagged: false }
   | { flagged: true; reason: string };
 
+// Domains we own and operate. Owner mailboxes (support@, admin@, …) on these
+// are legitimate by definition, so they must never trip phishing detection.
+const OWN_DOMAINS = ["getmailkit.com"];
+
 // Mailbox prefixes that are almost always either impersonation or spam.
 const SUSPICIOUS_NAMES = new Set([
   "noreply",
@@ -112,6 +116,11 @@ export function checkPhishingPattern(
   mailboxLocal: string,
   domain: string,
 ): PhishingCheckResult {
+  const host = domain.toLowerCase().replace(/\.+$/, "");
+  if (OWN_DOMAINS.some((d) => host === d || host.endsWith(`.${d}`))) {
+    return { flagged: false };
+  }
+
   const local = mailboxLocal.toLowerCase().replace(/[._-]/g, "");
 
   if (
