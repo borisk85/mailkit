@@ -463,12 +463,27 @@ export function SetupWizard({
       );
     }, 1100);
     startTransition(async () => {
-      const result = await continueSmtpSetup({
-        runId: snapshot.runId,
-        cfToken: snapshot.cfToken,
-      });
-      clearInterval(smtpTimer);
-      handleSmtpResult(result, snapshot, setState);
+      try {
+        const result = await continueSmtpSetup({
+          runId: snapshot.runId,
+          cfToken: snapshot.cfToken,
+        });
+        clearInterval(smtpTimer);
+        handleSmtpResult(result, snapshot, setState);
+      } catch {
+        // Function timeout / network drop — don't leave the spinner hanging.
+        // Offer a retry instead of an infinite "Verifying…" circle.
+        clearInterval(smtpTimer);
+        setState({
+          kind: "smtp_awaiting_retry",
+          runId: snapshot.runId,
+          cfToken: snapshot.cfToken,
+          zoneName: snapshot.zoneName,
+          mailboxLocal: snapshot.mailboxLocal,
+          destinationEmail: snapshot.destinationEmail,
+          errorKey: "setup.errors.smtp_verify_timeout",
+        });
+      }
     });
   }
 

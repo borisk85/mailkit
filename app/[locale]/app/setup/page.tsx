@@ -9,6 +9,12 @@ import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 import { SetupWizard } from "./setup-wizard";
 
+// SMTP setup runs several sequential Cloudflare + Postmark API calls plus a
+// short DKIM-propagation wait in one request. Without a raised limit the
+// function can be killed mid-run, leaving the run stuck at cf_done with no
+// error and the wizard spinner hanging. 60s gives the flow room to finish.
+export const maxDuration = 60;
+
 const MOCK_STATES = [
   "token_entry",
   "token_invalid",
