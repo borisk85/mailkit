@@ -1103,6 +1103,13 @@ export function SetupWizard({
             startTransition(async () => {
               const result = await prepareGmailStep({ runId: snapshot.runId });
               if (result.status === "error") {
+                // The run is behind the UI (stale tab / earlier restart left
+                // this tab ahead of the real progress). Reload to re-sync to
+                // the actual step instead of dead-ending on an error.
+                if (result.errorKey === "setup.errors.run_wrong_state") {
+                  window.location.reload();
+                  return;
+                }
                 setState({
                   kind: "smtp_done",
                   runId: snapshot.runId,
@@ -1134,6 +1141,10 @@ export function SetupWizard({
           t={t}
           onReady={(result) => {
             if (result.status === "error") {
+              if (result.errorKey === "setup.errors.run_wrong_state") {
+                window.location.reload();
+                return;
+              }
               setState({
                 kind: "smtp_done",
                 runId: state.runId,
