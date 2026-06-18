@@ -2003,9 +2003,6 @@ function FailedStep({
       <p className="mt-3 text-[15px] leading-relaxed text-mk-text-secondary">
         {t(bodyKey)}
       </p>
-      <p className="mt-2 text-sm leading-relaxed text-mk-text-tertiary">
-        {t("step3.failed.reassure")}
-      </p>
       <div className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
         <Button onClick={onRestart} className="w-full sm:w-auto">
           {t("step3.failed.restartCta")}

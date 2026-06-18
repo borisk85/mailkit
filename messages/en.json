@@ -411,7 +411,6 @@
         "bodyCf": "We ran into a problem setting up Cloudflare email routing.",
         "bodySmtp": "We ran into a problem setting up sending for your domain.",
         "bodyGmail": "We ran into a problem on the Gmail step.",
-        "reassure": "It's nothing you did — a restart clears it almost every time. If it doesn't, we'll finish the setup for you.",
         "restartCta": "Restart from Step 1",
         "supportCta": "Email support"
       }
