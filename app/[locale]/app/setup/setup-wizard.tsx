@@ -23,6 +23,7 @@ import { TbMailFilled } from "react-icons/tb";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { GmailStepSchematic } from "@/components/app/gmail-step-schematic";
+import { GmailScreenshotGallery } from "@/components/app/wizard/gmail-screenshot-gallery";
 import { cn } from "@/lib/utils";
 import {
   WizardStepper,
@@ -2329,6 +2330,7 @@ function GmailStepBody({
     return (
       <>
         <p className="text-sm">{t("gmail.steps.openSettings.body")}</p>
+        <GmailScreenshotGallery />
         <div className="flex flex-wrap gap-2">
           <a
             href="https://mail.google.com/mail/u/0/#settings/accounts"
