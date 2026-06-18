@@ -500,7 +500,7 @@
         "openSettings": {
           "title": "Open Gmail → Settings",
           "body": "Click the ⚙ (top-right) → See all settings → Accounts and Import → Send mail as → Add another email address.",
-          "nextCta": "I opened the dialog"
+          "nextCta": "Done"
         },
         "senderInfo": {
           "title": "Fill in sender info",
