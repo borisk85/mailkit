@@ -2141,10 +2141,6 @@ function GmailWizard({
     setCurrentIdx((i) => Math.min(i + 1, total - 1));
   }
 
-  function goBack() {
-    setCurrentIdx((i) => Math.max(i - 1, 0));
-  }
-
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <div className="flex flex-wrap items-center justify-between gap-2">
@@ -2180,7 +2176,6 @@ function GmailWizard({
               }}
               checkboxError={checkboxError}
               onExpand={() => setCurrentIdx(idx)}
-              onBack={goBack}
               onNext={advance}
               onSubmit={() => {
                 if (!confirmed) {
@@ -2220,7 +2215,6 @@ function GmailStepCard({
   setConfirmed,
   checkboxError,
   onExpand,
-  onBack,
   onNext,
   onSubmit,
 }: {
@@ -2236,7 +2230,6 @@ function GmailStepCard({
   setConfirmed: (v: boolean) => void;
   checkboxError: boolean;
   onExpand: () => void;
-  onBack: () => void;
   onNext: () => void;
   onSubmit: () => void;
 }) {
@@ -2283,11 +2276,6 @@ function GmailStepCard({
             <span className="block text-sm font-semibold">{title}</span>
           </span>
         </span>
-        {status === "done" ? (
-          <span className="text-xs font-medium text-mk-success">
-            {t("step3.state.ok")}
-          </span>
-        ) : null}
       </button>
 
       {status === "active" ? (
@@ -2304,15 +2292,6 @@ function GmailStepCard({
             onNext={onNext}
             onSubmit={onSubmit}
           />
-          {idx > 0 ? (
-            <button
-              type="button"
-              onClick={onBack}
-              className="inline-flex items-center gap-1 text-xs font-medium text-mk-text-tertiary transition-colors hover:text-mk-text-secondary"
-            >
-              ← Back
-            </button>
-          ) : null}
         </div>
       ) : null}
     </li>
