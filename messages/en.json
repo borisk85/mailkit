@@ -453,8 +453,8 @@
       "done": "SMTP ready for your mailbox"
     },
     "smtp": {
-      "continueCta": "Continue",
-      "continueCtaLoading": "Starting SMTP setup…",
+      "continueCta": "Set up sending",
+      "continueCtaLoading": "Setting up sending…",
       "recheck": {
         "title": "Waiting for DNS verification",
         "body": "DNS records are in place. Our SMTP provider hasn't confirmed them yet — propagation usually takes a few minutes.",
