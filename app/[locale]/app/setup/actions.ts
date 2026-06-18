@@ -804,6 +804,27 @@ const smtpContinueSchema = z.object({
   cfToken: z.string().min(20).max(200),
 });
 
+// TEMP diagnostic: persist a breadcrumb into cf_state.dbg_smtp so we can see
+// exactly how far continueSmtpSetup gets, since Vercel CLI won't surface the
+// console logs. Removed once the stall is diagnosed.
+async function dbgMark(
+  admin: ReturnType<typeof createServiceClient>,
+  runId: string,
+  existing: unknown,
+  msg: string,
+) {
+  try {
+    const base =
+      existing && typeof existing === "object"
+        ? (existing as Record<string, unknown>)
+        : {};
+    await admin
+      .from("setup_runs")
+      .update({ cf_state: { ...base, dbg_smtp: msg } })
+      .eq("id", runId);
+  } catch {}
+}
+
 export async function continueSmtpSetup(input: {
   runId: string;
   cfToken: string;
@@ -844,6 +865,12 @@ export async function continueSmtpSetup(input: {
     rowStatus: row.status,
     cfLen: parsed.data.cfToken.length,
   });
+  await dbgMark(
+    admin,
+    row.id,
+    row.cf_state,
+    `enter st=${row.status} cf=${parsed.data.cfToken.length}`,
+  );
 
   if (SMTP_ALREADY_DONE.has(row.status)) {
     return { status: "ok", runId: row.id, runStatus: "smtp_done" };
@@ -851,6 +878,7 @@ export async function continueSmtpSetup(input: {
 
   if (!SMTP_RESUMABLE.has(row.status)) {
     console.log("[SMTP] wrong_state", { rowStatus: row.status });
+    await dbgMark(admin, row.id, row.cf_state, `wrong_state st=${row.status}`);
     return { status: "error", errorKey: "setup.errors.run_wrong_state" };
   }
 
@@ -861,10 +889,17 @@ export async function continueSmtpSetup(input: {
       hasZoneId: !!zoneId,
       hasZoneName: !!zoneName,
     });
+    await dbgMark(
+      admin,
+      row.id,
+      row.cf_state,
+      `corrupt zid=${!!zoneId} zname=${!!zoneName}`,
+    );
     return { status: "error", errorKey: "setup.errors.run_corrupt" };
   }
 
   console.log("[SMTP] -> runPostmarkSetup", { rowStatus: row.status });
+  await dbgMark(admin, row.id, row.cf_state, `to_pm st=${row.status}`);
   const pm = createPostmarkAccountClient(postmarkToken);
   const cf = createCloudflareClient(parsed.data.cfToken);
   return runPostmarkSetup({ pm, cf, admin, row });
@@ -906,11 +941,18 @@ async function runPostmarkSetup(args: {
       // server instead of burning a new one each time — that's what exhausted
       // the Free-tier 10-server cap. createServer also reuses on 603/614.
       console.log("[SMTP] creating server", { domain: row.domain });
+      await dbgMark(admin, row.id, row.cf_state, "pm:createServer:start");
       const server = await pm.createServer(row.domain);
       console.log("[SMTP] server ready", {
         id: server.id,
         tokenLen: server.apiToken?.length ?? 0,
       });
+      await dbgMark(
+        admin,
+        row.id,
+        row.cf_state,
+        `pm:server id=${server.id} tok=${server.apiToken?.length ?? 0}`,
+      );
       pmState = {
         ...pmState,
         server_id: server.id,
@@ -1030,6 +1072,12 @@ async function runPostmarkSetup(args: {
     };
   } catch (e) {
     console.log("[SMTP] threw", { msg: String(e) });
+    await dbgMark(
+      admin,
+      row.id,
+      row.cf_state,
+      `threw ${String(e).slice(0, 160)}`,
+    );
     await failRun(admin, row.id, STEP.smtpCreateSender, errMsg(e));
     return mapPostmarkError(e);
   }
