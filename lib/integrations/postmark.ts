@@ -48,9 +48,10 @@ export function createPostmarkAccountClient(accountToken: string) {
   const client = new AccountClient(accountToken);
 
   async function createServer(customerId: string): Promise<PostmarkServer> {
+    const name = `mailkit-${customerId}`;
     try {
       const server = await client.createServer({
-        Name: `mailkit-${customerId}`,
+        Name: name,
         Color: "Blue",
         SmtpApiActivated: true,
         RawEmailEnabled: false,
@@ -63,6 +64,23 @@ export function createPostmarkAccountClient(accountToken: string) {
         smtpApiActivated: server.SmtpApiActivated ?? true,
       };
     } catch (e) {
+      // Re-run of the same setup: the server already exists (Postmark 603).
+      // Reuse it so the SMTP step is idempotent instead of failing.
+      if (isDuplicateServer(e)) {
+        const list = await client.getServers({ count: 500, offset: 0 });
+        const existing = list.Servers?.find(
+          (s: Models.Server) => s.Name === name,
+        );
+        if (existing) {
+          const detail = await client.getServer(existing.ID);
+          return {
+            id: detail.ID,
+            name: detail.Name,
+            apiToken: detail.ApiTokens?.[0] ?? "",
+            smtpApiActivated: detail.SmtpApiActivated ?? true,
+          };
+        }
+      }
       throw toPostmarkError(e);
     }
   }
@@ -186,6 +204,17 @@ function normalizeDomain(domain: Models.DomainDetails): PostmarkDomain {
 function isDuplicateDomain(e: unknown): boolean {
   if (e instanceof Errors.PostmarkError) {
     if (e.code === 501) return true;
+  }
+  if (e instanceof Error) {
+    return /already exists/i.test(e.message);
+  }
+  return false;
+}
+
+function isDuplicateServer(e: unknown): boolean {
+  if (e instanceof Errors.PostmarkError) {
+    // 603 — "This server name already exists."
+    if (e.code === 603) return true;
   }
   if (e instanceof Error) {
     return /already exists/i.test(e.message);
