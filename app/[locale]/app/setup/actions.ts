@@ -835,23 +835,36 @@ export async function continueSmtpSetup(input: {
     .maybeSingle();
 
   if (!row || row.user_id !== user.id) {
+    console.log("[SMTP] run_not_found", { runId: parsed.data.runId });
     return { status: "error", errorKey: "setup.errors.run_not_found" };
   }
+
+  console.log("[SMTP] enter", {
+    runId: row.id,
+    rowStatus: row.status,
+    cfLen: parsed.data.cfToken.length,
+  });
 
   if (SMTP_ALREADY_DONE.has(row.status)) {
     return { status: "ok", runId: row.id, runStatus: "smtp_done" };
   }
 
   if (!SMTP_RESUMABLE.has(row.status)) {
+    console.log("[SMTP] wrong_state", { rowStatus: row.status });
     return { status: "error", errorKey: "setup.errors.run_wrong_state" };
   }
 
   const zoneId = row.cf_zone_id;
   const zoneName = row.domain;
   if (!zoneId || !zoneName) {
+    console.log("[SMTP] corrupt", {
+      hasZoneId: !!zoneId,
+      hasZoneName: !!zoneName,
+    });
     return { status: "error", errorKey: "setup.errors.run_corrupt" };
   }
 
+  console.log("[SMTP] -> runPostmarkSetup", { rowStatus: row.status });
   const pm = createPostmarkAccountClient(postmarkToken);
   const cf = createCloudflareClient(parsed.data.cfToken);
   return runPostmarkSetup({ pm, cf, admin, row });
@@ -892,7 +905,12 @@ async function runPostmarkSetup(args: {
       // Key the Postmark server by domain (not run id) so retries reuse one
       // server instead of burning a new one each time — that's what exhausted
       // the Free-tier 10-server cap. createServer also reuses on 603/614.
+      console.log("[SMTP] creating server", { domain: row.domain });
       const server = await pm.createServer(row.domain);
+      console.log("[SMTP] server ready", {
+        id: server.id,
+        tokenLen: server.apiToken?.length ?? 0,
+      });
       pmState = {
         ...pmState,
         server_id: server.id,
@@ -1011,6 +1029,7 @@ async function runPostmarkSetup(args: {
       runStatus: runStatus as SmtpSetupOk["runStatus"],
     };
   } catch (e) {
+    console.log("[SMTP] threw", { msg: String(e) });
     await failRun(admin, row.id, STEP.smtpCreateSender, errMsg(e));
     return mapPostmarkError(e);
   }
