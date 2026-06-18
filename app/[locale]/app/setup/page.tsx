@@ -164,6 +164,7 @@ export default async function SetupPage({
           activeRun={activeRun}
           hasPurchase={hasPurchase}
           initialToken={initialToken}
+          userEmail={user?.email ?? ""}
         />
       </div>
     </div>

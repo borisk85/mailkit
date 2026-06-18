@@ -393,6 +393,7 @@ export function SetupWizard({
   activeRun,
   hasPurchase,
   initialToken,
+  userEmail,
 }: {
   initialMock: MockKey;
   activeRun?: {
@@ -409,6 +410,12 @@ export function SetupWizard({
    * user back to step 1.
    */
   initialToken?: string | null;
+  /**
+   * The signed-in Google account email. Used to deep-link the Gmail
+   * Send-As step straight into the right inbox via ?authuser=, so a user
+   * with several Google accounts open doesn't land in the wrong one.
+   */
+  userEmail?: string;
 }) {
   const t = useTranslations("setup");
   const tErr = useTranslations("setup.errors");
@@ -1208,6 +1215,7 @@ export function SetupWizard({
         <GmailWizard
           state={state}
           isPending={isPending}
+          userEmail={userEmail}
           t={t}
           translateErr={translateErr}
           onComplete={() => {
@@ -2112,12 +2120,14 @@ type GmailStepId = (typeof GMAIL_STEP_IDS)[number];
 function GmailWizard({
   state,
   isPending,
+  userEmail,
   t,
   translateErr,
   onComplete,
 }: {
   state: Extract<WizardState, { kind: "gmail_smtp_ready" }>;
   isPending: boolean;
+  userEmail?: string;
   t: (key: string, values?: Record<string, string>) => string;
   translateErr: (key: string, details?: string) => string;
   onComplete: () => void;
@@ -2161,6 +2171,7 @@ function GmailWizard({
               status={status}
               t={t}
               state={state}
+              userEmail={userEmail}
               isPending={isPending}
               confirmed={confirmed}
               setConfirmed={(v) => {
@@ -2203,6 +2214,7 @@ function GmailStepCard({
   status,
   t,
   state,
+  userEmail,
   isPending,
   confirmed,
   setConfirmed,
@@ -2218,6 +2230,7 @@ function GmailStepCard({
   status: "done" | "active" | "pending";
   t: (key: string, values?: Record<string, string>) => string;
   state: Extract<WizardState, { kind: "gmail_smtp_ready" }>;
+  userEmail?: string;
   isPending: boolean;
   confirmed: boolean;
   setConfirmed: (v: boolean) => void;
@@ -2283,6 +2296,7 @@ function GmailStepCard({
             id={id}
             t={t}
             state={state}
+            userEmail={userEmail}
             isPending={isPending}
             confirmed={confirmed}
             setConfirmed={setConfirmed}
@@ -2309,6 +2323,7 @@ function GmailStepBody({
   id,
   t,
   state,
+  userEmail,
   isPending,
   confirmed,
   setConfirmed,
@@ -2319,6 +2334,7 @@ function GmailStepBody({
   id: GmailStepId;
   t: (key: string, values?: Record<string, string>) => string;
   state: Extract<WizardState, { kind: "gmail_smtp_ready" }>;
+  userEmail?: string;
   isPending: boolean;
   confirmed: boolean;
   setConfirmed: (v: boolean) => void;
@@ -2327,13 +2343,21 @@ function GmailStepBody({
   onSubmit: () => void;
 }) {
   if (id === "openSettings") {
+    // Deep-link straight into the signed-in account's Settings → Accounts
+    // tab. ?authuser=<email> pins the right inbox even when several Google
+    // accounts are open in the browser; fall back to u/0 if we have no email.
+    const settingsHref = userEmail
+      ? `https://mail.google.com/mail/?authuser=${encodeURIComponent(
+          userEmail,
+        )}#settings/accounts`
+      : "https://mail.google.com/mail/u/0/#settings/accounts";
     return (
       <>
         <p className="text-sm">{t("gmail.steps.openSettings.body")}</p>
         <GmailScreenshotGallery />
         <div className="flex flex-wrap gap-2">
           <a
-            href="https://mail.google.com/mail/u/0/#settings/accounts"
+            href={settingsHref}
             target="_blank"
             rel="noreferrer"
             className="inline-flex"
