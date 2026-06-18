@@ -889,7 +889,10 @@ async function runPostmarkSetup(args: {
 
     // Step 1: create Postmark Server (one per customer setup run)
     if (runStatus === "cf_done") {
-      const server = await pm.createServer(row.id);
+      // Key the Postmark server by domain (not run id) so retries reuse one
+      // server instead of burning a new one each time — that's what exhausted
+      // the Free-tier 10-server cap. createServer also reuses on 603/614.
+      const server = await pm.createServer(row.domain);
       pmState = {
         ...pmState,
         server_id: server.id,
