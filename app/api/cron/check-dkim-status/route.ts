@@ -13,7 +13,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
  * Cron — runs every minute. Checks pending DKIM verifications:
  *
  *   verified + user inactive >5min (or email explicitly requested):
- *     → advance status to brevo_done, send "domain ready" email
+ *     → advance status to smtp_done, send "domain ready" email
  *
  *   not verified + dns_written >15min + 15m email not sent:
  *     → send "still verifying" email once
@@ -21,7 +21,7 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
  *   not verified + dns_written >30min + 30m email not sent:
  *     → send "taking longer than usual" email once
  *
- * Uses updated_at as a proxy for when brevo_dns_written was set; accurate
+ * Uses updated_at as a proxy for when smtp_dns_written was set; accurate
  * enough for the 15/30-min thresholds at MVP scale.
  */
 export async function GET(request: Request) {
@@ -43,7 +43,7 @@ export async function GET(request: Request) {
     .select(
       "id, domain, status, cf_state, updated_at, last_active_at, dkim_notify_15m_sent_at, dkim_notify_30m_sent_at",
     )
-    .eq("status", "brevo_dns_written");
+    .eq("status", "smtp_dns_written");
 
   if (error) {
     console.error("[cron/check-dkim-status] DB error:", error.message);
@@ -87,11 +87,11 @@ export async function GET(request: Request) {
 
       if (dkimVerified) {
         const newPmState = { ...pmState, dkim_verified: true };
-        // Advance to brevo_done.
+        // Advance to smtp_done (same terminal state the client poll sets).
         await admin
           .from("setup_runs")
           .update({
-            status: "brevo_done",
+            status: "smtp_done",
             cf_state: {
               ...((row.cf_state as Record<string, unknown>) ?? {}),
               postmark: newPmState,
@@ -168,7 +168,20 @@ async function getUserEmail(
     .maybeSingle();
   if (!data) return null;
 
-  const { data: purchase } = await admin
+  // Prefer the purchase linked by user_id (the webhook always links by it);
+  // fall back to matching the sender domain in custom_data for older rows.
+  if (data.user_id) {
+    const { data: byUser } = await admin
+      .from("purchases")
+      .select("user_email")
+      .eq("user_id", data.user_id)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (byUser?.user_email) return byUser.user_email;
+  }
+
+  const { data: byDomain } = await admin
     .from("purchases")
     .select("user_email")
     .contains("custom_data", { domain: data.domain })
@@ -176,5 +189,5 @@ async function getUserEmail(
     .limit(1)
     .maybeSingle();
 
-  return purchase?.user_email ?? null;
+  return byDomain?.user_email ?? null;
 }
