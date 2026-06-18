@@ -912,7 +912,14 @@ async function runPostmarkSetup(args: {
         pmState = { ...pmState, domain, domain_id: domain.id };
       }
 
-      // DKIM TXT record
+      // DKIM TXT record. Guard against an empty host/value — Cloudflare
+      // rejects an empty DNS name as "9000: DNS name is invalid", which is
+      // opaque; surface the real cause instead.
+      if (!domain.dkimHost || !domain.dkimValue) {
+        throw new Error(
+          `postmark returned no DKIM record for ${zoneName} (dkimHost="${domain.dkimHost}")`,
+        );
+      }
       await upsertDnsByPattern(cf, zoneId, {
         pattern: "v=dkim1",
         record: {

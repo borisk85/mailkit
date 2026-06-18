@@ -168,8 +168,13 @@ function normalizeDomain(domain: Models.DomainDetails): PostmarkDomain {
   return {
     id: domain.ID,
     name: domain.Name,
-    dkimHost: domain.DKIMHost ?? "",
-    dkimValue: domain.DKIMTextValue ?? "",
+    // A freshly added domain returns its DKIM in the *Pending* fields
+    // (the active key only populates DKIMHost/DKIMTextValue after Postmark
+    // verifies the published record). Publishing the pending record is the
+    // correct setup step — falling back to it avoids writing an empty DNS
+    // name to Cloudflare (which rejects it as "9000: DNS name is invalid").
+    dkimHost: domain.DKIMHost || domain.DKIMPendingHost || "",
+    dkimValue: domain.DKIMTextValue || domain.DKIMPendingTextValue || "",
     dkimVerified: !!domain.DKIMVerified,
     returnPathHost:
       domain.ReturnPathDomain ?? `pm-bounces.${domain.Name ?? ""}`,
