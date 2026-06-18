@@ -41,13 +41,13 @@ export function Step4Dkim({
           </div>
         </div>
 
-        {/* Status badge */}
-        <div className="flex items-center justify-center gap-2 rounded-lg border border-mk-border-subtle bg-surface-elevated px-4 py-2.5">
+        {/* Status badge — live focal point */}
+        <div className="flex items-center justify-center gap-2 rounded-lg border border-mk-accent/30 bg-mk-accent/5 px-4 py-2.5">
           <Loader2
             className="size-4 shrink-0 animate-spin text-mk-accent"
             aria-hidden
           />
-          <span className="text-sm text-mk-text-secondary">
+          <span className="text-sm font-medium text-mk-text-primary">
             Checking every 30 seconds...
           </span>
         </div>
