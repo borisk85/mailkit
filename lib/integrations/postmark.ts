@@ -47,17 +47,34 @@ export function createPostmarkAccountClient(accountToken: string) {
 
   const client = new AccountClient(accountToken);
 
-  async function createServer(customerId: string): Promise<PostmarkServer> {
-    const name = `mailkit-${customerId}`;
+  async function createServer(_customerId: string): Promise<PostmarkServer> {
+    // ONE shared Postmark server backs every customer. Sender domains and
+    // DKIM are per-domain (addSenderDomain), NOT per-server, so a single
+    // server sends for all setups. Creating a server per customer hits the
+    // Postmark Free cap of 10 (and Free can't delete servers — 403), which
+    // is what stalled real runs. So: reuse an existing MailKit server first,
+    // and only create the shared one if the account has none yet.
+    const SHARED_NAME = "mailkit-shared";
     const toServer = (s: Models.Server): PostmarkServer => ({
       id: s.ID,
       name: s.Name,
       apiToken: s.ApiTokens?.[0] ?? "",
       smtpApiActivated: s.SmtpApiActivated ?? true,
     });
+
+    // 1) Reuse an existing server — never create a new one per customer.
+    const list = await client.getServers({ count: 500, offset: 0 });
+    const servers = list.Servers ?? [];
+    const existing =
+      servers.find((s: Models.Server) => s.Name === SHARED_NAME) ??
+      servers.find((s: Models.Server) => s.Name?.startsWith("mailkit-")) ??
+      servers[0];
+    if (existing) return toServer(await client.getServer(existing.ID));
+
+    // 2) Brand-new account with no servers yet — create the single shared one.
     try {
       const server = await client.createServer({
-        Name: name,
+        Name: SHARED_NAME,
         Color: "Blue",
         SmtpApiActivated: true,
         RawEmailEnabled: false,
@@ -65,21 +82,13 @@ export function createPostmarkAccountClient(accountToken: string) {
       });
       return toServer(server);
     } catch (e) {
-      // Reuse an existing server instead of failing:
-      //   603 — a server with this exact name already exists (idempotent
-      //         re-run of the same domain's setup).
-      //   614 — the account hit its server limit. Postmark Free caps at 10
-      //         and we can't delete servers on Free (403), so reuse any
-      //         existing MailKit server — sender domains + DKIM are per-domain,
-      //         not per-server, so one server backs many setups.
+      // Race / limit: another setup created it (603) or the cap was hit
+      // (614) — re-list and reuse whatever exists.
       if (isDuplicateServer(e) || isServerLimitReached(e)) {
-        const list = await client.getServers({ count: 500, offset: 0 });
-        const servers = list.Servers ?? [];
-        const match = isDuplicateServer(e)
-          ? servers.find((s: Models.Server) => s.Name === name)
-          : (servers.find((s: Models.Server) =>
-              s.Name.startsWith("mailkit-"),
-            ) ?? servers[0]);
+        const l2 = await client.getServers({ count: 500, offset: 0 });
+        const s2 = l2.Servers ?? [];
+        const match =
+          s2.find((s: Models.Server) => s.Name === SHARED_NAME) ?? s2[0];
         if (match) return toServer(await client.getServer(match.ID));
       }
       throw toPostmarkError(e);
