@@ -767,7 +767,7 @@ export function SetupWizard({
       case "smtp_awaiting_retry":
         return "Configuring DNS records for sending. This is automatic — takes ~30 seconds.";
       case "smtp_done":
-        return "One last step — connect it to your Gmail.";
+        return "One last step — add your new address to Gmail.";
       case "gmail_instructions_shown":
       case "gmail_smtp_ready":
         return "Almost done — add the address as Send-As to send from it.";

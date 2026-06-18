@@ -463,7 +463,7 @@
       },
       "terminal": {
         "title": "Email infrastructure ready",
-        "body": "{mailbox}@{domain} can now send and receive.",
+        "body": "Can now send and receive.",
         "gmailCta": "Continue to Gmail Send-As →"
       }
     },
