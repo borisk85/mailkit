@@ -33,6 +33,7 @@ import { Step4Dkim } from "@/components/app/wizard/step4-dkim";
 
 import {
   checkDomainNS,
+  checkPurchaseStatus,
   confirmGmailSendAs,
   continueSmtpSetup,
   pollDkimStatus,
@@ -418,6 +419,36 @@ export function SetupWizard({
   );
   const [isPending, startTransition] = useTransition();
   const [hydrated, setHydrated] = useState(false);
+  // Purchase gate for the post-CF step. Seeded from the server prop, but a
+  // payment can land after this page rendered (webhook beats nothing, the
+  // redirect can beat the webhook) — so the post-CF effect below polls and
+  // flips this true on its own, then auto-advances to SMTP. No reload, no
+  // stale tab, no manual "Continue".
+  const [purchaseConfirmed, setPurchaseConfirmed] = useState(!!hasPurchase);
+  const continuedRef = useRef(false);
+
+  function runContinueToSmtp(
+    snapshot: Extract<WizardState, { kind: "cf_done_pending_smtp" }>,
+  ) {
+    if (continuedRef.current) return;
+    continuedRef.current = true;
+    setState({
+      kind: "smtp_running",
+      runId: snapshot.runId,
+      cfToken: snapshot.cfToken,
+      zoneName: snapshot.zoneName,
+      mailboxLocal: snapshot.mailboxLocal,
+      destinationEmail: snapshot.destinationEmail,
+      reached: "sender",
+    });
+    startTransition(async () => {
+      const result = await continueSmtpSetup({
+        runId: snapshot.runId,
+        cfToken: snapshot.cfToken,
+      });
+      handleSmtpResult(result, snapshot, setState);
+    });
+  }
 
   // Survive a refresh anywhere in the flow: restore the saved step (or
   // resume an in-progress run) so the user isn't sent back to re-paste the
@@ -549,8 +580,43 @@ export function SetupWizard({
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
-     
   }, []);
+
+  // ── Payment lands → leave the pay step on its own ─────────────────────
+  // While parked on the post-CF pay step without a confirmed purchase,
+  // poll the server (and re-check whenever the tab regains focus — e.g.
+  // the user comes back from the checkout). The moment a paid order shows
+  // up, flip the gate; the effect below then advances to SMTP.
+  useEffect(() => {
+    if (state.kind !== "cf_done_pending_smtp" || purchaseConfirmed) return;
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const res = await checkPurchaseStatus();
+        if (!cancelled && res.paid) setPurchaseConfirmed(true);
+      } catch {
+        // transient — next tick retries
+      }
+    };
+    void check();
+    const id = setInterval(check, 4000);
+    window.addEventListener("focus", check);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+      window.removeEventListener("focus", check);
+    };
+  }, [state.kind, purchaseConfirmed]);
+
+  // Purchase confirmed while on the post-CF step → go straight to SMTP.
+  // Fires once (continuedRef). Covers both the just-paid return and a
+  // returning paid user — either way the next real action is SMTP.
+  useEffect(() => {
+    if (state.kind === "cf_done_pending_smtp" && purchaseConfirmed) {
+      runContinueToSmtp(state);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.kind, purchaseConfirmed]);
 
   async function handleStartSetup(
     token: string,
@@ -933,30 +999,12 @@ export function SetupWizard({
         <CfDonePendingSmtpStep
           state={state}
           isPending={isPending}
-          hasPurchase={!!hasPurchase}
+          hasPurchase={purchaseConfirmed}
           t={t}
           tState={tState}
           tSteps={tSteps}
           translateErr={translateErr}
-          onContinue={() => {
-            const snapshot = state;
-            setState({
-              kind: "smtp_running",
-              runId: snapshot.runId,
-              cfToken: snapshot.cfToken,
-              zoneName: snapshot.zoneName,
-              mailboxLocal: snapshot.mailboxLocal,
-              destinationEmail: snapshot.destinationEmail,
-              reached: "sender",
-            });
-            startTransition(async () => {
-              const result = await continueSmtpSetup({
-                runId: snapshot.runId,
-                cfToken: snapshot.cfToken,
-              });
-              handleSmtpResult(result, snapshot, setState);
-            });
-          }}
+          onContinue={() => runContinueToSmtp(state)}
         />
       ) : null}
 
@@ -1662,16 +1710,13 @@ function CfDonePendingSmtpStep({
           </Button>
         ) : (
           <div className="mt-3">
-            {/* Opens checkout in a NEW tab so the wizard tab stays put — the
-                pay route 303-redirects, and a redirect in this tab's history
-                makes Back bounce past /app/setup to /app. New tab avoids that;
-                the CF token is now stored server-side, so the new tab resumes
-                fine after payment. Real <a> (API route), not next/link. */}
-            {}
+            {/* Same-tab checkout: the pay route 303-redirects to Lemon
+                Squeezy and LS redirects back to /app/setup?paid=1, so this
+                one tab returns freshly rendered with the purchase recorded —
+                no orphaned stale tab. Real <a> (API route), not next/link. */}
+            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/api/checkout/start"
-              target="_blank"
-              rel="noopener noreferrer"
               className="mk-cta-shadow inline-flex h-10 items-center justify-center rounded-[8px] bg-mk-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
             >
               Complete setup — $5

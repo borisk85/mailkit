@@ -170,6 +170,29 @@ async function getAuthenticatedUser() {
   return user;
 }
 
+/**
+ * Has the current user got a paid purchase? Polled client-side on the
+ * post-CF screen so a payment that lands after the page was rendered
+ * (the LS webhook records the order a beat after the redirect) flips the
+ * wizard forward on its own — the user never has to reload to leave the
+ * pay step. RLS-scoped read of the caller's own purchases.
+ */
+export async function checkPurchaseStatus(): Promise<{ paid: boolean }> {
+  const sb = await createClient();
+  const {
+    data: { user },
+  } = await sb.auth.getUser();
+  if (!user) return { paid: false };
+  const { data } = await sb
+    .from("purchases")
+    .select("id")
+    .eq("user_id", user.id)
+    .eq("status", "paid")
+    .limit(1)
+    .maybeSingle();
+  return { paid: !!data };
+}
+
 export async function verifyCloudflareToken(input: {
   token: string;
 }): Promise<VerifyOk | ActionError> {
