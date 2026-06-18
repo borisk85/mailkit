@@ -370,7 +370,7 @@
       "tokenHelpLink": "Open Cloudflare API Tokens"
     },
     "step2": {
-      "title": "Step 2 — Pick the domain and mailbox",
+      "title": "Step 2 — Name your mailbox",
       "zoneLabel": "Domain",
       "zonePlaceholder": "Select a domain",
       "mailboxLabel": "Mailbox name",
