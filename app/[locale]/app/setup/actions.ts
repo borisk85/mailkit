@@ -1175,6 +1175,14 @@ function sleepMs(ms: number): Promise<void> {
 // the full downstream range so a double-click can't transition a run
 // out of "done".
 const GMAIL_PREPARE_RESUMABLE = new Set([
+  // smtp_done / gmail_instructions_shown are the normal entry points.
+  // The earlier SMTP statuses (and cf_done) are allowed too so a run whose
+  // SMTP server never persisted can self-heal in prepareGmailStep instead of
+  // dead-ending the user at step 4.
+  "cf_done",
+  "smtp_sender_created",
+  "smtp_dns_written",
+  "smtp_verified",
   "smtp_done",
   "gmail_instructions_shown",
 ]);
@@ -1422,17 +1430,49 @@ export async function prepareGmailStep(input: {
     return { status: "error", errorKey: "setup.errors.run_wrong_state" };
   }
 
-  // Load per-customer SMTP credentials from the Postmark server token stored in cf_state.
+  // Load per-customer SMTP credentials from the Postmark server token stored
+  // in cf_state. If the run reached this step without one (an SMTP setup that
+  // never persisted its server — e.g. an earlier stuck run), self-heal: ensure
+  // a Postmark server + sender domain exist and persist the token. Both calls
+  // are Postmark-only (no Cloudflare token needed); the domain's DNS/DKIM was
+  // written earlier by the SMTP step, so sending stays valid.
   let smtp: SmtpDisplay;
   try {
-    const pmState =
+    let pmState =
       ((row.cf_state as Record<string, unknown> | null)?.postmark as
         | Record<string, unknown>
         | undefined) ?? {};
-    smtp = buildPostmarkSmtpDisplay(
-      (pmState.server_token as string | undefined) ?? "",
-    );
+    let serverToken = (pmState.server_token as string | undefined) ?? "";
+    if (!serverToken) {
+      const postmarkToken = process.env.POSTMARK_ACCOUNT_TOKEN;
+      if (!postmarkToken) {
+        return {
+          status: "error",
+          errorKey: "setup.errors.postmark_invalid_token",
+        };
+      }
+      const pm = createPostmarkAccountClient(postmarkToken);
+      const server = await pm.createServer(row.domain);
+      const domain = await pm.addSenderDomain(row.domain);
+      serverToken = server.apiToken;
+      pmState = {
+        ...pmState,
+        server_id: server.id,
+        server_token: server.apiToken,
+        domain,
+        domain_id: domain.id,
+      };
+      const baseCf = (row.cf_state as Record<string, unknown> | null) ?? {};
+      await admin
+        .from("setup_runs")
+        .update({ cf_state: { ...baseCf, postmark: pmState } })
+        .eq("id", row.id);
+    }
+    smtp = buildPostmarkSmtpDisplay(serverToken);
   } catch (e) {
+    if (e instanceof PostmarkError) {
+      return { status: "error", errorKey: "setup.errors.postmark_unavailable" };
+    }
     return mapSmtpConfigError(e);
   }
 
