@@ -94,7 +94,7 @@
       },
       "step1": {
         "title": "Cloudflare Email Routing",
-        "time": "~15 sec",
+        "time": "~1 min",
         "body": "We turn on email routing for your domain and add the records that let it receive mail."
       },
       "step2": {
@@ -103,9 +103,9 @@
         "body": "We provision Postmark and add DNS records for you."
       },
       "step3": {
-        "title": "DNS verification",
-        "time": "~30 sec",
-        "body": "We check the records are live and Gmail will accept email signed by your domain."
+        "title": "DNS verification (DKIM)",
+        "time": "~5–30 min",
+        "body": "Your DKIM records propagate and we verify them in the background — this is the longest part, usually 5–30 minutes. You can close the tab; we keep checking."
       },
       "step4": {
         "title": "Gmail Send-As",
