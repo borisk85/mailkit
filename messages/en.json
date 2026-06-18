@@ -464,7 +464,7 @@
       "terminal": {
         "title": "Email infrastructure ready",
         "body": "Can now send and receive.",
-        "gmailCta": "Continue to Gmail Send-As →"
+        "gmailCta": "Continue to Gmail Send-As"
       }
     },
     "gmailStep": {

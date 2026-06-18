@@ -1734,7 +1734,11 @@ function CfDonePendingSmtpStep({
         </div>
 
         {hasPurchase ? (
-          <Button className="mt-3" onClick={onContinue} disabled={isPending}>
+          <Button
+            className="mt-3 bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+            onClick={onContinue}
+            disabled={isPending}
+          >
             {isPending ? t("smtp.continueCtaLoading") : t("smtp.continueCta")}
           </Button>
         ) : (
@@ -1746,7 +1750,7 @@ function CfDonePendingSmtpStep({
             {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
             <a
               href="/api/checkout/start"
-              className="mk-cta-shadow inline-flex h-10 items-center justify-center rounded-[8px] bg-mk-accent px-5 text-sm font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
+              className="mk-cta-shadow inline-flex h-8 items-center justify-center rounded-lg bg-mk-accent px-2.5 text-sm font-medium text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40"
             >
               Complete setup — $5
             </a>
@@ -1874,7 +1878,11 @@ function SmtpDoneStep({
           <Send className="size-5" aria-hidden />
           {t("smtp.terminal.title")}
         </div>
-        <Button className="mt-3" onClick={onContinue} disabled={isPending}>
+        <Button
+          className="mt-3 bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+          onClick={onContinue}
+          disabled={isPending}
+        >
           {isPending
             ? t("gmail.intro.startCtaLoading")
             : t("smtp.terminal.gmailCta")}
@@ -1987,12 +1995,15 @@ function FailedStep({
         {t(bodyKey)}
       </p>
       <div className="mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row">
-        <Button onClick={onRestart} className="w-full sm:w-auto">
+        <Button
+          onClick={onRestart}
+          className="w-full bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow sm:w-auto"
+        >
           {t("step3.failed.restartCta")}
         </Button>
         <a
           href="mailto:support@getmailkit.com"
-          className="inline-flex h-10 w-full items-center justify-center rounded-[8px] border border-mk-border-strong px-5 text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary sm:w-auto"
+          className="inline-flex h-8 w-full items-center justify-center rounded-lg border border-mk-border-strong px-2.5 text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary sm:w-auto"
         >
           {t("step3.failed.supportCta")}
         </a>
