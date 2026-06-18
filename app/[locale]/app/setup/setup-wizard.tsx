@@ -783,7 +783,7 @@ export function SetupWizard({
 
   const phaseTitle = (() => {
     if (state.kind === "cf_done_pending_smtp") return "Almost there";
-    if (state.kind === "smtp_done") return "Sending is set up";
+    if (state.kind === "smtp_done") return "Sending is ready";
     if (state.kind === "failed") return t("step3.failed.title");
     switch (getStepperStep(state.kind)) {
       case 2:
