@@ -16,6 +16,7 @@ import {
   EyeOff,
   Inbox,
   Loader2,
+  Send,
 } from "lucide-react";
 import { TbMailFilled } from "react-icons/tb";
 
@@ -1868,20 +1869,12 @@ function SmtpDoneStep({
       <h2 className="pb-2 font-mono text-[1.3125rem] font-semibold text-mk-text-primary">
         {state.mailboxLocal}@{state.zoneName}
       </h2>
-      <div className="rounded-lg border border-mk-success/30 bg-mk-success/10 p-4">
-        <p className="flex items-start gap-2 text-sm text-mk-text-secondary">
-          <CheckCircle2
-            className="mt-0.5 size-5 shrink-0 text-mk-success"
-            aria-hidden
-          />
-          <span>
-            {t("smtp.terminal.body", {
-              mailbox: state.mailboxLocal,
-              domain: state.zoneName,
-            })}
-          </span>
-        </p>
-        <Button className="mt-4" onClick={onContinue} disabled={isPending}>
+      <div className="rounded-lg border border-mk-success/30 bg-mk-success/10 p-4 text-sm">
+        <div className="flex items-center gap-2 font-medium text-mk-success">
+          <Send className="size-5" aria-hidden />
+          {t("smtp.terminal.title")}
+        </div>
+        <Button className="mt-3" onClick={onContinue} disabled={isPending}>
           {isPending
             ? t("gmail.intro.startCtaLoading")
             : t("smtp.terminal.gmailCta")}
