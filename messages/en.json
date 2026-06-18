@@ -505,7 +505,7 @@
         "senderInfo": {
           "title": "Fill in sender info",
           "body": "Paste these into the first Gmail dialog. Leave \"Treat as an alias\" checked.",
-          "nextCta": "Next: SMTP settings"
+          "nextCta": "Done"
         },
         "smtpSettings": {
           "title": "SMTP settings",
@@ -513,12 +513,12 @@
           "securityStarttls": "TLS (STARTTLS)",
           "securitySsl": "SSL",
           "passwordWarning": "We don't store this password for you. Copy it now; if you lose it, ping support and we'll help.",
-          "nextCta": "Next: verify"
+          "nextCta": "Done"
         },
         "verificationEmail": {
           "title": "Gmail will email a confirmation code",
           "body": "Gmail sends a 9-digit code to {target}. Because Cloudflare forwards {target} to your inbox, it will arrive in the same Gmail you're using. Open the email, click the link OR paste the code back into the Gmail dialog.",
-          "nextCta": "I verified it"
+          "nextCta": "Done"
         },
         "confirm": {
           "title": "Confirm it works",
