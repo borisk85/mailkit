@@ -499,7 +499,7 @@
       "steps": {
         "openSettings": {
           "title": "Open Gmail → Settings",
-          "body": "In Gmail, click the ⚙ gear (top-right) → See all settings → Accounts and Import → Send mail as → Add another email address.",
+          "body": "Click the ⚙ (top-right) → See all settings → Accounts and Import → Send mail as → Add another email address.",
           "nextCta": "I opened the dialog"
         },
         "senderInfo": {
