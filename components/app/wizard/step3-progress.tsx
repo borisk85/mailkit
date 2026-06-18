@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, Circle, Loader2, Shield } from "lucide-react";
+import { CheckCircle2, Circle, Loader2, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -136,16 +136,13 @@ export function Step3Progress({ phase, reached }: Step3ProgressProps) {
               ))}
         </ol>
 
-        {/* Security note */}
-        <div className="flex items-start gap-2 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2.5">
-          <Shield
-            className="mt-0.5 size-4 shrink-0 text-mk-text-tertiary"
-            aria-hidden
-          />
-          <p className="text-xs leading-snug text-mk-text-tertiary">
+        {/* Security note — same trust line as step 1 */}
+        <div className="flex items-start gap-1.5 text-[11px] leading-snug text-mk-success">
+          <ShieldCheck className="mt-px size-3.5 shrink-0" aria-hidden />
+          <span>
             Your Cloudflare token is encrypted while this setup runs and deleted
             as soon as it finishes.
-          </p>
+          </span>
         </div>
       </div>
     </div>
