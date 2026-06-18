@@ -462,7 +462,7 @@
         "ctaLoading": "Checking…"
       },
       "terminal": {
-        "title": "Email infrastructure ready",
+        "title": "You can now send mail!",
         "body": "Can now send and receive.",
         "gmailCta": "Continue to Gmail Send-As"
       }
