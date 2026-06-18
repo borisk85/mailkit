@@ -786,7 +786,7 @@ export function SetupWizard({
         return "One last step — add your new address to Gmail.";
       case "gmail_instructions_shown":
       case "gmail_smtp_ready":
-        return "Almost done — add the address as Send-As to send from it.";
+        return "Almost done — add your new address to start sending from it.";
       case "gmail_done":
         return "All set — you can now send from your domain.";
       case "failed":
