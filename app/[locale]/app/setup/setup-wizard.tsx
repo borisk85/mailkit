@@ -2384,8 +2384,15 @@ function GmailStepBody({
   if (id === "smtpSettings") {
     return (
       <>
-        <GmailStepSchematic id="smtpSettings" />
         <p className="text-sm">{t("gmail.steps.smtpSettings.body")}</p>
+        <GmailScreenshotGallery
+          screens={[
+            {
+              src: "/screenshots/gmail/smtpsettings-1.webp",
+              label: "Send mail through your SMTP server",
+            },
+          ]}
+        />
         <FieldRow
           label={t("gmail.fields.smtpHost")}
           value={state.smtp.host}

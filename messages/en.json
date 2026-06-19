@@ -510,7 +510,7 @@
         "smtpSettings": {
           "title": "SMTP settings",
           "body": "Paste these four values.",
-          "securityStarttls": "TLS (STARTTLS)",
+          "securityStarttls": "TLS (recommended)",
           "securitySsl": "SSL",
           "passwordWarning": "We don't store this password for you. Copy it now; if you lose it, ping support and we'll help.",
           "nextCta": "Done"
