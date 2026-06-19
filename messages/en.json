@@ -504,7 +504,7 @@
         },
         "senderInfo": {
           "title": "Fill in sender info",
-          "body": "Paste these into the first Gmail dialog. Leave \"Treat as an alias\" checked.",
+          "body": "Paste these into the \"Add another email address\" window. Leave \"Treat as an alias\" checked.",
           "nextCta": "Done"
         },
         "smtpSettings": {
