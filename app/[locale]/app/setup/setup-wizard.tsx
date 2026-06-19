@@ -2419,6 +2419,14 @@ function GmailStepBody({
         <div className="rounded-md border border-mk-warning/30 bg-mk-warning/10 p-3 text-xs text-mk-text-secondary">
           {t("gmail.steps.smtpSettings.passwordWarning")}
         </div>
+        <div className="space-y-1">
+          <span className="block text-xs font-medium text-mk-text-tertiary">
+            {t("gmail.fields.smtpSecurity")}
+          </span>
+          <p className="text-sm font-medium text-mk-text-primary">
+            {t("gmail.steps.smtpSettings.securityStarttls")}
+          </p>
+        </div>
         <Button onClick={onNext} size="sm">
           {t("gmail.steps.smtpSettings.nextCta")}
         </Button>
