@@ -2420,7 +2420,7 @@ function GmailStepBody({
           value={state.smtp.password}
           t={t}
         />
-        <div className="rounded-md border border-mk-warning/30 bg-mk-warning/10 p-3 text-xs text-mk-text-secondary">
+        <div className="rounded-md border border-mk-warning/40 bg-mk-warning/10 p-4 text-sm text-mk-text-secondary">
           {t("gmail.steps.smtpSettings.passwordWarning")}
         </div>
         <div className="space-y-1">
