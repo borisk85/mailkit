@@ -2583,9 +2583,6 @@ function GmailDoneStep({
         </strong>
         {bodyParts.slice(1).join(targetEmail)}
       </p>
-      <p className="rounded-md border border-mk-success/30 bg-mk-success/10 px-3 py-2 text-left text-xs leading-5 text-mk-text-secondary">
-        {t("gmail.steps.done.warmupTip")}
-      </p>
       <Link href="/app" className="inline-flex">
         <Button variant="outline">
           {t("gmail.steps.done.backToDashboard")}
