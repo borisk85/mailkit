@@ -1209,16 +1209,6 @@ type GmailConfirmOk = {
 
 const gmailRunSchema = z.object({ runId: z.string().uuid() });
 
-function titleCaseLocal(mailboxLocal: string): string {
-  const cleaned = mailboxLocal.replace(/[._-]+/g, " ").trim();
-  if (!cleaned) return mailboxLocal;
-  return cleaned
-    .split(" ")
-    .filter(Boolean)
-    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-    .join(" ");
-}
-
 function mapSmtpConfigError(e: unknown): ActionError {
   if (e instanceof PostmarkSmtpConfigError) {
     return {
@@ -1495,7 +1485,7 @@ export async function prepareGmailStep(input: {
   }
 
   const targetEmail = `${row.mailbox_local}@${row.domain}`;
-  const displayName = titleCaseLocal(row.mailbox_local);
+  const displayName = row.mailbox_local;
   const existingGmailState =
     (row.gmail_state as Record<string, unknown> | null) ?? {};
   const nextGmailState = {
