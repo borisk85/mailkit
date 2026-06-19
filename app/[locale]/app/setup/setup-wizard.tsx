@@ -2440,16 +2440,23 @@ function GmailStepBody({
   if (id === "verificationEmail") {
     return (
       <>
-        <GmailStepSchematic id="verificationEmail" />
+        <GmailScreenshotGallery
+          screens={[
+            {
+              src: "/screenshots/gmail/verification-1.webp",
+              label: "Open the confirmation email",
+            },
+            {
+              src: "/screenshots/gmail/verification-2.webp",
+              label: "Click Confirm",
+            },
+          ]}
+        />
         <p className="text-sm">
           {t("gmail.steps.verificationEmail.body", {
             target: state.targetEmail,
           })}
         </p>
-        <div className="flex items-center gap-2 text-sm text-mk-text-secondary">
-          <Loader2 className="size-4 animate-spin" aria-hidden />
-          Waiting for verification email…
-        </div>
         <Button onClick={onNext} size="sm">
           {t("gmail.steps.verificationEmail.nextCta")}
         </Button>
