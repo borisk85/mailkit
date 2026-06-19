@@ -1238,9 +1238,12 @@ export function SetupWizard({
               });
               if (result.status === "error") {
                 setState({ ...snapshot, errorKey: result.errorKey });
+              } else {
+                // Real success — flip `completed` on so the wizard reveals the
+                // inline success block under the (now all-done) steps, on the
+                // same page. No separate terminal screen.
+                setState({ ...snapshot, completed: true, errorKey: undefined });
               }
-              // Success: the wizard stays mounted and reveals the inline
-              // success block below the steps — no separate terminal screen.
             });
           }}
         />
@@ -2128,11 +2131,14 @@ function GmailWizard({
   translateErr: (key: string, details?: string) => string;
   onComplete: () => void;
 }) {
-  const [currentIdx, setCurrentIdx] = useState(
-    state.completed ? GMAIL_STEP_IDS.length : 0,
-  );
-  const [finished, setFinished] = useState(!!state.completed);
+  const [currentIdx, setCurrentIdx] = useState(0);
   const total = GMAIL_STEP_IDS.length;
+  // Success is driven by the real server result (state.completed), never
+  // optimistic — the "all set" block only shows when the setup truly finished.
+  // A completed setup also locks every step as done, so there's no Finish
+  // button to re-submit (and no "form looks off" error from re-running it).
+  const finished = !!state.completed;
+  const shownIdx = state.completed ? total : currentIdx;
 
   function advance() {
     setCurrentIdx((i) => Math.min(i + 1, total - 1));
@@ -2150,11 +2156,7 @@ function GmailWizard({
       <ol className="space-y-3">
         {GMAIL_STEP_IDS.map((id, idx) => {
           const status: "done" | "active" | "pending" =
-            idx < currentIdx
-              ? "done"
-              : idx === currentIdx
-                ? "active"
-                : "pending";
+            idx < shownIdx ? "done" : idx === shownIdx ? "active" : "pending";
           return (
             <GmailStepCard
               key={id}
@@ -2168,13 +2170,7 @@ function GmailWizard({
               isPending={isPending}
               onExpand={() => setCurrentIdx(idx)}
               onNext={advance}
-              onSubmit={() => {
-                // Mark every card done, then reveal the success block inline
-                // below the steps — the wizard stays in place.
-                setCurrentIdx(total);
-                setFinished(true);
-                onComplete();
-              }}
+              onSubmit={onComplete}
             />
           );
         })}
