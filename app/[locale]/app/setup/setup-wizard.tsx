@@ -9,6 +9,7 @@ import {
   ArrowUpRight,
   Check,
   CheckCircle2,
+  PartyPopper,
   ChevronDown,
   Circle,
   Copy,
@@ -2564,7 +2565,7 @@ function GmailDoneStep({
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6 text-center">
       <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-mk-success/10 ring-1 ring-mk-success/25">
-        <CheckCircle2 className="size-9 text-mk-success" aria-hidden />
+        <PartyPopper className="size-9 text-mk-success" aria-hidden />
       </div>
       <h2 className="text-xl font-semibold text-mk-text-primary">
         {t("gmail.steps.done.title")}
