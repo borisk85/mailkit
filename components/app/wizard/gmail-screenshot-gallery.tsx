@@ -16,7 +16,7 @@ export interface GmailScreen {
 const DEFAULT_SCREENS: GmailScreen[] = [
   { src: "/screenshots/gmail/step-1.webp", label: "Open Settings" },
   { src: "/screenshots/gmail/step-2.webp", label: "See all settings" },
-  { src: "/screenshots/gmail/step-3.webp", label: "Accounts and Import" },
+  { src: "/screenshots/gmail/step-3.webp", label: "Open Accounts and Import" },
   { src: "/screenshots/gmail/step-4.webp", label: "Add another email address" },
 ];
 
