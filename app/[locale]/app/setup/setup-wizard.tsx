@@ -2099,10 +2099,6 @@ function GmailLoadingStep({
       <p className="text-sm text-mk-text-secondary">
         {t("gmail.intro.subtitle", { target: targetEmail })}
       </p>
-      <div className="flex items-center gap-2 text-sm text-mk-text-secondary">
-        <Loader2 className="size-4 animate-spin" aria-hidden />
-        {t("gmail.intro.startCtaLoading")}
-      </div>
     </section>
   );
 }
