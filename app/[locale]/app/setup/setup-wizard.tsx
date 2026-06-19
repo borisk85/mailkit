@@ -2355,8 +2355,8 @@ function GmailStepBody({
   if (id === "senderInfo") {
     return (
       <>
-        <GmailStepSchematic id="senderInfo" />
         <p className="text-sm">{t("gmail.steps.senderInfo.body")}</p>
+        <GmailScreenshotGallery />
         <FieldRow
           label={t("gmail.fields.displayName")}
           value={state.displayName}
