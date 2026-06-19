@@ -2572,9 +2572,7 @@ function GmailDoneStep({
 }) {
   return (
     <div className="space-y-4 text-center">
-      <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-mk-success/10 ring-1 ring-mk-success/25">
-        <PartyPopper className="size-9 text-mk-success" aria-hidden />
-      </div>
+      <PartyPopper className="mx-auto size-12 text-mk-success" aria-hidden />
       <h2 className="text-xl font-semibold text-mk-text-primary">
         {t("gmail.steps.done.title")}
       </h2>
