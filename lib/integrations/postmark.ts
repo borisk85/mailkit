@@ -62,6 +62,19 @@ export function createPostmarkAccountClient(accountToken: string) {
       smtpApiActivated: s.SmtpApiActivated ?? true,
     });
 
+    // The shared server's SMTP API MUST be on. A server left with
+    // SmtpApiActivated=false (e.g. an abuse-suspended or leftover test
+    // server) makes Gmail reject the SMTP login with "Authentication error",
+    // silently breaking every customer's Send-As setup. So whenever we reuse
+    // a server, re-enable SMTP if it's off.
+    const ensureSmtpActive = async (id: number): Promise<Models.Server> => {
+      const s = await client.getServer(id);
+      if (s.SmtpApiActivated === false) {
+        return client.editServer(id, { SmtpApiActivated: true });
+      }
+      return s;
+    };
+
     // 1) Reuse an existing server — never create a new one per customer.
     const list = await client.getServers({ count: 500, offset: 0 });
     const servers = list.Servers ?? [];
@@ -69,7 +82,7 @@ export function createPostmarkAccountClient(accountToken: string) {
       servers.find((s: Models.Server) => s.Name === SHARED_NAME) ??
       servers.find((s: Models.Server) => s.Name?.startsWith("mailkit-")) ??
       servers[0];
-    if (existing) return toServer(await client.getServer(existing.ID));
+    if (existing) return toServer(await ensureSmtpActive(existing.ID));
 
     // 2) Brand-new account with no servers yet — create the single shared one.
     try {
@@ -89,7 +102,7 @@ export function createPostmarkAccountClient(accountToken: string) {
         const s2 = l2.Servers ?? [];
         const match =
           s2.find((s: Models.Server) => s.Name === SHARED_NAME) ?? s2[0];
-        if (match) return toServer(await client.getServer(match.ID));
+        if (match) return toServer(await ensureSmtpActive(match.ID));
       }
       throw toPostmarkError(e);
     }
