@@ -2566,6 +2566,10 @@ function GmailDoneStep({
   targetEmail: string;
   t: (key: string, values?: Record<string, string>) => string;
 }) {
+  // Split the body on the address so it can be rendered bold + white inline.
+  const bodyParts = t("gmail.steps.done.body", { target: targetEmail }).split(
+    targetEmail,
+  );
   return (
     <div className="space-y-4 text-center">
       <PartyPopper className="mx-auto size-12 text-mk-success" aria-hidden />
@@ -2573,7 +2577,11 @@ function GmailDoneStep({
         {t("gmail.steps.done.title")}
       </h2>
       <p className="mx-auto max-w-md text-sm text-mk-text-secondary">
-        {t("gmail.steps.done.body", { target: targetEmail })}
+        {bodyParts[0]}
+        <strong className="font-semibold text-mk-text-primary">
+          {targetEmail}
+        </strong>
+        {bodyParts.slice(1).join(targetEmail)}
       </p>
       <p className="rounded-md border border-mk-success/30 bg-mk-success/10 px-3 py-2 text-left text-xs leading-5 text-mk-text-secondary">
         {t("gmail.steps.done.warmupTip")}
