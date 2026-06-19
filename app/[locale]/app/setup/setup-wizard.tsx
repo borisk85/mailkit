@@ -2466,7 +2466,6 @@ function GmailStepBody({
   if (id === "confirm") {
     return (
       <>
-        <GmailStepSchematic id="confirm" />
         <p className="text-sm">
           {t("gmail.steps.confirm.body", { target: state.targetEmail })}
         </p>
