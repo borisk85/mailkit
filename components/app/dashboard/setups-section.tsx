@@ -9,13 +9,11 @@ import {
   setupDetailLabel,
   setupOverallState,
   type DashboardSetup,
-  type SendUsage,
   type SetupOverallState,
 } from "@/lib/dashboard-types";
 import { Button } from "@/components/ui/button";
 
 import { DeleteSetupButton } from "./delete-setup-button";
-import { SendingLimitsWidget } from "./sending-limits-widget";
 import { StatusBadge } from "./status-badge";
 
 const stateTone: Record<
@@ -30,11 +28,9 @@ const stateTone: Record<
 
 export function SetupsSection({
   setups,
-  sendUsage,
   deleteSetupAction,
 }: {
   setups: DashboardSetup[];
-  sendUsage: SendUsage[];
   deleteSetupAction: (runId: string) => Promise<void>;
 }) {
   const t = useTranslations("dashboard.setups");
@@ -56,24 +52,11 @@ export function SetupsSection({
   const visible = setups.filter((s) => !hiddenIds.has(s.id));
   if (visible.length === 0) return null;
 
-  const doneUsages = sendUsage.filter((u) =>
-    visible.some(
-      (s) => s.domain === u.domain && setupOverallState(s) === "done",
-    ),
-  );
-
   return (
     <section className="space-y-3">
       <h2 className="text-lg font-semibold text-mk-text-primary">
         {t("title")}
       </h2>
-      {doneUsages.length > 0 && (
-        <div className="space-y-2">
-          {doneUsages.map((u) => (
-            <SendingLimitsWidget key={u.domain} usage={u} />
-          ))}
-        </div>
-      )}
       <div className="space-y-3">
         {visible.map((setup) => {
           const state = setupOverallState(setup);

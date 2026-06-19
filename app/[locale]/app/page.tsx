@@ -120,7 +120,6 @@ export default async function AppHome({
         <>
           <SetupsSection
             setups={data.setups}
-            sendUsage={data.sendUsage}
             deleteSetupAction={deleteFailedSetup}
           />
           <AddAnotherCard locale={locale} />
