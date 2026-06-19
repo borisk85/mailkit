@@ -101,8 +101,20 @@ export async function getDashboardData(
     created_at: string;
   }>;
 
+  // Hide failed setups that are shadowed by a done setup for the same
+  // domain+mailbox — they are noise once the real setup succeeded.
+  const doneKeys = new Set(
+    setupsRaw
+      .filter((s) => s.status === "done")
+      .map((s) => `${s.domain}:${s.mailbox_local}`),
+  );
+  const visibleSetups = setupsRaw.filter(
+    (s) =>
+      s.status !== "failed" || !doneKeys.has(`${s.domain}:${s.mailbox_local}`),
+  );
+
   return {
-    setups: setupsRaw.map((s) => ({
+    setups: visibleSetups.map((s) => ({
       id: s.id,
       domain: s.domain,
       mailboxLocal: s.mailbox_local,

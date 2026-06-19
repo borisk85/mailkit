@@ -336,6 +336,16 @@ export async function startSetupRun(input: {
     return mapCfError(e);
   }
 
+  // Clean up previous failed runs for this domain+mailbox before starting
+  // fresh — keeps the dashboard tidy (no accumulating red cards).
+  await admin
+    .from("setup_runs")
+    .delete()
+    .eq("user_id", user.id)
+    .eq("cf_zone_id", parsed.data.zoneId)
+    .eq("mailbox_local", parsed.data.mailboxLocal)
+    .eq("status", "failed");
+
   const { data: inserted, error: insertError } = await admin
     .from("setup_runs")
     .insert({
