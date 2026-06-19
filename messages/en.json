@@ -517,7 +517,7 @@
           "nextCta": "Done"
         },
         "verificationEmail": {
-          "title": "Gmail will email a confirmation code",
+          "title": "Gmail will email a confirmation link",
           "body": "Gmail just emailed a confirmation link to {target} — it lands in this same inbox. Open the email, click the link, then press Confirm.",
           "nextCta": "Done"
         },
