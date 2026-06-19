@@ -15,9 +15,7 @@ export function RefundsSection({ refunds }: { refunds: DashboardRefund[] }) {
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold text-mk-text-primary">
-        {t("title")}
-      </h2>
+      <h2 className="mk-eyebrow text-mk-text-tertiary">{t("title")}</h2>
 
       {/* Desktop: table */}
       <div className="hidden overflow-x-auto rounded-lg border border-zinc-200 sm:block dark:border-zinc-800">

@@ -54,9 +54,7 @@ export function SetupsSection({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold text-mk-text-primary">
-        {t("title")}
-      </h2>
+      <h2 className="mk-eyebrow text-mk-text-tertiary">{t("title")}</h2>
       <div className="space-y-3">
         {visible.map((setup) => {
           const state = setupOverallState(setup);

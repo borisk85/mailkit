@@ -50,9 +50,7 @@ export function DangerZoneSection({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-semibold text-mk-text-primary">
-        {t("title")}
-      </h2>
+      <h2 className="mk-eyebrow text-mk-text-tertiary">{t("title")}</h2>
       <div className="rounded-xl border border-mk-border-subtle bg-surface-elevated p-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <p className="text-sm text-mk-text-secondary">{t("description")}</p>
