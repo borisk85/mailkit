@@ -2444,11 +2444,11 @@ function GmailStepBody({
           screens={[
             {
               src: "/screenshots/gmail/verification-1.webp",
-              label: "Open the confirmation email",
+              label: "Gmail Confirmation",
             },
             {
               src: "/screenshots/gmail/verification-2.webp",
-              label: "Click Confirm",
+              label: "Confirmation",
             },
           ]}
         />
