@@ -2389,11 +2389,11 @@ function GmailStepBody({
           screens={[
             {
               src: "/screenshots/gmail/smtpsettings-1.webp",
-              label: "Enter SMTP settings",
+              label: "Send mail through your SMTP server",
             },
             {
               src: "/screenshots/gmail/smtpsettings-2.webp",
-              label: "Confirm your address",
+              label: "Confirm verification and add your email address",
             },
           ]}
         />
