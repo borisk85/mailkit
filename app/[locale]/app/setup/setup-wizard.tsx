@@ -2541,33 +2541,31 @@ function PasswordRow({
         {label}
       </label>
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-        <Input
-          readOnly
-          value={value}
-          type={visible ? "text" : "password"}
-          className="flex-1 font-mono text-sm"
-        />
-        <div className="flex gap-2">
-          <Button
+        <div className="relative flex-1">
+          <Input
+            readOnly
+            value={value}
+            type={visible ? "text" : "password"}
+            className="w-full pr-10 font-mono text-sm"
+          />
+          <button
             type="button"
-            variant="outline"
-            size="icon"
             onClick={() => setVisible((v) => !v)}
             aria-label={
               visible
                 ? t("gmail.common.hidePassword")
                 : t("gmail.common.showPassword")
             }
-            className="size-11 sm:size-10"
+            className="absolute right-2.5 top-1/2 -translate-y-1/2 text-mk-text-tertiary hover:text-mk-text-primary transition-colors"
           >
             {visible ? (
               <EyeOff className="size-4" aria-hidden />
             ) : (
               <Eye className="size-4" aria-hidden />
             )}
-          </Button>
-          <CopyButton value={value} t={t} />
+          </button>
         </div>
+        <CopyButton value={value} t={t} />
       </div>
     </div>
   );
