@@ -80,7 +80,7 @@ export function CfScreenshotGallery({
         className="m-auto max-w-3xl w-[90vw] rounded-xl border border-mk-border-subtle bg-surface-base p-0 shadow-2xl overflow-hidden backdrop:bg-black/60 backdrop:backdrop-blur-sm"
       >
         {open && (
-          <div className="flex max-h-[90vh] flex-col">
+          <div className="flex flex-col">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-mk-border-subtle px-5 py-3">
               <div>
@@ -102,13 +102,13 @@ export function CfScreenshotGallery({
             </div>
 
             {/* Image */}
-            <div className="relative flex min-h-0 flex-1 items-center justify-center overflow-hidden bg-surface-elevated-2">
+            <div className="relative bg-surface-elevated-2">
               <Image
                 src={`/screenshots/cf-token/step-${idx + 1}.webp`}
                 alt={STEPS[idx].label}
                 width={1265}
                 height={800}
-                className="max-h-full w-full rounded-none object-contain"
+                className="mx-auto w-full max-h-[70vh] rounded-none object-contain"
                 priority
               />
             </div>
