@@ -14,7 +14,7 @@ export interface GmailScreen {
 
 // Default set = the openSettings navigation (gear → Add another email address).
 const DEFAULT_SCREENS: GmailScreen[] = [
-  { src: "/screenshots/gmail/step-1.webp", label: "Open Settings (gear)" },
+  { src: "/screenshots/gmail/step-1.webp", label: "Open Settings" },
   { src: "/screenshots/gmail/step-2.webp", label: "See all settings" },
   { src: "/screenshots/gmail/step-3.webp", label: "Accounts and Import" },
   { src: "/screenshots/gmail/step-4.webp", label: "Add another email address" },
