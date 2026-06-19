@@ -576,17 +576,13 @@ export function SetupWizard({
   // domain step (rebuilt from this tab's saved token+zones), from which Start
   // resumes the SAME run (deduped). Back from 'token' leaves to /app (it's
   // the first step). Never dumps the user out mid-wizard.
-  const poppingRef = useRef(false);
   const prevStepRef = useRef<string | null>(null);
+  const currentStepRef = useRef<string>("token");
 
   useEffect(() => {
     if (!hydrated) return;
     const step = stepForKind(state.kind);
-    if (poppingRef.current) {
-      poppingRef.current = false;
-      prevStepRef.current = step;
-      return;
-    }
+    currentStepRef.current = step;
     try {
       if (prevStepRef.current === null) {
         window.history.replaceState({ wizStep: step }, "", `?step=${step}`);
@@ -599,40 +595,23 @@ export function SetupWizard({
     prevStepRef.current = step;
   }, [state.kind, hydrated]);
 
+  // Browser Back never resets the wizard or drops the user to an earlier step.
+  // Past the first step, Back just re-pins the current URL — you stay exactly
+  // where you are with everything you've already filled in still there. Only
+  // the first step (token) lets Back leave the wizard back to /app.
   useEffect(() => {
     const onPop = () => {
-      const target =
-        new URLSearchParams(window.location.search).get("step") ?? "token";
-      poppingRef.current = true;
-      if (target === "token") {
-        setState({ kind: "token_entry" });
-        return;
-      }
-      // A run that's already underway: Back used to collapse the user to the
-      // domain step (step 2), which is jarring from a later step. Re-resume
-      // from the server so Back lands the user back on their real step instead.
-      if (activeRun) {
-        window.location.reload();
-        return;
-      }
-      let saved: { token?: string; zones?: Zone[] } | null = null;
+      const current = currentStepRef.current;
+      if (current === "token") return;
       try {
-        const raw = sessionStorage.getItem(SETUP_SESSION_KEY);
-        saved = raw ? JSON.parse(raw) : null;
-      } catch {}
-      if (saved?.token && Array.isArray(saved.zones) && saved.zones.length) {
-        setState({
-          kind: "zone_selection",
-          zones: saved.zones,
-          token: saved.token,
-        });
-      } else {
-        setState({ kind: "token_entry" });
+        window.history.pushState({ wizStep: current }, "", `?step=${current}`);
+      } catch {
+        // history API unavailable — nothing to re-pin
       }
     };
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
-  }, [activeRun]);
+  }, []);
 
   // ── Payment lands → leave the pay step on its own ─────────────────────
   // While parked on the post-CF pay step without a confirmed purchase,
