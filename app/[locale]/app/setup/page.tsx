@@ -82,6 +82,10 @@ export default async function SetupPage({
   // the authenticated owner of the run.
   let initialToken: string | null = null;
   let hasPurchase = false;
+  // Address of the most recent COMPLETED setup. When the user has a done run
+  // and nothing in progress, the wizard shows the success screen instead of
+  // falling back to an earlier step from stale tab state.
+  let completedTarget: string | null = null;
 
   const supabase = await createClient();
   const {
@@ -150,6 +154,22 @@ export default async function SetupPage({
           );
         }
         hasPurchase = !!purchaseResult.data;
+
+        // No run in progress, but a finished one exists → the user already
+        // completed setup. Surface the success screen, not step 2.
+        if (!activeRun) {
+          const doneResult = await admin
+            .from("setup_runs")
+            .select("domain, mailbox_local")
+            .eq("user_id", user.id)
+            .eq("status", "done")
+            .order("created_at", { ascending: false })
+            .limit(1)
+            .maybeSingle();
+          if (doneResult.data) {
+            completedTarget = `${doneResult.data.mailbox_local}@${doneResult.data.domain}`;
+          }
+        }
       } catch {
         // best-effort; don't block wizard load
       }
@@ -165,6 +185,7 @@ export default async function SetupPage({
           hasPurchase={hasPurchase}
           initialToken={initialToken}
           userEmail={user?.email ?? ""}
+          completedTarget={completedTarget}
         />
       </div>
     </div>

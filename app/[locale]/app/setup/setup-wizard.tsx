@@ -394,6 +394,7 @@ export function SetupWizard({
   hasPurchase,
   initialToken,
   userEmail,
+  completedTarget,
 }: {
   initialMock: MockKey;
   activeRun?: {
@@ -416,6 +417,8 @@ export function SetupWizard({
    * with several Google accounts open doesn't land in the wrong one.
    */
   userEmail?: string;
+  /** Address of an already-completed setup — renders the success screen. */
+  completedTarget?: string | null;
 }) {
   const t = useTranslations("setup");
   const tErr = useTranslations("setup.errors");
@@ -506,6 +509,20 @@ export function SetupWizard({
       saved = raw ? JSON.parse(raw) : null;
     } catch {}
 
+    // Setup already finished — show the success screen, never an earlier step.
+    if (completedTarget) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setState({
+        kind: "gmail_done",
+        targetEmail: completedTarget,
+        zoneName: "",
+        mailboxLocal: "",
+        destinationEmail: "",
+      });
+      setHydrated(true);
+      return;
+    }
+
     if (activeRun) {
       const zone = saved?.zones?.find((z) => z.name === activeRun.domain);
       if (saved?.token && zone) {
@@ -551,7 +568,7 @@ export function SetupWizard({
           setHydrated(true);
         });
       } else {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
+         
         setHydrated(true);
       }
       return;
@@ -1208,6 +1225,12 @@ export function SetupWizard({
             });
           }}
         />
+      ) : null}
+
+      {state.kind === "gmail_done" ? (
+        <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
+          <GmailDoneStep targetEmail={state.targetEmail} t={t} />
+        </section>
       ) : null}
 
       {state.kind === "failed" ? (
@@ -2147,7 +2170,9 @@ function GmailWizard({
       ) : null}
 
       {finished ? (
-        <GmailDoneStep targetEmail={state.targetEmail} t={t} />
+        <div className="border-t border-mk-border-subtle pt-6">
+          <GmailDoneStep targetEmail={state.targetEmail} t={t} />
+        </div>
       ) : null}
     </section>
   );
@@ -2531,7 +2556,7 @@ function GmailDoneStep({
   t: (key: string, values?: Record<string, string>) => string;
 }) {
   return (
-    <div className="space-y-4 border-t border-mk-border-subtle pt-6 text-center">
+    <div className="space-y-4 text-center">
       <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-mk-success/10 ring-1 ring-mk-success/25">
         <PartyPopper className="size-9 text-mk-success" aria-hidden />
       </div>
