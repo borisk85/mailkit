@@ -512,7 +512,7 @@
           "body": "Paste these four values.",
           "securityStarttls": "TLS (recommended)",
           "securitySsl": "SSL",
-          "passwordWarning": "We don't store this password for you. Copy it now; if you lose it, ping support and we'll help.",
+          "passwordWarning": "Save this password — you'll need it if you set up Send-As again.",
           "nextCta": "Done"
         },
         "verificationEmail": {
