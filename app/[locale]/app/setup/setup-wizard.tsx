@@ -2424,7 +2424,7 @@ function GmailStepBody({
             {t("gmail.fields.smtpSecurity")}
           </span>
           <p className="text-sm font-medium text-mk-text-primary">
-            {t("gmail.steps.smtpSettings.securityStarttls")}
+            {t("gmail.steps.smtpSettings.securityHint")}
           </p>
         </div>
         <Button onClick={onNext} size="sm">
