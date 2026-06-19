@@ -101,17 +101,15 @@ export async function getDashboardData(
     created_at: string;
   }>;
 
-  // Hide failed setups that are shadowed by a done setup for the same
-  // domain+mailbox — they are noise once the real setup succeeded.
-  const doneKeys = new Set(
-    setupsRaw
-      .filter((s) => s.status === "done")
-      .map((s) => `${s.domain}:${s.mailbox_local}`),
-  );
-  const visibleSetups = setupsRaw.filter(
-    (s) =>
-      s.status !== "failed" || !doneKeys.has(`${s.domain}:${s.mailbox_local}`),
-  );
+  // One card per mailbox address: keep only the most recent setup run per
+  // domain+mailbox pair. Older attempts (failed or otherwise) are noise.
+  const seenKeys = new Set<string>();
+  const visibleSetups = setupsRaw.filter((s) => {
+    const key = `${s.domain}:${s.mailbox_local}`;
+    if (seenKeys.has(key)) return false;
+    seenKeys.add(key);
+    return true;
+  });
 
   return {
     setups: visibleSetups.map((s) => ({
