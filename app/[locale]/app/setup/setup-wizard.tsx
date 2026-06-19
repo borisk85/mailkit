@@ -2386,6 +2386,7 @@ function GmailStepBody({
       <>
         <p className="text-sm">{t("gmail.steps.smtpSettings.body")}</p>
         <GmailScreenshotGallery
+          title="Add another email address you own"
           screens={[
             {
               src: "/screenshots/gmail/smtpsettings-1.webp",
@@ -2393,7 +2394,7 @@ function GmailStepBody({
             },
             {
               src: "/screenshots/gmail/smtpsettings-2.webp",
-              label: "Confirm verification and add your email address",
+              label: "Confirmation window",
             },
           ]}
         />
