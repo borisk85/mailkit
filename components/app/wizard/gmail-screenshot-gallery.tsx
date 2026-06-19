@@ -23,13 +23,10 @@ const DEFAULT_SCREENS: GmailScreen[] = [
 interface GmailScreenshotGalleryProps {
   /** Screens to show. Defaults to the openSettings navigation set. */
   screens?: GmailScreen[];
-  /** Dominant heading for the modal (the screen's main title, not a section sub-header). */
-  title?: string;
 }
 
 export function GmailScreenshotGallery({
   screens = DEFAULT_SCREENS,
-  title,
 }: GmailScreenshotGalleryProps) {
   const [open, setOpen] = useState(false);
   const [idx, setIdx] = useState(0);
@@ -89,13 +86,11 @@ export function GmailScreenshotGallery({
             {/* Header */}
             <div className="flex items-center justify-between border-b border-mk-border-subtle px-5 py-3">
               <div>
-                {title && (
-                  <p className="text-sm font-semibold text-mk-text-primary">
-                    {title}
-                  </p>
-                )}
-                <p className="text-xs font-medium text-mk-text-tertiary">
-                  {screens[idx].label} · {idx + 1} of {screens.length}
+                <p className="text-xs font-semibold uppercase tracking-wide text-mk-text-tertiary">
+                  Step {idx + 1} of {screens.length}
+                </p>
+                <p className="text-sm font-medium text-mk-text-primary">
+                  {screens[idx].label}
                 </p>
               </div>
               <button
