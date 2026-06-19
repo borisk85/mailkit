@@ -2391,6 +2391,10 @@ function GmailStepBody({
               src: "/screenshots/gmail/smtpsettings-1.webp",
               label: "Send mail through your SMTP server",
             },
+            {
+              src: "/screenshots/gmail/smtpsettings-2.webp",
+              label: "Confirm verification and add your email address",
+            },
           ]}
         />
         <FieldRow
