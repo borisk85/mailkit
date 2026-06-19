@@ -576,37 +576,34 @@ export function SetupWizard({
   // domain step (rebuilt from this tab's saved token+zones), from which Start
   // resumes the SAME run (deduped). Back from 'token' leaves to /app (it's
   // the first step). Never dumps the user out mid-wizard.
-  const prevStepRef = useRef<string | null>(null);
   const currentStepRef = useRef<string>("token");
 
+  // Browser Back must never reset the wizard, jump between steps, or trigger a
+  // route re-render that re-initialises state. Past the first step we trap it:
+  // each step pushes a sentinel history entry on the SAME url, and on Back we
+  // immediately re-arm one. Because the url never changes, the App Router never
+  // navigates or re-renders the page — the current step and everything already
+  // filled in stay exactly as they are. Only the first step (token) opts out,
+  // so Back there can still leave the wizard back to /app.
   useEffect(() => {
     if (!hydrated) return;
     const step = stepForKind(state.kind);
     currentStepRef.current = step;
+    if (step === "token") return;
     try {
-      if (prevStepRef.current === null) {
-        window.history.replaceState({ wizStep: step }, "", `?step=${step}`);
-      } else if (prevStepRef.current !== step) {
-        window.history.pushState({ wizStep: step }, "", `?step=${step}`);
-      }
+      window.history.pushState(null, "");
     } catch {
       // history API unavailable — degrade silently, wizard still works
     }
-    prevStepRef.current = step;
   }, [state.kind, hydrated]);
 
-  // Browser Back never resets the wizard or drops the user to an earlier step.
-  // Past the first step, Back just re-pins the current URL — you stay exactly
-  // where you are with everything you've already filled in still there. Only
-  // the first step (token) lets Back leave the wizard back to /app.
   useEffect(() => {
     const onPop = () => {
-      const current = currentStepRef.current;
-      if (current === "token") return;
+      if (currentStepRef.current === "token") return;
       try {
-        window.history.pushState({ wizStep: current }, "", `?step=${current}`);
+        window.history.pushState(null, "");
       } catch {
-        // history API unavailable — nothing to re-pin
+        // history API unavailable — nothing to re-arm
       }
     };
     window.addEventListener("popstate", onPop);
