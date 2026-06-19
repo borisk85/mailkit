@@ -98,35 +98,31 @@ export function SetupsSection({
                   {setup.errorMsg}
                 </p>
               ) : null}
-              <div className="flex items-center gap-2">
-                {isSetupReSetupEligible(setup) ? (
-                  <>
+              {state !== "done" && (
+                <div className="flex items-center gap-2">
+                  {isSetupReSetupEligible(setup) ? (
+                    <>
+                      <Link href="/app/setup">
+                        <Button size="sm" variant="default">
+                          {t("actions.reSetup")}
+                        </Button>
+                      </Link>
+                      <DeleteSetupButton
+                        runId={setup.id}
+                        domain={setup.domain}
+                        deleteAction={deleteSetupAction}
+                        onSuccess={() => handleDeleteSuccess(setup.id)}
+                      />
+                    </>
+                  ) : (
                     <Link href="/app/setup">
                       <Button size="sm" variant="default">
-                        {t("actions.reSetup")}
+                        {t("actions.continue")}
                       </Button>
                     </Link>
-                    <DeleteSetupButton
-                      runId={setup.id}
-                      domain={setup.domain}
-                      deleteAction={deleteSetupAction}
-                      onSuccess={() => handleDeleteSuccess(setup.id)}
-                    />
-                  </>
-                ) : state === "done" ? (
-                  <Link href="/app/setup">
-                    <Button size="sm" variant="outline">
-                      {t("actions.open")}
-                    </Button>
-                  </Link>
-                ) : (
-                  <Link href="/app/setup">
-                    <Button size="sm" variant="default">
-                      {t("actions.continue")}
-                    </Button>
-                  </Link>
-                )}
-              </div>
+                  )}
+                </div>
+              )}
             </div>
           );
         })}
