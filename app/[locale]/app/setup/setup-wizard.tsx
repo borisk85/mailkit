@@ -2419,29 +2419,6 @@ function GmailStepBody({
         <div className="rounded-md border border-mk-warning/30 bg-mk-warning/10 p-3 text-xs text-mk-text-secondary">
           {t("gmail.steps.smtpSettings.passwordWarning")}
         </div>
-        <div className="space-y-1 text-sm">
-          <span className="block text-xs font-medium text-mk-text-tertiary">
-            {t("gmail.fields.smtpSecurity")}
-          </span>
-          <label className="flex items-center gap-2">
-            <input
-              type="radio"
-              name="smtp-security"
-              defaultChecked={state.smtp.securityMode === "starttls"}
-              readOnly
-            />
-            {t("gmail.steps.smtpSettings.securityStarttls")}
-          </label>
-          <label className="flex items-center gap-2 text-mk-text-tertiary">
-            <input
-              type="radio"
-              name="smtp-security"
-              defaultChecked={state.smtp.securityMode === "ssl"}
-              readOnly
-            />
-            {t("gmail.steps.smtpSettings.securitySsl")}
-          </label>
-        </div>
         <Button onClick={onNext} size="sm">
           {t("gmail.steps.smtpSettings.nextCta")}
         </Button>
