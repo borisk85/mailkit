@@ -2356,7 +2356,14 @@ function GmailStepBody({
     return (
       <>
         <p className="text-sm">{t("gmail.steps.senderInfo.body")}</p>
-        <GmailScreenshotGallery />
+        <GmailScreenshotGallery
+          screens={[
+            {
+              src: "/screenshots/gmail/senderinfo-1.webp",
+              label: "Add another email address",
+            },
+          ]}
+        />
         <FieldRow
           label={t("gmail.fields.displayName")}
           value={state.displayName}

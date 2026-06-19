@@ -4,30 +4,34 @@ import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Images, X } from "lucide-react";
 
-// Mirrors CfScreenshotGallery one-to-one for visual consistency across the
-// wizard. Real Gmail screenshots live in /public/screenshots/gmail/step-N.webp
-// (1265×800), supplied by the owner since capturing them needs a Gmail login.
-const STEPS = [
-  { label: "Open Settings (gear)" },
-  { label: "See all settings" },
-  { label: "Accounts and Import" },
-  { label: "Add another email address" },
-] as const;
+// Real Gmail screenshots live in /public/screenshots/gmail/, supplied by the
+// owner since capturing them needs a Gmail login. Each wizard sub-step passes
+// its OWN screens so step 2 doesn't repeat step 1's navigation shots.
+export interface GmailScreen {
+  src: string;
+  label: string;
+}
+
+// Default set = the openSettings navigation (gear → Add another email address).
+const DEFAULT_SCREENS: GmailScreen[] = [
+  { src: "/screenshots/gmail/step-1.webp", label: "Open Settings (gear)" },
+  { src: "/screenshots/gmail/step-2.webp", label: "See all settings" },
+  { src: "/screenshots/gmail/step-3.webp", label: "Accounts and Import" },
+  { src: "/screenshots/gmail/step-4.webp", label: "Add another email address" },
+];
 
 interface GmailScreenshotGalleryProps {
-  /** 0-based inclusive start index into STEPS */
-  from?: number;
-  /** 0-based inclusive end index into STEPS */
-  to?: number;
+  /** Screens to show. Defaults to the openSettings navigation set. */
+  screens?: GmailScreen[];
 }
 
 export function GmailScreenshotGallery({
-  from = 0,
-  to = STEPS.length - 1,
+  screens = DEFAULT_SCREENS,
 }: GmailScreenshotGalleryProps) {
   const [open, setOpen] = useState(false);
-  const [idx, setIdx] = useState(from);
+  const [idx, setIdx] = useState(0);
   const dialogRef = useRef<HTMLDialogElement>(null);
+  const last = screens.length - 1;
 
   // open/close native dialog
   useEffect(() => {
@@ -49,19 +53,19 @@ export function GmailScreenshotGallery({
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowRight") setIdx((i) => Math.min(i + 1, to));
-      if (e.key === "ArrowLeft") setIdx((i) => Math.max(i - 1, from));
+      if (e.key === "ArrowRight") setIdx((i) => Math.min(i + 1, last));
+      if (e.key === "ArrowLeft") setIdx((i) => Math.max(i - 1, 0));
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [open]);
+  }, [open, last]);
 
   return (
     <>
       <button
         type="button"
         onClick={() => {
-          setIdx(from);
+          setIdx(0);
           setOpen(true);
         }}
         className="inline-flex items-center gap-1.5 text-xs text-mk-text-tertiary hover:text-mk-text-secondary underline underline-offset-2 transition-colors"
@@ -83,10 +87,10 @@ export function GmailScreenshotGallery({
             <div className="flex items-center justify-between border-b border-mk-border-subtle px-5 py-3">
               <div>
                 <p className="text-xs font-semibold uppercase tracking-wide text-mk-text-tertiary">
-                  Step {idx - from + 1} of {to - from + 1}
+                  Step {idx + 1} of {screens.length}
                 </p>
                 <p className="text-sm font-medium text-mk-text-primary">
-                  {STEPS[idx].label}
+                  {screens[idx].label}
                 </p>
               </div>
               <button
@@ -102,8 +106,8 @@ export function GmailScreenshotGallery({
             {/* Image */}
             <div className="relative bg-surface-elevated-2">
               <Image
-                src={`/screenshots/gmail/step-${idx + 1}.webp`}
-                alt={STEPS[idx].label}
+                src={screens[idx].src}
+                alt={screens[idx].label}
                 width={1265}
                 height={800}
                 className="w-full rounded-none object-contain"
@@ -115,14 +119,14 @@ export function GmailScreenshotGallery({
             <div className="flex items-center justify-between border-t border-mk-border-subtle px-5 py-3">
               {/* Step dots */}
               <div className="flex gap-1.5">
-                {STEPS.slice(from, to + 1).map((_, i) => (
+                {screens.map((_, i) => (
                   <button
-                    key={from + i}
+                    key={i}
                     type="button"
-                    onClick={() => setIdx(from + i)}
+                    onClick={() => setIdx(i)}
                     aria-label={`Go to step ${i + 1}`}
                     className={`size-2 rounded-full transition-colors ${
-                      from + i === idx
+                      i === idx
                         ? "bg-mk-accent"
                         : "bg-mk-border-subtle hover:bg-mk-text-tertiary"
                     }`}
@@ -134,8 +138,8 @@ export function GmailScreenshotGallery({
               <div className="flex gap-2">
                 <button
                   type="button"
-                  onClick={() => setIdx((i) => Math.max(i - 1, from))}
-                  disabled={idx === from}
+                  onClick={() => setIdx((i) => Math.max(i - 1, 0))}
+                  disabled={idx === 0}
                   className="rounded-md border border-mk-border-subtle p-1.5 text-mk-text-secondary transition-colors hover:bg-mk-border-subtle disabled:opacity-30"
                   aria-label="Previous screenshot"
                 >
@@ -143,8 +147,8 @@ export function GmailScreenshotGallery({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setIdx((i) => Math.min(i + 1, to))}
-                  disabled={idx === to}
+                  onClick={() => setIdx((i) => Math.min(i + 1, last))}
+                  disabled={idx === last}
                   className="rounded-md border border-mk-border-subtle p-1.5 text-mk-text-secondary transition-colors hover:bg-mk-border-subtle disabled:opacity-30"
                   aria-label="Next screenshot"
                 >
