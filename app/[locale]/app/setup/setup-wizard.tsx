@@ -132,6 +132,9 @@ type WizardState =
       displayName: string;
       smtp: SmtpDisplay;
       errorKey?: string;
+      // True when resuming an already-finished setup — the Gmail wizard opens
+      // straight on its success block under the (all-done) steps.
+      completed?: boolean;
     }
   | {
       kind: "gmail_done";
@@ -509,15 +512,29 @@ export function SetupWizard({
       saved = raw ? JSON.parse(raw) : null;
     } catch {}
 
-    // Setup already finished — show the success screen, never an earlier step.
+    // Setup already finished — open the Gmail wizard straight on its success
+    // block, under the (all-done) steps, on the SAME page. Step data is unused
+    // here because every step renders collapsed/done.
     if (completedTarget) {
+      const at = completedTarget.indexOf("@");
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setState({
-        kind: "gmail_done",
-        targetEmail: completedTarget,
-        zoneName: "",
-        mailboxLocal: "",
+        kind: "gmail_smtp_ready",
+        completed: true,
+        runId: "",
+        zoneName: at > 0 ? completedTarget.slice(at + 1) : "",
+        mailboxLocal: at > 0 ? completedTarget.slice(0, at) : completedTarget,
         destinationEmail: "",
+        targetEmail: completedTarget,
+        displayName: "",
+        smtp: {
+          host: "",
+          port: 0,
+          username: "",
+          password: "",
+          securityMode: "starttls",
+          keyVersion: 0,
+        },
       });
       setHydrated(true);
       return;
@@ -568,7 +585,6 @@ export function SetupWizard({
           setHydrated(true);
         });
       } else {
-         
         setHydrated(true);
       }
       return;
@@ -805,8 +821,11 @@ export function SetupWizard({
       case "smtp_done":
         return "One last step — add your new address to Gmail.";
       case "gmail_instructions_shown":
-      case "gmail_smtp_ready":
         return "Almost done — add your new address to start sending from it.";
+      case "gmail_smtp_ready":
+        return state.completed
+          ? "All set — you can now send from your domain."
+          : "Almost done — add your new address to start sending from it.";
       case "gmail_done":
         return "All set — you can now send from your domain.";
       case "failed":
@@ -1225,12 +1244,6 @@ export function SetupWizard({
             });
           }}
         />
-      ) : null}
-
-      {state.kind === "gmail_done" ? (
-        <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-          <GmailDoneStep targetEmail={state.targetEmail} t={t} />
-        </section>
       ) : null}
 
       {state.kind === "failed" ? (
@@ -2115,8 +2128,10 @@ function GmailWizard({
   translateErr: (key: string, details?: string) => string;
   onComplete: () => void;
 }) {
-  const [currentIdx, setCurrentIdx] = useState(0);
-  const [finished, setFinished] = useState(false);
+  const [currentIdx, setCurrentIdx] = useState(
+    state.completed ? GMAIL_STEP_IDS.length : 0,
+  );
+  const [finished, setFinished] = useState(!!state.completed);
   const total = GMAIL_STEP_IDS.length;
 
   function advance() {
