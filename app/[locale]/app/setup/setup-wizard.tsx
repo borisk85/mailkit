@@ -1226,22 +1226,12 @@ export function SetupWizard({
               });
               if (result.status === "error") {
                 setState({ ...snapshot, errorKey: result.errorKey });
-                return;
               }
-              setState({
-                kind: "gmail_done",
-                zoneName: snapshot.zoneName,
-                mailboxLocal: snapshot.mailboxLocal,
-                destinationEmail: snapshot.destinationEmail,
-                targetEmail: snapshot.targetEmail,
-              });
+              // Success: the wizard stays mounted and reveals the inline
+              // success block below the steps — no separate terminal screen.
             });
           }}
         />
-      ) : null}
-
-      {state.kind === "gmail_done" ? (
-        <GmailDoneStep state={state} t={t} />
       ) : null}
 
       {state.kind === "failed" ? (
@@ -2127,6 +2117,7 @@ function GmailWizard({
   onComplete: () => void;
 }) {
   const [currentIdx, setCurrentIdx] = useState(0);
+  const [finished, setFinished] = useState(false);
   const total = GMAIL_STEP_IDS.length;
 
   function advance() {
@@ -2164,9 +2155,10 @@ function GmailWizard({
               onExpand={() => setCurrentIdx(idx)}
               onNext={advance}
               onSubmit={() => {
-                // Mark every card done before the terminal panel replaces
-                // the wizard, so the user sees all checkmarks land.
+                // Mark every card done, then reveal the success block inline
+                // below the steps — the wizard stays in place.
                 setCurrentIdx(total);
+                setFinished(true);
                 onComplete();
               }}
             />
@@ -2176,6 +2168,10 @@ function GmailWizard({
 
       {state.errorKey ? (
         <InlineError message={translateErr(state.errorKey)} />
+      ) : null}
+
+      {finished ? (
+        <GmailDoneStep targetEmail={state.targetEmail} t={t} />
       ) : null}
     </section>
   );
@@ -2552,14 +2548,14 @@ function CopyButton({
 }
 
 function GmailDoneStep({
-  state,
+  targetEmail,
   t,
 }: {
-  state: Extract<WizardState, { kind: "gmail_done" }>;
+  targetEmail: string;
   t: (key: string, values?: Record<string, string>) => string;
 }) {
   return (
-    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6 text-center">
+    <div className="space-y-4 border-t border-mk-border-subtle pt-6 text-center">
       <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-mk-success/10 ring-1 ring-mk-success/25">
         <PartyPopper className="size-9 text-mk-success" aria-hidden />
       </div>
@@ -2567,7 +2563,7 @@ function GmailDoneStep({
         {t("gmail.steps.done.title")}
       </h2>
       <p className="mx-auto max-w-md text-sm text-mk-text-secondary">
-        {t("gmail.steps.done.body", { target: state.targetEmail })}
+        {t("gmail.steps.done.body", { target: targetEmail })}
       </p>
       <p className="rounded-md border border-mk-success/30 bg-mk-success/10 px-3 py-2 text-left text-xs leading-5 text-mk-text-secondary">
         {t("gmail.steps.done.warmupTip")}
@@ -2577,7 +2573,7 @@ function GmailDoneStep({
           {t("gmail.steps.done.backToDashboard")}
         </Button>
       </Link>
-    </section>
+    </div>
   );
 }
 
