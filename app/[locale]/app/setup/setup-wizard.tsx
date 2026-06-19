@@ -22,7 +22,6 @@ import { TbMailFilled } from "react-icons/tb";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { GmailStepSchematic } from "@/components/app/gmail-step-schematic";
 import { GmailScreenshotGallery } from "@/components/app/wizard/gmail-screenshot-gallery";
 import { cn } from "@/lib/utils";
 import {
@@ -2112,8 +2111,6 @@ const GMAIL_STEP_IDS = [
   "senderInfo",
   "smtpSettings",
   "verificationEmail",
-  "confirm",
-  "done",
 ] as const;
 type GmailStepId = (typeof GMAIL_STEP_IDS)[number];
 
@@ -2133,8 +2130,6 @@ function GmailWizard({
   onComplete: () => void;
 }) {
   const [currentIdx, setCurrentIdx] = useState(0);
-  const [confirmed, setConfirmed] = useState(false);
-  const [checkboxError, setCheckboxError] = useState(false);
   const total = GMAIL_STEP_IDS.length;
 
   function advance() {
@@ -2169,24 +2164,11 @@ function GmailWizard({
               state={state}
               userEmail={userEmail}
               isPending={isPending}
-              confirmed={confirmed}
-              setConfirmed={(v) => {
-                setConfirmed(v);
-                if (v) setCheckboxError(false);
-              }}
-              checkboxError={checkboxError}
               onExpand={() => setCurrentIdx(idx)}
               onNext={advance}
               onSubmit={() => {
-                if (!confirmed) {
-                  setCheckboxError(true);
-                  return;
-                }
-                // Auto-advance past the last card so all six show as done
-                // before the terminal panel replaces the wizard. Keeps
-                // the visual continuity even if confirmGmailSendAs is
-                // instant — user sees 6/6 checkmarks, not a mid-flight
-                // "step 5 active" snapshot.
+                // Mark every card done before the terminal panel replaces
+                // the wizard, so the user sees all checkmarks land.
                 setCurrentIdx(total);
                 onComplete();
               }}
@@ -2211,9 +2193,6 @@ function GmailStepCard({
   state,
   userEmail,
   isPending,
-  confirmed,
-  setConfirmed,
-  checkboxError,
   onExpand,
   onNext,
   onSubmit,
@@ -2226,9 +2205,6 @@ function GmailStepCard({
   state: Extract<WizardState, { kind: "gmail_smtp_ready" }>;
   userEmail?: string;
   isPending: boolean;
-  confirmed: boolean;
-  setConfirmed: (v: boolean) => void;
-  checkboxError: boolean;
   onExpand: () => void;
   onNext: () => void;
   onSubmit: () => void;
@@ -2286,9 +2262,6 @@ function GmailStepCard({
             state={state}
             userEmail={userEmail}
             isPending={isPending}
-            confirmed={confirmed}
-            setConfirmed={setConfirmed}
-            checkboxError={checkboxError}
             onNext={onNext}
             onSubmit={onSubmit}
           />
@@ -2304,9 +2277,6 @@ function GmailStepBody({
   state,
   userEmail,
   isPending,
-  confirmed,
-  setConfirmed,
-  checkboxError,
   onNext,
   onSubmit,
 }: {
@@ -2315,9 +2285,6 @@ function GmailStepBody({
   state: Extract<WizardState, { kind: "gmail_smtp_ready" }>;
   userEmail?: string;
   isPending: boolean;
-  confirmed: boolean;
-  setConfirmed: (v: boolean) => void;
-  checkboxError: boolean;
   onNext: () => void;
   onSubmit: () => void;
 }) {
@@ -2457,45 +2424,11 @@ function GmailStepBody({
             target: state.targetEmail,
           })}
         </p>
-        <Button onClick={onNext} size="sm">
-          {t("gmail.steps.verificationEmail.nextCta")}
-        </Button>
-      </>
-    );
-  }
-  if (id === "confirm") {
-    return (
-      <>
-        <p className="text-sm">
-          {t("gmail.steps.confirm.body", { target: state.targetEmail })}
-        </p>
-        <label className="flex items-start gap-2 text-sm">
-          <input
-            type="checkbox"
-            className="mt-1 size-4"
-            checked={confirmed}
-            onChange={(e) => setConfirmed(e.target.checked)}
-          />
-          <span>{t("gmail.steps.confirm.checkbox")}</span>
-        </label>
-        {checkboxError ? (
-          <InlineError message={t("gmail.errors.checkboxRequired")} />
-        ) : null}
         <Button onClick={onSubmit} size="sm" disabled={isPending}>
           {isPending
-            ? t("gmail.steps.confirm.submitCtaLoading")
-            : t("gmail.steps.confirm.submitCta")}
+            ? t("gmail.steps.verificationEmail.finishLoading")
+            : t("gmail.steps.verificationEmail.finishCta")}
         </Button>
-      </>
-    );
-  }
-  if (id === "done") {
-    return (
-      <>
-        <GmailStepSchematic id="done" />
-        <p className="text-sm">
-          {t("gmail.steps.done.body", { target: state.targetEmail })}
-        </p>
       </>
     );
   }
@@ -2629,17 +2562,17 @@ function GmailDoneStep({
   t: (key: string, values?: Record<string, string>) => string;
 }) {
   return (
-    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-      <div className="flex items-center gap-2">
-        <CheckCircle2 className="size-6 text-mk-success" aria-hidden />
-        <h2 className="text-lg font-semibold text-mk-text-primary">
-          {t("gmail.steps.done.title")}
-        </h2>
+    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6 text-center">
+      <div className="mx-auto flex size-16 items-center justify-center rounded-full bg-mk-success/10 ring-1 ring-mk-success/25">
+        <CheckCircle2 className="size-9 text-mk-success" aria-hidden />
       </div>
-      <p className="text-sm text-mk-text-secondary">
+      <h2 className="text-xl font-semibold text-mk-text-primary">
+        {t("gmail.steps.done.title")}
+      </h2>
+      <p className="mx-auto max-w-md text-sm text-mk-text-secondary">
         {t("gmail.steps.done.body", { target: state.targetEmail })}
       </p>
-      <p className="rounded-md border border-mk-success/30 bg-mk-success/10 px-3 py-2 text-xs leading-5 text-mk-text-secondary">
+      <p className="rounded-md border border-mk-success/30 bg-mk-success/10 px-3 py-2 text-left text-xs leading-5 text-mk-text-secondary">
         {t("gmail.steps.done.warmupTip")}
       </p>
       <Link href="/app" className="inline-flex">

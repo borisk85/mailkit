@@ -519,7 +519,8 @@
         "verificationEmail": {
           "title": "Open the confirmation email",
           "body": "Gmail emailed a confirmation link to {target} — it lands in this same inbox. Open the email, click the link, then press Confirm.",
-          "nextCta": "Done"
+          "finishCta": "Finish setup",
+          "finishLoading": "Finishing…"
         },
         "confirm": {
           "title": "Confirm it works",
@@ -529,8 +530,8 @@
           "submitCtaLoading": "Finishing…"
         },
         "done": {
-          "title": "Done — you're sending from your domain",
-          "body": "Compose in Gmail, switch From to {target}, send. Receipts land in your inbox as usual.",
+          "title": "You're all set!",
+          "body": "You can now send and receive email right in Gmail from your new branded address, {target}.",
           "warmupTip": "Tip: warm up the domain gradually — 10–20 emails per day in the first week, then ramp up. Bursts from a fresh domain are the fastest way to land in spam.",
           "backToDashboard": "Back to dashboard"
         }
