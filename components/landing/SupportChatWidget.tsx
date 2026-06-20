@@ -116,11 +116,7 @@ export default function SupportChatWidget() {
   }, [open, messages, view]);
 
   function openContactForm() {
-    // Pre-fill message from last user question
-    const lastUserMsg = [...messages]
-      .reverse()
-      .find((m) => m.role === "user" && !m.isFeedback);
-    setCfMessage(lastUserMsg ? lastUserMsg.content : "");
+    setCfMessage("");
     setView("contact");
   }
 
@@ -146,8 +142,7 @@ export default function SupportChatWidget() {
           role: "assistant",
           content:
             data.reply ??
-            data.error ??
-            "Something went wrong. Email us at support@getmailkit.com.",
+            "Something went wrong. Try again or use Contact support below.",
         },
       ]);
     } catch {
@@ -155,7 +150,7 @@ export default function SupportChatWidget() {
         ...prev,
         {
           role: "assistant",
-          content: "Failed to connect. Email us at support@getmailkit.com.",
+          content: "Failed to connect. Try again or use Contact support below.",
         },
       ]);
     } finally {
@@ -433,10 +428,6 @@ export default function SupportChatWidget() {
             onSubmit={submitContact}
             className="flex flex-col gap-3 px-5 py-5"
           >
-            <p className="text-sm text-muted-foreground">
-              We&apos;ll reply to your email within 24 hours.
-            </p>
-
             <div className="flex flex-col gap-1">
               <label className="text-xs font-medium text-foreground">
                 Your name

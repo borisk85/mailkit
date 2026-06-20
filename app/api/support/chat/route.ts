@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
   } catch (err) {
     console.error("Support chat error:", err);
     return NextResponse.json(
-      { error: "Failed to get a response. Email support@getmailkit.com." },
+      { error: "Failed to get a response. Please try again." },
       { status: 500 },
     );
   }
