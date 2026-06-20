@@ -124,10 +124,9 @@ ${ctaHtml}
           </tr>
           <tr>
             <td class="mk-divider" style="margin-top:40px;padding-top:24px;border-top:1px solid #E4E4E7;">
-              <p class="mk-footer-text" style="font-size:13px;line-height:1.6;color:#71717A;margin:24px 0 8px;">${escapeHtml(
+              <p class="mk-footer-text" style="font-size:13px;line-height:1.6;color:#71717A;margin:24px 0 12px;">${escapeHtml(
                 footer.questions,
               )}</p>
-              <p class="mk-footer-text" style="font-size:12px;line-height:1.6;color:#71717A;margin:0 0 12px;">support@getmailkit.com</p>
               <p class="mk-footer-text" style="font-size:13px;line-height:1.6;color:#71717A;margin:0;">
                 <a href="${SITE_URL}/terms" class="mk-footer-link" style="color:#71717A;text-decoration:underline;">${escapeHtml(
                   footer.termsLabel,

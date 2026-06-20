@@ -49,7 +49,7 @@ export async function sendDkimReadyEmail(opts: {
     subject: "Domain ready — finish your MailKit setup",
     title: "Your domain is verified",
     body: `Good news! ${opts.domain} has been verified with our email provider. Click below to complete the final step — it takes about 3 minutes in Gmail settings.`,
-    cta: { text: "Finish setup in Gmail →", url: opts.finishUrl },
+    cta: { text: "Finish setup in Gmail", url: opts.finishUrl },
   });
 }
 
@@ -71,7 +71,7 @@ export async function sendDkimDelayedEmail(opts: {
     title: opts.isVeryLong ? "Taking a bit longer" : "Still working on it",
     body,
     cta: opts.isVeryLong
-      ? { text: "Check setup status →", url: opts.finishUrl }
+      ? { text: "Check setup status", url: opts.finishUrl }
       : undefined,
   });
 }
