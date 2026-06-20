@@ -263,8 +263,8 @@
     "eyebrow": "My account",
     "title": "Welcome back, {name}.",
     "addAnother": {
-      "title": "Set up another mailbox",
-      "body": "One more email address on your domain.",
+      "title": "Add new mailbox",
+      "body": "One-time payment — $5",
       "cta": "Set up email"
     },
     "emptyState": {
