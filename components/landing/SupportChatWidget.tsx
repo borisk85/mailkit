@@ -24,7 +24,7 @@ const HISTORY_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_SESSION_DISLIKES = 3;
 
 const GREETING =
-  "Hi! I'm the MailKit support assistant. Ask me anything about setup, pricing, or refunds.";
+  "Hi! I'm MailKit's AI assistant. Ask me anything about the service.";
 
 const SUGGESTED_QUESTIONS = [
   "How long does setup take?",
