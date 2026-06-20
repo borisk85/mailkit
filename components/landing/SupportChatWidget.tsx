@@ -464,7 +464,7 @@ export default function SupportChatWidget() {
             )}
             {!hasConversation && (
               <p className="mt-2 text-center text-[10px] text-muted-foreground">
-                AI assistant · responses may not always be accurate.
+                Responses may not always be accurate.
               </p>
             )}
           </div>
