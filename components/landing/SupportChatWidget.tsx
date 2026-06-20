@@ -27,10 +27,10 @@ const GREETING =
   "Hi! I'm MailKit's AI assistant. Ask me anything about the service.";
 
 const SUGGESTED_QUESTIONS = [
-  "How long does setup take?",
+  "What exactly do I get for $5?",
   "What if my domain isn't on Cloudflare?",
   "What are the sending limits?",
-  "How do I get a refund?",
+  "Is there a money-back guarantee?",
 ];
 
 interface StoredHistory {
