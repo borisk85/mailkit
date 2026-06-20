@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 
@@ -17,8 +16,7 @@ export async function AddAnotherCard({ locale }: { locale: string }) {
         <p className="mt-0.5 text-sm text-mk-text-secondary">{t("body")}</p>
       </div>
       <Link href="/api/checkout/start" className="shrink-0">
-        <Button size="sm" variant="outline" className="gap-1.5">
-          <Plus className="size-3.5" aria-hidden />
+        <Button size="sm" variant="outline">
           {t("cta")}
         </Button>
       </Link>
