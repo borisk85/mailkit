@@ -59,6 +59,24 @@ No guides found in search results for this combination. Postmark has a free deve
 
 ---
 
+## Which SMTP service do people actually use — market data
+
+From search results (Brevo, Mailgun, emailtooltester.com, 2026):
+
+| Service | Free limit | Audience | Notes |
+|---|---|---|---|
+| **Brevo** | 300/day | SMB + developers | Most guides target this; all-in-one, provides domain DKIM |
+| Gmail SMTP | 500/day | Anyone with Gmail | No domain DKIM; simplest path |
+| Mailgun | 100/day | Developers | "Built for developers by developers" — not SMB-friendly |
+| Resend | 3,000/month | Developers | Developer-first; no guides for this use case found |
+| Mailtrap | 4,000/month | Testing | Originally a testing tool, not production |
+
+**Conclusion from data:** For the Cloudflare + Gmail Send-As use case, Brevo is the de facto standard among guides that go beyond Gmail SMTP. Gmail SMTP is the "zero-effort" fallback. No guides use Postmark for this use case despite Postmark having a free developer tier.
+
+Sources: [Brevo — 11 Best Free SMTP Servers (2026)](https://www.brevo.com/blog/free-smtp-servers/), [emailtooltester.com — 12 Best Free SMTP Servers 2026](https://www.emailtooltester.com/en/blog/free-smtp-servers/)
+
+---
+
 ## Key gap confirmed by the guides themselves
 
 The Brevo+Gmail guide explicitly states: using Gmail's native SMTP causes **DKIM misalignment** → "sent via gmail.com" warnings → emails landing in spam on Outlook and corporate servers. This is why they recommend Brevo instead of Gmail SMTP.
