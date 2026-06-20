@@ -152,13 +152,31 @@ async function handleOrderCreated(
       ? customData.user_id
       : null;
 
+  const amountCents = attrs.total ?? 0;
+
+  // Coupon abuse guard: check BEFORE inserting so the purchase never
+  // lands as 'paid' even for a millisecond. One free setup per user.
+  let isAbuseRefund = false;
+  if (amountCents === 0 && userId) {
+    const { count } = await admin
+      .from("purchases")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("status", "paid");
+
+    if (count && count > 0) {
+      isAbuseRefund = true;
+    }
+  }
+
   const row = {
     user_id: userId,
     ls_order_id: String(orderId),
     ls_order_identifier: attrs.identifier ?? null,
-    amount_cents: attrs.total ?? 0,
+    amount_cents: amountCents,
     currency: attrs.currency ?? "USD",
-    status: "paid" as const,
+    status: isAbuseRefund ? ("refunded" as const) : ("paid" as const),
+    refunded_at: isAbuseRefund ? new Date().toISOString() : null,
     test_mode: !!attrs.test_mode,
     custom_data: customData,
     user_email: attrs.user_email ?? "",
@@ -167,44 +185,21 @@ async function handleOrderCreated(
   // Upsert on ls_order_id so LS replay / manual resend doesn't dup.
   const { error } = await admin
     .from("purchases")
-    .upsert(row, { onConflict: "ls_order_id", ignoreDuplicates: true });
+    .upsert(row, { onConflict: "ls_order_id", ignoreDuplicates: false });
 
   if (error) {
     throw new Error(`purchases upsert failed: ${error.message}`);
   }
 
-  // Coupon abuse guard: if this order is free (amount=0) and the user
-  // already has a prior paid purchase, refund immediately. One free
-  // setup per customer — subsequent setups pay full price.
-  if (row.amount_cents === 0 && userId) {
-    const { count } = await admin
-      .from("purchases")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userId)
-      .eq("status", "paid")
-      .neq("ls_order_id", String(orderId));
-
-    if (count && count > 0) {
-      // Mark refunded in DB immediately so the wizard gate sees it
-      // before the LS API round-trip completes — otherwise the setup
-      // advances while the refund is still in-flight.
-      await admin
-        .from("purchases")
-        .update({
-          status: "refunded",
-          refunded_at: new Date().toISOString(),
-        })
-        .eq("ls_order_id", String(orderId));
-
-      const apiKey = process.env.LEMONSQUEEZY_API_KEY;
-      if (apiKey) {
-        const ls = createLemonSqueezyClient(apiKey);
-        await ls.createRefund(String(orderId));
-      }
-      console.info(
-        `[ls-webhook] coupon abuse — auto-refunded order ${orderId} for user ${userId}`,
-      );
+  if (isAbuseRefund) {
+    const apiKey = process.env.LEMONSQUEEZY_API_KEY;
+    if (apiKey) {
+      const ls = createLemonSqueezyClient(apiKey);
+      await ls.createRefund(String(orderId));
     }
+    console.info(
+      `[ls-webhook] coupon abuse — inserted as refunded, order ${orderId} for user ${userId}`,
+    );
   }
 }
 
