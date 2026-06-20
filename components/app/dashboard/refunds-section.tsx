@@ -44,7 +44,11 @@ export function RefundsSection({ refunds }: { refunds: DashboardRefund[] }) {
               >
                 <td className="px-4 py-3">
                   <time dateTime={r.createdAt}>
-                    {new Date(r.createdAt).toLocaleDateString("en")}
+                    {new Date(r.createdAt).toLocaleDateString("en", {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                    })}
                   </time>
                 </td>
                 <td className="px-4 py-3 tabular-nums">
@@ -75,7 +79,11 @@ export function RefundsSection({ refunds }: { refunds: DashboardRefund[] }) {
                 dateTime={r.createdAt}
                 className="text-xs text-mk-text-tertiary"
               >
-                {new Date(r.createdAt).toLocaleDateString("en")}
+                {new Date(r.createdAt).toLocaleDateString("en", {
+                  year: "numeric",
+                  month: "short",
+                  day: "numeric",
+                })}
               </time>
             </div>
             <p className="text-xs text-mk-text-secondary">

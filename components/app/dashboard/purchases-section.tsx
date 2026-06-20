@@ -80,7 +80,11 @@ export function PurchasesSection({
                 >
                   <td className="px-4 py-3">
                     <time dateTime={p.createdAt}>
-                      {new Date(p.createdAt).toLocaleDateString("en")}
+                      {new Date(p.createdAt).toLocaleDateString("en", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </time>
                   </td>
                   <td className="px-4 py-3">{p.domain ?? "—"}</td>
@@ -123,7 +127,11 @@ export function PurchasesSection({
                   </p>
                   <p className="text-xs text-mk-text-tertiary">
                     <time dateTime={p.createdAt}>
-                      {new Date(p.createdAt).toLocaleDateString("en")}
+                      {new Date(p.createdAt).toLocaleDateString("en", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </time>
                   </p>
                 </div>

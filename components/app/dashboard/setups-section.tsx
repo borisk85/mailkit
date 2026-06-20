@@ -73,7 +73,11 @@ export function SetupsSection({
                   <p className="mt-0.5 text-xs text-mk-text-tertiary">
                     {t("createdLabel")}:{" "}
                     <time dateTime={setup.createdAt}>
-                      {new Date(setup.createdAt).toLocaleDateString("en")}
+                      {new Date(setup.createdAt).toLocaleDateString("en", {
+                        year: "numeric",
+                        month: "short",
+                        day: "numeric",
+                      })}
                     </time>
                   </p>
                   {setupDetailLabel(setup.status) ? (
