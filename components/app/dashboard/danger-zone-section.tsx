@@ -67,7 +67,7 @@ export function DangerZoneSection({
 
       <Dialog open={open} onOpenChange={handleOpen}>
         <DialogContent>
-          <DialogHeader>
+          <DialogHeader className="gap-3">
             <DialogTitle>{t("deleteConfirm.title")}</DialogTitle>
             <DialogDescription>{t("deleteConfirm.body")}</DialogDescription>
           </DialogHeader>
