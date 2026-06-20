@@ -1,13 +1,9 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
-
-import {
-  LEMON_SQUEEZY_CHECKOUT_URL,
-  withFirst100Discount,
-} from "@/lib/constants/lemon-squeezy";
 
 /**
  * Launch-week banner — premium-pass refresh per UI_REVIEW_BRIEF §2.1.
@@ -52,14 +48,12 @@ export function AnnouncementBanner() {
     <div className="relative w-full bg-amber-300 text-stone-900">
       <div className="mx-auto flex min-h-10 max-w-6xl flex-col items-center justify-center gap-1 px-10 py-2 text-center sm:flex-row sm:gap-3">
         <span className="mk-body-small font-semibold">{t("message")}</span>
-        <a
-          href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
-          target="_blank"
-          rel="noreferrer"
+        <Link
+          href="/app/setup"
           className="mk-body-small font-semibold hover:opacity-75 focus:outline-none"
         >
           {t("cta")}
-        </a>
+        </Link>
       </div>
       <button
         type="button"

@@ -22,7 +22,7 @@ export function Footer() {
 
   return (
     <footer className="w-full border-t border-mk-border-subtle bg-surface-elevated">
-      <div className="mx-auto max-w-6xl px-4 pb-24 pt-20 sm:px-6 sm:pb-20">
+      <div className="mx-auto max-w-6xl px-4 pb-10 pt-16 sm:px-6 sm:pb-10">
         <div className="grid gap-12 sm:grid-cols-2 lg:grid-cols-5 lg:gap-8">
           <div className="lg:col-span-2">
             <Link
