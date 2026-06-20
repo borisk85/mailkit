@@ -1,19 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { X } from "lucide-react";
 
-/**
- * Launch-week banner — premium-pass refresh per UI_REVIEW_BRIEF §2.1.
- * Replaces the old gradient-red full-width strip with a thin accent
- * wash that's present but doesn't dominate. 36px tall, 8% accent
- * background, sparkle icon, body-small typography.
- *
- * Dismissal persists in localStorage under `mailkit.announcement.v1`.
- * Bump suffix to `.v2` when copy rotates to re-prompt all users.
- */
+import {
+  LEMON_SQUEEZY_CHECKOUT_URL,
+  withFirst100Discount,
+} from "@/lib/constants/lemon-squeezy";
+
 const STORAGE_KEY = "mailkit.announcement.v2";
 
 export function AnnouncementBanner() {
@@ -35,26 +30,29 @@ export function AnnouncementBanner() {
 
   if (!hydrated || dismissed) return null;
 
-  function onDismiss() {
+  function onDismiss(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
     setDismissed(true);
     try {
       localStorage.setItem(STORAGE_KEY, "1");
     } catch {
-      // no-op — session-only dismissal is fine
+      // no-op
     }
   }
 
   return (
     <div className="relative w-full bg-amber-300 text-stone-900">
-      <div className="mx-auto flex min-h-10 max-w-6xl flex-col items-center justify-center gap-1 px-10 py-2 text-center sm:flex-row sm:gap-3">
-        <span className="mk-body-small font-semibold">{t("message")}</span>
-        <Link
-          href="/app/setup"
-          className="mk-body-small font-semibold hover:opacity-75 focus:outline-none"
-        >
-          {t("cta")}
-        </Link>
-      </div>
+      <a
+        href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
+        target="_blank"
+        rel="noreferrer"
+        className="block hover:opacity-90 transition-opacity"
+      >
+        <div className="mx-auto flex min-h-10 max-w-6xl items-center justify-center px-10 py-2 text-center">
+          <span className="mk-body-small font-semibold">{t("message")}</span>
+        </div>
+      </a>
       <button
         type="button"
         onClick={onDismiss}
