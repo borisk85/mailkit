@@ -26,6 +26,30 @@ const MAX_SESSION_DISLIKES = 3;
 const GREETING =
   "Hi! I'm MailKit's AI assistant. Ask me anything about the service.";
 
+const EMOJIS = [
+  "😀",
+  "😊",
+  "😭",
+  "😐",
+  "😤",
+  "😑",
+  "😍",
+  "😡",
+  "😜",
+  "😏",
+  "😘",
+  "😎",
+  "😱",
+  "😇",
+  "👍",
+  "👎",
+  "👋",
+  "👌",
+  "✌️",
+  "🤗",
+  "🦄",
+];
+
 const SUGGESTED_QUESTIONS = [
   "What exactly do I get for $5?",
   "What if my domain isn't on Cloudflare?",
@@ -75,6 +99,7 @@ export default function SupportChatWidget() {
   const [loading, setLoading] = useState(false);
   const [ratings, setRatings] = useState<Record<number, "up" | "down">>({});
   const [sessionDislikes, setSessionDislikes] = useState(0);
+  const [showEmoji, setShowEmoji] = useState(false);
 
   // Contact form state
   const [cfName, setCfName] = useState("");
@@ -156,6 +181,12 @@ export default function SupportChatWidget() {
     } finally {
       setLoading(false);
     }
+  }
+
+  function insertEmoji(emoji: string) {
+    setInput((v) => v + emoji);
+    setShowEmoji(false);
+    inputRef.current?.focus();
   }
 
   function onKey(e: React.KeyboardEvent) {
@@ -367,36 +398,58 @@ export default function SupportChatWidget() {
 
           {/* Input */}
           <div className="border-t border-border bg-background px-4 py-3">
-            <div className="flex items-center gap-2 rounded-xl bg-muted px-3 py-1.5">
-              <textarea
-                ref={inputRef}
-                value={input}
-                onChange={(e) => {
-                  setInput(e.target.value);
-                  e.target.style.height = "24px";
-                  e.target.style.height =
-                    Math.min(e.target.scrollHeight, 80) + "px";
-                }}
-                onKeyDown={onKey}
-                placeholder="Ask a question..."
-                maxLength={500}
-                rows={1}
-                className="flex-1 resize-none bg-transparent text-foreground placeholder:text-muted-foreground outline-none"
-                style={{
-                  height: "24px",
-                  maxHeight: "80px",
-                  fontSize: "16px",
-                  lineHeight: "24px",
-                }}
-              />
-              <button
-                onClick={() => send()}
-                disabled={loading || !input.trim()}
-                aria-label="Send message"
-                className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-primary transition-all hover:opacity-90 disabled:opacity-30"
-              >
-                <Send className="h-3.5 w-3.5 text-primary-foreground" />
-              </button>
+            <div className="relative">
+              {showEmoji && (
+                <div className="absolute bottom-full right-0 mb-2 grid grid-cols-6 gap-1 rounded-xl border border-border bg-card p-2 shadow-xl z-10">
+                  {EMOJIS.map((e) => (
+                    <button
+                      key={e}
+                      onClick={() => insertEmoji(e)}
+                      className="flex h-8 w-8 items-center justify-center rounded-lg text-lg transition-colors hover:bg-muted"
+                    >
+                      {e}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <div className="flex items-center gap-2 rounded-xl bg-muted px-3 py-1.5">
+                <textarea
+                  ref={inputRef}
+                  value={input}
+                  onChange={(e) => {
+                    setInput(e.target.value);
+                    e.target.style.height = "24px";
+                    e.target.style.height =
+                      Math.min(e.target.scrollHeight, 80) + "px";
+                  }}
+                  onKeyDown={onKey}
+                  placeholder="Ask a question..."
+                  maxLength={500}
+                  rows={1}
+                  className="flex-1 resize-none bg-transparent text-foreground placeholder:text-muted-foreground outline-none"
+                  style={{
+                    height: "24px",
+                    maxHeight: "80px",
+                    fontSize: "16px",
+                    lineHeight: "24px",
+                  }}
+                />
+                <button
+                  onClick={() => setShowEmoji((v) => !v)}
+                  className="flex-shrink-0 text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label="Emoji"
+                >
+                  <span className="text-lg leading-none">😊</span>
+                </button>
+                <button
+                  onClick={() => send()}
+                  disabled={loading || !input.trim()}
+                  aria-label="Send message"
+                  className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-primary transition-all hover:opacity-90 disabled:opacity-30"
+                >
+                  <Send className="h-3.5 w-3.5 text-primary-foreground" />
+                </button>
+              </div>
             </div>
 
             {/* Escalation link — shown after first bot reply */}
