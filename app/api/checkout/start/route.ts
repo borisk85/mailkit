@@ -4,7 +4,7 @@ import {
   FIRST_100_DISCOUNT_CODE,
   LEMON_SQUEEZY_CHECKOUT_URL,
 } from "@/lib/constants/lemon-squeezy";
-import { createClient } from "@/lib/supabase/server";
+import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 /**
  * Checkout-start — auth'd buy flow for users already in /app.
@@ -73,8 +73,11 @@ export async function GET() {
   }
   // Apply the launch promo only on the user's FIRST purchase.
   // Repeat buyers (add-another mailbox) pay full price — one coupon per customer.
+  // Must use service client: purchases table has RLS enabled with no user SELECT
+  // policy, so the user-scoped client always returns count=0.
   if (!url.searchParams.has("checkout[discount_code]")) {
-    const { count } = await supabase
+    const admin = createServiceClient();
+    const { count } = await admin
       .from("purchases")
       .select("id", { count: "exact", head: true })
       .eq("user_id", user.id)
