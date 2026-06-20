@@ -281,7 +281,7 @@
       "needLink": "Migration guide"
     },
     "setups": {
-      "title": "Domain setups",
+      "title": "Mailboxes",
       "domainLabel": "Domain",
       "mailboxLabel": "Mailbox",
       "createdLabel": "Started",
