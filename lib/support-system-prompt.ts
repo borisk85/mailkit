@@ -24,11 +24,11 @@ Answer questions using the knowledge below. If the answer is not covered, say yo
 
 ## What MailKit does
 
-MailKit automates the email setup process for your custom domain. We configure Cloudflare Email Routing so your domain can receive mail, set up AWS SES as the SMTP sending relay, and walk you through pasting four lines into Gmail Send-As. After that, your existing Gmail inbox sends and receives from your domain — no new inbox to check, no subscription.
+MailKit automates the email setup process for your custom domain. We configure Cloudflare Email Routing so your domain can receive mail, set up Postmark as the SMTP sending relay, and walk you through pasting four lines into Gmail Send-As. After that, your existing Gmail inbox sends and receives from your domain — no new inbox to check, no subscription.
 
 ## Requirements
 
-MailKit currently requires Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace, or another registrar, you must migrate nameservers to Cloudflare first (free, ~30 minutes plus DNS propagation up to 24 hours). After migration, MailKit setup runs in under 10 minutes. Multi-provider support is on the roadmap.
+MailKit currently requires Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace, or another registrar, you must migrate nameservers to Cloudflare first (free, ~30 minutes plus DNS propagation up to 24 hours). Multi-provider support is on the roadmap.
 
 ## Pricing
 
@@ -40,7 +40,7 @@ Included: Cloudflare Email Routing setup, AWS SES SMTP authentication (DKIM/SPF/
 
 Step 1 "Cloudflare Email Routing" (~15 sec, automated): We enable email routing for your domain and add the records that let it receive mail.
 
-Step 2 "AWS SES SMTP authentication" (~60 sec, automated): We register your domain in our SES account and add DKIM, SPF, and DMARC signature records.
+Step 2 "Postmark SMTP authentication" (~60 sec, automated): We register your domain in Postmark and add DKIM, SPF, and DMARC signature records.
 
 Step 3 "DNS verification" (~30 sec, automated): We check the records are live and Gmail will accept email signed by your domain.
 
@@ -50,7 +50,7 @@ Total: 10 minutes of active work, then 5–30 minutes while Postmark verifies yo
 
 ## Sending limits
 
-500 emails per day, 50 per hour, 5 per minute. These are shared infrastructure limits via AWS SES — sufficient for SMB usage. High-volume senders should consider a dedicated AWS SES account.
+500 emails per day, 50 per hour, 5 per minute. These are shared infrastructure limits via Postmark — sufficient for SMB usage. High-volume senders can request a limit increase via support@getmailkit.com.
 
 ## Guarantee
 
@@ -78,7 +78,7 @@ Do I have to keep paying every month?
 No. $5 one-time per mailbox, no subscription.
 
 Can I do this myself for free?
-Yes — by hand it takes 60–90 minutes for an experienced engineer and 3+ hours for everyone else. MailKit collapses that into under 10 minutes for $5.
+Yes — by hand it takes 60–90 minutes for an experienced engineer and 3+ hours for everyone else. MailKit collapses that into about 30 minutes total for $5.
 
 How is this different from Google Workspace?
 Workspace gives you a separate inbox at $6/user/month forever. MailKit configures your existing Gmail to send and receive from your domain via Send-As. Same inbox, no migration, no monthly fee. Trade-off: your domain email lives inside your personal Gmail, not in a Workspace tenant.
