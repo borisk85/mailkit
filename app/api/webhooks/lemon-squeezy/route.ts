@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import {
+  createLemonSqueezyClient,
   hashWebhookBody,
   verifyWebhookSignature,
 } from "@/lib/integrations/lemon-squeezy";
@@ -170,6 +171,29 @@ async function handleOrderCreated(
 
   if (error) {
     throw new Error(`purchases upsert failed: ${error.message}`);
+  }
+
+  // Coupon abuse guard: if this order is free (amount=0) and the user
+  // already has a prior paid purchase, refund immediately. One free
+  // setup per customer — subsequent setups pay full price.
+  if (row.amount_cents === 0 && userId) {
+    const { count } = await admin
+      .from("purchases")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userId)
+      .eq("status", "paid")
+      .neq("ls_order_id", String(orderId));
+
+    if (count && count > 0) {
+      const apiKey = process.env.LEMONSQUEEZY_API_KEY;
+      if (apiKey) {
+        const ls = createLemonSqueezyClient(apiKey);
+        await ls.createRefund(String(orderId));
+        console.info(
+          `[ls-webhook] coupon abuse — auto-refunded order ${orderId} for user ${userId}`,
+        );
+      }
+    }
   }
 }
 
