@@ -1,63 +1,72 @@
 # Research: "Do It Yourself" Guides — Cloudflare Email + Gmail
 
 **Date:** 2026-06-20  
-**Purpose:** Understand what free guides teach users, their limitations, and why they are not a real competitor to MailKit.
+**Purpose:** Understand what free guides teach users and why they are not a real competitor to MailKit.
 
 ---
 
-## What the guides recommend
+## Two types of guides found
 
-All top-ranking guides use **Gmail's own SMTP** (`smtp.gmail.com`) with an App Password — not Brevo, Mailgun, Postmark, or any third-party ESP. Reason: it's free and requires no new account.
+### Type 1: Gmail SMTP (majority of guides)
 
-### Typical steps (7–8)
+Use `smtp.gmail.com` with an App Password. No third-party ESP needed.
 
+**Steps (7–8):**
 1. Enable 2FA on Google account
-2. Generate App Password (16-char, one-time)
+2. Generate App Password (16-char)
 3. Enable Cloudflare Email Routing + set forwarding address
 4. Add SPF record in Cloudflare DNS
-5. Add DMARC record (`p=none` — monitoring only, not enforcement)
-6. Gmail → Settings → Accounts → Send mail as → enter `smtp.gmail.com` + App Password
-7. Click confirmation link sent by Gmail
-8. Send a test email
+5. Add DMARC record (`p=none`)
+6. Gmail → Settings → Accounts → Send mail as → `smtp.gmail.com` + App Password
+7. Click confirmation link
+8. Test
 
-**Time:** None of the guides state an estimate. For a non-technical SMB user: realistically 1–2 hours with errors and re-reading.
+**Time:** None of these guides state an estimate.
 
----
-
-## Sources
-
-- [pradeepsingh.com — Send Mail as Gmail for Cloudflare](https://pradeepsingh.com/send-mail-as-gmail-cloudflare/) — 7 steps, Gmail SMTP
-- [dawid.dev — Gmail SMTP + Cloudflare Complete Guide](https://dawid.dev/dev/ops/gmail-smtp-cloudflare-email-routing-complete-guide) — 8 steps, mentions 500 emails/day Gmail limit, suggests Workspace or dedicated ESP for higher volume
+**Sources:**
+- [pradeepsingh.com — Send Mail as Gmail for Cloudflare](https://pradeepsingh.com/send-mail-as-gmail-cloudflare/) — 7 steps
+- [dawid.dev — Gmail SMTP + Cloudflare Complete Guide](https://dawid.dev/dev/ops/gmail-smtp-cloudflare-email-routing-complete-guide) — 8 steps, notes 500/day Gmail limit, suggests Workspace or dedicated ESP for higher volume
 - [dev.to — Use Gmail Send-As with Cloudflare Email Routing](https://dev.to/jaygooby/use-a-basic-gmail-account-to-send-mail-as-with-a-domain-that-uses-cloudflare-email-routing-89b)
 - [dev.to — Custom domain emails for free](https://dev.to/evgenii_zinner/custom-domain-emails-for-free-6o5)
-- [nonprofitpress.cloud — Cloudflare + Gmail for nonprofits](https://www.nonprofitpress.cloud/guides/how-nonprofits-can-use-cloudflare-email-routing-gmail-to-send-and-receive-custom-domain-emails-for-free/)
 
 ---
 
-## Why guides are not a real competitor — key gaps
+### Type 2: Cloudflare + Brevo + Gmail (fewer guides, more steps)
 
-### 1. No custom domain DKIM (biggest deliverability issue)
-Gmail SMTP signs outgoing email with `@gmail.com` DKIM, **not** the user's domain DKIM. This breaks DKIM alignment. Without alignment, DMARC cannot be enforced. Spam filters trust the email less.
+Use Brevo free tier as SMTP relay instead of Gmail SMTP. Brevo provides domain DKIM.
 
-MailKit via Postmark sets up DKIM specifically for the user's domain — proper alignment, real deliverability.
+**Steps (12–14):** ~5 for Cloudflare incoming, ~4 for Brevo domain/DKIM setup, ~3–4 for Gmail Send-As.
 
-### 2. DMARC stays at `p=none` forever
-Guides set DMARC to monitoring-only (`p=none`). Users never progress to `p=quarantine` or `p=reject` because Gmail SMTP would fail those checks. Domain stays unprotected against spoofing.
+**Time:** One guide states "20–30 minutes" (optimistic — excludes DNS propagation waits).
 
-### 3. App Password is fragile
-Google can revoke App Passwords silently if they detect unusual activity. No warning to the user — email just stops working one day.
+**Pain points reported by the guides themselves:**
+- Most common error: wrong SMTP username in Gmail (users paste email instead of Brevo Login)
+- Multiple DNS records (SPF, DKIM, DMARC, CNAME) — conflicts if records already exist
+- Email verification delays across three separate services (Brevo, Cloudflare, Gmail)
+- New domain requires gradual warm-up over weeks regardless of correct setup
+- Brevo free plan: 300 emails/day limit
+- Multi-service coordination: three platforms, incoming/outgoing split across different services
 
-### 4. No error recovery, no support, no refund
-If something breaks mid-setup, the user is on their own. Guides have no support channel. MailKit has auto-refund on failure + 30-day functional guarantee.
+**Sources:**
+- [agentpedia.codes — Free Custom Domain Email with Cloudflare, Brevo & Gmail (2026)](https://agentpedia.codes/blog/free-custom-domain-email-cloudflare-brevo-gmail) — 8 steps + warm-up phase, time ~20–30 min stated
+- [johnstool.net — Building custom domain email service with Cloudflare and Brevo](https://johnstool.net/blog/building-custom-domain-email-service-with-Cloudflare-and-Brevo) — 12–14 steps, notes Brevo 300/day free limit
 
-### 5. Complexity for SMB without tech background
-7–8 manual steps involving DNS records, App Passwords, and SMTP configuration is a real barrier for non-technical small business owners. Each step is a potential failure point with no guidance on recovery.
+---
 
-### 6. "Works" ≠ "works well"
-Guides solve "technically sends email." They don't address inbox delivery, DMARC enforcement, or long-term reliability. MailKit solves the complete problem.
+### Type 3: Cloudflare + Postmark
+
+No guides found in search results for this combination. Postmark has a free developer tier but does not appear in DIY guide ecosystems.
+
+---
+
+## Key gap confirmed by the guides themselves
+
+The Brevo+Gmail guide explicitly states: using Gmail's native SMTP causes **DKIM misalignment** → "sent via gmail.com" warnings → emails landing in spam on Outlook and corporate servers. This is why they recommend Brevo instead of Gmail SMTP.
+
+MailKit solves this with Postmark DKIM on the user's own domain — same fix, automated.
 
 ---
 
 ## Conclusion
 
-Free guides are not a competitor — they are a **conversion opportunity**. Users who find a guide, attempt the setup, get confused or hit a spam problem, are the exact audience for MailKit. The $5 price point vs 1–2 hours of frustrating manual work is a strong pitch.
+Free guides are not a competitor — they are a conversion opportunity. Users who attempt the Brevo path (12–14 steps, DNS errors, username confusion, multi-service coordination) are the exact audience for MailKit at $5.
