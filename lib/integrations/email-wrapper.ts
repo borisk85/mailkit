@@ -112,7 +112,7 @@ export function wrapBrandedHtml({
         <table role="presentation" class="mk-card" width="560" cellspacing="0" cellpadding="0" border="0" style="border-collapse:collapse;max-width:560px;margin:0 auto;background:#FFFFFF;border-radius:12px;padding:40px;">
           <tr>
             <td style="padding-bottom:32px;">
-              <img src="${SITE_URL}/brand/mailkit-logo-full.png" alt="Mailkit" width="120" height="auto" style="display:block;border:0;outline:none;text-decoration:none;width:120px;height:auto;">
+              <img src="${SITE_URL}/brand/mailkit-logo-full.png" alt="Mailkit" width="160" height="auto" style="display:block;border:0;outline:none;text-decoration:none;width:160px;height:auto;">
             </td>
           </tr>
           <tr>
