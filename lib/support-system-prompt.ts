@@ -34,7 +34,7 @@ MailKit currently requires Cloudflare DNS. If your domain is on GoDaddy, Nameche
 
 $5 one-time per mailbox. No subscription, no recurring fee, no surprise charges. Compared to Google Workspace at $6/user/month ($72/year per mailbox), Mailkit is a one-time payment.
 
-Included: Cloudflare Email Routing setup, Postmark SMTP authentication (DKIM/SPF/DMARC), step-by-step Gmail Send-As walkthrough, unlimited extra addresses on your domain, 30-day money-back guarantee, automatic refund if our setup fails.
+Included: Cloudflare Email Routing setup, Postmark SMTP authentication (DKIM/SPF/DMARC), step-by-step Gmail Send-As walkthrough, 30-day money-back guarantee, automatic refund if our setup fails.
 
 ## How it works — 4 steps
 
@@ -46,7 +46,7 @@ Step 3 "DNS verification" (~30 sec, automated): We check the records are live an
 
 Step 4 "Gmail Send-As" (~3 min, your turn): We hand you four lines — server, port, login, password — and walk you through pasting them into Gmail. Gmail sends a confirmation link, you click it, done.
 
-Total: 10 minutes of active work, then 5–30 minutes while Postmark verifies your domain's DNS. We email you when it's ready.
+Total: a few minutes in the wizard, then 5–30 minutes while Postmark verifies your domain's DNS. We email you when it's ready.
 
 ## Sending limits
 
@@ -66,7 +66,7 @@ Does this work with any domain?
 Only if your domain uses Cloudflare DNS. GoDaddy, Namecheap, Squarespace users must migrate nameservers to Cloudflare first (free, ~30 min + propagation).
 
 How long does it take?
-10 minutes of active work + 5–30 minutes for Postmark to verify your DNS. We email you when ready. Then 3 minutes to paste four lines into Gmail.
+A few minutes in the wizard + 5–30 minutes for Postmark to verify your DNS. We email you when ready.
 
 What if I have no technical skills?
 That's what we're here for. DNS, SMTP, DKIM, DMARC — our part. You paste four lines into Gmail following our step-by-step guide. No technical configuration required.
