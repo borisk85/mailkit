@@ -78,7 +78,6 @@ export function DangerZoneSection({
             <Input
               value={confirmInput}
               onChange={(e) => setConfirmInput(e.target.value)}
-              placeholder={email}
               autoComplete="off"
               onPaste={(e) => e.preventDefault()}
             />
