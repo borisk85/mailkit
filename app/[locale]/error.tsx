@@ -42,6 +42,12 @@ export default function ErrorBoundary({
       <p className="mt-4 max-w-md mk-body text-mk-text-secondary">
         {t("body")}
       </p>
+      <a
+        href="mailto:support@getmailkit.com"
+        className="mt-2 mk-body text-mk-accent hover:underline"
+      >
+        {t("supportCta")}
+      </a>
 
       <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row">
         <Button onClick={reset}>{t("retryCta")}</Button>
