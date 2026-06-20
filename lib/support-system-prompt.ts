@@ -36,15 +36,17 @@ $5 one-time per mailbox. No subscription, no recurring fee, no surprise charges.
 
 Included: Cloudflare Email Routing setup, Postmark SMTP authentication (DKIM/SPF/DMARC), step-by-step Gmail Send-As walkthrough, 30-day money-back guarantee, automatic refund if our setup fails.
 
-## How it works — 4 steps
+## How it works — 5 steps
 
-Step 1 "Cloudflare Email Routing" (~15 sec, automated): We enable email routing for your domain and add the records that let it receive mail.
+Step 1 "Paste your Cloudflare token" (~5 min, your turn): You create a scoped API token in Cloudflare — we show you exactly how — and paste it in. That's what lets us set up your domain.
 
-Step 2 "Postmark SMTP authentication" (~60 sec, automated): We register your domain in Postmark and add DKIM, SPF, and DMARC signature records.
+Step 2 "Cloudflare Email Routing" (~1 min, automated): We enable email routing for your domain and add the records that let it receive mail.
 
-Step 3 "DNS verification" (~30 sec, automated): We check the records are live and Gmail will accept email signed by your domain.
+Step 3 "Postmark SMTP authentication" (~60 sec, automated): We register your domain in Postmark and add DKIM, SPF, and DMARC signature records.
 
-Step 4 "Gmail Send-As" (~3 min, your turn): We hand you four lines — server, port, login, password — and walk you through pasting them into Gmail. Gmail sends a confirmation link, you click it, done.
+Step 4 "DNS verification" (~5–30 min, automated): We check the records are live and Gmail will accept email signed by your domain. This is the longest part — DNS propagation usually takes 5–30 minutes. You can close the tab; we keep checking.
+
+Step 5 "Gmail Send-As" (~3 min, your turn): We hand you four lines — server, port, login, password — and walk you through pasting them into Gmail. Gmail sends a confirmation link, you click it, done.
 
 Total: a few minutes in the wizard, then 5–30 minutes while Postmark verifies your domain's DNS. We email you when it's ready.
 
