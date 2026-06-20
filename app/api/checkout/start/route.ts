@@ -71,9 +71,17 @@ export async function GET() {
     // strands the purchase.
     url.searchParams.set("checkout[email]", user.email);
   }
-  // Keep the launch promo applied (no-op if the code isn't in LS yet).
+  // Apply the launch promo only on the user's FIRST purchase.
+  // Repeat buyers (add-another mailbox) pay full price — one coupon per customer.
   if (!url.searchParams.has("checkout[discount_code]")) {
-    url.searchParams.set("checkout[discount_code]", FIRST_100_DISCOUNT_CODE);
+    const { count } = await supabase
+      .from("purchases")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("status", "paid");
+    if (!count || count === 0) {
+      url.searchParams.set("checkout[discount_code]", FIRST_100_DISCOUNT_CODE);
+    }
   }
 
   // no-store so the browser never reuses a stale redirect target (e.g. a
