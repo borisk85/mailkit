@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 
 import {
-  createLemonSqueezyClient,
   hashWebhookBody,
   verifyWebhookSignature,
 } from "@/lib/integrations/lemon-squeezy";
@@ -192,13 +191,10 @@ async function handleOrderCreated(
   }
 
   if (isAbuseRefund) {
-    const apiKey = process.env.LEMONSQUEEZY_API_KEY;
-    if (apiKey) {
-      const ls = createLemonSqueezyClient(apiKey);
-      await ls.createRefund(String(orderId));
-    }
+    // Order was $0 (full coupon) — no money to refund via LS API.
+    // The DB row is already 'refunded' so the wizard gate blocks the user.
     console.info(
-      `[ls-webhook] coupon abuse — inserted as refunded, order ${orderId} for user ${userId}`,
+      `[ls-webhook] coupon abuse — blocked, order ${orderId} for user ${userId}`,
     );
   }
 }
