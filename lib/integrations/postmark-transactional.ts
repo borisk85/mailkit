@@ -283,6 +283,75 @@ export async function sendDeliverabilityWarnEmail(args: {
   });
 }
 
+export async function sendSetupCompleteEmail(args: {
+  toEmail: string;
+  toName?: string;
+  domain: string;
+  mailbox: string;
+}): Promise<void> {
+  const { toEmail, toName, domain, mailbox } = args;
+  const address = `${mailbox}@${domain}`;
+  const subject = `${address} is ready to use`;
+
+  const textContent = [
+    "Your email is set up.",
+    "",
+    `${address} is now live. You can send from it in Gmail — just pick it from the "From" dropdown when composing.`,
+    "",
+    "If you run into anything, reply to this email or write to support@getmailkit.com.",
+    "",
+    "— MailKit",
+  ].join("\n");
+
+  const branded = brandedEmailContent({
+    title: "Your email is ready",
+    textContent,
+    preheader: `${address} is set up — you can now send from Gmail`,
+  });
+
+  await sendTransactionalEmail({
+    to: { email: toEmail, name: toName },
+    subject,
+    textContent: branded.textContent,
+    htmlContent: branded.htmlContent,
+  });
+}
+
+const SITE_URL = "https://getmailkit.com";
+
+export async function sendAbandonedSetupEmail(args: {
+  toEmail: string;
+  toName?: string;
+}): Promise<void> {
+  const { toEmail, toName } = args;
+  const subject = "Your MailKit setup is waiting";
+
+  const textContent = [
+    "You purchased MailKit but haven't started setup yet.",
+    "",
+    "It takes about 30 minutes total — we handle the DNS and SMTP parts automatically. You only need to paste a Cloudflare token at the start and follow a short Gmail walkthrough at the end.",
+    "",
+    "Your $5 is waiting. Pick up where you left off:",
+    `${SITE_URL}/en/app/setup`,
+    "",
+    "— MailKit",
+  ].join("\n");
+
+  const branded = brandedEmailContent({
+    title: "Complete your email setup",
+    textContent,
+    cta: { text: "Start setup", url: `${SITE_URL}/en/app/setup` },
+    preheader: "Your domain email setup is ready — takes about 30 minutes",
+  });
+
+  await sendTransactionalEmail({
+    to: { email: toEmail, name: toName },
+    subject,
+    textContent: branded.textContent,
+    htmlContent: branded.htmlContent,
+  });
+}
+
 function formatPct(rate: number): string {
   if (!Number.isFinite(rate) || rate < 0) return "0%";
   return `${rate.toFixed(2)}%`;

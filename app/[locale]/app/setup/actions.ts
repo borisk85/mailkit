@@ -25,6 +25,7 @@ import {
   type SmtpDisplay,
 } from "@/lib/integrations/postmark-smtp";
 import { triggerAutoRefund } from "@/lib/auto-refund";
+import { sendSetupCompleteEmail } from "@/lib/integrations/postmark-transactional";
 import { encryptToken } from "@/lib/crypto/token-cipher";
 import { checkPhishingPattern } from "@/lib/phishing";
 import { sendTelegramAlert, escapeHtml } from "@/lib/telegram-alert";
@@ -1540,7 +1541,7 @@ export async function confirmGmailSendAs(input: {
   const admin = createServiceClient();
   const { data: row } = await admin
     .from("setup_runs")
-    .select("id, user_id, status, gmail_state")
+    .select("id, user_id, status, gmail_state, domain, mailbox_local")
     .eq("id", parsed.data.runId)
     .maybeSingle();
 
@@ -1571,6 +1572,24 @@ export async function confirmGmailSendAs(input: {
     .from("setup_runs")
     .update({ status: "done", gmail_state: nextGmailState })
     .eq("id", row.id);
+
+  // Fire-and-forget — do not await so a missing email never blocks the user.
+  const { data: purchase } = await admin
+    .from("purchases")
+    .select("user_email")
+    .eq("user_id", user.id)
+    .eq("status", "paid")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (purchase?.user_email && row.domain && row.mailbox_local) {
+    sendSetupCompleteEmail({
+      toEmail: purchase.user_email,
+      domain: row.domain,
+      mailbox: row.mailbox_local,
+    }).catch((e) => console.error("[setup-complete-email] send failed:", e));
+  }
 
   return { status: "ok", runId: row.id, runStatus: "done" };
 }
