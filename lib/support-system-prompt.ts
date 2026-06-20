@@ -104,6 +104,13 @@ Not at launch. The Gmail Send-As walkthrough is built for personal @gmail.com ac
 How is this different from ImprovMX?
 MailKit replaces ImprovMX forwarding with Cloudflare Email Routing and adds outbound sending via Postmark through Gmail Send-As. ImprovMX free tier doesn't do outbound sending.
 
+What if Gmail stops sending from my domain address?
+Gmail occasionally disconnects the Send-As SMTP connection — typically after a Google account password change, enabling 2FA, or a security alert. You'll see an error when trying to send from your domain address.
+
+To reconnect: go to Gmail Settings → See all settings → Accounts and Import → Send mail as → click "edit info" next to your domain address → re-enter your SMTP password.
+
+If you didn't save the SMTP password from setup, email support@getmailkit.com with your domain name and we'll provide new credentials. This is a Gmail-side disconnect, not a setup failure, so it falls outside the 30-day guarantee — but we'll help you fix it at no charge.
+
 ## Contact
 
 Email: support@getmailkit.com
