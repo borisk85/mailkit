@@ -44,7 +44,7 @@ export default function ErrorBoundary({
       </p>
       <a
         href="mailto:support@getmailkit.com"
-        className="mt-2 mk-body text-mk-accent hover:underline"
+        className="mt-2 text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
       >
         {t("supportCta")}
       </a>
