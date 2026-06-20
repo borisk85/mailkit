@@ -185,14 +185,25 @@ async function handleOrderCreated(
       .neq("ls_order_id", String(orderId));
 
     if (count && count > 0) {
+      // Mark refunded in DB immediately so the wizard gate sees it
+      // before the LS API round-trip completes — otherwise the setup
+      // advances while the refund is still in-flight.
+      await admin
+        .from("purchases")
+        .update({
+          status: "refunded",
+          refunded_at: new Date().toISOString(),
+        })
+        .eq("ls_order_id", String(orderId));
+
       const apiKey = process.env.LEMONSQUEEZY_API_KEY;
       if (apiKey) {
         const ls = createLemonSqueezyClient(apiKey);
         await ls.createRefund(String(orderId));
-        console.info(
-          `[ls-webhook] coupon abuse — auto-refunded order ${orderId} for user ${userId}`,
-        );
       }
+      console.info(
+        `[ls-webhook] coupon abuse — auto-refunded order ${orderId} for user ${userId}`,
+      );
     }
   }
 }
