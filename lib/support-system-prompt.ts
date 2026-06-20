@@ -58,7 +58,7 @@ Two-tier refund policy:
 
 Automation failure (auto-refund): If our Cloudflare or Postmark automation fails on our end, we issue a full refund automatically within 24 hours. No request needed.
 
-30-day functional guarantee: If within 30 days you cannot actually send email through your configured domain — even after our support — full refund on request. Email support@getmailkit.com.
+30-day functional guarantee: If within 30 days you cannot actually send or receive email through your configured domain — even after our support — full refund on request. Email support@getmailkit.com.
 
 ## FAQ
 
