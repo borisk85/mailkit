@@ -19,7 +19,7 @@ interface Message {
 
 type View = "chat" | "contact" | "sent";
 
-const STORAGE_KEY = "mailkit_support_chat";
+const STORAGE_KEY = "mailkit_support_chat_v2";
 const HISTORY_TTL_MS = 24 * 60 * 60 * 1000;
 const MAX_SESSION_DISLIKES = 3;
 
