@@ -581,7 +581,6 @@
   "error": {
     "title": "Something broke on our end",
     "body": "An unexpected error happened. We've logged it and we're looking into it. You can try refreshing the page or heading back home.",
-    "supportCta": "Email support@getmailkit.com",
     "retryCta": "Try again",
     "homeCta": "Back to home",
     "errorIdLabel": "Error ID"
