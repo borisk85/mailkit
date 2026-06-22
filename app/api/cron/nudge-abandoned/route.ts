@@ -65,10 +65,18 @@ export async function GET(request: Request) {
 
       await sendAbandonedSetupEmail({ toEmail: p.user_email });
 
-      await admin
+      const { error: stampError } = await admin
         .from("purchases")
         .update({ abandoned_nudge_sent_at: new Date().toISOString() })
         .eq("id", p.id);
+
+      if (stampError) {
+        console.error(
+          "[cron/nudge-abandoned] stamp failed:",
+          stampError.message,
+        );
+        throw new Error(`stamp failed: ${stampError.message}`);
+      }
 
       return { id: p.id, result: "nudged" };
     }),
