@@ -329,7 +329,7 @@ export async function sendAbandonedSetupEmail(args: {
   const textContent = [
     "You purchased MailKit but haven't started setup yet.",
     "",
-    "We handle the DNS and SMTP parts automatically. You only need to paste a Cloudflare token at the start and follow a short Gmail walkthrough at the end.",
+    "It takes about 30 minutes total — we handle the DNS and SMTP parts automatically. You only need to paste a Cloudflare token at the start and follow a short Gmail walkthrough at the end.",
     "",
     "Your $5 is waiting. Pick up where you left off:",
     `${SITE_URL}/en/app/setup`,
