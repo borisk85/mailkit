@@ -1,12 +1,11 @@
 {
   "metadata": {
-    "title": "MailKit — Email on your Cloudflare domain in 30 minutes",
+    "title": "MailKit — Email on your Cloudflare domain",
     "description": "Already on Cloudflare DNS? Automated Email Routing + Postmark SMTP setup with guided Gmail Send-As. $5 per mailbox."
   },
   "landing": {
     "announcementBanner": {
       "message": "🎁 First 25 setups — FREE →",
-      "cta": "Claim →",
       "dismiss": "Dismiss banner"
     },
     "header": {

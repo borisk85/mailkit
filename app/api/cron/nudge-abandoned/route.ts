@@ -86,5 +86,10 @@ export async function GET(request: Request) {
     o.status === "fulfilled" ? o.value : { result: "exception" },
   );
   console.log("[cron/nudge-abandoned]", JSON.stringify(summary));
-  return NextResponse.json({ nudged: purchases.length, summary });
+  const nudgedCount = summary.filter((o) => o?.result === "nudged").length;
+  return NextResponse.json({
+    nudged: nudgedCount,
+    total: purchases.length,
+    summary,
+  });
 }
