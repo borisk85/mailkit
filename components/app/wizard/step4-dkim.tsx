@@ -43,7 +43,7 @@ export function Step4Dkim({
 
         {/* Status badge — live focal point + long-poll note right under it */}
         <div className="space-y-2">
-          <div className="flex items-center justify-center gap-2 rounded-lg border border-mk-accent/30 bg-mk-accent/5 px-4 py-2.5">
+          <div className="flex items-center justify-center gap-2 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-4 py-2.5">
             <Loader2
               className="size-4 shrink-0 animate-spin text-mk-accent"
               aria-hidden
