@@ -5,14 +5,14 @@ import Image from "next/image";
 import { ChevronLeft, ChevronRight, Images, X } from "lucide-react";
 
 const STEPS = [
-  { label: "Open Profile dropdown" },
-  { label: "Click API Tokens" },
-  { label: "Click Create Token" },
-  { label: "Choose Custom token" },
-  { label: "Add permissions" },
-  { label: "Set Zone Resource" },
-  { label: "Continue to summary" },
-  { label: "Review summary" },
+  { label: "Open your profile" },
+  { label: "Go to API Tokens" },
+  { label: "Start a new token" },
+  { label: "Use a Custom token" },
+  { label: "Set the permissions" },
+  { label: "Scope it to your zone" },
+  { label: "Continue to the summary" },
+  { label: "Review the details" },
   { label: "Copy your token" },
 ] as const;
 
