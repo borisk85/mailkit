@@ -2525,9 +2525,10 @@ function GmailStepBody({
           ]}
         />
         <p className="text-sm">
-          {t("gmail.steps.verificationEmail.body", {
-            target: state.targetEmail,
-          })}
+          Gmail emailed a confirmation link to{" "}
+          <span className="font-mono">{state.targetEmail}</span> — it lands in
+          this same inbox. Open the email, click the link, then press{" "}
+          <span className="font-semibold">Confirm</span>.
         </p>
         <Button
           onClick={onSubmit}
