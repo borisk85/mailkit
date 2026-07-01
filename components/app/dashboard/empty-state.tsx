@@ -28,9 +28,6 @@ export function DashboardEmptyState() {
       </div>
       <h2 className="mk-heading-3 text-mk-text-primary">{t("title")}</h2>
       <p className="mx-auto mt-3 max-w-md mk-body-small text-mk-text-secondary">
-        <span className="[font-variant-emoji:text]" aria-hidden>
-          ⏱
-        </span>{" "}
         {t("body")}
       </p>
       <Link href="/app/setup" className="mt-6 inline-flex">
