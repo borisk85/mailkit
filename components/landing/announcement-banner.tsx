@@ -45,7 +45,6 @@ export function AnnouncementBanner() {
     <div className="relative w-full bg-amber-300 text-stone-900">
       <a
         href={withFirst100Discount(LEMON_SQUEEZY_CHECKOUT_URL)}
-        target="_blank"
         rel="noreferrer"
         className="block hover:opacity-90 transition-opacity"
       >

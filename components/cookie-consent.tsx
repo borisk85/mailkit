@@ -109,24 +109,28 @@ export function CookieConsent() {
     <div
       role="region"
       aria-label="Cookie consent"
-      className="fixed left-2 right-2 bottom-2 z-50 flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-mk-border-strong bg-surface-elevated-2/95 px-4 py-3 backdrop-blur-md mk-card-shadow sm:left-1/2 sm:right-auto sm:bottom-4 sm:-translate-x-1/2 sm:rounded-full sm:px-5 sm:py-2.5"
+      className="fixed left-2 right-2 bottom-2 z-50 flex flex-wrap items-center justify-center gap-3 rounded-2xl bg-amber-300 px-4 py-3 text-stone-900 sm:left-1/2 sm:right-auto sm:bottom-4 sm:-translate-x-1/2 sm:rounded-full sm:px-5 sm:py-2.5"
     >
-      <p className="mk-body-small text-mk-text-secondary">{t("body")}</p>
+      <p className="mk-body-small font-semibold">{t("body")}</p>
       <div className="flex items-center gap-3">
-        <Button onClick={handleAccept} size="sm" className="shrink-0">
+        <Button
+          onClick={handleAccept}
+          size="sm"
+          className="shrink-0 bg-stone-900 text-amber-300 hover:bg-stone-800"
+        >
           {t("accept")}
         </Button>
         <Button
           onClick={handleDecline}
           size="sm"
           variant="outline"
-          className="shrink-0"
+          className="shrink-0 border-stone-900 text-stone-900 hover:bg-amber-400"
         >
           {t("decline")}
         </Button>
         <Link
           href="/privacy"
-          className="mk-body-small font-medium text-mk-text-secondary underline-offset-4 hover:text-mk-text-primary hover:underline"
+          className="mk-body-small font-medium text-stone-700 underline-offset-4 hover:text-stone-900 hover:underline"
         >
           {t("details")}
         </Link>
