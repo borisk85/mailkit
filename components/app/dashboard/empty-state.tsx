@@ -23,8 +23,8 @@ export function DashboardEmptyState() {
             "radial-gradient(circle, rgba(124, 92, 255, 0.12), transparent 70%)",
         }}
       />
-      <div className="relative mx-auto mb-6 inline-flex size-12 items-center justify-center rounded-full bg-mk-accent/10">
-        <Mail className="size-6 text-mk-accent" aria-hidden />
+      <div className="relative mx-auto mb-6 inline-flex size-16 items-center justify-center rounded-full bg-mk-accent/10">
+        <Mail className="size-8 text-mk-accent" aria-hidden />
       </div>
       <h2 className="mk-heading-3 text-mk-text-primary">{t("title")}</h2>
       <p className="mx-auto mt-3 max-w-md mk-body-small text-mk-text-secondary">
