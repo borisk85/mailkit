@@ -2374,7 +2374,7 @@ function GmailStepBody({
           {[1, 2, 3, 4].map((n) => (
             <span key={n}>
               <span className="mx-1 text-mk-text-tertiary">→</span>
-              <span className="inline-flex items-center rounded bg-[#0f6fde] px-1.5 py-0.5 text-[12px] font-semibold leading-none text-white">
+              <span className="inline-flex items-center rounded bg-[#0846a8] px-1.5 py-0.5 text-[12px] font-semibold leading-none text-white">
                 {t(`gmail.steps.openSettings.menu${n}`)}
               </span>
             </span>
