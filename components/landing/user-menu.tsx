@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import { createClient } from "@/lib/supabase/client";
@@ -21,7 +22,16 @@ async function startOAuth() {
 
 export function UserMenu() {
   const t = useTranslations("landing.header");
+  const tAuth = useTranslations("auth");
+  const router = useRouter();
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+
+  const handleSignOut = async () => {
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
+  };
 
   useEffect(() => {
     const supabase = createClient();
@@ -43,9 +53,14 @@ export function UserMenu() {
 
   if (isLoggedIn) {
     return (
-      <Link href="/app" className={buttonVariants({ size: "sm" })}>
-        {t("myAccount")}
-      </Link>
+      <div className="flex items-center gap-2">
+        <Link href="/app" className={buttonVariants({ size: "sm" })}>
+          {t("myAccount")}
+        </Link>
+        <Button variant="outline" size="sm" onClick={handleSignOut}>
+          {tAuth("signOut")}
+        </Button>
+      </div>
     );
   }
 
