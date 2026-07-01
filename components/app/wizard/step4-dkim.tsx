@@ -60,8 +60,8 @@ export function Step4Dkim({
         </div>
 
         {/* Close-tab reassurance */}
-        <div className="flex items-center gap-1.5 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2.5 text-xs leading-snug text-mk-text-tertiary">
-          <Bell className="size-3.5 shrink-0" aria-hidden />
+        <div className="flex items-center gap-2 rounded-lg bg-mk-accent/8 px-3 py-2.5 text-xs leading-snug text-mk-text-tertiary">
+          <Bell className="size-3.5 shrink-0 text-mk-accent" aria-hidden />
           <p>
             You can safely close this tab. We&apos;ll email{" "}
             <span className="font-mono">{destinationEmail}</span> when the
