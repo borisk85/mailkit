@@ -395,7 +395,7 @@
       },
       "awaitingVerify": {
         "title": "Check your Gmail inbox",
-        "body": "Cloudflare sent a verification link to {email}. Click it, then retry.",
+        "body": "Cloudflare sent a verification link to {email}. Click it.",
         "cta": "I clicked it",
         "ctaLoading": "Checking…"
       },
