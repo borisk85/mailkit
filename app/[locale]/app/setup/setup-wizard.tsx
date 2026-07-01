@@ -1990,25 +1990,29 @@ function SmtpDoneStep({
   onContinue: () => void;
 }) {
   return (
-    <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-      <h2 className="pb-2 font-mono text-[1.3125rem] font-semibold text-mk-text-primary">
+    <section className="rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
+      <h2 className="font-mono text-[1.3125rem] font-semibold text-mk-text-primary">
         {state.mailboxLocal}@{state.zoneName}
       </h2>
-      <div className="flex items-center gap-2 text-sm font-medium text-mk-text-secondary">
-        <Send className="size-5 text-mk-text-tertiary" aria-hidden />
-        {t("smtp.terminal.title")}
+      <div className="mt-5 space-y-4 border-t border-mk-border-subtle pt-5">
+        <div className="flex items-center gap-2 text-sm font-medium text-mk-text-secondary">
+          <Send className="size-5 text-mk-text-tertiary" aria-hidden />
+          {t("smtp.terminal.title")}
+        </div>
+        <Button
+          className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+          onClick={onContinue}
+          disabled={isPending}
+        >
+          {isPending
+            ? t("gmail.intro.startCtaLoading")
+            : t("smtp.terminal.gmailCta")}
+        </Button>
       </div>
-      <Button
-        className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
-        onClick={onContinue}
-        disabled={isPending}
-      >
-        {isPending
-          ? t("gmail.intro.startCtaLoading")
-          : t("smtp.terminal.gmailCta")}
-      </Button>
       {state.errorKey ? (
-        <InlineError message={translateErr(state.errorKey)} />
+        <div className="mt-4">
+          <InlineError message={translateErr(state.errorKey)} />
+        </div>
       ) : null}
     </section>
   );
