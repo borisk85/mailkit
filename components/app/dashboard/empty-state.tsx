@@ -3,6 +3,7 @@ import { useTranslations } from "next-intl";
 import { Mail } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "./status-badge";
 
 /**
  * First-visit empty state — premium-pass refresh per UI_REVIEW_BRIEF
@@ -27,9 +28,9 @@ export function DashboardEmptyState() {
         <Mail className="size-8 text-mk-accent" aria-hidden />
       </div>
       <h2 className="mk-heading-3 text-mk-text-primary">{t("title")}</h2>
-      <p className="mx-auto mt-3 max-w-md mk-body-small text-mk-text-secondary">
-        {t("body")}
-      </p>
+      <div className="mt-3">
+        <StatusBadge tone="neutral">{t("body")}</StatusBadge>
+      </div>
       <Link href="/app/setup" className="mt-6 inline-flex">
         <Button>{t("cta")}</Button>
       </Link>
