@@ -1601,9 +1601,6 @@ function ProgressStep({
 }) {
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-      <h2 className="text-lg font-semibold">
-        {zoneName} · {mailboxLocal}@{zoneName}
-      </h2>
       <ol className="space-y-2">
         {PROGRESS_ORDER.map((step) => {
           const s = statusOf(step, state, reached);
@@ -1640,9 +1637,6 @@ function AwaitingVerifyStep({
 }) {
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-      <h2 className="text-lg font-semibold">
-        {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
-      </h2>
       <ol className="space-y-2">
         {PROGRESS_ORDER.map((step) => {
           const s = statusOf(step, "awaiting", "destination");
@@ -1846,9 +1840,6 @@ function SmtpRunningStep({
   void _t;
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-      <h2 className="text-lg font-semibold">
-        {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
-      </h2>
       <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
       <SmtpProgressList
         overall="running"
@@ -1881,9 +1872,6 @@ function SmtpAwaitingRetryStep({
 }) {
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
-      <h2 className="text-lg font-semibold">
-        {state.zoneName} · {state.mailboxLocal}@{state.zoneName}
-      </h2>
       <CfDoneBlock zoneName={state.zoneName} tState={tState} tSteps={tSteps} />
       <SmtpProgressList
         overall="awaiting"
