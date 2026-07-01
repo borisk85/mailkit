@@ -320,7 +320,6 @@ export function Step1Token({
           <h2 className="text-xl font-semibold text-mk-text-primary">
             {t("heading")}
           </h2>
-          <p className="mt-1.5 text-xs text-mk-text-tertiary">{t("sub")}</p>
         </div>
 
         {resumeFor && (

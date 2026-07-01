@@ -358,7 +358,7 @@
       "cancelBtn": "I'll migrate first"
     },
     "title": "Connect your domain",
-    "subtitle": "Paste your Cloudflare API token to begin.",
+    "subtitle": "Paste your Cloudflare API token to begin — takes ~5 minutes.",
     "step1": {
       "title": "Step 1 — Paste your Cloudflare API token",
       "tokenLabel": "Cloudflare API token",

@@ -815,7 +815,7 @@ export function SetupWizard({
       case "smtp_dkim_polling":
         return state.mockIsLong
           ? "This is taking longer than usual — still working in the background."
-          : "Postmark is checking DKIM on your DNS — usually 5–30 minutes.";
+          : "This is the longest step — usually 5–30 minutes.";
       case "smtp_awaiting_retry":
         return "Configuring DNS records for sending. This is automatic — takes ~30 seconds.";
       case "smtp_done":
