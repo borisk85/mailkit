@@ -2407,7 +2407,17 @@ function GmailStepBody({
   if (id === "senderInfo") {
     return (
       <>
-        <p className="text-sm">{t("gmail.steps.senderInfo.body")}</p>
+        <p className="text-sm leading-relaxed text-mk-text-primary">
+          Paste these into the{" "}
+          <span className="inline-flex items-center rounded bg-[#0846a8] px-1.5 py-0.5 text-[12px] font-semibold leading-none text-white">
+            Add another email address
+          </span>{" "}
+          window. Leave{" "}
+          <span className="inline-flex items-center rounded bg-[#0846a8] px-1.5 py-0.5 text-[12px] font-semibold leading-none text-white">
+            Treat as an alias
+          </span>{" "}
+          checked.
+        </p>
         <GmailScreenshotGallery
           screens={[
             {
