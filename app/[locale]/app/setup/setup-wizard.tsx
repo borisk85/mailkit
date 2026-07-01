@@ -2407,12 +2407,7 @@ function GmailStepBody({
   if (id === "senderInfo") {
     return (
       <>
-        <p className="text-sm">
-          Paste these into the{" "}
-          <span className="font-semibold">Add another email address</span>{" "}
-          window. Leave <span className="font-semibold">Treat as an alias</span>{" "}
-          checked.
-        </p>
+        <p className="text-sm">{t("gmail.steps.senderInfo.body")}</p>
         <GmailScreenshotGallery
           screens={[
             {
@@ -2641,12 +2636,7 @@ function CopyButton({
       size="sm"
       onClick={onCopy}
       aria-label={copied ? t("gmail.common.copied") : t("gmail.common.copy")}
-      className={cn(
-        "min-h-11 min-w-[6.25rem] justify-center sm:min-h-10",
-        copied &&
-          "border-mk-success/40 bg-mk-success/10 text-mk-success hover:bg-mk-success/10 hover:text-mk-success",
-        error && "border-mk-danger",
-      )}
+      className={cn("min-h-11 sm:min-h-10", error && "border-mk-danger")}
     >
       {copied ? (
         <Check className="size-4" aria-hidden />
