@@ -1,6 +1,6 @@
 "use client";
 
-import { Clock, Loader2 } from "lucide-react";
+import { Bell, Clock, Loader2 } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 
@@ -60,8 +60,9 @@ export function Step4Dkim({
         </div>
 
         {/* Close-tab reassurance */}
-        <div className="text-center">
-          <p className="text-xs leading-snug text-mk-text-tertiary">
+        <div className="flex items-center justify-center gap-1.5 text-xs leading-snug text-mk-text-tertiary">
+          <Bell className="size-3.5 shrink-0" aria-hidden />
+          <p>
             You can safely close this tab. We&apos;ll email{" "}
             <span className="font-mono font-semibold text-mk-text-primary">
               {destinationEmail}
