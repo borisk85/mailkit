@@ -461,7 +461,7 @@
         "ctaLoading": "Checking…"
       },
       "terminal": {
-        "title": "You can now send mail!",
+        "title": "Now connect it to your Gmail to send from it.",
         "body": "Can now send and receive.",
         "gmailCta": "Continue to Gmail Send-As"
       }
