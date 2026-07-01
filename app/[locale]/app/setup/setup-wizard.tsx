@@ -2729,9 +2729,9 @@ function GmailDoneStep({
       </h2>
       <p className="mx-auto max-w-md text-sm text-mk-text-secondary">
         {bodyParts[0]}
-        <strong className="font-semibold text-mk-text-primary">
+        <span className="inline-flex items-center rounded-md border border-mk-border-subtle bg-surface-elevated-2 px-2 py-0.5 align-middle font-mono text-[0.8125rem] leading-none text-mk-text-primary">
           {targetEmail}
-        </strong>
+        </span>
         {bodyParts.slice(1).join(targetEmail)}
       </p>
       <Link href="/app" className="inline-flex">
