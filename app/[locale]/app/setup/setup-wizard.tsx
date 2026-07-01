@@ -1736,7 +1736,11 @@ function AwaitingVerifyStep({
         <p className="mt-1.5 text-xs text-mk-text-secondary">
           {tr.rich("step3.awaitingVerify.body", {
             email: state.destinationEmail,
-            mono: (chunks) => <span className="font-mono">{chunks}</span>,
+            mono: (chunks) => (
+              <span className="inline-flex items-center rounded-md border border-mk-border-subtle bg-surface-elevated-2 px-2 py-0.5 align-middle font-mono text-[0.8125rem] leading-none text-mk-text-primary">
+                {chunks}
+              </span>
+            ),
           })}
         </p>
         <Button
@@ -2197,16 +2201,43 @@ function GmailWizard({
   onComplete: () => void;
 }) {
   const [currentIdx, setCurrentIdx] = useState(0);
+  // Furthest sub-step the user has actually reached by pressing "Done".
+  const [maxIdx, setMaxIdx] = useState(0);
   const total = GMAIL_STEP_IDS.length;
+  const storageKey = `mk_gmail_step:${state.targetEmail}`;
+
+  // Persist/restore the reached sub-step so a page refresh keeps the real
+  // progress (not a reset to step 1) and never lands the user past a step they
+  // haven't completed. Runs after mount — localStorage isn't available on SSR.
+  useEffect(() => {
+    try {
+      const saved = parseInt(localStorage.getItem(storageKey) || "0", 10);
+      if (Number.isFinite(saved) && saved > 0 && saved <= total - 1) {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        setMaxIdx(saved);
+         
+        setCurrentIdx(saved);
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [storageKey]);
+
   // Success is driven by the real server result (state.completed), never
   // optimistic — the "all set" block only shows when the setup truly finished.
-  // A completed setup also locks every step as done, so there's no Finish
-  // button to re-submit (and no "form looks off" error from re-running it).
   const finished = !!state.completed;
-  const shownIdx = state.completed ? total : currentIdx;
 
+  // "Done" advances one step and records the furthest reached step (persisted),
+  // so a refresh restores it and forward steps stay locked until then.
   function advance() {
-    setCurrentIdx((i) => Math.min(i + 1, total - 1));
+    const next = Math.min(currentIdx + 1, total - 1);
+    setCurrentIdx(next);
+    setMaxIdx((m) => {
+      const nm = Math.max(m, next);
+      try {
+        localStorage.setItem(storageKey, String(nm));
+      } catch {}
+      return nm;
+    });
   }
 
   return (
@@ -2220,8 +2251,15 @@ function GmailWizard({
 
       <ol className="space-y-3">
         {GMAIL_STEP_IDS.map((id, idx) => {
-          const status: "done" | "active" | "pending" =
-            idx < shownIdx ? "done" : idx === shownIdx ? "active" : "pending";
+          // Reachable = already completed via "Done" (idx <= maxIdx). Active is
+          // where the user currently is; anything past maxIdx stays locked.
+          const status: "done" | "active" | "pending" = state.completed
+            ? "done"
+            : idx === currentIdx
+              ? "active"
+              : idx <= maxIdx
+                ? "done"
+                : "pending";
           return (
             <GmailStepCard
               key={id}
@@ -2233,7 +2271,11 @@ function GmailWizard({
               state={state}
               userEmail={userEmail}
               isPending={isPending}
-              onExpand={() => setCurrentIdx(idx)}
+              onExpand={() => {
+                // Back to any reached step is fine; forward past an
+                // un-completed step is blocked.
+                if (idx <= maxIdx) setCurrentIdx(idx);
+              }}
               onNext={advance}
               onSubmit={onComplete}
             />
@@ -2307,7 +2349,8 @@ function GmailStepCard({
       <button
         type="button"
         onClick={onExpand}
-        className="flex w-full items-center justify-between gap-3 text-left"
+        disabled={status === "pending"}
+        className="flex w-full items-center justify-between gap-3 text-left disabled:cursor-not-allowed"
         aria-expanded={status === "active"}
       >
         <span className="flex items-center gap-3">
@@ -2526,9 +2569,11 @@ function GmailStepBody({
         />
         <p className="text-sm">
           Gmail emailed a confirmation link to{" "}
-          <span className="font-mono">{state.targetEmail}</span> — it lands in
-          this same inbox. Open the email, click the link, then press
-          &quot;Confirm&quot;.
+          <span className="inline-flex items-center rounded-md border border-mk-border-subtle bg-surface-elevated-2 px-2 py-0.5 align-middle font-mono text-[0.8125rem] leading-none text-mk-text-primary">
+            {state.targetEmail}
+          </span>{" "}
+          — it lands in this same inbox. Open the email, click the link, then
+          press &quot;Confirm&quot;.
         </p>
         <Button
           onClick={onSubmit}

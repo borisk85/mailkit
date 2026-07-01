@@ -64,8 +64,10 @@ export function Step4Dkim({
           <Bell className="size-3.5 shrink-0 text-mk-accent" aria-hidden />
           <p>
             You can safely close this tab. We&apos;ll email{" "}
-            <span className="font-mono">{destinationEmail}</span> when the
-            verification completes.
+            <span className="inline-flex items-center rounded-md border border-mk-border-subtle bg-surface-elevated-2 px-2 py-0.5 align-middle font-mono text-[0.8125rem] leading-none text-mk-text-primary">
+              {destinationEmail}
+            </span>{" "}
+            when the verification completes.
           </p>
         </div>
       </div>
