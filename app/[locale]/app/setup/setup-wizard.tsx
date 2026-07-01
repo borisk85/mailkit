@@ -1657,21 +1657,21 @@ function AwaitingVerifyStep({
         })}
       </ol>
       <div
-        className="rounded-md border border-mk-warning/40 bg-mk-warning/10 p-5 text-sm"
+        className="rounded-md border border-mk-warning/40 bg-mk-warning/10 p-4 text-sm"
         style={{ borderLeftWidth: "4px", borderLeftColor: "var(--mk-warning)" }}
       >
-        <div className="flex items-center gap-2 text-base font-semibold text-mk-text-primary">
+        <div className="flex items-center gap-2 text-sm font-semibold text-mk-text-primary">
           <AlertCircle
-            className="size-5 shrink-0 text-mk-warning"
+            className="size-4 shrink-0 text-mk-warning"
             aria-hidden
           />
           {t("step3.awaitingVerify.title")}
         </div>
-        <p className="mt-2 text-mk-text-secondary">
+        <p className="mt-1.5 text-xs text-mk-text-secondary">
           {t("step3.awaitingVerify.body", { email: state.destinationEmail })}
         </p>
         <Button
-          className="mt-4"
+          className="mt-3"
           onClick={onRetry}
           disabled={isPending}
           variant="outline"
