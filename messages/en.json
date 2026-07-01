@@ -474,7 +474,7 @@
     "gmail": {
       "intro": {
         "title": "Last step — Gmail Send-As",
-        "subtitle": "~3 minutes of copying and pasting.",
+        "subtitle": "Add your new address to start sending from it.",
         "startCta": "Start Gmail setup",
         "startCtaLoading": "Opening Gmail setup…"
       },
