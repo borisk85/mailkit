@@ -11,6 +11,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   ShieldCheck,
+  Lightbulb,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -76,7 +77,8 @@ function PermissionChecklist() {
               </li>
             ))}
           </ul>
-          <div className="mt-3 rounded-md bg-mk-accent/8 px-3 py-2">
+          <div className="mt-3 flex items-center gap-2.5 rounded-md bg-mk-accent/8 px-3 py-2">
+            <Lightbulb className="size-4 shrink-0 text-mk-accent" aria-hidden />
             <span className="text-xs leading-snug text-mk-text-secondary">
               Click{" "}
               <span className="font-medium text-mk-text-primary">
@@ -120,7 +122,8 @@ function ZoneResourceCard() {
               </code>
             </li>
           </ul>
-          <div className="mt-3 rounded-md bg-mk-accent/8 px-3 py-2">
+          <div className="mt-3 flex items-center gap-2.5 rounded-md bg-mk-accent/8 px-3 py-2">
+            <Lightbulb className="size-4 shrink-0 text-mk-accent" aria-hidden />
             <span className="text-xs leading-snug text-mk-text-secondary">
               Pick the domain this token is for.
             </span>
@@ -552,8 +555,8 @@ export function Step1Token({
             <InlineError message={translateErr(errorKey, errorDetails)} />
           )}
 
-          <div className="flex items-start gap-1.5 text-[11px] leading-snug text-mk-success">
-            <ShieldCheck className="mt-px size-3.5 shrink-0" aria-hidden />
+          <div className="flex items-center gap-1.5 text-[11px] leading-snug text-mk-success">
+            <ShieldCheck className="size-3.5 shrink-0" aria-hidden />
             <span>
               Encrypted while your setup runs, deleted when it finishes — never
               used for anything else.
