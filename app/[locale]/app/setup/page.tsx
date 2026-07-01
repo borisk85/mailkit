@@ -177,7 +177,7 @@ export default async function SetupPage({
   }
 
   return (
-    <div className="flex items-start justify-center px-4 py-12">
+    <div className="flex min-h-[calc(100vh-180px)] items-center justify-center px-4 py-12">
       <div className="w-full max-w-4xl">
         <SetupWizard
           initialMock={mock}
