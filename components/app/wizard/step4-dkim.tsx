@@ -62,12 +62,10 @@ export function Step4Dkim({
         {/* Close-tab reassurance */}
         <div className="flex items-center justify-center gap-1.5 text-xs leading-snug text-mk-text-tertiary">
           <Bell className="size-3.5 shrink-0" aria-hidden />
-          <p>
+          <p className="text-center">
             You can safely close this tab. We&apos;ll email{" "}
-            <span className="font-mono font-semibold text-mk-text-primary">
-              {destinationEmail}
-            </span>{" "}
-            when the verification completes.
+            <span className="font-mono">{destinationEmail}</span> when the
+            verification completes.
           </p>
         </div>
       </div>

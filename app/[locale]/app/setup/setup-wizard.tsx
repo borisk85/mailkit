@@ -1665,11 +1665,7 @@ function AwaitingVerifyStep({
         <p className="mt-1.5 text-xs text-mk-text-secondary">
           {tr.rich("step3.awaitingVerify.body", {
             email: state.destinationEmail,
-            mono: (chunks) => (
-              <span className="font-mono font-semibold text-mk-text-primary">
-                {chunks}
-              </span>
-            ),
+            mono: (chunks) => <span className="font-mono">{chunks}</span>,
           })}
         </p>
         <Button
