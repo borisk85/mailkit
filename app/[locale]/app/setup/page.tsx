@@ -13,7 +13,7 @@ import { SetupWizard } from "./setup-wizard";
 // short DKIM-propagation wait in one request. Without a raised limit the
 // function can be killed mid-run, leaving the run stuck at cf_done with no
 // error and the wizard spinner hanging. 60s gives the flow room to finish.
-export const maxDuration = 60;
+export const maxDuration = 300;
 
 const MOCK_STATES = [
   "token_entry",
