@@ -2636,7 +2636,10 @@ function CopyButton({
       size="sm"
       onClick={onCopy}
       aria-label={copied ? t("gmail.common.copied") : t("gmail.common.copy")}
-      className={cn("min-h-11 sm:min-h-10", error && "border-mk-danger")}
+      className={cn(
+        "min-h-11 min-w-[6.25rem] justify-center sm:min-h-10",
+        error && "border-mk-danger",
+      )}
     >
       {copied ? (
         <Check className="size-4" aria-hidden />
