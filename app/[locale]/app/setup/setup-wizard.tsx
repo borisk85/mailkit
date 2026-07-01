@@ -1665,10 +1665,11 @@ function AwaitingVerifyStep({
           {t("step3.awaitingVerify.body", { email: state.destinationEmail })}
         </p>
         <Button
-          className="mt-3"
+          className="mt-3 hover:border-mk-warning/50 hover:bg-mk-warning/15"
           onClick={onRetry}
           disabled={isPending}
           variant="outline"
+          size="sm"
         >
           {isPending
             ? t("step3.awaitingVerify.ctaLoading")
