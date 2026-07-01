@@ -891,11 +891,11 @@ export function SetupWizard({
       case "smtp_done":
         return "Your domain is verified — it can send email now.";
       case "gmail_instructions_shown":
-        return "Almost done — ~3 minutes of copying and pasting.";
+        return "Almost done — 3 minutes of copying and pasting.";
       case "gmail_smtp_ready":
         return state.completed
           ? "All set — you can now send from your domain."
-          : "Almost done — ~3 minutes of copying and pasting.";
+          : "Almost done — 3 minutes of copying and pasting.";
       case "gmail_done":
         return "All set — you can now send from your domain.";
       case "failed":
