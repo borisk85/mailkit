@@ -109,7 +109,7 @@ export function CookieConsent() {
     <div
       role="region"
       aria-label="Cookie consent"
-      className="fixed left-2 right-2 bottom-2 z-50 flex flex-wrap items-center justify-center gap-3 rounded-2xl border border-mk-border-strong bg-surface-elevated-2/95 px-4 py-3 backdrop-blur-md mk-card-shadow sm:left-1/2 sm:right-auto sm:bottom-4 sm:-translate-x-1/2 sm:rounded-full sm:px-5 sm:py-2.5"
+      className="fixed left-2 right-2 bottom-2 z-50 flex flex-wrap items-center justify-center gap-2 rounded-xl border border-mk-border-strong bg-surface-elevated-2/95 px-3 py-2 backdrop-blur-md mk-card-shadow sm:left-1/2 sm:right-auto sm:bottom-3 sm:-translate-x-1/2 sm:rounded-full sm:px-4 sm:py-1.5"
     >
       <p className="mk-body-small text-mk-text-secondary">{t("body")}</p>
       <div className="flex items-center gap-3">
