@@ -63,7 +63,9 @@ export function Step4Dkim({
         <div className="text-center">
           <p className="text-xs leading-snug text-mk-text-tertiary">
             You can safely close this tab. We&apos;ll email{" "}
-            <span className="font-mono font-medium">{destinationEmail}</span>{" "}
+            <span className="font-mono font-semibold text-mk-text-primary">
+              {destinationEmail}
+            </span>{" "}
             when the verification completes.
           </p>
         </div>

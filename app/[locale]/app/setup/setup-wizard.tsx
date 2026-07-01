@@ -1635,6 +1635,7 @@ function AwaitingVerifyStep({
   translateErr: (key: string, details?: string) => string;
   onRetry: () => void;
 }) {
+  const tr = useTranslations("setup");
   return (
     <section className="space-y-4 rounded-xl border border-mk-border-subtle bg-surface-elevated p-6">
       <ol className="space-y-2">
@@ -1662,7 +1663,14 @@ function AwaitingVerifyStep({
           {t("step3.awaitingVerify.title")}
         </div>
         <p className="mt-1.5 text-xs text-mk-text-secondary">
-          {t("step3.awaitingVerify.body", { email: state.destinationEmail })}
+          {tr.rich("step3.awaitingVerify.body", {
+            email: state.destinationEmail,
+            mono: (chunks) => (
+              <span className="font-mono font-semibold text-mk-text-primary">
+                {chunks}
+              </span>
+            ),
+          })}
         </p>
         <Button
           className="mt-3 bg-mk-accent text-white hover:bg-mk-accent-hover"
