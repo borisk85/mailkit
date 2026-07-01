@@ -207,7 +207,7 @@ function ActiveStep({
             <Button
               type="button"
               size="sm"
-              className="gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover"
+              className="w-full gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover sm:w-auto"
               onClick={onNext}
             >
               Done
