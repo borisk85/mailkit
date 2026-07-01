@@ -1292,7 +1292,7 @@ function TokenEntryStep({
           onSubmit(token.trim());
         }}
       >
-        <label className="block text-sm font-medium">
+        <label className="block text-sm font-medium text-mk-text-secondary">
           {t("step1.tokenLabel")}
           <Input
             className="mt-1 font-mono"
@@ -1491,7 +1491,7 @@ function ZoneSelectionStep({
           }}
         >
           <div className="space-y-1.5">
-            <span className="block text-sm font-medium text-mk-text-primary">
+            <span className="block text-sm font-medium text-mk-text-secondary">
               {t("step2.zoneLabel")}
             </span>
             {zones.length > 1 ? (
@@ -1510,7 +1510,7 @@ function ZoneSelectionStep({
           </div>
 
           <div className="space-y-1.5">
-            <span className="block text-sm font-medium text-mk-text-primary">
+            <span className="block text-sm font-medium text-mk-text-secondary">
               {t("step2.mailboxLabel")}
             </span>
             <Input
