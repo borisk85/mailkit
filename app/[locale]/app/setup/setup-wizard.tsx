@@ -2381,7 +2381,11 @@ function GmailStepBody({
               Open Gmail Settings ↗
             </Button>
           </a>
-          <Button onClick={onNext} size="sm">
+          <Button
+            onClick={onNext}
+            size="sm"
+            className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+          >
             {t("gmail.steps.openSettings.nextCta")}
           </Button>
         </div>
@@ -2411,7 +2415,11 @@ function GmailStepBody({
           t={t}
           mono
         />
-        <Button onClick={onNext} size="sm">
+        <Button
+          onClick={onNext}
+          size="sm"
+          className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+        >
           {t("gmail.steps.senderInfo.nextCta")}
         </Button>
       </>
@@ -2467,7 +2475,11 @@ function GmailStepBody({
             {t("gmail.steps.smtpSettings.securityHint")}
           </p>
         </div>
-        <Button onClick={onNext} size="sm">
+        <Button
+          onClick={onNext}
+          size="sm"
+          className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+        >
           {t("gmail.steps.smtpSettings.nextCta")}
         </Button>
       </>
@@ -2493,7 +2505,12 @@ function GmailStepBody({
             target: state.targetEmail,
           })}
         </p>
-        <Button onClick={onSubmit} size="sm" disabled={isPending}>
+        <Button
+          onClick={onSubmit}
+          size="sm"
+          disabled={isPending}
+          className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+        >
           {isPending
             ? t("gmail.steps.verificationEmail.finishLoading")
             : t("gmail.steps.verificationEmail.finishCta")}
