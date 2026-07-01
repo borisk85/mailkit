@@ -109,9 +109,9 @@ export function CookieConsent() {
     <div
       role="region"
       aria-label="Cookie consent"
-      className="fixed left-2 right-2 bottom-2 z-50 flex flex-wrap items-center justify-center gap-2 rounded-full border border-mk-border-strong bg-surface-elevated-2/95 px-3 py-1.5 backdrop-blur-md mk-card-shadow sm:left-1/2 sm:right-auto sm:bottom-3 sm:-translate-x-1/2"
+      className="fixed left-2 right-2 bottom-2 z-50 flex flex-wrap items-center justify-center gap-2 rounded-full border border-white/30 bg-surface-elevated-2/95 px-3 py-1.5 backdrop-blur-md mk-card-shadow sm:left-1/2 sm:right-auto sm:bottom-3 sm:-translate-x-1/2"
     >
-      <p className="text-xs text-mk-text-secondary">{t("body")}</p>
+      <p className="text-xs text-white/80">{t("body")}</p>
       <div className="flex items-center gap-2">
         <Button
           onClick={handleAccept}
@@ -124,7 +124,7 @@ export function CookieConsent() {
           onClick={handleDecline}
           size="sm"
           variant="outline"
-          className="h-6 shrink-0 rounded-full px-3 text-xs"
+          className="h-6 shrink-0 rounded-full px-3 text-xs border-white/30 text-white/60 hover:bg-white/10"
         >
           {t("decline")}
         </Button>
