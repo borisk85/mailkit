@@ -2368,7 +2368,24 @@ function GmailStepBody({
       : "https://mail.google.com/mail/u/0/#settings/accounts";
     return (
       <>
-        <p className="text-sm">{t("gmail.steps.openSettings.body")}</p>
+        <div className="space-y-3 text-sm">
+          <p>{t("gmail.steps.openSettings.intro")}</p>
+          <ol className="space-y-2.5">
+            {[1, 2, 3, 4, 5].map((n) => (
+              <li key={n} className="flex items-center gap-3">
+                <span
+                  className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-mk-border-subtle bg-surface-elevated text-xs font-semibold text-mk-text-tertiary"
+                  aria-hidden
+                >
+                  {n}
+                </span>
+                <span className="text-mk-text-primary">
+                  {t(`gmail.steps.openSettings.menu${n}`)}
+                </span>
+              </li>
+            ))}
+          </ol>
+        </div>
         <GmailScreenshotGallery />
         <div className="flex flex-wrap gap-2">
           <a
