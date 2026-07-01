@@ -541,6 +541,38 @@ export function SetupWizard({
     }
 
     if (activeRun) {
+      // Resume without replaying the pipeline. Once the run is past the SMTP
+      // DNS write, re-running startSetupRun only flashes the user back to the
+      // earlier "setting up / verifying" screens on refresh. Restore straight
+      // to the run's real point instead. Additive: any other status falls
+      // through to the existing resume path below, unchanged.
+      if (activeRun.status === "smtp_dns_written") {
+        setState({
+          kind: "smtp_dkim_polling",
+          runId: activeRun.id,
+          cfToken: saved?.token ?? initialToken ?? "",
+          zoneName: activeRun.domain,
+          mailboxLocal: activeRun.mailboxLocal,
+          destinationEmail: userEmail ?? "",
+        });
+        setHydrated(true);
+        return;
+      }
+      if (
+        activeRun.status === "smtp_verified" ||
+        activeRun.status === "smtp_done"
+      ) {
+        setState({
+          kind: "smtp_done",
+          runId: activeRun.id,
+          zoneName: activeRun.domain,
+          mailboxLocal: activeRun.mailboxLocal,
+          destinationEmail: userEmail ?? "",
+        });
+        setHydrated(true);
+        return;
+      }
+
       const zone = saved?.zones?.find((z) => z.name === activeRun.domain);
       if (saved?.token && zone) {
         // Resume an in-progress run without forcing a token re-paste.
