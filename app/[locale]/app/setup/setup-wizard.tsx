@@ -2676,15 +2676,21 @@ function DkimPollingStep({
     let timer: ReturnType<typeof setTimeout>;
 
     async function check() {
-      const res = await pollDkimStatus({ runId: state.runId });
-      if (cancelled) return;
-      if (res.status === "ready") {
-        onReady();
-        return;
+      try {
+        const res = await pollDkimStatus({ runId: state.runId });
+        if (cancelled) return;
+        if (res.status === "ready") {
+          onReady();
+          return;
+        }
+        // Flip "taking longer" UI after threshold.
+        if (Date.now() - startedAt >= DKIM_LONG_THRESHOLD_MS) setIsLong(true);
+      } catch {
+        // Transient network / server-action failure — swallow it. One failed
+        // poll must NEVER kill the loop, or the page hangs on "Checking…"
+        // until a manual refresh (the bug this fixes).
       }
-      // Flip "taking longer" UI after threshold.
-      if (Date.now() - startedAt >= DKIM_LONG_THRESHOLD_MS) setIsLong(true);
-      timer = setTimeout(check, 30_000);
+      if (!cancelled) timer = setTimeout(check, 30_000);
     }
 
     timer = setTimeout(check, 30_000);
