@@ -1994,9 +1994,9 @@ function SmtpDoneStep({
       <h2 className="pb-2 font-mono text-[1.3125rem] font-semibold text-mk-text-primary">
         {state.mailboxLocal}@{state.zoneName}
       </h2>
-      <div className="rounded-lg border border-mk-success/30 bg-mk-success/10 p-4 text-sm">
-        <div className="flex items-center gap-2 font-medium text-mk-success">
-          <Send className="size-5" aria-hidden />
+      <div className="rounded-lg border border-mk-border-subtle bg-surface-elevated-2 p-4 text-sm">
+        <div className="flex items-center gap-2 font-medium text-mk-text-primary">
+          <Send className="size-5 text-mk-text-secondary" aria-hidden />
           {t("smtp.terminal.title")}
         </div>
         <Button
