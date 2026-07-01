@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import {
   AlertCircle,
+  ArrowRight,
   ArrowUpRight,
   Check,
   CheckCircle2,
@@ -2368,24 +2369,17 @@ function GmailStepBody({
       : "https://mail.google.com/mail/u/0/#settings/accounts";
     return (
       <>
-        <div className="space-y-3 text-sm">
-          <p>{t("gmail.steps.openSettings.intro")}</p>
-          <ol className="space-y-2.5">
-            {[1, 2, 3, 4, 5].map((n) => (
-              <li key={n} className="flex items-center gap-3">
-                <span
-                  className="flex size-7 shrink-0 items-center justify-center rounded-full border-2 border-mk-border-subtle bg-surface-elevated text-xs font-semibold text-mk-text-tertiary"
-                  aria-hidden
-                >
-                  {n}
-                </span>
-                <span className="text-mk-text-primary">
-                  {t(`gmail.steps.openSettings.menu${n}`)}
-                </span>
-              </li>
-            ))}
-          </ol>
-        </div>
+        <p className="text-sm leading-relaxed text-mk-text-primary">
+          {t("gmail.steps.openSettings.lead")}
+          {[1, 2, 3, 4].map((n) => (
+            <span key={n}>
+              <span className="mx-1 text-mk-text-tertiary">→</span>
+              <span className="inline-flex items-center rounded bg-mk-accent/12 px-1.5 py-0.5 text-[12px] font-semibold leading-none text-mk-accent">
+                {t(`gmail.steps.openSettings.menu${n}`)}
+              </span>
+            </span>
+          ))}
+        </p>
         <GmailScreenshotGallery />
         <div className="flex flex-wrap gap-2">
           <a
@@ -2401,9 +2395,10 @@ function GmailStepBody({
           <Button
             onClick={onNext}
             size="sm"
-            className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+            className="gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover"
           >
             {t("gmail.steps.openSettings.nextCta")}
+            <ArrowRight className="size-3" aria-hidden />
           </Button>
         </div>
       </>
@@ -2435,9 +2430,10 @@ function GmailStepBody({
         <Button
           onClick={onNext}
           size="sm"
-          className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+          className="gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover"
         >
           {t("gmail.steps.senderInfo.nextCta")}
+          <ArrowRight className="size-3" aria-hidden />
         </Button>
       </>
     );
@@ -2495,9 +2491,10 @@ function GmailStepBody({
         <Button
           onClick={onNext}
           size="sm"
-          className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+          className="gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover"
         >
           {t("gmail.steps.smtpSettings.nextCta")}
+          <ArrowRight className="size-3" aria-hidden />
         </Button>
       </>
     );
@@ -2526,7 +2523,7 @@ function GmailStepBody({
           onClick={onSubmit}
           size="sm"
           disabled={isPending}
-          className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+          className="gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover"
         >
           {isPending
             ? t("gmail.steps.verificationEmail.finishLoading")

@@ -498,12 +498,11 @@
       "steps": {
         "openSettings": {
           "title": "Open Gmail",
-          "intro": "In Gmail, follow these in order:",
-          "menu1": "Click the ⚙ (top-right)",
-          "menu2": "See all settings",
-          "menu3": "Accounts and Import",
-          "menu4": "Send mail as",
-          "menu5": "Add another email address",
+          "lead": "Click the ⚙ (top-right)",
+          "menu1": "See all settings",
+          "menu2": "Accounts and Import",
+          "menu3": "Send mail as",
+          "menu4": "Add another email address",
           "nextCta": "Done"
         },
         "senderInfo": {
