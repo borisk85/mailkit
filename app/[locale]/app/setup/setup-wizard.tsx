@@ -2215,7 +2215,7 @@ function GmailWizard({
       if (Number.isFinite(saved) && saved > 0 && saved <= total - 1) {
         // eslint-disable-next-line react-hooks/set-state-in-effect
         setMaxIdx(saved);
-         
+
         setCurrentIdx(saved);
       }
     } catch {}
@@ -2350,7 +2350,7 @@ function GmailStepCard({
         type="button"
         onClick={onExpand}
         disabled={status === "pending"}
-        className="flex w-full items-center justify-between gap-3 text-left disabled:cursor-not-allowed"
+        className="flex w-full items-center justify-between gap-3 text-left disabled:cursor-default"
         aria-expanded={status === "active"}
       >
         <span className="flex items-center gap-3">
