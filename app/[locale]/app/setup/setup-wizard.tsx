@@ -1994,21 +1994,19 @@ function SmtpDoneStep({
       <h2 className="pb-2 font-mono text-[1.3125rem] font-semibold text-mk-text-primary">
         {state.mailboxLocal}@{state.zoneName}
       </h2>
-      <div className="rounded-lg border border-mk-accent/30 bg-mk-accent/8 p-4 text-sm">
-        <div className="flex items-center gap-2 font-medium text-mk-accent">
-          <Send className="size-5" aria-hidden />
-          {t("smtp.terminal.title")}
-        </div>
-        <Button
-          className="mt-3 bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
-          onClick={onContinue}
-          disabled={isPending}
-        >
-          {isPending
-            ? t("gmail.intro.startCtaLoading")
-            : t("smtp.terminal.gmailCta")}
-        </Button>
+      <div className="flex items-center gap-2 text-sm font-medium text-mk-text-secondary">
+        <Send className="size-5 text-mk-text-tertiary" aria-hidden />
+        {t("smtp.terminal.title")}
       </div>
+      <Button
+        className="bg-mk-accent text-white hover:bg-mk-accent-hover mk-cta-shadow"
+        onClick={onContinue}
+        disabled={isPending}
+      >
+        {isPending
+          ? t("gmail.intro.startCtaLoading")
+          : t("smtp.terminal.gmailCta")}
+      </Button>
       {state.errorKey ? (
         <InlineError message={translateErr(state.errorKey)} />
       ) : null}
