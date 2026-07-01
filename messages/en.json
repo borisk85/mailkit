@@ -492,7 +492,7 @@
         "smtpHost": "SMTP server",
         "smtpPort": "Port",
         "smtpUsername": "Username",
-        "smtpPassword": "Password (SMTP key)",
+        "smtpPassword": "Password",
         "smtpSecurity": "Secured connection"
       },
       "steps": {
@@ -512,7 +512,7 @@
         },
         "smtpSettings": {
           "title": "SMTP settings",
-          "body": "Paste these four values, then click Add Account.",
+          "body": "Paste these four values, then click \"Add Account\".",
           "securityStarttls": "TLS (recommended)",
           "securitySsl": "SSL",
           "securityHint": "TLS (recommended).",

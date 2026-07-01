@@ -2477,8 +2477,18 @@ function GmailStepBody({
           value={state.smtp.password}
           t={t}
         />
-        <div className="rounded-md border border-mk-warning/40 bg-mk-warning/10 p-4 text-sm text-mk-text-secondary">
-          {t("gmail.steps.smtpSettings.passwordWarning")}
+        <div
+          className="flex items-start gap-2 rounded-md border border-mk-warning/40 bg-mk-warning/10 p-4 text-sm text-mk-text-secondary"
+          style={{
+            borderLeftWidth: "4px",
+            borderLeftColor: "var(--mk-warning)",
+          }}
+        >
+          <AlertCircle
+            className="mt-0.5 size-4 shrink-0 text-mk-warning"
+            aria-hidden
+          />
+          <span>{t("gmail.steps.smtpSettings.passwordWarning")}</span>
         </div>
         <div className="space-y-1">
           <span className="block text-xs font-medium text-mk-text-tertiary">
