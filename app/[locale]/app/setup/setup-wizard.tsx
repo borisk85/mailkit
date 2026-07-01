@@ -2620,7 +2620,7 @@ function ProgressRow({
         {icon}
         {label}
       </span>
-      {status !== "ok" ? (
+      {status !== "ok" && status !== "pending" ? (
         <span className="text-xs text-mk-text-tertiary">{stateLabel}</span>
       ) : null}
     </li>
