@@ -807,7 +807,7 @@ export function SetupWizard({
         return "This domain's DNS is not on Cloudflare yet — migration required before setup.";
       case "setup_running":
       case "awaiting_verify":
-        return "Configuring Cloudflare Email Routing to receive mail.";
+        return "Getting your domain ready to receive mail.";
       case "cf_done_pending_smtp":
         return "Receiving is ready — sending comes next.";
       case "smtp_running":
