@@ -679,6 +679,44 @@ export function SetupWizard({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state.kind, purchaseConfirmed]);
 
+  // ── Destination verified → advance on its own ────────────────────────
+  // The awaiting_verify step waits for the user to click Cloudflare's
+  // verification link, which opens in a separate tab/inbox. Poll the
+  // server so the page advances the moment the destination is verified —
+  // no manual "I clicked it" and no refresh. Re-check on tab focus too, so
+  // it flips instantly when the user returns from clicking the link.
+  useEffect(() => {
+    if (state.kind !== "awaiting_verify") return;
+    const { runId, token, zoneName, mailboxLocal } = state;
+    let cancelled = false;
+    const check = async () => {
+      try {
+        const result = await resumeDestinationVerify({ runId, token });
+        if (cancelled || result.status === "error") return;
+        if (result.runStatus === "cf_done") {
+          setState({
+            kind: "cf_done_pending_smtp",
+            runId,
+            cfToken: token,
+            zoneName,
+            mailboxLocal,
+            destinationEmail: result.destinationEmail,
+          });
+        }
+      } catch {
+        // transient — next tick retries
+      }
+    };
+    const id = setInterval(check, 8000);
+    window.addEventListener("focus", check);
+    return () => {
+      cancelled = true;
+      clearInterval(id);
+      window.removeEventListener("focus", check);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state.kind]);
+
   async function handleStartSetup(
     token: string,
     zoneId: string,
