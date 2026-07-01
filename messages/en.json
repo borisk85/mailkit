@@ -498,7 +498,7 @@
       "steps": {
         "openSettings": {
           "title": "Open Gmail",
-          "lead": "Click the ⚙ (top-right)",
+          "lead": "Click the ⚙",
           "menu1": "See all settings",
           "menu2": "Accounts and Import",
           "menu3": "Send mail as",
