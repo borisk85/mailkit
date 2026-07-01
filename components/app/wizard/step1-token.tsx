@@ -207,7 +207,7 @@ function ActiveStep({
             <Button
               type="button"
               size="sm"
-              className="w-full gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover sm:w-auto"
+              className="gap-1.5 bg-mk-accent text-white hover:bg-mk-accent-hover"
               onClick={onNext}
             >
               Done
@@ -313,7 +313,7 @@ export function Step1Token({
   ];
 
   return (
-    <div className="grid gap-0 md:grid-cols-2">
+    <div className="grid gap-y-6 md:grid-cols-2 md:gap-y-0">
       {/* ── Left column: instructions ─────────────────────────────────────── */}
       <div className="space-y-5 pr-8 md:border-r md:border-mk-border-subtle">
         <div>
