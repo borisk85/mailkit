@@ -88,7 +88,7 @@
       "manualBadge": "Your turn",
       "stepToken": {
         "title": "Create and paste your Cloudflare token",
-        "body": "A scoped API token. We show you exactly where to click, and that's what lets us set up your domain."
+        "body": "Takes a few minutes in your Cloudflare dashboard. We show you exactly where to click."
       },
       "step1": {
         "title": "Name your mailbox",
