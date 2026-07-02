@@ -51,7 +51,7 @@ export function ProblemSection() {
                 {tWithout("duration")}
               </span>
             </header>
-            <ul className="space-y-2.5">
+            <ul className="flex flex-1 flex-col justify-evenly gap-y-2.5">
               {withoutSteps.map((step) => (
                 <li
                   key={step}
