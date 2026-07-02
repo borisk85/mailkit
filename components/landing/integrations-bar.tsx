@@ -10,10 +10,9 @@ import { HiMail } from "react-icons/hi";
  * Gmail uses the official multi-color envelope SVG (Wikimedia Commons,
  * 2020 Google brand mark) since users recognize it visually.
  *
- * Layout: a flow diagram, not a logo strip — animated dashes run
- * Cloudflare → Postmark → Gmail (the mail's actual journey). Dashes
- * are horizontal on sm+ rows, vertical in the mobile column; static
- * under prefers-reduced-motion (see mk-flow-dash in globals.css).
+ * Layout: inline horizontal — label on the left, vertical divider,
+ * brand row on the right. Brand name labels are secondary-tone so
+ * they don't compete with the primary "Работает на" heading.
  */
 export function IntegrationsBar() {
   const t = useTranslations("landing.integrations");
@@ -22,15 +21,13 @@ export function IntegrationsBar() {
       aria-label={t("label")}
       className="w-full border-y border-mk-border-subtle bg-surface-elevated/40"
     >
-      <ul className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-y-4 px-4 py-10 sm:flex-row sm:gap-x-8 sm:gap-y-0 sm:px-6 sm:py-12">
+      <ul className="mx-auto flex max-w-6xl flex-col items-center justify-center gap-y-8 px-4 py-10 sm:flex-row sm:gap-x-16 sm:gap-y-0 sm:px-6 sm:py-12">
         <LogoItem name="Cloudflare">
           <SiCloudflare size={40} color="#F38020" aria-hidden />
         </LogoItem>
-        <FlowDash />
         <LogoItem name="Postmark">
           <HiMail size={40} color="#FFDE00" aria-hidden />
         </LogoItem>
-        <FlowDash />
         <LogoItem name="Gmail">
           <Image
             src="/brand/gmail.svg"
@@ -42,15 +39,6 @@ export function IntegrationsBar() {
         </LogoItem>
       </ul>
     </section>
-  );
-}
-
-function FlowDash() {
-  return (
-    <li aria-hidden className="flex items-center">
-      <span className="mk-flow-dash hidden h-0.5 w-14 sm:block" />
-      <span className="mk-flow-dash-v block h-9 w-0.5 sm:hidden" />
-    </li>
   );
 }
 

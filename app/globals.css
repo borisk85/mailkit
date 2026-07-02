@@ -524,45 +524,6 @@ html {
     }
   }
 
-  /* Integrations flow — dashes running Cloudflare → Postmark → Gmail.
-   * Painted area is a few px tall; static dashes under reduced-motion. */
-  .mk-flow-dash {
-    background-image: linear-gradient(
-      90deg,
-      color-mix(in srgb, var(--mk-accent) 60%, transparent) 0 6px,
-      transparent 6px 12px
-    );
-    background-size: 12px 100%;
-    background-repeat: repeat-x;
-  }
-  .mk-flow-dash-v {
-    background-image: linear-gradient(
-      180deg,
-      color-mix(in srgb, var(--mk-accent) 60%, transparent) 0 6px,
-      transparent 6px 12px
-    );
-    background-size: 100% 12px;
-    background-repeat: repeat-y;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .mk-flow-dash {
-      animation: mk-flow-dash 1.4s linear infinite;
-    }
-    .mk-flow-dash-v {
-      animation: mk-flow-dash-v 1.4s linear infinite;
-    }
-  }
-  @keyframes mk-flow-dash {
-    to {
-      background-position-x: 12px;
-    }
-  }
-  @keyframes mk-flow-dash-v {
-    to {
-      background-position-y: 12px;
-    }
-  }
-
   /* CTA shine — one-shot light sweep across the accent button on hover. */
   .mk-cta-shine {
     position: relative;
