@@ -92,7 +92,7 @@
       },
       "step1": {
         "title": "Name your mailbox",
-        "body": "Pick the address you want: hello@, sales@, anything. That's the mailbox we create on your domain."
+        "body": "Pick the address you want for your new mailbox. We create it on your domain."
       },
       "step2": {
         "title": "Automation does the setup",
