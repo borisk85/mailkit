@@ -12,6 +12,11 @@ import { LandingCtaButton } from "@/components/landing/landing-cta-button";
  * In one glance: "switch your From from gmail.com to yourdomain.com".
  * Decorative chrome (Inbox label, draft-saved indicator, dot menus) is
  * removed so the From rows are the only thing competing for attention.
+ *
+ * Liveliness pass: the From-stack plays an 8s CSS loop — the @gmail
+ * address gets struck out, then the custom rows light up and their
+ * Mailkit badges pop in. Pure CSS (opacity/transform), static final
+ * state under prefers-reduced-motion — see mk-hero-* in globals.css.
  */
 export function Hero() {
   const t = useTranslations("landing.hero");
@@ -48,7 +53,7 @@ export function Hero() {
           <div className="mt-2 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-x-6">
             <LandingCtaButton
               label={t("primaryCta")}
-              className="mk-cta-shadow mk-hover-lift group inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+              className="mk-cta-shadow mk-hover-lift mk-cta-shine group inline-flex h-[52px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
             />
             <a
               href="#how-it-works"
@@ -127,12 +132,14 @@ function GmailComposeMockup() {
             badgePrefix={t("fromCustomBadgePrefix")}
             badge={t("fromCustomBadge")}
             highlighted
+            sceneIndex={1}
           />
           <FromRow
             value={t("fromCustom2")}
             badgePrefix={t("fromCustomBadgePrefix")}
             badge={t("fromCustomBadge")}
             highlighted
+            sceneIndex={2}
           />
         </div>
 
@@ -174,20 +181,30 @@ function FromRow({
   badgePrefix,
   highlighted = false,
   muted = false,
+  sceneIndex,
 }: {
   value: string;
   badge: string;
   badgePrefix?: string;
   highlighted?: boolean;
   muted?: boolean;
+  sceneIndex?: 1 | 2;
 }) {
   if (highlighted) {
+    // Border/bg live on an opacity-animated overlay (not the row) so
+    // the "lights up" beat is compositor-only; base = always visible.
     return (
-      <div className="flex items-center justify-between rounded-md border border-mk-accent/40 bg-mk-accent/[0.06] px-3 py-2 ring-1 ring-mk-accent/20">
-        <span className="font-mono text-xs font-medium text-mk-text-primary">
+      <div className="relative flex items-center justify-between rounded-md px-3 py-2">
+        <span
+          aria-hidden
+          className={`mk-hero-glow-${sceneIndex} pointer-events-none absolute inset-0 rounded-md border border-mk-accent/40 bg-mk-accent/[0.06] ring-1 ring-mk-accent/20`}
+        />
+        <span className="relative font-mono text-xs font-medium text-mk-text-primary">
           {value}
         </span>
-        <span className="inline-flex items-center gap-1.5">
+        <span
+          className={`mk-hero-badge-${sceneIndex} relative inline-flex items-center gap-1.5`}
+        >
           {badgePrefix && (
             <span className="text-[10px] font-medium text-mk-text-tertiary">
               {badgePrefix}
@@ -205,11 +222,17 @@ function FromRow({
       <span
         className={
           muted
-            ? "font-mono text-xs text-mk-text-tertiary line-through"
+            ? "relative font-mono text-xs text-mk-text-tertiary"
             : "font-mono text-xs text-mk-text-secondary"
         }
       >
         {value}
+        {muted && (
+          <span
+            aria-hidden
+            className="mk-hero-strike absolute inset-x-0 top-1/2 h-px bg-current"
+          />
+        )}
       </span>
       <span className="inline-flex items-center gap-1 text-[10px] font-medium text-mk-text-tertiary">
         <Check className="size-3" aria-hidden />

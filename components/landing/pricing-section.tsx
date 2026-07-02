@@ -26,7 +26,7 @@ export function PricingSection() {
   return (
     <section id="pricing" className="w-full" aria-labelledby="pricing-heading">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-30 lg:py-32">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+        <div className="mk-scroll-reveal mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
           <h2
             id="pricing-heading"
@@ -39,8 +39,17 @@ export function PricingSection() {
           </p>
         </div>
 
-        <div className="mx-auto mt-16 max-w-[480px]">
-          <article className="flex flex-col gap-6 rounded-[20px] border-2 border-mk-border-strong bg-surface-elevated-2 p-10 mk-card-shadow-strong">
+        <div className="mk-scroll-reveal relative mx-auto mt-16 max-w-[480px]">
+          <div
+            aria-hidden
+            className="pointer-events-none absolute -inset-8 -z-10 rounded-[3rem]"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 40%, rgba(124,92,255,0.14), transparent 70%)",
+              filter: "blur(12px)",
+            }}
+          />
+          <article className="mk-pricing-card flex flex-col gap-6 rounded-[20px] p-10 mk-card-shadow-strong">
             <span className="mk-eyebrow text-mk-text-tertiary">
               {t("badge")}
             </span>
@@ -72,7 +81,7 @@ export function PricingSection() {
 
             <LandingCtaButton
               label={t("cta")}
-              className="mk-cta-shadow mk-hover-lift inline-flex h-[52px] w-full items-center justify-center rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+              className="mk-cta-shadow mk-hover-lift mk-cta-shine inline-flex h-[52px] w-full items-center justify-center rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
             />
 
             <p className="mk-caption text-center text-mk-text-tertiary">

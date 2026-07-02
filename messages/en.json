@@ -103,8 +103,8 @@
       },
       "step3": {
         "title": "DNS verification (DKIM)",
-        "time": "~5–30 min",
-        "body": "Your DKIM records propagate and we verify them in the background — this is the longest part, usually 5–30 minutes. You can close the tab; we keep checking."
+        "time": "~16 min",
+        "body": "Your DKIM records propagate and we verify them in the background — this is the longest part, usually about 16 minutes. You can close the tab; we keep checking."
       },
       "step4": {
         "title": "Gmail Send-As",
@@ -176,7 +176,7 @@
         {
           "id": "timing",
           "q": "How long does it take?",
-          "a": "10 minutes of your active work, plus 5–30 minutes of background DKIM verification. Total ~30 minutes from start to first sent email."
+          "a": "10 minutes of your active work, plus about 16 minutes of background DKIM verification. Total ~30 minutes from start to first sent email."
         },
         {
           "id": "no-tech-skills",

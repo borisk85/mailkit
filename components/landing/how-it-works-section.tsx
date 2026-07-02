@@ -1,5 +1,13 @@
 import { useTranslations } from "next-intl";
 
+/**
+ * How it works — vertical timeline (replaced the 5-narrow-cards grid).
+ * A 5-step process with wildly different durations reads as a journey,
+ * not a card gallery: left rail carries the step number + a connector
+ * that "draws" itself on scroll (CSS scroll-driven animation, static
+ * line where unsupported), right side gives each step a full-width row
+ * so the long DKIM step no longer distorts the layout.
+ */
 export function HowItWorksSection() {
   const t = useTranslations("landing.howItWorks");
 
@@ -14,11 +22,20 @@ export function HowItWorksSection() {
   return (
     <section
       id="how-it-works"
-      className="w-full overflow-hidden"
+      className="relative w-full overflow-hidden"
       aria-labelledby="how-it-works-heading"
     >
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[520px]"
+        style={{
+          background:
+            "radial-gradient(ellipse 700px 360px at 50% 0%, rgba(124,92,255,0.08), transparent 70%)",
+        }}
+      />
+
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-30 lg:px-8 lg:py-32">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+        <div className="mk-scroll-reveal mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
           <h2
             id="how-it-works-heading"
@@ -31,9 +48,9 @@ export function HowItWorksSection() {
           </p>
         </div>
 
-        <ol className="mt-16 grid gap-6 sm:grid-cols-2 lg:grid-cols-5">
-          {steps.map(({ key, number, automated }) => (
-            <StepCard
+        <ol className="mx-auto mt-16 flex max-w-3xl flex-col">
+          {steps.map(({ key, number, automated }, i) => (
+            <TimelineStep
               key={key}
               number={number}
               title={t(`${key}.title`)}
@@ -42,6 +59,7 @@ export function HowItWorksSection() {
               automated={automated}
               automatedLabel={t("automatedBadge")}
               manualLabel={t("manualBadge")}
+              isLast={i === steps.length - 1}
             />
           ))}
         </ol>
@@ -50,7 +68,7 @@ export function HowItWorksSection() {
   );
 }
 
-function StepCard({
+function TimelineStep({
   number,
   title,
   time,
@@ -58,6 +76,7 @@ function StepCard({
   automated,
   automatedLabel,
   manualLabel,
+  isLast,
 }: {
   number: string;
   title: string;
@@ -66,37 +85,49 @@ function StepCard({
   automated: boolean;
   automatedLabel: string;
   manualLabel: string;
+  isLast: boolean;
 }) {
   return (
-    <li className="mk-hover-lift relative flex flex-col gap-4 overflow-hidden rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
-      <span
-        aria-hidden
-        className="pointer-events-none absolute right-4 top-3 select-none font-mono text-5xl font-bold leading-none text-mk-accent/10"
-      >
-        {number}
-      </span>
-      <div className="flex items-center justify-between">
+    <li className="mk-scroll-reveal relative grid grid-cols-[2.5rem_1fr] gap-x-5 sm:grid-cols-[3rem_1fr] sm:gap-x-8">
+      <div aria-hidden className="flex flex-col items-center">
         <span
-          className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold"
+          className="flex size-10 shrink-0 select-none items-center justify-center rounded-full border bg-surface-elevated font-mono text-sm font-semibold sm:size-12"
           style={{
-            backgroundColor: automated
-              ? "rgba(124, 92, 255, 0.12)"
-              : "rgba(34, 197, 94, 0.12)",
+            borderColor: automated
+              ? "color-mix(in srgb, var(--mk-accent) 45%, transparent)"
+              : "color-mix(in srgb, var(--mk-success) 45%, transparent)",
             color: automated ? "var(--mk-accent)" : "var(--mk-success)",
           }}
         >
-          {automated ? automatedLabel : manualLabel}
+          {number}
         </span>
+        {!isLast && <span className="mk-timeline-segment my-2 w-px flex-1" />}
       </div>
 
-      <div className="flex flex-col gap-3">
-        <span className="mk-caption font-mono text-mk-accent">{time}</span>
+      <div
+        className={`flex flex-col gap-2.5 pt-1.5 sm:pt-2.5 ${isLast ? "" : "pb-12"}`}
+      >
+        <div className="flex flex-wrap items-center gap-3">
+          <span
+            className="inline-flex items-center rounded-full px-2.5 py-1 text-[11px] font-semibold"
+            style={{
+              backgroundColor: automated
+                ? "rgba(124, 92, 255, 0.12)"
+                : "rgba(34, 197, 94, 0.12)",
+              color: automated ? "var(--mk-accent)" : "var(--mk-success)",
+            }}
+          >
+            {automated ? automatedLabel : manualLabel}
+          </span>
+          <span className="mk-caption font-mono text-mk-accent">{time}</span>
+        </div>
+
         <h3 className="text-lg font-semibold leading-snug tracking-tight text-mk-text-primary">
           {title}
         </h3>
-      </div>
 
-      <p className="mk-body-small text-mk-text-secondary">{body}</p>
+        <p className="mk-body max-w-2xl text-mk-text-secondary">{body}</p>
+      </div>
     </li>
   );
 }

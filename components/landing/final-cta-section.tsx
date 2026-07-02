@@ -29,7 +29,7 @@ export function FinalCtaSection() {
         }}
       />
 
-      <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 sm:py-30 lg:py-32">
+      <div className="mk-scroll-reveal mx-auto flex max-w-3xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 sm:py-30 lg:py-32">
         <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
         <h2 className="mk-display-1 text-balance text-mk-text-primary">
           {t("heading")}
@@ -41,7 +41,7 @@ export function FinalCtaSection() {
         <div className="mt-4 flex flex-wrap items-center justify-center gap-x-8 gap-y-3">
           <LandingCtaButton
             label={t("primaryCta")}
-            className="mk-cta-shadow mk-hover-lift group inline-flex h-[60px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-9 text-lg font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+            className="mk-cta-shadow mk-hover-lift mk-cta-shine group inline-flex h-[60px] items-center justify-center gap-2 rounded-[10px] bg-mk-accent px-9 text-lg font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
           />
           <Link
             href="/guarantee"

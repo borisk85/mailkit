@@ -453,4 +453,275 @@ html {
       transform: none;
     }
   }
+
+  /* ── Liveliness pass (2026-07) ─────────────────────────────────────
+   * Everything below is transform/opacity-only (compositor-friendly),
+   * zero JS. Scroll-driven pieces are progressive enhancements behind
+   * `@supports (animation-timeline: view())` — browsers without it get
+   * the static design. All loops respect prefers-reduced-motion. */
+
+  /* How-it-works timeline rail. Base = faint static line; with CSS
+   * scroll-driven animations the accent overlay "draws" itself as the
+   * segment scrolls into view. */
+  .mk-timeline-segment {
+    position: relative;
+    overflow: hidden;
+    border-radius: 9999px;
+    background: color-mix(in srgb, var(--mk-accent) 16%, transparent);
+  }
+  .mk-timeline-segment::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: color-mix(in srgb, var(--mk-accent) 55%, transparent);
+    transform-origin: top;
+  }
+  @supports (animation-timeline: view()) {
+    .mk-timeline-segment::after {
+      animation: mk-timeline-draw linear both;
+      animation-timeline: view();
+      animation-range: entry 20% cover 55%;
+    }
+  }
+  @keyframes mk-timeline-draw {
+    from {
+      transform: scaleY(0);
+    }
+    to {
+      transform: scaleY(1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .mk-timeline-segment::after {
+      animation: none;
+    }
+  }
+
+  /* Scroll reveal — scroll-driven variant of mk-reveal. Never applied
+   * to the hero (LCP must paint immediately). `-group` staggers direct
+   * children via offset ranges (visible for same-row grid items). */
+  @supports (animation-timeline: view()) {
+    .mk-scroll-reveal,
+    .mk-scroll-reveal-group > * {
+      animation: mk-reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 10% entry 50%;
+    }
+    .mk-scroll-reveal-group > *:nth-child(2) {
+      animation-range: entry 18% entry 58%;
+    }
+    .mk-scroll-reveal-group > *:nth-child(3) {
+      animation-range: entry 26% entry 66%;
+    }
+    .mk-scroll-reveal-group > *:nth-child(n + 4) {
+      animation-range: entry 34% entry 74%;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .mk-scroll-reveal,
+      .mk-scroll-reveal-group > * {
+        animation: none;
+      }
+    }
+  }
+
+  /* Integrations flow — dashes running Cloudflare → Postmark → Gmail.
+   * Painted area is a few px tall; static dashes under reduced-motion. */
+  .mk-flow-dash {
+    background-image: linear-gradient(
+      90deg,
+      color-mix(in srgb, var(--mk-accent) 60%, transparent) 0 6px,
+      transparent 6px 12px
+    );
+    background-size: 12px 100%;
+    background-repeat: repeat-x;
+  }
+  .mk-flow-dash-v {
+    background-image: linear-gradient(
+      180deg,
+      color-mix(in srgb, var(--mk-accent) 60%, transparent) 0 6px,
+      transparent 6px 12px
+    );
+    background-size: 100% 12px;
+    background-repeat: repeat-y;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mk-flow-dash {
+      animation: mk-flow-dash 1.4s linear infinite;
+    }
+    .mk-flow-dash-v {
+      animation: mk-flow-dash-v 1.4s linear infinite;
+    }
+  }
+  @keyframes mk-flow-dash {
+    to {
+      background-position-x: 12px;
+    }
+  }
+  @keyframes mk-flow-dash-v {
+    to {
+      background-position-y: 12px;
+    }
+  }
+
+  /* CTA shine — one-shot light sweep across the accent button on hover. */
+  .mk-cta-shine {
+    position: relative;
+    overflow: hidden;
+  }
+  .mk-cta-shine::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: -35%;
+    width: 35%;
+    background: linear-gradient(
+      105deg,
+      transparent,
+      rgba(255, 255, 255, 0.28),
+      transparent
+    );
+    transform: translateX(-120%) skewX(-16deg);
+    pointer-events: none;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mk-cta-shine:hover::after {
+      animation: mk-cta-shine 700ms ease-out;
+    }
+  }
+  @keyframes mk-cta-shine {
+    to {
+      transform: translateX(520%) skewX(-16deg);
+    }
+  }
+
+  /* Pricing card — accent gradient border (padding-box/border-box
+   * two-layer trick). The one card on the page that carries money. */
+  .mk-pricing-card {
+    border: 2px solid transparent;
+    background:
+      linear-gradient(var(--surface-elevated-2), var(--surface-elevated-2))
+        padding-box,
+      linear-gradient(
+          150deg,
+          color-mix(in srgb, var(--mk-accent) 60%, transparent),
+          color-mix(in srgb, var(--mk-accent) 12%, transparent) 45%,
+          color-mix(in srgb, var(--mk-accent) 45%, transparent)
+        )
+        border-box;
+  }
+
+  /* Hero mockup scene — 8s loop telling the product story: the @gmail
+   * address gets struck out, then the custom-domain rows light up and
+   * their Mailkit badges pop in. Base styles = the final (static)
+   * state, so no-animation contexts render the pre-loop design. */
+  .mk-hero-strike {
+    transform-origin: left center;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mk-hero-strike {
+      animation: mk-hero-strike 8s ease-in-out infinite;
+    }
+    .mk-hero-glow-1 {
+      animation: mk-hero-glow-1 8s linear infinite;
+    }
+    .mk-hero-glow-2 {
+      animation: mk-hero-glow-2 8s linear infinite;
+    }
+    .mk-hero-badge-1 {
+      animation: mk-hero-badge-1 8s ease infinite;
+    }
+    .mk-hero-badge-2 {
+      animation: mk-hero-badge-2 8s ease infinite;
+    }
+  }
+  @keyframes mk-hero-strike {
+    0%,
+    8% {
+      transform: scaleX(0);
+      opacity: 1;
+    }
+    18% {
+      transform: scaleX(1);
+    }
+    90% {
+      transform: scaleX(1);
+      opacity: 1;
+    }
+    97%,
+    100% {
+      transform: scaleX(1);
+      opacity: 0;
+    }
+  }
+  @keyframes mk-hero-glow-1 {
+    0%,
+    24% {
+      opacity: 0;
+    }
+    32%,
+    88% {
+      opacity: 1;
+    }
+    96%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes mk-hero-glow-2 {
+    0%,
+    36% {
+      opacity: 0;
+    }
+    44%,
+    88% {
+      opacity: 1;
+    }
+    96%,
+    100% {
+      opacity: 0;
+    }
+  }
+  @keyframes mk-hero-badge-1 {
+    0%,
+    26% {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    33% {
+      opacity: 1;
+      transform: scale(1.08);
+    }
+    37%,
+    88% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    96%,
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
+  @keyframes mk-hero-badge-2 {
+    0%,
+    38% {
+      opacity: 0;
+      transform: scale(0.6);
+    }
+    45% {
+      opacity: 1;
+      transform: scale(1.08);
+    }
+    49%,
+    88% {
+      opacity: 1;
+      transform: scale(1);
+    }
+    96%,
+    100% {
+      opacity: 0;
+      transform: scale(1);
+    }
+  }
 }

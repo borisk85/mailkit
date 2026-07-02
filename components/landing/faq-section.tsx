@@ -21,7 +21,7 @@ export function FaqSection({
   return (
     <section id="faq" className="w-full" aria-labelledby="faq-heading">
       <div className="mx-auto max-w-3xl px-4 py-20 sm:px-6 sm:py-30 lg:py-32">
-        <div className="mx-auto flex flex-col items-center gap-6 text-center">
+        <div className="mk-scroll-reveal mx-auto flex flex-col items-center gap-6 text-center">
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
           <h2
             id="faq-heading"
@@ -31,7 +31,7 @@ export function FaqSection({
           </h2>
         </div>
 
-        <Accordion className="mt-16 flex w-full flex-col gap-2">
+        <Accordion className="mk-scroll-reveal-group mt-16 flex w-full flex-col gap-2">
           {displayed.map((item) => (
             <AccordionItem
               key={item.id}

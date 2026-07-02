@@ -22,7 +22,7 @@ export function ProblemSection() {
   return (
     <section id="problem" className="w-full" aria-labelledby="problem-heading">
       <div className="mx-auto max-w-6xl px-4 py-20 sm:px-6 sm:py-30 lg:py-32">
-        <div className="mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
+        <div className="mk-scroll-reveal mx-auto flex max-w-3xl flex-col items-center gap-6 text-center">
           <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
           <h2
             id="problem-heading"
@@ -35,7 +35,7 @@ export function ProblemSection() {
           </p>
         </div>
 
-        <div className="mt-16 grid items-stretch gap-6 lg:grid-cols-2 lg:gap-8">
+        <div className="mk-scroll-reveal-group mt-16 grid items-stretch gap-6 lg:grid-cols-2 lg:gap-8">
           <article className="flex h-full flex-col gap-6 rounded-2xl border border-mk-border-subtle bg-surface-elevated p-8 mk-card-shadow">
             <header className="flex items-baseline justify-between gap-4">
               <div className="flex items-center gap-2.5">
