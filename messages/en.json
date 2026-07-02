@@ -31,9 +31,9 @@
       }
     },
     "hero": {
-      "headlineLine1": "Professional email on your domain",
+      "headlineLine1": "Professional email on your Cloudflare domain",
       "headlineLine2": "in 30 minutes — no tech skills needed.",
-      "subhead": "Domain on Cloudflare? We set up receiving, sending, and Gmail Send-As — built to reach the inbox, not spam. You finish in your regular Gmail, guided every step.",
+      "subhead": "You start with a Cloudflare token and finish in your regular Gmail — both guided. We automate everything technical in between: routing, SMTP, DKIM. Built to reach the inbox, not spam.",
       "guaranteeLink": "see policy",
       "microcopy": "Requires Cloudflare DNS.",
       "migrationHint": "Open Cloudflare migration guide",
@@ -135,7 +135,8 @@
         "steps": [
           "Sign in with Google",
           "Paste Cloudflare API token",
-          "Watch automation run (~30 sec)",
+          "Watch automation run (~2 min)",
+          "DKIM verifies in the background (~16 min) — you can close the tab",
           "Add to Gmail (3 minutes)",
           "Built to land in the inbox, not the spam folder",
           "Your branded email is ready"
@@ -243,7 +244,7 @@
     "finalCta": {
       "eyebrow": "Ready",
       "heading": "30 minutes from now, you'll have email on your Cloudflare domain.",
-      "subhead": "Or your money back, automatically. No tickets, no calls, no questions.",
+      "subhead": "Or your money back — automatic if setup fails, one email otherwise. No calls, no questions.",
       "primaryCta": "Set up email",
       "secondaryCta": "Read the guarantee first"
     },
