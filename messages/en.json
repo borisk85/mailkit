@@ -114,8 +114,8 @@
     },
     "problem": {
       "eyebrow": "The problem",
-      "heading": "Setting up email on your own domain takes about an hour.",
-      "subhead": "Finding a current guide, navigating three different dashboards, and knowing which field gets what — that's where most people get stuck.",
+      "heading": "Setting up email on your own domain takes about an hour — if nothing goes wrong.",
+      "subhead": "You can do it yourself for free — find a current guide, navigate three different dashboards, know which field gets what. That's where most people get stuck.",
       "without": {
         "title": "Manual setup",
         "duration": "60–90 min manual",
