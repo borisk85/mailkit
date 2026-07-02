@@ -50,6 +50,12 @@ export function Header() {
             {t("nav.pricing")}
           </NavAnchor>
           <NavAnchor
+            sectionId="trust"
+            className="text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
+          >
+            {t("nav.guarantees")}
+          </NavAnchor>
+          <NavAnchor
             sectionId="faq"
             className="text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
           >
