@@ -83,7 +83,7 @@
     "howItWorks": {
       "eyebrow": "How it works",
       "heading": "Five steps. Guided all the way.",
-      "subheading": "You paste your Cloudflare token, name your mailbox, and add four lines to Gmail — automation does the rest.",
+      "subheading": "Nothing technical on your side — the wizard walks you through every screen.",
       "automatedBadge": "Automated",
       "manualBadge": "Your turn",
       "stepToken": {
