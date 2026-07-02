@@ -142,12 +142,12 @@
       "heading": "We refund first, ask questions later.",
       "subhead": "Two clear guarantees, written in plain language.",
       "automation": {
-        "title": "Automation failure",
+        "title": "If our setup fails",
         "body": "If our automated setup fails on our end (Cloudflare or Postmark phase), you get a full refund within 24 hours. Automatic. No request needed.",
         "badge": "Auto-refund"
       },
       "functional": {
-        "title": "30-day functional",
+        "title": "If email doesn't work",
         "body": "If within 30 days you can't actually send email through your domain (even after our support), you get a full refund on request. Just email us.",
         "badge": "30-day"
       },
