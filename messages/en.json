@@ -100,7 +100,7 @@
       },
       "step3": {
         "title": "Verification runs in the background",
-        "body": "Your DKIM records propagate and we verify them in the background — this is the longest part. You can close the tab; we keep checking."
+        "body": "Your DKIM records propagate and we verify them in the background. This is the longest part. You can close the tab; we keep checking and will let you know."
       },
       "step4": {
         "title": "Gmail Send-As",
