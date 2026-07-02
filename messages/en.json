@@ -96,11 +96,11 @@
       },
       "step2": {
         "title": "Automation does the setup",
-        "body": "We turn on email routing, provision SMTP, and add the DNS records. You just watch it run."
+        "body": "We turn on email routing, provision SMTP, and add the DNS records."
       },
       "step3": {
         "title": "Verification runs in the background",
-        "body": "Your DKIM records propagate and we verify them in the background. This is the longest part. You can close the tab. We keep checking and will let you know."
+        "body": "Your DKIM records propagate and we verify them in the background. You can close the tab. We keep checking and will let you know."
       },
       "step4": {
         "title": "Gmail Send-As",
