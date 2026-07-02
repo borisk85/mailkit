@@ -50,13 +50,13 @@ export function PricingSection() {
             }}
           />
           <article className="mk-pricing-card flex flex-col gap-6 rounded-[20px] p-10 mk-card-shadow-strong">
-            <div className="flex items-baseline gap-3">
+            <div>
               <span className="mk-display-1 text-mk-text-primary">
                 {t("price")}
               </span>
-              <span className="mk-body-large text-mk-text-tertiary">
+              <p className="mk-body-small mt-1 text-mk-text-tertiary">
                 {t("priceUnit")}
-              </span>
+              </p>
             </div>
 
             <div className="h-px w-full bg-mk-border-subtle" />
