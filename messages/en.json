@@ -131,10 +131,8 @@
       "with": {
         "title": "Automated",
         "duration": "~30 min",
-        "tokenHint": "How to create your API token in Cloudflare dashboard",
         "steps": [
-          "Sign in with Google",
-          "Paste Cloudflare API token",
+          "Create and paste Cloudflare API token",
           "Watch automation run (~2 min)",
           "DKIM verifies in the background (~16 min) — you can close the tab",
           "Add to Gmail (3 minutes)",

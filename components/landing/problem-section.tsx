@@ -1,5 +1,5 @@
 import { useTranslations } from "next-intl";
-import { Check, HelpCircle, Rocket, Wrench } from "lucide-react";
+import { Check, Rocket, Wrench, X } from "lucide-react";
 
 /**
  * Problem section — premium-pass refresh per UI_REVIEW_BRIEF §2.5.
@@ -57,8 +57,8 @@ export function ProblemSection() {
                   key={step}
                   className="flex items-start gap-3 px-2 py-1.5 text-mk-text-tertiary"
                 >
-                  <span
-                    className="mt-2 size-1 shrink-0 rounded-full bg-mk-text-tertiary"
+                  <X
+                    className="mt-1 size-4 shrink-0 text-mk-text-tertiary"
                     aria-hidden
                   />
                   <span className="mk-body-small">{step}</span>
@@ -83,27 +83,14 @@ export function ProblemSection() {
               </span>
             </header>
             <ul className="space-y-2.5">
-              {withSteps.map((step, i) => (
+              {withSteps.map((step) => (
                 <li key={step} className="flex items-start gap-3 px-2 py-1.5">
                   <Check
                     className="mt-1 size-4 shrink-0 text-mk-accent"
                     aria-hidden
                   />
-                  <span className="inline-flex items-start gap-1">
-                    <span className="mk-body-small text-mk-text-primary/85">
-                      {step}
-                    </span>
-                    {i === 1 && (
-                      <span
-                        className="group relative mt-0.5 shrink-0 inline-flex cursor-default"
-                        aria-label={tWith("tokenHint")}
-                      >
-                        <HelpCircle className="size-3.5 text-mk-text-tertiary transition-colors group-hover:text-mk-accent" />
-                        <span className="pointer-events-none absolute bottom-full right-0 z-10 mb-2 w-52 rounded-lg border border-mk-border-subtle bg-surface-elevated-2 px-3 py-2 text-xs text-mk-text-secondary opacity-0 shadow-lg transition-opacity group-hover:opacity-100">
-                          {tWith("tokenHint")}
-                        </span>
-                      </span>
-                    )}
+                  <span className="mk-body-small text-mk-text-primary/85">
+                    {step}
                   </span>
                 </li>
               ))}
