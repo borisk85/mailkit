@@ -50,10 +50,6 @@ export function PricingSection() {
             }}
           />
           <article className="mk-pricing-card flex flex-col gap-6 rounded-[20px] p-10 mk-card-shadow-strong">
-            <span className="mk-eyebrow text-mk-text-tertiary">
-              {t("badge")}
-            </span>
-
             <div className="flex items-baseline gap-3">
               <span className="mk-display-1 text-mk-text-primary">
                 {t("price")}
@@ -89,10 +85,10 @@ export function PricingSection() {
             </p>
           </article>
 
-          <p className="mk-caption mt-3 text-center text-mk-text-tertiary">
+          <p className="mk-caption mt-3 text-center">
             <a
               href="#faq"
-              className="underline-offset-4 hover:text-mk-text-secondary hover:underline"
+              className="font-medium text-mk-accent underline-offset-4 hover:underline"
             >
               {t("faqLink")}
             </a>
