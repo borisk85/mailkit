@@ -100,7 +100,7 @@
       },
       "step3": {
         "title": "Waiting for confirmation",
-        "body": "Your DKIM records propagate and we verify them in the background. You can close the tab. We keep checking and will let you know."
+        "body": "Your DKIM records propagate and we verify them in the background. You can close the tab. We'll email you when it's done."
       },
       "step4": {
         "title": "Gmail Send-As",
