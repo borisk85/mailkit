@@ -139,8 +139,8 @@
     },
     "trust": {
       "eyebrow": "Guarantees",
-      "heading": "We refund first, ask questions later.",
-      "subhead": "Two clear guarantees, written in plain language.",
+      "heading": "Money back, no drama.",
+      "subhead": "Your $5 is covered either way.",
       "automation": {
         "title": "If our setup fails",
         "body": "If our automated setup fails on our end (Cloudflare or Postmark phase), you get a full refund within 24 hours. Automatic. No request needed.",
