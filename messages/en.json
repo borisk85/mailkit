@@ -130,7 +130,7 @@
       },
       "with": {
         "title": "Automated",
-        "duration": "30 min",
+        "duration": "~30 min",
         "tokenHint": "How to create your API token in Cloudflare dashboard",
         "steps": [
           "Sign in with Google",
