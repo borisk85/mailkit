@@ -99,7 +99,7 @@
         "body": "We turn on email routing, provision SMTP, and add the DNS records."
       },
       "step3": {
-        "title": "Verification runs in the background",
+        "title": "Waiting for confirmation",
         "body": "Your DKIM records propagate and we verify them in the background. You can close the tab. We keep checking and will let you know."
       },
       "step4": {
