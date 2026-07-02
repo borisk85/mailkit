@@ -13,7 +13,7 @@ export function HowItWorksSection() {
 
   const steps = [
     { key: "stepToken", number: "01", automated: false },
-    { key: "step1", number: "02", automated: true },
+    { key: "step1", number: "02", automated: false },
     { key: "step2", number: "03", automated: true },
     { key: "step3", number: "04", automated: true },
     { key: "step4", number: "05", automated: false },

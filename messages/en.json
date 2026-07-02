@@ -87,22 +87,22 @@
       "automatedBadge": "Automated",
       "manualBadge": "Your turn",
       "stepToken": {
-        "title": "Paste your Cloudflare token",
+        "title": "Create and paste your Cloudflare token",
         "time": "~5 min",
-        "body": "You create a scoped API token in Cloudflare — we show you exactly how — and paste it in. That's what lets us set up your domain."
+        "body": "A scoped API token — we show you exactly where to click. That's what lets us set up your domain."
       },
       "step1": {
-        "title": "Cloudflare Email Routing",
+        "title": "Name your mailbox",
         "time": "~1 min",
-        "body": "We turn on email routing for your domain and add the records that let it receive mail."
+        "body": "Pick the address you want — hello@, sales@, anything. That's the mailbox we create on your domain."
       },
       "step2": {
-        "title": "Postmark SMTP setup",
-        "time": "~60 sec",
-        "body": "We provision Postmark and add DNS records for you."
+        "title": "Automation does the setup",
+        "time": "~2 min",
+        "body": "We turn on email routing, provision SMTP, and add the DNS records — you just watch it run."
       },
       "step3": {
-        "title": "DNS verification (DKIM)",
+        "title": "Verification runs in the background",
         "time": "~16 min",
         "body": "Your DKIM records propagate and we verify them in the background — this is the longest part, usually about 16 minutes. You can close the tab; we keep checking."
       },
