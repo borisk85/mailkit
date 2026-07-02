@@ -70,7 +70,7 @@
         "Cloudflare Email Routing setup",
         "Postmark SMTP setup (sender verification, DKIM signature, SPF, DMARC)",
         "Step-by-step Gmail Send-As walkthrough",
-        "One address on your domain — add more for $5 each",
+        "One address on your domain. Add more for $5 each",
         "30-day money-back guarantee",
         "Automatic refund if our setup fails"
       ],
@@ -88,23 +88,23 @@
       "manualBadge": "Your turn",
       "stepToken": {
         "title": "Create and paste your Cloudflare token",
-        "body": "A scoped API token — we show you exactly where to click. That's what lets us set up your domain."
+        "body": "A scoped API token. We show you exactly where to click, and that's what lets us set up your domain."
       },
       "step1": {
         "title": "Name your mailbox",
-        "body": "Pick the address you want — hello@, sales@, anything. That's the mailbox we create on your domain."
+        "body": "Pick the address you want: hello@, sales@, anything. That's the mailbox we create on your domain."
       },
       "step2": {
         "title": "Automation does the setup",
-        "body": "We turn on email routing, provision SMTP, and add the DNS records — you just watch it run."
+        "body": "We turn on email routing, provision SMTP, and add the DNS records. You just watch it run."
       },
       "step3": {
         "title": "Verification runs in the background",
-        "body": "Your DKIM records propagate and we verify them in the background. This is the longest part. You can close the tab; we keep checking and will let you know."
+        "body": "Your DKIM records propagate and we verify them in the background. This is the longest part. You can close the tab. We keep checking and will let you know."
       },
       "step4": {
         "title": "Gmail Send-As",
-        "body": "We hand you four lines — server, port, login, password — and walk you through pasting them into Gmail. Gmail then sends a confirmation link, you click it, done."
+        "body": "We hand you four lines and walk you through pasting them into Gmail. Click the confirmation link it sends, and you're done."
       }
     },
     "problem": {
@@ -144,12 +144,12 @@
       "subhead": "Two clear guarantees, written in plain language.",
       "automation": {
         "title": "Automation failure",
-        "body": "If our automated setup fails on our end (Cloudflare or Postmark phase) — full refund within 24 hours. Automatic. No request needed.",
+        "body": "If our automated setup fails on our end (Cloudflare or Postmark phase), you get a full refund within 24 hours. Automatic. No request needed.",
         "badge": "Auto-refund"
       },
       "functional": {
         "title": "30-day functional",
-        "body": "If within 30 days you can't actually send email through your domain — even after our support — full refund on request. Just email us.",
+        "body": "If within 30 days you can't actually send email through your domain (even after our support), you get a full refund on request. Just email us.",
         "badge": "30-day"
       },
       "policyLinkLabel": "Read full policy →"
@@ -167,7 +167,7 @@
         {
           "id": "smtp-dependency",
           "q": "What if MailKit shuts down?",
-          "a": "Your domain, DNS records, Cloudflare Email Routing, and Gmail Send-As are yours forever — they live on your accounts, not ours. The only piece tied to our infrastructure is the SMTP relay (Postmark). If we ever close, we give you 90 days notice plus a step-by-step guide to migrate the SMTP relay to your own Postmark or alternative provider account. No lock-in."
+          "a": "Your domain, DNS records, Cloudflare Email Routing, and Gmail Send-As are yours forever. They live on your accounts, not ours. The only piece tied to our infrastructure is the SMTP relay (Postmark). If we ever close, we give you 90 days notice plus a step-by-step guide to migrate the SMTP relay to your own Postmark or alternative provider account. No lock-in."
         },
         {
           "id": "timing",
@@ -182,32 +182,32 @@
         {
           "id": "wont-break-site",
           "q": "Will this break my website?",
-          "a": "No. Email configuration doesn't touch your website settings. Email and web run on different DNS records — we only modify the ones needed for email."
+          "a": "No. Email configuration doesn't touch your website settings. Email and web run on different DNS records, and we only modify the ones needed for email."
         },
         {
           "id": "cost",
           "q": "Do I have to keep paying every month?",
-          "a": "No. MailKit is a one-time $5 fee per mailbox — no subscription, no recurring charges. That covers the full automated setup: Cloudflare Email Routing for receiving, Postmark SMTP for sending, and the step-by-step Gmail Send-As walkthrough. Compared to Google Workspace at $6/user/month ($72 a year per mailbox), MailKit is a one-and-done payment."
+          "a": "No. MailKit is a one-time $5 fee per mailbox: no subscription, no recurring charges. That covers the full automated setup: Cloudflare Email Routing for receiving, Postmark SMTP for sending, and the step-by-step Gmail Send-As walkthrough. Compared to Google Workspace at $6/user/month ($72 a year per mailbox), MailKit is a one-and-done payment."
         },
         {
           "id": "duration",
           "q": "Can I do this myself for free?",
-          "a": "Yes — but expect an evening of documentation and wrong turns. You'd navigate Cloudflare Email Routing, Postmark SMTP configuration, five DNS records (MX, SPF, DKIM, DMARC, DKIM verification), and the Gmail Send-As setup — each requiring its own guide, its own dashboard, and a wait to see if the change took effect. MailKit automates the Postmark piece — the most technically involved part — and guides you step by step through the rest."
+          "a": "Yes, but expect an evening of documentation and wrong turns. You'd navigate Cloudflare Email Routing, Postmark SMTP configuration, five DNS records (MX, SPF, DKIM, DMARC, DKIM verification), and the Gmail Send-As setup, each requiring its own guide, its own dashboard, and a wait to see if the change took effect. MailKit automates the Postmark piece (the most technically involved part) and guides you step by step through the rest."
         },
         {
           "id": "vs-workspace",
           "q": "How is this different from Google Workspace?",
-          "a": "Google Workspace gives you a separate inbox at $6/user/month forever — a new mailbox to check, a separate password, full migration if you stop paying. MailKit configures your existing Gmail to send and receive from your domain via Gmail Send-As. Same Gmail inbox, no migration, no monthly fee. The trade-off: with MailKit your domain email lives inside your personal Gmail, not in a Workspace tenant."
+          "a": "Google Workspace gives you a separate inbox at $6/user/month forever: a new mailbox to check, a separate password, full migration if you stop paying. MailKit configures your existing Gmail to send and receive from your domain via Gmail Send-As. Same Gmail inbox, no migration, no monthly fee. The trade-off: with MailKit your domain email lives inside your personal Gmail, not in a Workspace tenant."
         },
         {
           "id": "fail",
           "q": "What happens if the setup fails halfway?",
-          "a": "If our Cloudflare or Postmark automation fails, we issue an automatic full refund within 24 hours. The dashboard shows you which step failed and why. If you'd like to retry once we've fixed our side, we'll let you know — no extra charge if the failure was on our end."
+          "a": "If our Cloudflare or Postmark automation fails, we issue an automatic full refund within 24 hours. The dashboard shows you which step failed and why. If you'd like to retry once we've fixed our side, we'll let you know. No extra charge if the failure was on our end."
         },
         {
           "id": "manual-step",
           "q": "Why doesn't Mailkit fully automate the Gmail step?",
-          "a": "The Gmail API method that adds Send-As entries (gmail.settings.sendAs.create) is blocked on personal @gmail.com accounts — it requires Google Workspace with domain-wide delegation. We made that part a 3-minute guided walkthrough with copy-paste values instead. The other technical parts (Cloudflare + Postmark + DNS) are fully automated."
+          "a": "The Gmail API method that adds Send-As entries (gmail.settings.sendAs.create) is blocked on personal @gmail.com accounts. It requires Google Workspace with domain-wide delegation. We made that part a 3-minute guided walkthrough with copy-paste values instead. The other technical parts (Cloudflare + Postmark + DNS) are fully automated."
         },
         {
           "id": "token-safety",
@@ -222,24 +222,24 @@
         {
           "id": "improvmx",
           "q": "How is this different from ImprovMX?",
-          "a": "MailKit replaces the receiving piece (ImprovMX forwarding) with Cloudflare Email Routing and adds outbound sending via Postmark SMTP through Gmail Send-As — ImprovMX's free tier doesn't do outbound. You'll need to remove the existing MX records on your domain before setup; our wizard detects conflicts and tells you exactly which records block the run."
+          "a": "MailKit replaces the receiving piece (ImprovMX forwarding) with Cloudflare Email Routing and adds outbound sending via Postmark SMTP through Gmail Send-As. ImprovMX's free tier doesn't do outbound. You'll need to remove the existing MX records on your domain before setup. Our wizard detects conflicts and tells you exactly which records block the run."
         },
         {
           "id": "workspace-support",
           "q": "Do you support Google Workspace mailboxes?",
-          "a": "Not at launch. The Gmail Send-As walkthrough is built for personal @gmail.com accounts — Workspace admins can already create domain mailboxes natively without Mailkit. If there's enough demand, Workspace support is on the post-launch roadmap."
+          "a": "Not at launch. The Gmail Send-As walkthrough is built for personal @gmail.com accounts, and Workspace admins can already create domain mailboxes natively without Mailkit. If there's enough demand, Workspace support is on the post-launch roadmap."
         },
         {
           "id": "sending-limits",
           "q": "What are the sending limits?",
-          "a": "500 emails per day, 50 per hour, 5 per minute — per domain. These are standard limits on our shared email relay. For most small-business use, you'll never hit them. If you need higher throughput after your first month, email support@getmailkit.com — we review requests individually."
+          "a": "500 emails per day, 50 per hour, 5 per minute — per domain. These are standard limits on our shared email relay. For most small-business use, you'll never hit them. If you need higher throughput after your first month, email support@getmailkit.com. We review requests individually."
         }
       ]
     },
     "finalCta": {
       "eyebrow": "Ready",
       "heading": "30 minutes from now, you'll have email on your Cloudflare domain.",
-      "subhead": "Or your money back — automatic if setup fails, one email otherwise. No calls, no questions.",
+      "subhead": "Or your money back: automatic if setup fails, one email otherwise. No calls, no questions.",
       "primaryCta": "Set up email",
       "secondaryCta": "Read the guarantee first"
     },
@@ -258,7 +258,7 @@
     "eyebrow": "My account",
     "title": "Welcome back, {name}.",
     "addAnother": {
-      "label": "Add new mailbox — $5 one-time"
+      "label": "Add new mailbox · $5 one-time"
     },
     "emptyState": {
       "title": "Set up email on your domain",
@@ -267,7 +267,7 @@
     },
     "onboarding": {
       "getTitle": "What you'll get",
-      "getBody": "A professional email address you send and receive from — right inside your existing Gmail.",
+      "getBody": "A professional email address you send and receive from, right inside your existing Gmail.",
       "needTitle": "What you need",
       "needBody": "A domain on Cloudflare DNS.",
       "needLinkPrefix": "Not on Cloudflare yet?",
@@ -332,11 +332,11 @@
     },
     "dangerZone": {
       "title": "Delete account",
-      "description": "Deletes your account and setup history. Sign back in within 30 days to undo — after that, it's permanent.",
+      "description": "Deletes your account and setup history. Sign back in within 30 days to undo. After that, it's permanent.",
       "deleteCta": "Delete my account",
       "deleteConfirm": {
         "title": "Delete your account?",
-        "body": "You'll be signed out and your account scheduled for deletion. Signing back in with the same Google account within 30 days restores everything; after 30 days your account and setup history are gone for good. Your DNS records and Gmail Send-As stay unchanged — those live in Cloudflare and Gmail.",
+        "body": "You'll be signed out and your account scheduled for deletion. Signing back in with the same Google account within 30 days restores everything. After 30 days your account and setup history are gone for good. Your DNS records and Gmail Send-As stay unchanged. Those live in Cloudflare and Gmail.",
         "emailPrompt": "Type {email} to confirm:",
         "confirmCta": "Delete account",
         "cancel": "Cancel"
@@ -352,14 +352,14 @@
       "cancelBtn": "I'll migrate first"
     },
     "title": "Connect your domain",
-    "subtitle": "Paste your Cloudflare API token to begin — takes ~5 minutes.",
+    "subtitle": "Paste your Cloudflare API token to begin. Takes ~5 minutes.",
     "step1": {
       "title": "Step 1 — Paste your Cloudflare API token",
       "tokenLabel": "Cloudflare API token",
       "tokenPlaceholder": "Paste the token here",
       "cta": "Validate",
       "ctaLoading": "Validating…",
-      "tokenHelp": "Create at https://dash.cloudflare.com/profile/api-tokens — template Custom token, scopes: Zone:Zone:Read, Zone:DNS:Edit, Zone:Zone Settings:Edit, Zone:Email Routing Rules:Edit (all four zone-scoped; set Zone Resource to the specific zone) + Account:Email Routing Addresses:Edit (account-scoped).",
+      "tokenHelp": "Create at https://dash.cloudflare.com/profile/api-tokens. Template Custom token, scopes: Zone:Zone:Read, Zone:DNS:Edit, Zone:Zone Settings:Edit, Zone:Email Routing Rules:Edit (all four zone-scoped, with Zone Resource set to the specific zone) + Account:Email Routing Addresses:Edit (account-scoped).",
       "tokenHelpLink": "Open Cloudflare API Tokens"
     },
     "step2": {
@@ -367,7 +367,7 @@
       "zoneLabel": "Domain",
       "zonePlaceholder": "Select a domain",
       "mailboxLabel": "Mailbox name",
-      "mailboxHint": "This becomes {local}@{domain} — lowercase letters, digits, dot, dash, underscore.",
+      "mailboxHint": "This becomes {local}@{domain}: lowercase letters, digits, dot, dash, underscore.",
       "mailboxRules": "Lowercase letters, numbers, dot, dash, underscore.",
       "cta": "Start setup",
       "ctaLoading": "Starting…"
@@ -417,27 +417,27 @@
       "cloudflare_error": "Cloudflare returned an unexpected error.",
       "cloudflare_unavailable": "Cloudflare is temporarily unavailable. Try again in a few minutes.",
       "invalid_input": "Something in the form looks off. Check it and try again.",
-      "no_primary_email": "Your Google account email is missing — sign out and sign back in.",
+      "no_primary_email": "Your Google account email is missing. Sign out and sign back in.",
       "not_authenticated": "You are not signed in.",
       "run_not_found": "We couldn't find your setup. Start a new one.",
       "run_wrong_state": "Your setup got out of sync. Reopen this page to continue.",
       "run_corrupt": "Your setup is missing some data. Start a new one.",
       "db_insert_failed": "We couldn't save your setup. Try again.",
       "unexpected": "Something unexpected happened.",
-      "smtp_invalid_token": "Our SMTP provider rejected the API key. Hold tight while we rotate it — nothing for you to do.",
-      "smtp_domain_taken": "Our SMTP provider already knows this domain from a previous run — we picked up the existing setup.",
+      "smtp_invalid_token": "Our SMTP provider rejected the API key. Hold tight while we rotate it. Nothing for you to do.",
+      "smtp_domain_taken": "Our SMTP provider already knows this domain from a previous run. We picked up the existing setup.",
       "smtp_rate_limited": "Our SMTP provider throttled our requests. Retrying shortly.",
       "smtp_unavailable": "Our SMTP provider is temporarily unavailable. Try again in a few minutes.",
-      "smtp_verify_timeout": "Our SMTP provider could not verify your domain yet. DNS propagation can take a few minutes — retry soon.",
+      "smtp_verify_timeout": "Our SMTP provider could not verify your domain yet. DNS propagation can take a few minutes. Retry soon.",
       "smtp_state_unrecoverable": "Our SMTP provider returned an incomplete setup for this domain. Please ping support.",
       "spf_conflict": "Your SPF record ends in -all (strict policy). Soften it to ~all so our SMTP relay can send on your behalf, then retry.",
       "dns_write_failed": "We could not write a DNS record cleanly. Details: {details}",
-      "smtp_misconfigured": "Our SMTP relay is not configured yet. This is on us — nothing to fix on your side; ping support if you see this for more than a minute.",
-      "postmark_invalid_token": "Our SMTP provider rejected the API key. Hold tight while we rotate it — nothing for you to do.",
-      "postmark_domain_taken": "Our SMTP provider already knows this domain from a previous run — we picked up the existing setup.",
+      "smtp_misconfigured": "Our SMTP relay is not configured yet. This is on us, nothing to fix on your side. Ping support if you see this for more than a minute.",
+      "postmark_invalid_token": "Our SMTP provider rejected the API key. Hold tight while we rotate it. Nothing for you to do.",
+      "postmark_domain_taken": "Our SMTP provider already knows this domain from a previous run. We picked up the existing setup.",
       "postmark_rate_limited": "Our SMTP provider throttled our requests. Retrying shortly.",
       "postmark_unavailable": "Our SMTP provider is temporarily unavailable. Try again in a few minutes.",
-      "postmark_dkim_timeout": "DKIM verification timed out. DNS propagation can take a few minutes — retry soon."
+      "postmark_dkim_timeout": "DKIM verification timed out. DNS propagation can take a few minutes. Retry soon."
     },
     "smtpSteps": {
       "sender": "SMTP sender domain registered",
@@ -450,7 +450,7 @@
       "continueCtaLoading": "Setting up sending…",
       "recheck": {
         "title": "Waiting for DNS verification",
-        "body": "DNS records are in place. Our SMTP provider hasn't confirmed them yet — propagation usually takes a few minutes.",
+        "body": "DNS records are in place. Our SMTP provider hasn't confirmed them yet. Propagation usually takes a few minutes.",
         "cta": "Re-check verification",
         "ctaLoading": "Checking…"
       },
@@ -510,12 +510,12 @@
           "securityStarttls": "TLS (recommended)",
           "securitySsl": "SSL",
           "securityHint": "TLS (recommended).",
-          "passwordWarning": "Save this password — you'll need it if you set up Send-As again.",
+          "passwordWarning": "Save this password. You'll need it if you set up Send-As again.",
           "nextCta": "Done"
         },
         "verificationEmail": {
           "title": "Open the confirmation email",
-          "body": "Gmail emailed a confirmation link to {target} — it lands in this same inbox. Open the email, click the link, then press Confirm.",
+          "body": "Gmail emailed a confirmation link to {target}. It lands in this same inbox. Open the email, click the link, then press Confirm.",
           "finishCta": "Finish setup",
           "finishLoading": "Finishing…"
         },
@@ -529,7 +529,7 @@
         "done": {
           "title": "You're all set!",
           "body": "You can now send and receive email right in Gmail from your new branded address, {target}.",
-          "warmupTip": "Tip: warm up the domain gradually — 10–20 emails per day in the first week, then ramp up. Bursts from a fresh domain are the fastest way to land in spam.",
+          "warmupTip": "Tip: warm up the domain gradually, 10–20 emails per day in the first week, then ramp up. Bursts from a fresh domain are the fastest way to land in spam.",
           "backToDashboard": "Back to dashboard"
         }
       },
@@ -544,7 +544,7 @@
         "sub": "Takes ~5 minutes.",
         "instructionOpenCF": "Open Cloudflare API Tokens",
         "permTitle": "Required permissions",
-        "scopeNote": "Limit to one zone — keeps this token scoped to your domain only"
+        "scopeNote": "Limit to one zone so the token is scoped to your domain only"
       },
       "step2": {
         "heading": "Your domain and email address",
@@ -572,7 +572,7 @@
       "privacy": "Privacy Policy",
       "guarantee": "Guarantee",
       "supportEmail": "support@getmailkit.com",
-      "builtInPublic": "Built in public — GitHub →"
+      "builtInPublic": "Built in public on GitHub →"
     }
   },
   "error": {
@@ -584,7 +584,7 @@
   },
   "notFound": {
     "title": "Page not found",
-    "body": "The page you're looking for doesn't exist or was moved. Russian-language pages were discontinued — try the home page or check the FAQ.",
+    "body": "The page you're looking for doesn't exist or was moved. Russian-language pages were discontinued. Try the home page or check the FAQ.",
     "homeCta": "Back to home",
     "faqCta": "View FAQ"
   },
