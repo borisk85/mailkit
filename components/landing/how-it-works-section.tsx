@@ -54,7 +54,6 @@ export function HowItWorksSection() {
               key={key}
               number={number}
               title={t(`${key}.title`)}
-              time={t(`${key}.time`)}
               body={t(`${key}.body`)}
               automated={automated}
               automatedLabel={t("automatedBadge")}
@@ -71,7 +70,6 @@ export function HowItWorksSection() {
 function TimelineStep({
   number,
   title,
-  time,
   body,
   automated,
   automatedLabel,
@@ -80,7 +78,6 @@ function TimelineStep({
 }: {
   number: string;
   title: string;
-  time: string;
   body: string;
   automated: boolean;
   automatedLabel: string;
@@ -119,7 +116,6 @@ function TimelineStep({
           >
             {automated ? automatedLabel : manualLabel}
           </span>
-          <span className="mk-caption font-mono text-mk-accent">{time}</span>
         </div>
 
         <h3 className="text-lg font-semibold leading-snug tracking-tight text-mk-text-primary">

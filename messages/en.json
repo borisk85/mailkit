@@ -88,27 +88,22 @@
       "manualBadge": "Your turn",
       "stepToken": {
         "title": "Create and paste your Cloudflare token",
-        "time": "~5 min",
         "body": "A scoped API token — we show you exactly where to click. That's what lets us set up your domain."
       },
       "step1": {
         "title": "Name your mailbox",
-        "time": "~1 min",
         "body": "Pick the address you want — hello@, sales@, anything. That's the mailbox we create on your domain."
       },
       "step2": {
         "title": "Automation does the setup",
-        "time": "~2 min",
         "body": "We turn on email routing, provision SMTP, and add the DNS records — you just watch it run."
       },
       "step3": {
         "title": "Verification runs in the background",
-        "time": "~16 min",
-        "body": "Your DKIM records propagate and we verify them in the background — this is the longest part, usually about 16 minutes. You can close the tab; we keep checking."
+        "body": "Your DKIM records propagate and we verify them in the background — this is the longest part. You can close the tab; we keep checking."
       },
       "step4": {
         "title": "Gmail Send-As",
-        "time": "~3 min",
         "body": "We hand you four lines — server, port, login, password — and walk you through pasting them into Gmail. Gmail then sends a confirmation link, you click it, done."
       }
     },
