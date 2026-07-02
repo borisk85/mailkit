@@ -67,19 +67,24 @@ export function PricingSection() {
 
             <div className="h-px w-full bg-mk-border-subtle" />
 
-            <ul className="flex flex-col gap-3">
-              {inclusions.map((item) => (
-                <li key={item} className="flex items-start gap-3">
-                  <Check
-                    className="mt-1 size-4 shrink-0 text-mk-accent"
-                    aria-hidden
-                  />
-                  <span className="mk-body-small text-mk-text-primary">
-                    {item}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            <div className="flex flex-col gap-3">
+              <span className="mk-eyebrow text-mk-text-tertiary">
+                {t("inclusionsHeading")}
+              </span>
+              <ul className="flex flex-col gap-3">
+                {inclusions.map((item) => (
+                  <li key={item} className="flex items-start gap-3">
+                    <Check
+                      className="mt-1 size-4 shrink-0 text-mk-accent"
+                      aria-hidden
+                    />
+                    <span className="mk-body-small text-mk-text-primary">
+                      {item}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
 
             <LandingCtaButton
               label={t("cta")}
