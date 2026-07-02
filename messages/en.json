@@ -147,7 +147,7 @@
         "badge": "Auto-refund"
       },
       "functional": {
-        "title": "If email doesn't work",
+        "title": "If your mailbox doesn't work",
         "body": "If within 30 days you can't actually send email through your domain (even after our support), you get a full refund on request. Just email us.",
         "badge": "30-day"
       },
