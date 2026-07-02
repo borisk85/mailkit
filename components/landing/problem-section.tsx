@@ -103,14 +103,16 @@ export function ProblemSection() {
 
         {/* Section-level CTA pattern: centered primary button + caption
          * underneath (the caption anchors the button — a bare centered
-         * button reads as orphaned). Reuse this exact block for any
-         * future mid-page section CTA. */}
-        <div className="mt-12 flex flex-col items-center gap-3">
+         * button reads as orphaned). The caption rides inside
+         * LandingCtaButton so it hides when the button flips to
+         * "My account" for logged-in users. Reuse this exact block for
+         * any future mid-page section CTA. */}
+        <div className="mt-12 flex justify-center">
           <LandingCtaButton
             label={tHero("primaryCta")}
+            caption={t("ctaNote")}
             className="mk-cta-shadow mk-hover-lift mk-cta-shine inline-flex h-[52px] items-center justify-center rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
           />
-          <p className="mk-caption text-mk-text-tertiary">{t("ctaNote")}</p>
         </div>
       </div>
     </section>

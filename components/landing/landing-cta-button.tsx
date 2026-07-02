@@ -21,9 +21,18 @@ async function startOAuth() {
 interface LandingCtaButtonProps {
   label: string;
   className?: string;
+  /** Caption under the button — sales context (price, guarantee).
+   * Rendered only for logged-out visitors: a logged-in user sees
+   * "My account" instead of the sales CTA, so the sales caption
+   * would pair wrong with it. */
+  caption?: string;
 }
 
-export function LandingCtaButton({ label, className }: LandingCtaButtonProps) {
+export function LandingCtaButton({
+  label,
+  className,
+  caption,
+}: LandingCtaButtonProps) {
   const t = useTranslations("landing.ctaButton");
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
 
@@ -40,25 +49,40 @@ export function LandingCtaButton({ label, className }: LandingCtaButtonProps) {
     return () => listener.subscription.unsubscribe();
   }, []);
 
-  if (isLoggedIn === null) {
+  const withCaption = (button: React.ReactNode, showCaption: boolean) => {
+    if (!caption) return button;
     return (
+      <span className="flex flex-col items-center gap-3">
+        {button}
+        {showCaption && (
+          <span className="mk-caption text-mk-text-tertiary">{caption}</span>
+        )}
+      </span>
+    );
+  };
+
+  if (isLoggedIn === null) {
+    return withCaption(
       <span className={className} style={{ visibility: "hidden" }} aria-hidden>
         {label}
-      </span>
+      </span>,
+      false,
     );
   }
 
   if (isLoggedIn) {
-    return (
+    return withCaption(
       <Link href="/app" className={className}>
         {t("myAccount")}
-      </Link>
+      </Link>,
+      false,
     );
   }
 
-  return (
+  return withCaption(
     <button type="button" onClick={startOAuth} className={className}>
       {label}
-    </button>
+    </button>,
+    true,
   );
 }
