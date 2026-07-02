@@ -117,13 +117,13 @@ export default async function AppHome({
           {data.purchases.length === 0 ? <OnboardingInfo /> : null}
         </>
       ) : (
-        <>
+        <div className="space-y-3">
           <SetupsSection
             setups={data.setups}
             deleteSetupAction={deleteFailedSetup}
           />
           <AddAnotherCard locale={locale} />
-        </>
+        </div>
       )}
 
       {data.purchases.length > 0 && (

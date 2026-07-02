@@ -262,9 +262,7 @@
     "eyebrow": "My account",
     "title": "Welcome back, {name}.",
     "addAnother": {
-      "title": "Add new mailbox",
-      "body": "One-time payment — $5",
-      "cta": "Set up email"
+      "label": "Add new mailbox — $5 one-time"
     },
     "emptyState": {
       "title": "Set up email on your domain",
