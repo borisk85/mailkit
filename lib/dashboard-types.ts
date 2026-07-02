@@ -127,7 +127,7 @@ export function setupDetailLabel(status: SetupStatus): string | null {
     case "smtp_sender_created":
       return "SMTP sender registered";
     case "smtp_dns_written":
-      return "Authentication records added — waiting for DNS propagation";
+      return "Authentication records added. Waiting for DNS propagation";
     case "smtp_verified":
       return "DNS records verified";
     case "smtp_done":

@@ -26,8 +26,8 @@ an error and did not reach the Gmail wizard phase.
 
 2. 30-Day Functional Guarantee (by request). If, within 30 days of
 purchase, you cannot send or receive email through the setup we
-configured — even after we've attempted to assist you via support
-— you are entitled to a full refund. Submit a request to
+configured (even after we've attempted to assist you via support),
+you are entitled to a full refund. Submit a request to
 support@getmailkit.com describing the issue. We respond within 48
 hours on business days.
 

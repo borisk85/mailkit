@@ -33,5 +33,5 @@ export const DELIVERABILITY_DISCLAIMER_EN = {
    * welcome email's tail line. Soft, action-oriented, doesn't dwell
    * on disclaimers.
    */
-  warmupTip: `Tip: warm up the domain gradually — 10–20 emails per day in the first week, then ramp up. Bursts from a fresh domain are the fastest way to land in spam.`,
+  warmupTip: `Tip: warm up the domain gradually, 10–20 emails per day in the first week, then ramp up. Bursts from a fresh domain are the fastest way to land in spam.`,
 };

@@ -36,7 +36,7 @@ export function Step4Dkim({
               Verifying your domain
             </h2>
             <p className="text-xs text-mk-text-tertiary">
-              Runs automatically in the background — no action needed.
+              Runs automatically in the background. No action needed.
             </p>
           </div>
         </div>
@@ -54,7 +54,7 @@ export function Step4Dkim({
           </div>
           {isLongPoll && (
             <p className="text-center text-sm font-medium text-mk-accent">
-              Taking longer than usual — it&apos;s normal.
+              Taking longer than usual? That&apos;s normal.
             </p>
           )}
         </div>

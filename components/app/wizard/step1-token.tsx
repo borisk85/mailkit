@@ -501,7 +501,7 @@ export function Step1Token({
               Paste your token
             </span>
             <p className="text-xs text-mk-text-tertiary">
-              Save a copy of this token for yourself — Cloudflare shows it only
+              Save a copy of this token for yourself. Cloudflare shows it only
               once and we can&apos;t show it again.
             </p>
 
@@ -557,7 +557,7 @@ export function Step1Token({
           <div className="flex items-center gap-1.5 text-[11px] leading-snug text-mk-success">
             <ShieldCheck className="size-3.5 shrink-0" aria-hidden />
             <span>
-              Encrypted while your setup runs, deleted when it finishes — never
+              Encrypted while your setup runs, deleted when it finishes. Never
               used for anything else.
             </span>
           </div>

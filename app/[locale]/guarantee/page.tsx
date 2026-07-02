@@ -42,7 +42,7 @@ export default async function GuaranteePage({
   const title = "Refund guarantee";
   const lastUpdated = "Updated 2026-04-25";
   const lede =
-    "Mailkit costs $5. If our setup fails on our end, you get the $5 back automatically within 24 hours. If within 30 days you can't actually send email through your domain, you also get your $5 back — just email support. The full policy below explains the edge cases.";
+    "Mailkit costs $5. If our setup fails on our end, you get the $5 back automatically within 24 hours. If within 30 days you can't actually send email through your domain, you also get your $5 back. Just email support. The full policy below explains the edge cases.";
 
   return (
     <>

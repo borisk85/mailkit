@@ -108,8 +108,8 @@ per-domain rate limits:
 These limits are enforced automatically. Exceeding them will pause
 outbound delivery for the remainder of the window. For most
 small-business use these limits are not a constraint. If you need
-higher throughput after 30 days of use, contact support@getmailkit.com
-— requests are reviewed individually based on sending history.
+higher throughput after 30 days of use, contact support@getmailkit.com.
+Requests are reviewed individually based on sending history.
 
 8. Account suspension
 

@@ -38,7 +38,7 @@ export default async function PrivacyPage({
   const title = "Privacy Policy";
   const lastUpdated = "Updated 2026-04-25";
   const lede =
-    "Mailkit collects the minimum: your email and name from Google OAuth, the domain you set up, and your Lemon Squeezy purchase record. No marketing trackers, no ad pixels, no data sold to third parties. The formal text below — for regulators and detail-readers — covers everything else.";
+    "Mailkit collects the minimum: your email and name from Google OAuth, the domain you set up, and your Lemon Squeezy purchase record. No marketing trackers, no ad pixels, no data sold to third parties. The formal text below, for regulators and detail-readers, covers everything else.";
 
   return (
     <>
