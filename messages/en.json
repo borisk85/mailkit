@@ -82,8 +82,8 @@
     },
     "howItWorks": {
       "eyebrow": "How it works",
-      "heading": "Five steps. Two are yours, three run themselves.",
-      "subheading": "Total time about 30 minutes. Your part: create and paste your Cloudflare token at the start, and add the SMTP details to Gmail at the end — both guided, a few minutes each.",
+      "heading": "Five steps. Guided all the way.",
+      "subheading": "You paste your Cloudflare token, name your mailbox, and add four lines to Gmail — automation does the rest.",
       "automatedBadge": "Automated",
       "manualBadge": "Your turn",
       "stepToken": {
