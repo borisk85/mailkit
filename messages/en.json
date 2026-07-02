@@ -133,9 +133,10 @@
         "duration": "~30 min",
         "steps": [
           "Create and paste Cloudflare API token",
-          "Watch automation run (~2 min)",
-          "DKIM verifies in the background (~16 min) — you can close the tab",
-          "Add to Gmail (3 minutes)",
+          "Name your mailbox",
+          "Watch automation run",
+          "DKIM verifies in the background — you can close the tab",
+          "Add to Gmail",
           "Built to land in the inbox, not the spam folder",
           "Your branded email is ready"
         ]
