@@ -135,11 +135,10 @@
           "Fast sign in with Google",
           "Create and paste Cloudflare API token",
           "Name your mailbox",
-          "Automation sets up routing, SMTP, and DNS",
-          "DKIM verifies in the background",
-          "Add your new address to Gmail",
-          "SPF, DKIM, DMARC — passed",
-          "Your branded email is ready"
+          "Automation sets up receiving and sending for you",
+          "Add your mailbox to Gmail",
+          "Spam filters trust your mail",
+          "You send and receive as you@yourdomain.com"
         ]
       }
     },
