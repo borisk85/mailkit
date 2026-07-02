@@ -138,7 +138,7 @@
           "Automation sets up routing, SMTP, and DNS",
           "DKIM verifies in the background",
           "Add your new address to Gmail",
-          "Your mail passes SPF, DKIM, and DMARC — the checks that keep you out of spam",
+          "SPF, DKIM, DMARC — passed",
           "Your branded email is ready"
         ]
       }

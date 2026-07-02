@@ -1,6 +1,8 @@
 import { useTranslations } from "next-intl";
 import { Check, Rocket, Wrench, X } from "lucide-react";
 
+import { LandingCtaButton } from "@/components/landing/landing-cta-button";
+
 /**
  * Problem section — premium-pass refresh per UI_REVIEW_BRIEF §2.5.
  * Centered eyebrow + Display-2 headline + Body-large subhead, then a
@@ -13,6 +15,7 @@ import { Check, Rocket, Wrench, X } from "lucide-react";
  */
 export function ProblemSection() {
   const t = useTranslations("landing.problem");
+  const tHero = useTranslations("landing.hero");
   const tWithout = useTranslations("landing.problem.without");
   const tWith = useTranslations("landing.problem.with");
 
@@ -96,6 +99,13 @@ export function ProblemSection() {
               ))}
             </ul>
           </article>
+        </div>
+
+        <div className="mt-10 flex justify-center">
+          <LandingCtaButton
+            label={tHero("primaryCta")}
+            className="mk-cta-shadow mk-hover-lift mk-cta-shine inline-flex h-[52px] items-center justify-center rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+          />
         </div>
       </div>
     </section>
