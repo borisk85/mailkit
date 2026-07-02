@@ -36,7 +36,7 @@
       "subhead": "You start with a Cloudflare token and finish in your regular Gmail — both guided. We automate everything technical in between: routing, SMTP, DKIM. Built to reach the inbox, not spam.",
       "guaranteeLink": "see policy",
       "microcopy": "Requires Cloudflare DNS.",
-      "migrationHint": "Open Cloudflare migration guide",
+      "notOnCloudflare": "Not on Cloudflare? →",
       "primaryCta": "Set up email",
       "secondaryCta": "See how it works",
       "mockup": {
