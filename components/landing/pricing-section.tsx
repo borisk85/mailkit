@@ -1,5 +1,11 @@
 import { useTranslations } from "next-intl";
 import { Check } from "lucide-react";
+import {
+  SiApplepay,
+  SiGooglepay,
+  SiLemonsqueezy,
+  SiStripe,
+} from "react-icons/si";
 
 import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 
@@ -80,9 +86,29 @@ export function PricingSection() {
               className="mk-cta-shadow mk-hover-lift mk-cta-shine inline-flex h-[52px] w-full items-center justify-center rounded-[10px] bg-mk-accent px-7 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
             />
 
-            <p className="mk-caption text-center text-mk-text-tertiary">
-              {t("paymentNote")}
-            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-2 gap-y-1.5">
+              <span className="mk-caption text-mk-text-tertiary">
+                {t("poweredBy")}
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <SiLemonsqueezy size={13} color="#FFC233" aria-hidden />
+                <span className="mk-caption font-medium text-mk-text-secondary">
+                  Lemon Squeezy
+                </span>
+              </span>
+              <span aria-hidden className="mk-caption text-mk-text-tertiary">
+                ·
+              </span>
+              <span
+                role="img"
+                aria-label={t("paymentMethods")}
+                className="inline-flex items-center gap-2.5 text-mk-text-tertiary"
+              >
+                <SiStripe size={15} aria-hidden />
+                <SiApplepay size={20} aria-hidden />
+                <SiGooglepay size={20} aria-hidden />
+              </span>
+            </div>
           </article>
 
           <p className="mk-caption mt-3 text-center">
