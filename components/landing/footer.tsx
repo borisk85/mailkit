@@ -63,6 +63,9 @@ export function Footer() {
             <FooterLink href={`${landingHref}#faq`}>
               {t("links.faq")}
             </FooterLink>
+            <FooterLink href="https://status.getmailkit.com" external>
+              {t("links.status")}
+            </FooterLink>
           </FooterColumn>
 
           <FooterColumn heading={t("legalHeading")}>
@@ -74,9 +77,6 @@ export function Footer() {
           <FooterColumn heading={t("contactHeading")}>
             <FooterLink href="mailto:support@getmailkit.com" external breakAll>
               {t("links.supportEmail")}
-            </FooterLink>
-            <FooterLink href="https://status.getmailkit.com" external>
-              {t("links.status")}
             </FooterLink>
           </FooterColumn>
         </div>
