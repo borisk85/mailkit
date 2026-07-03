@@ -164,9 +164,8 @@ export default async function GlossaryPage({
             Don’t want to set all this up yourself?
           </p>
           <p className="mk-body mt-2 text-mk-text-secondary">
-            MailKit’s wizard handles the DNS and SMTP, and guides you through
-            the two hands-on steps — pasting a Cloudflare token and a short
-            Gmail step.
+            MailKit does the DNS and SMTP — you just paste a token and finish in
+            Gmail.
           </p>
           <div className="mt-6 flex justify-center">
             <LandingCtaButton
