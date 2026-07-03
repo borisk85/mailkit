@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import { MailkitIcon } from "@/components/brand/mailkit-icon";
@@ -61,6 +62,12 @@ export function Header() {
           >
             {t("nav.faq")}
           </NavAnchor>
+          <Link
+            href="/compare"
+            className="text-sm font-medium text-mk-text-secondary transition-colors hover:text-mk-text-primary"
+          >
+            {t("nav.compare")}
+          </Link>
         </nav>
 
         <div className="flex items-center gap-1 sm:gap-2">

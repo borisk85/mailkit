@@ -18,6 +18,7 @@ export async function generateMetadata({
     title: "FAQ — MailKit",
     description:
       "Common questions about MailKit: Cloudflare DNS requirement, pricing, what happens on failure, Gmail automation, sending limits, and more.",
+    alternates: { canonical: "/faq" },
   };
 }
 

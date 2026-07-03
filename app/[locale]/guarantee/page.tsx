@@ -27,6 +27,7 @@ export async function generateMetadata(): Promise<Metadata> {
     title: "Refund guarantee — MailKit",
     description:
       "MailKit's two-tier guarantee: automatic refund on automation failure, plus 30-day functional guarantee on request.",
+    alternates: { canonical: "/guarantee" },
   };
 }
 

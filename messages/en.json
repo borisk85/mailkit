@@ -14,7 +14,8 @@
         "pricing": "Pricing",
         "howItWorks": "How it works",
         "guarantees": "Guarantees",
-        "faq": "FAQ"
+        "faq": "FAQ",
+        "compare": "Compare"
       },
       "signIn": "Sign in with Google",
       "signUp": "Sign up",
@@ -569,6 +570,9 @@
       "terms": "Terms of Service",
       "privacy": "Privacy Policy",
       "guarantee": "Guarantee",
+      "compare": "Compare",
+      "glossary": "Glossary",
+      "about": "About",
       "supportEmail": "support@getmailkit.com",
       "status": "Service status"
     }

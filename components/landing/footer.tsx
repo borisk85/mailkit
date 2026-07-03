@@ -63,12 +63,15 @@ export function Footer() {
             <FooterLink href={`${landingHref}#faq`}>
               {t("links.faq")}
             </FooterLink>
+            <FooterLink href="/compare">{t("links.compare")}</FooterLink>
+            <FooterLink href="/glossary">{t("links.glossary")}</FooterLink>
             <FooterLink href="https://status.getmailkit.com" external>
               {t("links.status")}
             </FooterLink>
           </FooterColumn>
 
           <FooterColumn heading={t("legalHeading")}>
+            <FooterLink href="/about">{t("links.about")}</FooterLink>
             <FooterLink href="/terms">{t("links.terms")}</FooterLink>
             <FooterLink href="/privacy">{t("links.privacy")}</FooterLink>
             <FooterLink href="/guarantee">{t("links.guarantee")}</FooterLink>
