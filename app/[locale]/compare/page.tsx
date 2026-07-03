@@ -64,8 +64,8 @@ const ROWS: { label: string; cells: Cell[] }[] = [
     cells: [{ v: "yes" }, { v: "yes" }, { v: "yes" }],
   },
   {
-    label: "Stops working if you stop paying",
-    cells: [{ v: "no", note: "stack stays yours" }, { v: "yes" }, { v: "yes" }],
+    label: "Keeps working if you stop paying",
+    cells: [{ v: "yes", note: "stack stays yours" }, { v: "no" }, { v: "no" }],
   },
 ];
 
@@ -161,7 +161,7 @@ export default async function ComparePage({
   return (
     <>
       <Header />
-      <main className="mx-auto max-w-5xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
+      <main className="mx-auto w-full min-w-0 max-w-5xl px-4 py-20 sm:px-6 sm:py-28 lg:px-8">
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
@@ -179,40 +179,40 @@ export default async function ComparePage({
         </div>
 
         {/* Comparison table */}
-        <div className="mt-16 overflow-x-auto">
+        <div className="mt-16 overflow-x-auto rounded-2xl border border-mk-border-subtle bg-surface-elevated">
           <table className="w-full min-w-[720px] border-collapse text-left">
             <thead>
-              <tr>
-                <th className="w-[34%] px-4 pb-4 align-bottom" />
+              <tr className="border-b border-mk-border-subtle">
+                <th className="w-[34%] px-6 py-5 align-bottom" />
                 {COLUMNS.map((col, i) => (
                   <th
                     key={col}
-                    className={`px-4 pb-4 text-center align-bottom ${
-                      i === 0 ? "" : ""
+                    className={`px-4 py-5 text-center align-bottom ${
+                      i === 0 ? "bg-mk-accent/[0.06]" : ""
                     }`}
                   >
-                    <span
-                      className={
-                        i === 0
-                          ? "mk-body font-bold text-mk-accent"
-                          : "mk-body font-semibold text-mk-text-secondary"
-                      }
-                    >
-                      {col}
-                    </span>
+                    {i === 0 ? (
+                      <span className="inline-block rounded-full bg-mk-accent px-5 py-1.5 text-sm font-bold tracking-wide text-white shadow-[0_6px_18px_rgba(124,92,255,0.35)]">
+                        {col}
+                      </span>
+                    ) : (
+                      <span className="mk-body font-semibold text-mk-text-secondary">
+                        {col}
+                      </span>
+                    )}
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {ROWS.map((row, ri) => (
+              {ROWS.map((row) => (
                 <tr
                   key={row.label}
-                  className="border-t border-mk-border-subtle"
+                  className="border-b border-mk-border-subtle transition-colors last:border-0 hover:bg-mk-text-primary/[0.02]"
                 >
                   <th
                     scope="row"
-                    className="px-4 py-5 text-left mk-body font-medium text-mk-text-primary"
+                    className="mk-body px-6 py-5 text-left font-medium text-mk-text-primary"
                   >
                     {row.label}
                   </th>
@@ -220,11 +220,7 @@ export default async function ComparePage({
                     <td
                       key={ci}
                       className={`px-4 py-5 text-center ${
-                        ci === 0
-                          ? "bg-mk-accent/[0.06] first:border-l first:border-r border-mk-accent/20"
-                          : ""
-                      } ${ri === ROWS.length - 1 && ci === 0 ? "rounded-b-[14px]" : ""} ${
-                        ri === 0 && ci === 0 ? "rounded-t-[14px]" : ""
+                        ci === 0 ? "bg-mk-accent/[0.06]" : ""
                       }`}
                     >
                       <Mark cell={cell} />
