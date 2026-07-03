@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 
 import { Footer } from "@/components/landing/footer";
@@ -165,19 +164,14 @@ export default async function GlossaryPage({
             Don’t want to touch any of this yourself?
           </p>
           <p className="mk-body mt-2 text-mk-text-secondary">
-            MailKit sets all of it up for you — once, for $5.
+            MailKit sets all of it up for you.
           </p>
-          <div className="mt-6 flex flex-col items-center gap-4">
+          <div className="mt-6 flex justify-center">
             <LandingCtaButton
               label="Set up email"
+              caption="$5 one-time · 30-day money-back guarantee"
               className="mk-cta-shadow mk-hover-lift inline-flex h-[52px] items-center justify-center rounded-[10px] bg-mk-accent px-8 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
             />
-            <Link
-              href="/#how-it-works"
-              className="mk-body font-medium text-mk-text-secondary underline-offset-4 transition-colors hover:text-mk-text-primary hover:underline"
-            >
-              See how it works
-            </Link>
           </div>
         </div>
       </main>
