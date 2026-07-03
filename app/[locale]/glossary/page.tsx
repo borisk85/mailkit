@@ -161,10 +161,12 @@ export default async function GlossaryPage({
 
         <div className="mt-16 rounded-[16px] border border-mk-border-subtle bg-surface-elevated p-8 text-center">
           <p className="mk-body-large text-mk-text-primary">
-            Don’t want to touch any of this yourself?
+            Don’t want to set all this up yourself?
           </p>
           <p className="mk-body mt-2 text-mk-text-secondary">
-            MailKit sets all of it up for you.
+            MailKit’s wizard handles the DNS and SMTP, and guides you through
+            the two hands-on steps — pasting a Cloudflare token and a short
+            Gmail step.
           </p>
           <div className="mt-6 flex justify-center">
             <LandingCtaButton
