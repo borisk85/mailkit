@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
+import { ChevronUp } from "lucide-react";
 import { SiX } from "react-icons/si";
 
 import { MailkitIcon } from "@/components/brand/mailkit-icon";
@@ -77,10 +78,17 @@ export function Footer() {
           </FooterColumn>
         </div>
 
-        <div className="mt-10 border-t border-mk-border-subtle pt-5">
+        <div className="mt-10 flex items-center justify-between gap-4 border-t border-mk-border-subtle pt-5">
           <p className="mk-caption text-mk-text-tertiary">
             {t("copyright", { year: new Date().getFullYear() })}
           </p>
+          <a
+            href="#top"
+            aria-label="Back to top"
+            className="mk-hover-lift inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-mk-border-subtle text-mk-text-tertiary transition-colors hover:bg-surface-elevated-2 hover:text-mk-text-secondary"
+          >
+            <ChevronUp className="size-4" aria-hidden />
+          </a>
         </div>
       </div>
     </footer>
