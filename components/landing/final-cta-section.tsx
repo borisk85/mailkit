@@ -30,7 +30,6 @@ export function FinalCtaSection() {
       />
 
       <div className="mk-scroll-reveal mx-auto flex max-w-3xl flex-col items-center gap-6 px-4 py-20 text-center sm:px-6 sm:py-30 lg:py-32">
-        <span className="mk-eyebrow text-mk-accent">{t("eyebrow")}</span>
         <h2 className="mk-display-1 text-balance text-mk-text-primary">
           {t("heading")}
         </h2>

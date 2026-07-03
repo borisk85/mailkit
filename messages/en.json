@@ -236,9 +236,8 @@
       ]
     },
     "finalCta": {
-      "eyebrow": "Ready",
       "heading": "30 minutes from now, you'll have email on your Cloudflare domain.",
-      "subhead": "Or your money back: automatic if setup fails, one email otherwise. No calls, no questions.",
+      "subhead": "Or your money back. No calls, no questions.",
       "primaryCta": "Set up email",
       "secondaryCta": "Read the guarantee first"
     },
