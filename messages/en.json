@@ -161,12 +161,12 @@
         {
           "id": "cf-required",
           "q": "Does this work with any domain?",
-          "a": "Right now MailKit only works if your domain uses Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace, or another registrar, you'll need to migrate nameservers to Cloudflare first. Cloudflare DNS is free and migration takes about 30 minutes plus DNS propagation up to 24 hours. After migration, MailKit setup runs in about 30 minutes. Multi-provider support is on our roadmap."
+          "a": "Right now MailKit only works if your domain uses Cloudflare DNS. If your domain is on GoDaddy, Namecheap, Squarespace, or another registrar, you'll need to migrate nameservers to Cloudflare first. Cloudflare DNS is free and migration takes about 30 minutes plus DNS propagation up to 24 hours. After migration, MailKit setup runs as usual."
         },
         {
           "id": "smtp-dependency",
           "q": "What if MailKit shuts down?",
-          "a": "Your domain, DNS records, Cloudflare Email Routing, and Gmail Send-As are yours forever. They live on your accounts, not ours. The only piece tied to our infrastructure is the SMTP relay (Postmark). If we ever close, we give you 90 days notice plus a step-by-step guide to migrate the SMTP relay to your own Postmark or alternative provider account. No lock-in."
+          "a": "Your domain, DNS records, Cloudflare Email Routing, and Gmail Send-As are yours forever. They live on your accounts, not ours. The only piece tied to our infrastructure is the SMTP relay (Postmark). If we ever close, we give you 90 days notice plus a guide to migrate the SMTP relay to your own Postmark or alternative provider account. No lock-in."
         },
         {
           "id": "timing",
@@ -186,12 +186,12 @@
         {
           "id": "cost",
           "q": "Do I have to keep paying every month?",
-          "a": "No. MailKit is a one-time $5 fee per mailbox: no subscription, no recurring charges. That covers the full automated setup: Cloudflare Email Routing for receiving, Postmark SMTP for sending, and the step-by-step Gmail Send-As walkthrough. Compared to Google Workspace at $6/user/month ($72 a year per mailbox), MailKit is a one-and-done payment."
+          "a": "No. MailKit is a one-time $5 fee per mailbox: no subscription, no recurring charges. That covers the full automated setup: Cloudflare Email Routing for receiving, Postmark SMTP for sending, and the guided Gmail Send-As walkthrough. Compared to Google Workspace at $6/user/month ($72 a year per mailbox), MailKit is a one-and-done payment."
         },
         {
           "id": "duration",
           "q": "Can I do this myself for free?",
-          "a": "Yes, but expect an evening of documentation and wrong turns. You'd navigate Cloudflare Email Routing, Postmark SMTP configuration, five DNS records (MX, SPF, DKIM, DMARC, DKIM verification), and the Gmail Send-As setup, each requiring its own guide, its own dashboard, and a wait to see if the change took effect. MailKit automates the Postmark piece (the most technically involved part) and guides you step by step through the rest."
+          "a": "Yes, but expect an evening of documentation and wrong turns. You'd navigate Cloudflare Email Routing, Postmark SMTP configuration, five DNS records (MX, SPF, DKIM, DMARC, DKIM verification), and the Gmail Send-As setup, each requiring its own guide, its own dashboard, and a wait to see if the change took effect. MailKit automates the technical setup and guides you through the rest."
         },
         {
           "id": "vs-workspace",
