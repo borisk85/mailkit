@@ -1,5 +1,11 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 
+/**
+ * Header section link. Points at `/#section` (not a bare `#section`) so it
+ * works from every page: on the landing it just scrolls to the section, and
+ * from a subpage like /glossary it navigates home first, then scrolls.
+ */
 export function NavAnchor({
   sectionId,
   className,
@@ -10,8 +16,8 @@ export function NavAnchor({
   children: ReactNode;
 }) {
   return (
-    <a href={`#${sectionId}`} className={className}>
+    <Link href={`/#${sectionId}`} className={className}>
       {children}
-    </a>
+    </Link>
   );
 }

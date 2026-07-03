@@ -20,6 +20,18 @@ type Term = { term: string; short: string; body: string };
 
 const TERMS: Term[] = [
   {
+    term: "DNS record",
+    short:
+      "An instruction stored with your domain that tells the internet how it should behave — where your email goes, which site to load, and so on.",
+    body: "DNS (Domain Name System) is the address book of the internet, and DNS records are its individual entries. Setting up email means adding a handful of them — MX, TXT, SPF, DKIM, DMARC — so your mail is delivered and trusted. Get one wrong and email quietly breaks, which is exactly the part MailKit handles for you.",
+  },
+  {
+    term: "Nameservers",
+    short:
+      "The servers that decide who controls your domain's DNS — the reason your domain has to be “on Cloudflare”.",
+    body: "Your domain points at a set of nameservers, and whoever runs them controls its DNS records. To let Cloudflare manage your email records, your domain's nameservers have to point to Cloudflare — that's what “moving your domain to Cloudflare” actually means. You change them once at your registrar (GoDaddy, Namecheap, and the like), and everything else happens inside Cloudflare.",
+  },
+  {
     term: "SPF (Sender Policy Framework)",
     short:
       "A DNS record listing which servers are allowed to send email for your domain.",
@@ -44,6 +56,12 @@ const TERMS: Term[] = [
     body: "MX (Mail Exchange) records point your domain at the servers that accept incoming mail. When someone emails hello@yourdomain.com, their server looks up your MX records to know where to deliver it. Setting them wrong means email silently fails to arrive.",
   },
   {
+    term: "TXT record",
+    short:
+      "A free-form DNS record used to prove things about your domain — including your email's SPF, DKIM and DMARC settings.",
+    body: "A TXT record simply stores a line of text in your DNS, and email authentication leans on it heavily: your SPF rule, your DMARC policy and often your DKIM key all live in TXT records. They're invisible to anyone visiting your site, but they decide whether your mail is trusted or dropped into spam.",
+  },
+  {
     term: "SMTP",
     short: "The protocol used to send email across the internet.",
     body: "SMTP (Simple Mail Transfer Protocol) is how mail is handed from one server to the next when you send a message. To send from your own domain you need valid SMTP credentials from a sending service — this is the part people most often misconfigure, because an API key is not the same as SMTP credentials.",
@@ -55,10 +73,22 @@ const TERMS: Term[] = [
     body: "Email Routing lets your domain receive mail and forward it to an existing inbox like Gmail, without running a mail server. It handles the incoming side (MX records and forwarding); you still need a sending path to reply from your domain address. It requires your domain's DNS to be managed on Cloudflare.",
   },
   {
+    term: "Email alias & catch-all",
+    short:
+      "Extra addresses on your domain — like hello@ or billing@ — that all land in the same inbox.",
+    body: "An alias is an address such as hello@yourdomain.com that forwards to your real inbox, so you can run several public-facing addresses without several logins. A catch-all goes further and forwards anything sent to your domain — even typos — to one place. Cloudflare Email Routing can set both up for free once your domain is connected.",
+  },
+  {
     term: "Gmail Send-As",
     short:
       "A Gmail setting that lets you send email from an address on your own domain.",
     body: "Send-As adds your custom address (hello@yourdomain.com) to Gmail's \"From\" dropdown, routing outgoing mail through your domain's SMTP credentials. It's what makes replies come from your domain instead of your @gmail.com address, while you keep using the same Gmail inbox.",
+  },
+  {
+    term: "Deliverability",
+    short:
+      "Whether your email actually reaches the inbox instead of the spam folder.",
+    body: "Deliverability is the real goal behind SPF, DKIM and DMARC: receiving servers judge whether to trust you, and correct DNS records are what earn that trust. A fresh domain with missing or broken records looks like a spammer, so its mail gets filtered out. Getting the records right the first time is what keeps your email landing where people can actually see it.",
   },
   {
     term: "Forwarding vs sending",

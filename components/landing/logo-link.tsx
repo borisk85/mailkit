@@ -23,9 +23,14 @@ export function LogoLink({
       style={style}
       aria-label={ariaLabel}
       onClick={(e) => {
-        e.preventDefault();
-        history.replaceState(null, "", window.location.pathname);
-        window.scrollTo({ top: 0, behavior: "smooth" });
+        // On the landing page the logo just clears any hash and scrolls to
+        // the top. On every other page it must navigate home like a normal
+        // link — so only intercept when we're already on "/".
+        if (window.location.pathname === "/") {
+          e.preventDefault();
+          history.replaceState(null, "", window.location.pathname);
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        }
       }}
     >
       {children}
