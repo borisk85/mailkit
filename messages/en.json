@@ -569,7 +569,8 @@
       "terms": "Terms of Service",
       "privacy": "Privacy Policy",
       "guarantee": "Guarantee",
-      "supportEmail": "support@getmailkit.com"
+      "supportEmail": "support@getmailkit.com",
+      "status": "Service status"
     }
   },
   "error": {

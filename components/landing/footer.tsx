@@ -75,6 +75,9 @@ export function Footer() {
             <FooterLink href="mailto:support@getmailkit.com" external breakAll>
               {t("links.supportEmail")}
             </FooterLink>
+            <FooterLink href="https://status.getmailkit.com" external>
+              {t("links.status")}
+            </FooterLink>
           </FooterColumn>
         </div>
 
