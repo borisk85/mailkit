@@ -73,7 +73,7 @@ const TERMS: Term[] = [
     body: "Email Routing lets your domain receive mail and forward it to an existing inbox like Gmail, without running a mail server. It handles the incoming side (MX records and forwarding); you still need a sending path to reply from your domain address. It requires your domain's DNS to be managed on Cloudflare.",
   },
   {
-    term: "Email alias & catch-all",
+    term: "Email alias and catch-all",
     short:
       "Extra addresses on your domain — like hello@ or billing@ — that all land in the same inbox.",
     body: "An alias is an address such as hello@yourdomain.com that forwards to your real inbox, so you can run several public-facing addresses without several logins. A catch-all goes further and forwards anything sent to your domain — even typos — to one place. Cloudflare Email Routing can set both up for free once your domain is connected.",
