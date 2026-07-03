@@ -22,7 +22,7 @@
 ## Key facts
 - Cost: $5 USD one-time per mailbox setup — not a subscription
 - Required: domain DNS managed on Cloudflare (free tier is enough), a personal Gmail account
-- Not required: Google Workspace, your own Brevo/Postmark account, paid Cloudflare plan
+- Not required: Google Workspace, your own SMTP or Postmark account, paid Cloudflare plan
 - Sending limit: 500 emails/day per domain (50/hour burst cap)
 - Refund policy: automatic refund if our automation fails; 30-day functional guarantee
 - Aliases: unlimited free aliases via Cloudflare Email Routing (anything@yourdomain.com)

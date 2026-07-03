@@ -61,7 +61,15 @@ export function organizationSchema(): Record<string, unknown> {
     name: "MailKit",
     url: siteUrl(),
     logo: abs("/brand/mailkit-logo-full.png"),
-    sameAs: [],
+    sameAs: ["https://x.com/borisfounder"],
+    founder: {
+      "@type": "Person",
+      "@id": `${siteUrl()}/#founder`,
+      name: "Boris Komarov",
+      jobTitle: "Founder",
+      url: "https://x.com/borisfounder",
+      sameAs: ["https://x.com/borisfounder"],
+    },
     contactPoint: {
       "@type": "ContactPoint",
       email: "support@getmailkit.com",
@@ -78,7 +86,7 @@ export function softwareApplicationSchema(): Record<string, unknown> {
     "@id": `${siteUrl()}/#software-application`,
     name: "MailKit",
     description:
-      "MailKit configures custom domain email in 5 minutes — Cloudflare Email Routing for receiving, Postmark SMTP for sending, guided Gmail Send-As wizard. $5 one-time per mailbox.",
+      "MailKit configures custom domain email in about 30 minutes (roughly 10 minutes of your time plus background DKIM verification) — Cloudflare Email Routing for receiving, Postmark SMTP for sending, guided Gmail Send-As wizard. $5 one-time per mailbox.",
     url: siteUrl(),
     applicationCategory: "BusinessApplication",
     operatingSystem: "Web",
@@ -101,7 +109,7 @@ export function productSchema(): Record<string, unknown> {
     "@id": `${siteUrl()}/#product`,
     name: "MailKit — custom domain email setup",
     description:
-      "One-time custom domain email setup in 5 minutes. Includes Cloudflare Email Routing, Postmark SMTP authentication, and guided Gmail Send-As wizard. Money-back guarantee on automation failure.",
+      "One-time custom domain email setup in about 30 minutes (roughly 10 minutes of active work plus background DKIM verification). Includes Cloudflare Email Routing, Postmark SMTP authentication, and guided Gmail Send-As wizard. Money-back guarantee on automation failure.",
     image: abs("/opengraph-image.png"),
     brand: {
       "@type": "Brand",

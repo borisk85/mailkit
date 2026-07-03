@@ -350,7 +350,7 @@
       "cancelBtn": "I'll migrate first"
     },
     "title": "Connect your domain",
-    "subtitle": "Paste your Cloudflare API token to begin. Takes ~5 minutes.",
+    "subtitle": "Paste your Cloudflare API token to begin. About 10 minutes of your time, ~30 minutes total with DKIM verification.",
     "step1": {
       "title": "Step 1 — Paste your Cloudflare API token",
       "tokenLabel": "Cloudflare API token",
@@ -539,7 +539,7 @@
     "wizard": {
       "step1": {
         "heading": "Create a Cloudflare API Token",
-        "sub": "Takes ~5 minutes.",
+        "sub": "Just a couple of minutes.",
         "instructionOpenCF": "Open Cloudflare API Tokens",
         "permTitle": "Required permissions",
         "scopeNote": "Limit to one zone so the token is scoped to your domain only"

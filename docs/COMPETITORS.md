@@ -9,7 +9,7 @@
 ### SendMailAs (sendmailas.com) — ЕДИНСТВЕННЫЙ ПРЯМОЙ КОНКУРЕНТ
 
 **Что делает:** автоматизирует настройку Cloudflare Email Routing + Gmail Send-As.
-Использует собственный SMTP relay (не Brevo).
+Использует собственный SMTP relay (не Postmark).
 
 **Ключевые факты:**
 - Тоже требует Cloudflare DNS — аудитория идентична
@@ -19,7 +19,7 @@
 
 **Критичное отличие MailKit vs SendMailAs:**
 - SendMailAs: пользователь завязан на их SMTP relay — перестал платить → перестал отправлять
-- MailKit: one-time $5 → юзер владеет стеком (Cloudflare free + Brevo free tier) независимо от нас навсегда
+- MailKit: one-time $5 → юзер владеет стеком (Cloudflare free + Postmark free tier) независимо от нас навсегда
 
 **Messaging angle против SendMailAs:**
 > "Не подписка — ваш стек. После настройки MailKit инфраструктура ваша. Никаких ежегодных платежей, никакой зависимости от нашего сервиса."
@@ -47,13 +47,13 @@ Unified send+receive через Cloudflare Workers API. Developer tool — SPF/D
 Google объявил отключение POP в Gmail. Часть DIY-методов через POP3 сломается. **Для нас плюс**: наш стек (SMTP relay через Postmark) POP3 не использует, не затронут. Часть пользователей потеряет работающий DIY и будет искать замену.
 
 ### Рост DIY-гайдов по нашему стеку
-В 2026 появились статьи именно про Cloudflare+Brevo+Gmail как бесплатный DIY. Конкурируют за ключевики ("cloudflare email brevo gmail"), но подтверждают спрос на этот стек.
+В 2026 появились статьи именно про Cloudflare+Postmark+Gmail как бесплатный DIY. Конкурируют за ключевики ("cloudflare email brevo gmail"), но подтверждают спрос на этот стек.
 
 ---
 
 ## Вывод
 
-Прямых конкурентов с моделью one-time payment + Cloudflare + Brevo + Gmail — **нет**.
+Прямых конкурентов с моделью one-time payment + Cloudflare + Postmark + Gmail — **нет**.
 SendMailAs — ближайший, но subscription и свой SMTP relay = vendor lock-in.
 
 **Таблица сравнения нужна** — SendMailAs + Workspace + ImprovMX как основные reference points.
@@ -65,4 +65,4 @@ SendMailAs — ближайший, но subscription и свой SMTP relay = ve
 
 - vs Workspace/Zoho: "Они заменяют Gmail. Мы его дополняем — ты остаёшься в привычном инбоксе."
 - vs ImprovMX/ForwardEmail: "Они берут каждый месяц. Мы — один раз. Твоя инфраструктура, не наша."
-- vs SendMailAs: "Они — ежегодная подписка, ты зависишь от их relay. Мы — $5 один раз, дальше Cloudflare и Brevo работают без нас."
+- vs SendMailAs: "Они — ежегодная подписка, ты зависишь от их relay. Мы — $5 один раз, дальше Cloudflare и Postmark работают без нас."

@@ -17,6 +17,9 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
 const PUBLIC_ROUTES = [
   { path: "", priority: 1.0, changeFrequency: "weekly" as const },
   { path: "/blog", priority: 0.8, changeFrequency: "weekly" as const },
+  { path: "/faq", priority: 0.7, changeFrequency: "monthly" as const },
+  { path: "/guarantee", priority: 0.6, changeFrequency: "monthly" as const },
+  { path: "/compare", priority: 0.7, changeFrequency: "monthly" as const },
   { path: "/terms", priority: 0.5, changeFrequency: "monthly" as const },
   { path: "/privacy", priority: 0.5, changeFrequency: "monthly" as const },
 ];

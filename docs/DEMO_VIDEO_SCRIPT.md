@@ -30,13 +30,13 @@
 ### Сцена 1 (0:00–0:08) — Hook problem
 
 **Visual:** Browser tab grid с 6-8 открытыми вкладками (Cloudflare,
-Brevo docs, Stack Overflow, Gmail Settings, Reddit r/sysadmin, AWS
+Postmark docs, Stack Overflow, Gmail Settings, Reddit r/sysadmin, AWS
 docs). Cursor нервно перепрыгивает между ними. Timestamp в углу
 крутится "00:00 → 00:45".
 
 **Voiceover:**
 > "Setting up email on your own domain takes ninety minutes.
-> Cloudflare. DNS records. Brevo SMTP. Gmail Send-As. One typo
+> Cloudflare. DNS records. Postmark SMTP. Gmail Send-As. One typo
 > and you start over."
 
 **Subtitle:** "Setting up email on your domain — 90 minutes of pain"
@@ -56,19 +56,19 @@ docs). Cursor нервно перепрыгивает между ними. Times
 
 **Visual:** Горизонтальный progress flow. Слева Cloudflare logo →
 анимированный checkmark "DNS configured" с приставкой "~15 sec". В
-центре Brevo logo → checkmark "SMTP authenticated" с "~60 sec". Справа
+центре Postmark logo → checkmark "SMTP authenticated" с "~60 sec". Справа
 Gmail logo → animated cursor показывает paste в SMTP form, checkmark
 "Send-As configured" с "~3 min, guided".
 
 **Voiceover:**
 > "We configure Cloudflare Email Routing in fifteen seconds. We
-> authenticate your domain in Brevo SMTP — sixty seconds. Then we
+> authenticate your domain in Postmark SMTP — sixty seconds. Then we
 > walk you through Gmail's three-minute Send-As setup with copy-paste
 > fields. That's the whole flow."
 
 **Subtitle (smooth transitions):**
 - "Step 1 — Cloudflare Email Routing (auto)"
-- "Step 2 — Brevo SMTP authentication (auto)"
+- "Step 2 — Postmark SMTP authentication (auto)"
 - "Step 3 — Gmail Send-As (3 minutes, guided)"
 
 ### Сцена 4 (0:30–0:45) — Outcome demonstration
@@ -128,12 +128,12 @@ generator поддерживает scene markers — используй разб
 
 ```
 Setting up email on your own domain takes ninety minutes. Cloudflare.
-DNS records. Brevo SMTP. Gmail Send-As. One typo and you start over.
+DNS records. Postmark SMTP. Gmail Send-As. One typo and you start over.
 
 MailKit does it for you in five minutes. Five dollars. One time.
 
 We configure Cloudflare Email Routing in fifteen seconds. We
-authenticate your domain in Brevo SMTP — sixty seconds. Then we walk
+authenticate your domain in Postmark SMTP — sixty seconds. Then we walk
 you through Gmail's three-minute Send-As setup with copy-paste fields.
 That's the whole flow.
 
@@ -224,12 +224,12 @@ Five dollars. Five minutes. Email on your domain. MailKit dot com.
 
 ```
 Настроить почту на своём домене занимает девяносто минут. Cloudflare.
-DNS записи. Brevo SMTP. Gmail Send-As. Одна опечатка — начинай заново.
+DNS записи. Postmark SMTP. Gmail Send-As. Одна опечатка — начинай заново.
 
 MailKit делает это за тебя за пять минут. За пять долларов. Один раз.
 
 Настраиваем Cloudflare Email Routing за пятнадцать секунд.
-Аутентифицируем твой домен в Brevo SMTP — шестьдесят секунд. Дальше
+Аутентифицируем твой домен в Postmark SMTP — шестьдесят секунд. Дальше
 ведём тебя через трёхминутную настройку Gmail Send-As с готовыми
 полями для копирования. Это весь процесс.
 
