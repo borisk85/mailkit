@@ -39,23 +39,21 @@ export function Footer() {
             <p className="mk-body-small mt-4 max-w-xs text-mk-text-tertiary">
               {t("tagline")}
             </p>
-            <div className="mt-5 flex items-center gap-2.5">
+            <div className="mt-5 flex items-center gap-4">
               <a
                 href="https://x.com/borisfounder"
                 target="_blank"
                 rel="noreferrer"
                 aria-label="Boris on X"
-                className="mk-hover-lift inline-flex size-8 items-center justify-center rounded-full border border-mk-border-subtle text-mk-text-tertiary transition-colors hover:bg-surface-elevated-2 hover:text-mk-text-primary"
+                className="text-mk-text-tertiary transition-colors hover:text-mk-text-primary"
               >
-                <SiX size={13} aria-hidden />
+                <SiX size={17} aria-hidden />
               </a>
             </div>
-            <p className="mk-caption mt-6 text-mk-text-tertiary">
-              {t("copyright")}
-            </p>
           </div>
 
           <FooterColumn heading={t("productHeading")}>
+            <FooterLink href="/app">{t("links.signIn")}</FooterLink>
             <FooterLink href={`${landingHref}#how-it-works`}>
               {t("links.howItWorks")}
             </FooterLink>
@@ -65,7 +63,6 @@ export function Footer() {
             <FooterLink href={`${landingHref}#faq`}>
               {t("links.faq")}
             </FooterLink>
-            <FooterLink href="/app">{t("links.signIn")}</FooterLink>
           </FooterColumn>
 
           <FooterColumn heading={t("legalHeading")}>
@@ -81,11 +78,12 @@ export function Footer() {
           </FooterColumn>
         </div>
 
-        <div className="mt-10 flex justify-end border-t border-mk-border-subtle pt-5">
+        <div className="mt-10 flex items-center justify-between gap-4 border-t border-mk-border-subtle pt-5">
+          <p className="mk-caption text-mk-text-tertiary">{t("copyright")}</p>
           <a
             href="#top"
             aria-label="Back to top"
-            className="mk-hover-lift inline-flex size-9 items-center justify-center rounded-full border border-mk-border-subtle text-mk-text-tertiary transition-colors hover:bg-surface-elevated-2 hover:text-mk-text-secondary"
+            className="mk-hover-lift inline-flex size-9 shrink-0 items-center justify-center rounded-full border border-mk-border-subtle text-mk-text-tertiary transition-colors hover:bg-surface-elevated-2 hover:text-mk-text-secondary"
           >
             <ChevronUp className="size-4" aria-hidden />
           </a>
