@@ -1,5 +1,21 @@
 import type { Metadata } from "next";
 import { setRequestLocale } from "next-intl/server";
+import {
+  ArrowLeftRight,
+  AtSign,
+  FileText,
+  Fingerprint,
+  Globe,
+  Inbox,
+  type LucideIcon,
+  MailCheck,
+  Reply,
+  Route,
+  Send,
+  Server,
+  ShieldAlert,
+  ShieldCheck,
+} from "lucide-react";
 
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
@@ -98,6 +114,24 @@ const TERMS: Term[] = [
   },
 ];
 
+// One curated icon per term (not auto-picked) — a small accent chip beside
+// each definition to break up the wall of text.
+const TERM_ICON: Record<string, LucideIcon> = {
+  "DNS record": Globe,
+  Nameservers: Server,
+  "SPF (Sender Policy Framework)": ShieldCheck,
+  "DKIM (DomainKeys Identified Mail)": Fingerprint,
+  "DMARC (Domain-based Message Authentication)": ShieldAlert,
+  "MX record": Inbox,
+  "TXT record": FileText,
+  SMTP: Send,
+  "Cloudflare Email Routing": Route,
+  "Email alias and catch-all": AtSign,
+  "Gmail Send-As": Reply,
+  Deliverability: MailCheck,
+  "Forwarding vs sending": ArrowLeftRight,
+};
+
 export default async function GlossaryPage({
   params,
 }: {
@@ -142,20 +176,35 @@ export default async function GlossaryPage({
         </div>
 
         <dl className="mt-16 flex flex-col gap-4">
-          {TERMS.map((t) => (
-            <div
-              key={t.term}
-              className="rounded-[16px] border border-mk-border-subtle bg-surface-elevated p-6 sm:p-8"
-            >
-              <dt className="mk-heading-2 text-mk-text-primary">{t.term}</dt>
-              <dd className="mk-body mt-2 font-medium text-mk-text-primary">
-                {t.short}
-              </dd>
-              <dd className="mk-body mt-3 text-pretty text-mk-text-secondary">
-                {t.body}
-              </dd>
-            </div>
-          ))}
+          {TERMS.map((t) => {
+            const Icon = TERM_ICON[t.term];
+            return (
+              <div
+                key={t.term}
+                className="rounded-[16px] border border-mk-border-subtle bg-surface-elevated p-6 sm:p-8"
+              >
+                <div className="flex items-center gap-3">
+                  {Icon ? (
+                    <span
+                      className="flex size-9 shrink-0 items-center justify-center rounded-[10px] bg-mk-accent/10 text-mk-accent"
+                      aria-hidden
+                    >
+                      <Icon className="size-[18px]" />
+                    </span>
+                  ) : null}
+                  <dt className="mk-heading-2 text-balance text-mk-text-primary">
+                    {t.term}
+                  </dt>
+                </div>
+                <dd className="mk-body mt-3 font-medium text-mk-accent">
+                  {t.short}
+                </dd>
+                <dd className="mk-body mt-2 text-pretty text-mk-text-secondary">
+                  {t.body}
+                </dd>
+              </div>
+            );
+          })}
         </dl>
 
         <div className="mt-16 rounded-[16px] border border-mk-border-subtle bg-surface-elevated p-8 text-center">
