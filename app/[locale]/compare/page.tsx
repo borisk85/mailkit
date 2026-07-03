@@ -22,15 +22,7 @@ type Cell = { v: "yes" | "no" | "na"; note?: string } | { text: string };
 
 const COLUMNS = ["MailKit", "SendMailAs", "Google Workspace"];
 
-const ROWS: { label: string; cells: Cell[] }[] = [
-  {
-    label: "Price",
-    cells: [
-      { text: "$5 once" },
-      { text: "$29 / year" },
-      { text: "$84 / year" },
-    ],
-  },
+const ROWS: { label: string; cells: Cell[]; isPrice?: boolean }[] = [
   {
     label: "Billing model",
     cells: [
@@ -67,6 +59,15 @@ const ROWS: { label: string; cells: Cell[] }[] = [
     label: "Keeps working if you stop paying",
     cells: [{ v: "yes", note: "stack stays yours" }, { v: "no" }, { v: "no" }],
   },
+  {
+    label: "Price",
+    cells: [
+      { text: "$5 once" },
+      { text: "$29 / year" },
+      { text: "$84 / year" },
+    ],
+    isPrice: true,
+  },
 ];
 
 const POSITIONING = [
@@ -84,10 +85,16 @@ const POSITIONING = [
   },
 ];
 
-function Mark({ cell }: { cell: Cell }) {
+function Mark({ cell, strong }: { cell: Cell; strong?: boolean }) {
   if ("text" in cell) {
     return (
-      <span className="mk-body font-medium text-mk-text-primary">
+      <span
+        className={
+          strong
+            ? "text-lg font-bold text-mk-text-primary"
+            : "mk-body font-medium text-mk-text-primary"
+        }
+      >
         {cell.text}
       </span>
     );
@@ -208,11 +215,17 @@ export default async function ComparePage({
               {ROWS.map((row) => (
                 <tr
                   key={row.label}
-                  className="border-b border-mk-border-subtle transition-colors last:border-0 hover:bg-mk-text-primary/[0.02]"
+                  className={`transition-colors hover:bg-mk-text-primary/[0.02] ${
+                    row.isPrice
+                      ? "border-t-2 border-mk-border-strong"
+                      : "border-b border-mk-border-subtle"
+                  }`}
                 >
                   <th
                     scope="row"
-                    className="mk-body px-6 py-5 text-left font-medium text-mk-text-primary"
+                    className={`mk-body px-6 py-5 text-left text-mk-text-primary ${
+                      row.isPrice ? "font-semibold" : "font-medium"
+                    }`}
                   >
                     {row.label}
                   </th>
@@ -223,7 +236,7 @@ export default async function ComparePage({
                         ci === 0 ? "bg-mk-accent/[0.06]" : ""
                       }`}
                     >
-                      <Mark cell={cell} />
+                      <Mark cell={cell} strong={!!row.isPrice && ci === 0} />
                     </td>
                   ))}
                 </tr>
