@@ -106,6 +106,7 @@ export default function SupportChatWidget() {
   const [cfEmail, setCfEmail] = useState("");
   const [cfMessage, setCfMessage] = useState("");
   const [cfSending, setCfSending] = useState(false);
+  const [cfTicket, setCfTicket] = useState<number | null>(null);
 
   const bottomRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -238,7 +239,7 @@ export default function SupportChatWidget() {
     setCfSending(true);
 
     try {
-      await fetch("/api/support/contact", {
+      const res = await fetch("/api/support/contact", {
         method: "POST",
         headers: { "content-type": "application/json" },
         body: JSON.stringify({
@@ -247,9 +248,12 @@ export default function SupportChatWidget() {
           message: cfMessage.trim(),
         }),
       });
+      const data = await res.json().catch(() => ({}));
+      setCfTicket(typeof data.ticket === "number" ? data.ticket : null);
       setView("sent");
     } catch {
       // Still show sent — message may have gone through
+      setCfTicket(null);
       setView("sent");
     } finally {
       setCfSending(false);
@@ -586,10 +590,11 @@ export default function SupportChatWidget() {
             </div>
             <div>
               <p className="text-sm font-semibold text-foreground">
-                Message sent!
+                {cfTicket ? `Request #${cfTicket} sent!` : "Message sent!"}
               </p>
               <p className="mt-1 text-xs text-muted-foreground">
-                We&apos;ll reply to your email within 24 hours.
+                We&apos;ve emailed you a copy — we&apos;ll reply to your email
+                within 24 hours.
               </p>
             </div>
             <button
