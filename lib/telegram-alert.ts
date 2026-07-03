@@ -1,12 +1,14 @@
 /**
- * Shared Telegram notification utility.
- * Used by: support feedback (dislikes), #ABUSE-1 abuse alerts, #ABUSE-3 phishing flags.
- * Same bot token for all channels — set TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID in env.
+ * Shared Telegram notification utility — owner alerts to Boris's bot
+ * (@mailkitsupportbot). Used by: abuse alerts, phishing flags,
+ * auto-refund events, coupon-abuse blocks, cron failures.
+ *
+ * Plain text only — no parse_mode, no markdown (owner requirement:
+ * readable lines in Telegram). Never throws: an alert failure must
+ * not break the path that reports it.
+ *
+ * Env: TELEGRAM_BOT_TOKEN + TELEGRAM_CHAT_ID (no-op when unset).
  */
-
-function escapeHtml(v: string): string {
-  return v.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
-}
 
 export async function sendTelegramAlert(
   lines: (string | null)[],
@@ -20,11 +22,20 @@ export async function sendTelegramAlert(
     .join("\n")
     .slice(0, 4000);
 
-  await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ chat_id: chatId, text, parse_mode: "HTML" }),
-  }).catch((e) => console.error("[telegram-alert]", e));
+  try {
+    const res = await fetch(
+      `https://api.telegram.org/bot${token}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text }),
+        signal: AbortSignal.timeout(5000),
+      },
+    );
+    if (!res.ok) {
+      console.error("[telegram-alert] sendMessage failed:", res.status);
+    }
+  } catch (e) {
+    console.error("[telegram-alert]", e);
+  }
 }
-
-export { escapeHtml };

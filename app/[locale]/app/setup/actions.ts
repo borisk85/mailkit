@@ -28,7 +28,7 @@ import { triggerAutoRefund } from "@/lib/auto-refund";
 import { sendSetupCompleteEmail } from "@/lib/integrations/postmark-transactional";
 import { encryptToken } from "@/lib/crypto/token-cipher";
 import { checkPhishingPattern } from "@/lib/phishing";
-import { sendTelegramAlert, escapeHtml } from "@/lib/telegram-alert";
+import { sendTelegramAlert } from "@/lib/telegram-alert";
 import { createClient, createServiceClient } from "@/lib/supabase/server";
 
 /**
@@ -346,6 +346,32 @@ export async function startSetupRun(input: {
     .eq("cf_zone_id", parsed.data.zoneId)
     .eq("mailbox_local", parsed.data.mailboxLocal)
     .eq("status", "failed");
+
+  // Refund-abuse detector: this domain already got a refund (any
+  // account — serial refunders rotate Google accounts, the domain
+  // can't rotate). Alert only, don't block: support decides.
+  void (async () => {
+    try {
+      const { data: priorRefund } = await admin
+        .from("purchases")
+        .select("id, user_email, refunded_at")
+        .eq("status", "refunded")
+        .contains("custom_data", { domain: zoneName })
+        .order("refunded_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+      if (priorRefund) {
+        await sendTelegramAlert([
+          "🟠 MailKit — re-setup after refund",
+          `Domain ${zoneName} starts a new setup, but already got a refund on ${(priorRefund.refunded_at ?? "").slice(0, 10)}.`,
+          `Current user: ${user.email ?? user.id}`,
+          `Refunded purchase: ${priorRefund.id} (${priorRefund.user_email || "no email"})`,
+        ]);
+      }
+    } catch (e) {
+      console.error("[setup] re-setup-after-refund detector failed", e);
+    }
+  })();
 
   const { data: inserted, error: insertError } = await admin
     .from("setup_runs")
@@ -1271,14 +1297,12 @@ async function flagPhishingPurchase(
     });
 
     void sendTelegramAlert([
-      "🚨 <b>Phishing pattern detected — MailKit</b>",
-      "",
-      `<b>Domain:</b> ${escapeHtml(domain)}`,
-      `<b>Reason:</b> ${escapeHtml(reason)}`,
-      `<b>Action:</b> kyc_review_required = true`,
-      purchase ? `<b>Purchase ID:</b> ${escapeHtml(purchase.id)}` : null,
-      "",
-      "Review in Supabase admin → purchases table.",
+      "🚨 MailKit — phishing pattern",
+      `Domain: ${domain}`,
+      `Reason: ${reason}`,
+      "Action: kyc_review_required = true",
+      purchase ? `Purchase: ${purchase.id}` : null,
+      "Review in Supabase → purchases.",
     ]);
   } catch (e) {
     console.error("[phishing-flag]", e);

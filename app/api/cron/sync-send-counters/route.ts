@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 
 import { suspendForRateLimit } from "@/lib/abuse-suspend";
+import { runCron } from "@/lib/cron-alert";
 import { createPostmarkStatsClient } from "@/lib/integrations/postmark-stats";
+import { sendTelegramAlert } from "@/lib/telegram-alert";
 import {
   currentWindowBuckets,
   evaluateSendLimits,
@@ -32,6 +34,10 @@ import { createServiceClient } from "@/lib/supabase/server";
  * in console.error for Vercel runtime logs.
  */
 export async function GET(request: Request) {
+  return runCron("sync-send-counters", () => handler(request));
+}
+
+async function handler(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     console.error("[cron/sync-send-counters] CRON_SECRET not configured");
@@ -169,6 +175,60 @@ export async function GET(request: Request) {
         error: msg,
       });
     }
+  }
+
+  // Refund-abuse detector: a refunded purchase whose domain still
+  // sends through our relay. Sends counted from refunded_at onward.
+  // Fires on every run until the owner suspends the server — that
+  // repetition is intentional (the alert is the to-do list).
+  try {
+    const { data: refunded } = await admin
+      .from("purchases")
+      .select("user_email, refunded_at, custom_data")
+      .eq("status", "refunded")
+      .gte(
+        "refunded_at",
+        new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString(),
+      );
+
+    for (const p of refunded ?? []) {
+      const cd = (p.custom_data ?? {}) as Record<string, unknown>;
+      const domain = typeof cd.domain === "string" ? cd.domain : "";
+      if (!domain || !p.refunded_at) continue;
+
+      const { data: run } = await admin
+        .from("setup_runs")
+        .select("cf_state")
+        .eq("domain", domain)
+        .not("postmark_server_id", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      const serverToken = (
+        (run?.cf_state as Record<string, unknown> | null)?.postmark as
+          | Record<string, unknown>
+          | undefined
+      )?.server_token as string | undefined;
+      if (!serverToken) continue;
+
+      const stats = createPostmarkStatsClient(serverToken);
+      const report = await stats.getAggregatedReport({
+        startDate: p.refunded_at.slice(0, 10),
+        endDate: todayDate,
+      });
+
+      if (report.requests > 0) {
+        await sendTelegramAlert([
+          "🟠 MailKit — refunded but still sending",
+          `Domain ${domain} got a refund on ${p.refunded_at.slice(0, 10)} and has sent ${report.requests} emails since.`,
+          `User: ${p.user_email || "unknown"}`,
+          "Suspend the Postmark server to cut them off.",
+        ]);
+      }
+    }
+  } catch (e) {
+    console.error("[cron/sync-send-counters] refund-abuse detector failed", e);
   }
 
   return NextResponse.json(summary, { status: 200 });

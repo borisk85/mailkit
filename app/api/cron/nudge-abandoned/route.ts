@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { sendAbandonedSetupEmail } from "@/lib/integrations/postmark-transactional";
+import { runCron } from "@/lib/cron-alert";
 import { createServiceClient } from "@/lib/supabase/server";
 
 /**
@@ -14,6 +15,10 @@ import { createServiceClient } from "@/lib/supabase/server";
  * Sends a "your setup is waiting" email and stamps abandoned_nudge_sent_at.
  */
 export async function GET(request: Request) {
+  return runCron("nudge-abandoned", () => handler(request));
+}
+
+async function handler(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     console.error("[cron/nudge-abandoned] CRON_SECRET not configured");

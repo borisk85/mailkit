@@ -6,6 +6,7 @@ import {
   formatRateForStorage,
 } from "@/lib/deliverability";
 import { createPostmarkStatsClient } from "@/lib/integrations/postmark-stats";
+import { runCron } from "@/lib/cron-alert";
 import { createServiceClient } from "@/lib/supabase/server";
 
 const RETENTION_DAYS = 90;
@@ -26,6 +27,10 @@ const WINDOW_DAYS = 7;
  * separately (no auto-purge — those are forensics).
  */
 export async function GET(request: Request) {
+  return runCron("sync-deliverability", () => handler(request));
+}
+
+async function handler(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     console.error("[cron/sync-deliverability] CRON_SECRET not configured");

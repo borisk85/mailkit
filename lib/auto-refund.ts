@@ -1,6 +1,7 @@
 import "server-only";
 
 import { sendAutoRefundEmail } from "@/lib/integrations/postmark-transactional";
+import { sendTelegramAlert } from "@/lib/telegram-alert";
 import {
   LemonSqueezyError,
   createLemonSqueezyClient,
@@ -116,6 +117,14 @@ export async function triggerAutoRefund(
         `[auto-refund] refunded purchase ${purchase.id} (LS order ${purchase.ls_order_id}) for run ${runId}, step ${step}`,
       );
 
+      void sendTelegramAlert([
+        "🟠 MailKit — auto-refund fired",
+        `Setup failed at step: ${step}`,
+        `User: ${purchase.user_email || "unknown"}`,
+        `Refunded: $${(purchase.amount_cents / 100).toFixed(2)} (LS order ${purchase.ls_order_id})`,
+        `Run: ${runId}`,
+      ]);
+
       // Notify the buyer. Email failure must not cascade: the refund
       // has already landed on LS + in our DB; a missed email is a
       // support issue, not a refund-pipeline failure. Swallow + log
@@ -163,6 +172,14 @@ export async function triggerAutoRefund(
         triggered_by: "system",
         notes: `LS_CALL_FAILED at auto-refund: ${lsMessage}. failed_step=${step}. LS order ${purchase.ls_order_id}. Manual retry required.`,
       });
+
+      void sendTelegramAlert([
+        "🔴 MailKit — auto-refund FAILED, manual action needed",
+        `Lemon Squeezy rejected the refund call: ${lsMessage}`,
+        `User: ${purchase.user_email || "unknown"}`,
+        `LS order: ${purchase.ls_order_id} — refund it manually in the LS dashboard`,
+        `Run: ${runId}, failed step: ${step}`,
+      ]);
     }
   } catch (outer) {
     // Last-ditch: never let auto-refund bubble up.

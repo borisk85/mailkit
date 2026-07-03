@@ -1,16 +1,13 @@
-import { escapeHtml, sendTelegramAlert } from "@/lib/telegram-alert";
+import { sendTelegramAlert } from "@/lib/telegram-alert";
 
 /**
- * Owner alert for abuse and operational events.
+ * Owner alert for abuse and operational events. Plain text.
  * Gracefully no-ops when TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID are
- * not set — add both env vars in Vercel to activate.
+ * not set.
  */
 export async function notifyOwnerViaTelegram(
   message: string,
   eventType: string,
 ): Promise<void> {
-  await sendTelegramAlert([
-    `🚨 <b>Abuse: ${escapeHtml(eventType)}</b>`,
-    escapeHtml(message),
-  ]);
+  await sendTelegramAlert([`🚨 MailKit — ${eventType}`, message]);
 }

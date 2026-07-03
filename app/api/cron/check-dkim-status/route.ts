@@ -5,6 +5,7 @@ import {
   sendDkimReadyEmail,
 } from "@/lib/notifications/email";
 import { createPostmarkAccountClient } from "@/lib/integrations/postmark";
+import { runCron } from "@/lib/cron-alert";
 import { createServiceClient } from "@/lib/supabase/server";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
@@ -25,6 +26,10 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
  * enough for the 15/30-min thresholds at MVP scale.
  */
 export async function GET(request: Request) {
+  return runCron("check-dkim-status", () => handler(request));
+}
+
+async function handler(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     console.error("[cron/check-dkim-status] CRON_SECRET not configured");

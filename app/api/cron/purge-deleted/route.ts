@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 
 import { DELETION_GRACE_DAYS } from "@/lib/account-lifecycle";
+import { runCron } from "@/lib/cron-alert";
 import { createServiceClient } from "@/lib/supabase/server";
 
 /**
@@ -19,6 +20,10 @@ import { createServiceClient } from "@/lib/supabase/server";
  * 200 summary with any errors for the Vercel runtime logs.
  */
 export async function GET(request: Request) {
+  return runCron("purge-deleted", () => handler(request));
+}
+
+async function handler(request: Request) {
   const secret = process.env.CRON_SECRET;
   if (!secret) {
     console.error("[cron/purge-deleted] CRON_SECRET not configured");

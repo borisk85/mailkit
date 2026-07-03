@@ -5,6 +5,7 @@ import {
   verifyWebhookSignature,
 } from "@/lib/integrations/lemon-squeezy";
 import { createServiceClient } from "@/lib/supabase/server";
+import { sendTelegramAlert } from "@/lib/telegram-alert";
 
 /**
  * Lemon Squeezy webhook receiver.
@@ -196,6 +197,14 @@ async function handleOrderCreated(
     console.info(
       `[ls-webhook] coupon abuse — blocked, order ${orderId} for user ${userId}`,
     );
+
+    void sendTelegramAlert([
+      "🟠 MailKit — coupon abuse blocked",
+      "Second $0 order from a user who already has a paid setup.",
+      `User: ${userId} (${attrs.user_email || "no email"})`,
+      `LS order: ${orderId}`,
+      "Stored as refunded, wizard gate blocks the run. No action required.",
+    ]);
   }
 }
 
