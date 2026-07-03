@@ -53,7 +53,6 @@ export function Footer() {
           </div>
 
           <FooterColumn heading={t("productHeading")}>
-            <FooterLink href="/app">{t("links.signIn")}</FooterLink>
             <FooterLink href={`${landingHref}#how-it-works`}>
               {t("links.howItWorks")}
             </FooterLink>
