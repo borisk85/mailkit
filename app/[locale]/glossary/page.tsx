@@ -4,6 +4,7 @@ import { setRequestLocale } from "next-intl/server";
 
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
+import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
 
@@ -34,20 +35,20 @@ const TERMS: Term[] = [
   {
     term: "SPF (Sender Policy Framework)",
     short:
-      "A DNS record listing which servers are allowed to send email for your domain.",
-    body: "SPF is a TXT record in your domain's DNS. It names the mail servers permitted to send messages using your domain, so receiving servers can reject spoofed mail that claims to be from you. Without a valid SPF record, your legitimate email is far more likely to land in spam.",
+      "A DNS record that lists which services are allowed to send email using your domain.",
+    body: "SPF is a short entry in your DNS that lists the services allowed to send mail as you. When a message arrives claiming to be from your domain, the other side checks that list — if the sender isn't on it, the mail looks fake and can be turned away. Without SPF, even your genuine email often ends up in spam.",
   },
   {
     term: "DKIM (DomainKeys Identified Mail)",
     short:
-      "A cryptographic signature that proves an email really came from your domain and wasn't altered.",
-    body: "DKIM adds a digital signature to every message, using a private key held by the sending service and a public key published in your DNS. The receiving server checks the signature to confirm the message is authentic and untampered. It's one of the strongest signals that you're a real sender, not a spammer.",
+      "A tamper-proof seal that proves an email really came from your domain and wasn't changed on the way.",
+    body: "DKIM puts an invisible seal on every email you send — a mark only your domain can produce. The email provider on the other end checks that seal to be sure the message really came from you and wasn't tampered with along the way. It's one of the strongest signals that you're a real sender, not a spammer.",
   },
   {
     term: "DMARC (Domain-based Message Authentication)",
     short:
-      "A policy telling receivers what to do when SPF or DKIM fails — and where to send reports.",
-    body: "DMARC is a DNS record that builds on SPF and DKIM. It tells receiving servers whether to quarantine or reject mail that fails authentication, and it can send you reports about who is sending email using your domain. It's the piece that turns SPF and DKIM into an actual anti-spoofing policy.",
+      "A rule telling other providers what to do when SPF or DKIM fails — and where to send you reports.",
+    body: "DMARC sits on top of SPF and DKIM and sets the rule: if an email claiming to be from you fails those checks, should it go to spam or be blocked outright? It can also send you a summary of who's trying to send mail as your domain. It's the piece that turns SPF and DKIM into a real anti-impersonation policy.",
   },
   {
     term: "MX record",
@@ -136,8 +137,9 @@ export default async function GlossaryPage({
             Email setup, in plain English
           </h1>
           <p className="mk-body-large text-pretty text-mk-text-secondary">
-            The DNS and email terms you run into when putting a real address on
-            your own domain — each one explained without the jargon.
+            The DNS and email terms you run into when setting up a professional
+            address on your own domain — what each one actually means, and why
+            it matters for your setup.
           </p>
         </div>
 
@@ -165,12 +167,16 @@ export default async function GlossaryPage({
           <p className="mk-body mt-2 text-mk-text-secondary">
             MailKit sets all of it up for you — once, for $5.
           </p>
-          <div className="mt-6">
+          <div className="mt-6 flex flex-col items-center gap-4">
+            <LandingCtaButton
+              label="Set up email"
+              className="mk-cta-shadow mk-hover-lift inline-flex h-[52px] items-center justify-center rounded-[10px] bg-mk-accent px-8 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
+            />
             <Link
-              href="/compare"
-              className="mk-body font-medium text-mk-accent underline underline-offset-4 transition-opacity hover:opacity-70"
+              href="/#how-it-works"
+              className="mk-body font-medium text-mk-text-secondary underline-offset-4 transition-colors hover:text-mk-text-primary hover:underline"
             >
-              See how MailKit works
+              See how it works
             </Link>
           </div>
         </div>
