@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 import { Check, X, Minus } from "lucide-react";
 
 import { Footer } from "@/components/landing/footer";
 import { Header } from "@/components/landing/header";
-import { LEMON_SQUEEZY_CHECKOUT_URL } from "@/lib/constants/lemon-squeezy";
+import { LandingCtaButton } from "@/components/landing/landing-cta-button";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
 
@@ -265,18 +264,11 @@ export default async function ComparePage({
           <p className="mk-body-large text-mk-text-primary">
             One domain, one payment, no subscription.
           </p>
-          <a
-            href={LEMON_SQUEEZY_CHECKOUT_URL}
+          <LandingCtaButton
+            label="Set up email"
+            caption="$5 one-time · 30-day money-back guarantee"
             className="mk-cta-shadow mk-hover-lift inline-flex h-[52px] items-center justify-center rounded-[10px] bg-mk-accent px-8 text-base font-semibold text-white transition-colors hover:bg-mk-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-mk-accent/40 focus-visible:ring-offset-2 focus-visible:ring-offset-surface-base"
-          >
-            Set up my email — $5
-          </a>
-          <Link
-            href="/faq"
-            className="mk-body font-medium text-mk-accent underline underline-offset-4 transition-opacity hover:opacity-70"
-          >
-            Read the FAQ
-          </Link>
+          />
         </div>
       </main>
       <Footer />
