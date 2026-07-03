@@ -11,16 +11,16 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://getmailkit.com";
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "MailKit vs Google Workspace, SendMailAs & ImprovMX — Compare",
+    title: "MailKit vs SendMailAs & Google Workspace — Compare",
     description:
-      "How MailKit compares to Google Workspace, SendMailAs, ImprovMX and ForwardEmail: a one-time $5 setup you own forever versus monthly subscriptions and vendor lock-in.",
+      "How MailKit compares to SendMailAs and Google Workspace: a one-time $5 setup you own forever versus monthly and yearly subscriptions with vendor lock-in.",
     alternates: { canonical: "/compare" },
   };
 }
 
 type Cell = { v: "yes" | "no" | "na"; note?: string } | { text: string };
 
-const COLUMNS = ["MailKit", "SendMailAs", "Google Workspace", "ImprovMX"];
+const COLUMNS = ["MailKit", "SendMailAs", "Google Workspace"];
 
 const ROWS: { label: string; cells: Cell[] }[] = [
   {
@@ -29,7 +29,6 @@ const ROWS: { label: string; cells: Cell[] }[] = [
       { text: "$5 once" },
       { text: "$29 / year" },
       { text: "$84 / year" },
-      { text: "$9 / month" },
     ],
   },
   {
@@ -38,17 +37,11 @@ const ROWS: { label: string; cells: Cell[] }[] = [
       { text: "One-time" },
       { text: "Subscription" },
       { text: "Subscription" },
-      { text: "Subscription" },
     ],
   },
   {
     label: "Keeps your existing Gmail inbox",
-    cells: [
-      { v: "yes" },
-      { v: "yes" },
-      { v: "no", note: "replaces Gmail" },
-      { v: "yes" },
-    ],
+    cells: [{ v: "yes" }, { v: "yes" }, { v: "no", note: "replaces Gmail" }],
   },
   {
     label: "You own the stack after setup",
@@ -56,34 +49,23 @@ const ROWS: { label: string; cells: Cell[] }[] = [
       { v: "yes", note: "Cloudflare + Postmark, yours" },
       { v: "no", note: "their SMTP relay" },
       { v: "no" },
-      { v: "no" },
     ],
   },
   {
     label: "No vendor lock-in",
-    cells: [{ v: "yes" }, { v: "no" }, { v: "no" }, { v: "no" }],
+    cells: [{ v: "yes" }, { v: "no" }, { v: "no" }],
   },
   {
     label: "Automated setup",
-    cells: [
-      { v: "yes" },
-      { v: "yes" },
-      { v: "na", note: "manual" },
-      { v: "na", note: "manual" },
-    ],
+    cells: [{ v: "yes" }, { v: "yes" }, { v: "na", note: "manual" }],
   },
   {
     label: "Real sending, not just forwarding",
-    cells: [{ v: "yes" }, { v: "yes" }, { v: "yes" }, { v: "yes" }],
+    cells: [{ v: "yes" }, { v: "yes" }, { v: "yes" }],
   },
   {
     label: "Stops working if you stop paying",
-    cells: [
-      { v: "no", note: "stack stays yours" },
-      { v: "yes" },
-      { v: "yes" },
-      { v: "yes" },
-    ],
+    cells: [{ v: "no", note: "stack stays yours" }, { v: "yes" }, { v: "yes" }],
   },
 ];
 
@@ -97,8 +79,8 @@ const POSITIONING = [
     text: "SendMailAs is a yearly subscription tied to their SMTP relay — stop paying and sending stops. With MailKit the Cloudflare + Postmark stack is yours after a one-time $5.",
   },
   {
-    vs: "vs ImprovMX / ForwardEmail",
-    text: "Both charge monthly and route through their service. MailKit sets up sending on your own domain, then steps out of the way.",
+    vs: "vs the DIY route",
+    text: "Doing it by hand means Cloudflare, DNS records, SMTP and Gmail Send-As yourself — an hour of fiddly work where one typo breaks delivery. MailKit is that hour, automated.",
   },
 ];
 
@@ -172,12 +154,6 @@ export default async function ComparePage({
         name: "Google Workspace",
         description:
           "Full email suite that replaces Gmail. $7 per user per month.",
-      },
-      {
-        "@type": "ListItem",
-        position: 4,
-        name: "ImprovMX",
-        description: "Email forwarding and SMTP on a $9/month subscription.",
       },
     ],
   };
