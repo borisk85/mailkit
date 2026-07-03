@@ -34,7 +34,7 @@ hours on business days.
 What is not covered:
 
 - Time you spend on the Gmail Send-As guided step. We provide a
-  step-by-step wizard with copy-paste fields; the actual clicks
+  step-by-step wizard with copy-paste fields — the actual clicks
   happen in your Gmail account, at your pace.
 - Failures caused by changes you make to DNS records, Cloudflare
   settings, or Gmail account settings after setup completion.

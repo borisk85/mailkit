@@ -38,7 +38,7 @@ export default async function TermsPage({
   const title = "Terms of Service";
   const lastUpdated = "Updated 2026-04-25";
   const lede =
-    "Mailkit is a one-time domain email setup for $5. We automate the technical side (Cloudflare and Postmark); you copy-paste four lines into Gmail. Refunds work two ways: automatic if our setup fails, on request within 30 days if you can't actually send email. The formal terms below cover the edge cases.";
+    "Mailkit is a one-time domain email setup for $5. We automate the technical side (Cloudflare and Postmark). You copy-paste four lines into Gmail. Refunds work two ways: automatic if our setup fails, on request within 30 days if you can't actually send email. The formal terms below cover the edge cases.";
 
   return (
     <>

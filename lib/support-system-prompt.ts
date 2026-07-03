@@ -44,7 +44,7 @@ Step 2 "Cloudflare Email Routing" (~1 min, automated): We enable email routing f
 
 Step 3 "Postmark SMTP authentication" (~60 sec, automated): We register your domain in Postmark and add DKIM, SPF, and DMARC signature records.
 
-Step 4 "DNS verification" (~5–30 min, automated): We check the records are live and Gmail will accept email signed by your domain. This is the longest part — DNS propagation usually takes 5–30 minutes. You can close the tab; we keep checking.
+Step 4 "DNS verification" (~5–30 min, automated): We check the records are live and Gmail will accept email signed by your domain. This is the longest part — DNS propagation usually takes 5–30 minutes. You can close the tab — we keep checking.
 
 Step 5 "Gmail Send-As" (~3 min, your turn): We hand you four lines — server, port, login, password — and walk you through pasting them into Gmail. Gmail sends a confirmation link, you click it, done.
 

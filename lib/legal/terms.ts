@@ -39,7 +39,7 @@ MailKit does NOT:
 
 MailKit is a one-time payment service priced at $5 USD per mailbox
 setup. Payment is processed by Lemon Squeezy as Merchant of Record.
-Prices may change; current pricing applies at the time of purchase.
+Prices may change. Current pricing applies at the time of purchase.
 
 3. Refund policy
 

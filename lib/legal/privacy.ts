@@ -122,7 +122,7 @@ function or as required by law.
 - All connections to our Service use HTTPS encryption in transit.
 - Your Cloudflare API token is stored encrypted at rest (AES-256)
   only while your setup is in progress, then deleted as soon as it
-  completes; it is never written in plain text. SMTP passwords are
+  completes. It is never written in plain text. SMTP passwords are
   shown to you for copy-paste and are not retained.
 - Our database uses Row-Level Security policies that enforce access
   controls at the data layer.

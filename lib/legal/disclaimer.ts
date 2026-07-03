@@ -26,7 +26,7 @@ export const DELIVERABILITY_DISCLAIMER_EN = {
    * Short form — for FAQ answer "Why might my emails go to spam?" if
    * a tighter version reads better than the full paragraph.
    */
-  attributionOnly: `Email deliverability to a specific recipient depends on sender reputation, content, sending practices, and the recipient's policies — factors outside MailKit's control. We configure correct SPF/DKIM/DMARC; warmup and list hygiene are the sender's job.`,
+  attributionOnly: `Email deliverability to a specific recipient depends on sender reputation, content, sending practices, and the recipient's policies — factors outside MailKit's control. We configure correct SPF/DKIM/DMARC. Warmup and list hygiene are the sender's job.`,
 
   /**
    * Single-sentence warmup tip — for the wizard "done" panel and the

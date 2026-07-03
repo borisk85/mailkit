@@ -70,7 +70,7 @@ const TERMS: Term[] = [
     term: "Cloudflare Email Routing",
     short:
       "A free Cloudflare feature that receives and forwards mail for your domain.",
-    body: "Email Routing lets your domain receive mail and forward it to an existing inbox like Gmail, without running a mail server. It handles the incoming side (MX records and forwarding); you still need a sending path to reply from your domain address. It requires your domain's DNS to be managed on Cloudflare.",
+    body: "Email Routing lets your domain receive mail and forward it to an existing inbox like Gmail, without running a mail server. It handles the incoming side (MX records and forwarding). You still need a sending path to reply from your domain address. It requires your domain's DNS to be managed on Cloudflare.",
   },
   {
     term: "Email alias and catch-all",
@@ -93,7 +93,7 @@ const TERMS: Term[] = [
   {
     term: "Forwarding vs sending",
     short:
-      "Forwarding delivers incoming mail to another inbox; sending lets you reply from your domain.",
+      "Forwarding delivers incoming mail to another inbox. Sending lets you reply from your domain.",
     body: "Many cheap tools only forward — they get mail to your inbox but can't send from your domain. A complete custom-domain setup needs both: receiving (forwarding via MX) and sending (SMTP + Send-As), so a reply from hello@yourdomain.com actually leaves as hello@yourdomain.com.",
   },
 ];
