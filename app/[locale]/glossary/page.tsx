@@ -133,7 +133,7 @@ export default async function GlossaryPage({
         <div className="flex flex-col gap-5">
           <span className="mk-eyebrow text-mk-accent">Glossary</span>
           <h1 className="mk-display-2 text-balance text-mk-text-primary">
-            Email setup, in plain English
+            Email setup, in plain words
           </h1>
           <p className="mk-body-large text-pretty text-mk-text-secondary">
             The DNS and email terms you run into when setting up a professional
