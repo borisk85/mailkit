@@ -569,8 +569,7 @@
       "terms": "Terms of Service",
       "privacy": "Privacy Policy",
       "guarantee": "Guarantee",
-      "supportEmail": "support@getmailkit.com",
-      "builtInPublic": "Built in public on GitHub →"
+      "supportEmail": "support@getmailkit.com"
     }
   },
   "error": {

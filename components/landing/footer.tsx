@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { ChevronUp } from "lucide-react";
+import { SiX } from "react-icons/si";
 
 import { MailkitIcon } from "@/components/brand/mailkit-icon";
 
@@ -10,12 +11,10 @@ import { MailkitIcon } from "@/components/brand/mailkit-icon";
  * placeholders) is gone until those pages exist; current layout is
  * Brand × 2 + Product + Legal + Contact = 4 effective columns.
  *
- * The Contact column carries a `Built in public — GitHub →` link so
- * skeptics can verify the codebase — concrete trust signal that
- * reinforces the indie-founder positioning in the tagline.
+ * The GitHub "built in public" link was removed 2026-07-03: the repo
+ * is private, so the link 404'd for every visitor — a fake trust
+ * signal. Bring it back only if the repo ever goes public.
  */
-const GITHUB_URL = "https://github.com/borisk85/mailkit";
-
 export function Footer() {
   const t = useTranslations("footer");
   const landingHref = "/";
@@ -40,6 +39,17 @@ export function Footer() {
             <p className="mk-body-small mt-4 max-w-xs text-mk-text-tertiary">
               {t("tagline")}
             </p>
+            <div className="mt-5 flex items-center gap-2.5">
+              <a
+                href="https://x.com/borisfounder"
+                target="_blank"
+                rel="noreferrer"
+                aria-label="Boris on X"
+                className="mk-hover-lift inline-flex size-8 items-center justify-center rounded-full border border-mk-border-subtle text-mk-text-tertiary transition-colors hover:bg-surface-elevated-2 hover:text-mk-text-primary"
+              >
+                <SiX size={13} aria-hidden />
+              </a>
+            </div>
             <p className="mk-caption mt-6 text-mk-text-tertiary">
               {t("copyright")}
             </p>
@@ -67,9 +77,6 @@ export function Footer() {
           <FooterColumn heading={t("contactHeading")}>
             <FooterLink href="mailto:support@getmailkit.com" external breakAll>
               {t("links.supportEmail")}
-            </FooterLink>
-            <FooterLink href={GITHUB_URL} external>
-              {t("links.builtInPublic")}
             </FooterLink>
           </FooterColumn>
         </div>
