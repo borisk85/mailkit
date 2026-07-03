@@ -62,12 +62,12 @@ export default async function StatusPage({
       <p className="mt-8 text-xs text-muted-foreground">
         For incident updates follow{" "}
         <a
-          href="https://twitter.com/MailKitHQ"
+          href="https://x.com/borisfounder"
           target="_blank"
           rel="noopener noreferrer"
           className="text-foreground transition-colors hover:text-foreground/70"
         >
-          @MailKitHQ
+          @borisfounder
         </a>{" "}
         on X.
       </p>
