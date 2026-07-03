@@ -137,8 +137,7 @@ export default async function GlossaryPage({
           </h1>
           <p className="mk-body-large text-pretty text-mk-text-secondary">
             The DNS and email terms you run into when setting up a professional
-            address on your own domain — what each one actually means, and why
-            it matters for your setup.
+            address on your own domain — what each one actually means.
           </p>
         </div>
 
