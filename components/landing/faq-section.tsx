@@ -1,12 +1,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "@/components/ui/accordion";
+import { FaqAccordion } from "@/components/landing/faq-accordion";
 
 export function FaqSection({
   previewCount,
@@ -31,22 +26,10 @@ export function FaqSection({
           </h2>
         </div>
 
-        <Accordion className="mk-scroll-reveal-group mt-16 flex w-full flex-col gap-2">
-          {displayed.map((item) => (
-            <AccordionItem
-              key={item.id}
-              value={item.id}
-              className="mk-hover-lift mk-faq-item rounded-xl border border-mk-border-subtle bg-surface-elevated px-6 py-1 transition-colors hover:bg-surface-elevated/60"
-            >
-              <AccordionTrigger className="mk-heading-3 text-left text-mk-text-primary">
-                {item.q}
-              </AccordionTrigger>
-              <AccordionContent className="mk-body text-mk-text-secondary">
-                <p className="max-w-[65ch]">{item.a}</p>
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion>
+        <FaqAccordion
+          items={displayed}
+          className="mk-scroll-reveal-group mt-16 flex w-full flex-col gap-2"
+        />
 
         {hasMore && (
           <div className="mt-10 text-center">

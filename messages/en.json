@@ -154,7 +154,7 @@
       "policyLinkLabel": "Read full policy →"
     },
     "faq": {
-      "eyebrow": "Common questions",
+      "eyebrow": "FAQ",
       "heading": "Everything you'd ask before paying $5.",
       "seeAll": "See all {count} questions →",
       "items": [
@@ -226,7 +226,7 @@
         {
           "id": "workspace-support",
           "q": "Do you support Google Workspace mailboxes?",
-          "a": "Not at launch. The Gmail Send-As walkthrough is built for personal @gmail.com accounts, and Workspace admins can already create domain mailboxes natively without Mailkit. If there's enough demand, Workspace support is on the post-launch roadmap."
+          "a": "Not at launch. The Gmail Send-As walkthrough is built for personal @gmail.com accounts, and Workspace admins can already create domain mailboxes natively without MailKit. If there's enough demand, Workspace support is on the post-launch roadmap."
         },
         {
           "id": "sending-limits",
