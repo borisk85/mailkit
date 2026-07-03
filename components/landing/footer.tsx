@@ -79,7 +79,9 @@ export function Footer() {
         </div>
 
         <div className="mt-10 flex items-center justify-between gap-4 border-t border-mk-border-subtle pt-5">
-          <p className="mk-caption text-mk-text-tertiary">{t("copyright")}</p>
+          <p className="mk-caption text-mk-text-tertiary">
+            {t("copyright", { year: new Date().getFullYear() })}
+          </p>
           <a
             href="#top"
             aria-label="Back to top"

@@ -557,7 +557,7 @@
   },
   "footer": {
     "tagline": "Email on your domain. Setup in 30 minutes. Backed by a 30-day guarantee.",
-    "copyright": "© 2026 Mailkit. Built by an independent founder.",
+    "copyright": "© {year} Mailkit. Built by an independent founder.",
     "productHeading": "Product",
     "legalHeading": "Legal",
     "contactHeading": "Contact",
