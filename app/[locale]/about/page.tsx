@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { setRequestLocale } from "next-intl/server";
 
 import { Footer } from "@/components/landing/footer";
@@ -21,11 +20,6 @@ const BUILT = [
     name: "VELA",
     url: "https://velabot.io",
     note: "Personal AI assistants in Telegram, powered by Claude.",
-  },
-  {
-    name: "MailKit",
-    url: SITE_URL,
-    note: "One-time setup of professional email on your own domain.",
   },
   {
     name: "Vibecraft",
@@ -137,14 +131,6 @@ export default async function AboutPage({
           >
             support@getmailkit.com
           </a>
-          <div className="mt-6">
-            <Link
-              href="/compare"
-              className="mk-body font-medium text-mk-text-secondary underline underline-offset-4 transition-colors hover:text-mk-text-primary"
-            >
-              See how MailKit compares
-            </Link>
-          </div>
         </div>
       </main>
       <Footer />
