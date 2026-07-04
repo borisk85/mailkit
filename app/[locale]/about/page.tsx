@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
 
 import { Footer } from "@/components/landing/footer";
@@ -15,19 +17,6 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const BUILT = [
-  {
-    name: "VELA",
-    url: "https://velabot.io",
-    note: "Personal AI assistants in Telegram, powered by Claude.",
-  },
-  {
-    name: "Vibecraft",
-    url: "https://vibecraft.kz",
-    note: "A studio building small, sharp software products.",
-  },
-];
-
 export default async function AboutPage({
   params,
 }: {
@@ -35,6 +24,9 @@ export default async function AboutPage({
 }) {
   const { locale } = await params;
   setRequestLocale(locale);
+
+  const linkCls =
+    "font-medium text-mk-accent underline underline-offset-4 transition-opacity hover:opacity-70";
 
   const personJsonLd = {
     "@context": "https://schema.org",
@@ -58,79 +50,83 @@ export default async function AboutPage({
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
 
-        <div className="flex flex-col gap-5">
-          <span className="mk-eyebrow text-mk-accent">About</span>
-          <h1 className="mk-display-2 text-balance text-mk-text-primary">
-            Who’s behind MailKit
-          </h1>
-        </div>
+        <Link
+          href="/"
+          className="mb-8 inline-flex items-center gap-1 text-sm text-mk-text-tertiary transition-colors hover:text-mk-text-secondary"
+        >
+          <ChevronLeft className="size-4" aria-hidden />
+          Back to homepage
+        </Link>
 
-        <div className="mk-body-large mt-10 flex flex-col gap-6 text-pretty text-mk-text-secondary">
-          <p>
-            MailKit is built by{" "}
-            <a
-              href="https://x.com/borisfounder"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="font-medium text-mk-accent underline underline-offset-4 transition-opacity hover:opacity-70"
-            >
-              Boris Komarov
-            </a>
-            , an independent founder from Almaty who ships AI-native products
-            solo — designing, building and running them with Claude Code rather
-            than a team.
-          </p>
-          <p>
-            The idea came from a chore I kept repeating: every new project needs
-            a real email address on its own domain, and every time it means the
-            same fight with Cloudflare, DNS records, SMTP credentials and
-            Gmail’s Send-As settings. It’s an hour of fiddly work with no room
-            for a single typo. MailKit is that hour, automated — so you paste
-            one token, follow a short guided step, and get a working{" "}
-            <span className="text-mk-text-primary">hello@yourdomain.com</span>{" "}
-            in your existing Gmail. Once for $5, no subscription.
-          </p>
-          <p>
-            It’s a small, honest product — not a venture-scale startup. The goal
-            is a tool that quietly does one annoying job well, backed by a
-            money-back guarantee if the automation ever fails on our end.
-          </p>
-        </div>
+        <h1 className="mk-display-2 text-balance text-mk-text-primary">
+          About
+        </h1>
 
-        {/* What I've built */}
-        <div className="mt-16">
-          <h2 className="mk-heading-1 text-mk-text-primary">
-            Other things I build
-          </h2>
-          <div className="mt-8 flex flex-col gap-3">
-            {BUILT.map((p) => (
+        <div className="mt-10 flex flex-col gap-10">
+          <section>
+            <h2 className="mk-heading-2 text-mk-text-primary">
+              What is MailKit
+            </h2>
+            <p className="mk-body mt-3 text-pretty text-mk-text-secondary">
+              MailKit is a one-time setup of professional email on your own
+              domain — no DNS headache, no monthly bill. It automates the
+              technical side: Cloudflare Email Routing, Postmark SMTP and the
+              DKIM, SPF and DMARC records. You paste one Cloudflare token and
+              follow a short guided step, and in about 30 minutes you’re sending
+              from{" "}
+              <span className="text-mk-text-primary">hello@yourdomain.com</span>{" "}
+              inside the Gmail inbox you already use. One-time $5, backed by a
+              30-day money-back guarantee.
+            </p>
+          </section>
+
+          <section>
+            <h2 className="mk-heading-2 text-mk-text-primary">Who built it</h2>
+            <p className="mk-body mt-3 text-pretty text-mk-text-secondary">
+              MailKit was built by{" "}
               <a
-                key={p.name}
-                href={p.url}
+                href="https://x.com/borisfounder"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group flex flex-col gap-1 rounded-[16px] border border-mk-border-subtle bg-surface-elevated p-6 transition-colors hover:border-mk-border-strong"
+                className={linkCls}
               >
-                <span className="mk-body font-semibold text-mk-text-primary">
-                  {p.name}
-                </span>
-                <span className="mk-body text-mk-text-secondary">{p.note}</span>
+                Boris Komarov
+              </a>{" "}
+              — an AI-native founder from Almaty, Kazakhstan, and the founder of{" "}
+              <a
+                href="https://vibecraft.kz"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkCls}
+              >
+                Vibecraft
               </a>
-            ))}
-          </div>
-        </div>
+              . Boris builds AI products solo, without a classic CS degree or a
+              traditional programming background: from bots and automations to
+              MVPs of mobile and web apps. Development is 100% AI-driven with
+              Claude Code on a modern tech stack.
+            </p>
+          </section>
 
-        {/* Contact */}
-        <div className="mt-16 rounded-[16px] border border-mk-border-subtle bg-surface-elevated p-8 text-center">
-          <p className="mk-body text-mk-text-secondary">
-            Questions, feedback, or something not working?
-          </p>
-          <a
-            href="mailto:support@getmailkit.com"
-            className="mk-body mt-2 inline-block font-medium text-mk-accent underline underline-offset-4 transition-opacity hover:opacity-70"
-          >
-            support@getmailkit.com
-          </a>
+          <section>
+            <h2 className="mk-heading-2 text-mk-text-primary">Contact</h2>
+            <p className="mk-body mt-3 text-mk-text-secondary">
+              Questions, ideas, partnership:{" "}
+              <a href="mailto:support@getmailkit.com" className={linkCls}>
+                support@getmailkit.com
+              </a>
+              <br />
+              On X:{" "}
+              <a
+                href="https://x.com/borisfounder"
+                target="_blank"
+                rel="noopener noreferrer"
+                className={linkCls}
+              >
+                @borisfounder
+              </a>
+            </p>
+          </section>
         </div>
       </main>
       <Footer />
