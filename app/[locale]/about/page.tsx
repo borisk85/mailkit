@@ -85,7 +85,7 @@ export default async function AboutPage({
             <p className="mk-body mt-3 text-pretty text-mk-text-secondary">
               MailKit was built by{" "}
               <a
-                href="https://x.com/borisfounder"
+                href="https://linkedin.com/in/boriskomarov"
                 target="_blank"
                 rel="noopener noreferrer"
                 className={linkCls}
