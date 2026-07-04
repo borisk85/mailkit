@@ -12,7 +12,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "MailKit vs SendMailAs & Google Workspace — Compare",
     description:
-      "How MailKit compares to SendMailAs and Google Workspace: a one-time $5 setup you own forever versus monthly and yearly subscriptions with vendor lock-in.",
+      "How MailKit compares to SendMailAs and Google Workspace: a one-time $5 setup versus monthly and yearly subscriptions — same Gmail inbox, one payment instead of a recurring bill.",
     alternates: { canonical: "/compare" },
   };
 }
@@ -35,16 +35,12 @@ const ROWS: { label: string; cells: Cell[]; isPrice?: boolean }[] = [
     cells: [{ v: "yes" }, { v: "yes" }, { v: "no", note: "replaces Gmail" }],
   },
   {
-    label: "You own the stack after setup",
+    label: "Your domain, DNS & Gmail stay yours",
     cells: [
-      { v: "yes", note: "Cloudflare + Postmark, yours" },
-      { v: "no", note: "their SMTP relay" },
-      { v: "no" },
+      { v: "yes", note: "on your own accounts" },
+      { v: "yes" },
+      { v: "no", note: "in a Workspace tenant" },
     ],
-  },
-  {
-    label: "No vendor lock-in",
-    cells: [{ v: "yes" }, { v: "no" }, { v: "no" }],
   },
   {
     label: "Automated setup",
@@ -53,10 +49,6 @@ const ROWS: { label: string; cells: Cell[]; isPrice?: boolean }[] = [
   {
     label: "Real sending, not just forwarding",
     cells: [{ v: "yes" }, { v: "yes" }, { v: "yes" }],
-  },
-  {
-    label: "Keeps working if you stop paying",
-    cells: [{ v: "yes", note: "stack stays yours" }, { v: "no" }, { v: "no" }],
   },
   {
     label: "Price",
@@ -76,7 +68,7 @@ const POSITIONING = [
   },
   {
     vs: "vs SendMailAs",
-    text: "SendMailAs is a yearly subscription tied to their SMTP relay — stop paying and sending stops. With MailKit the Cloudflare + Postmark stack is yours after a one-time $5.",
+    text: "SendMailAs and MailKit work the same way — Gmail Send-As over a hosted sending relay. The difference is the bill: SendMailAs is $29 every year, MailKit is a one-time $5.",
   },
   {
     vs: "vs the DIY route",
@@ -145,7 +137,7 @@ export default async function ComparePage({
         name: "MailKit",
         url: SITE_URL,
         description:
-          "One-time $5 setup of professional email on your own domain. Cloudflare Email Routing + Postmark SMTP + Gmail Send-As. You own the stack, no subscription.",
+          "One-time $5 setup of professional email on your own domain: Cloudflare Email Routing on your account + Gmail Send-As, with sending through MailKit's shared Postmark relay. No subscription.",
       },
       {
         "@type": "ListItem",
@@ -180,7 +172,8 @@ export default async function ComparePage({
           </h1>
           <p className="mk-body-large text-pretty text-mk-text-secondary">
             Everyone else bills you every month or every year. MailKit sets up
-            email on your own domain once — then the stack is yours to keep.
+            email on your own domain for a one-time $5 — same Gmail inbox, no
+            recurring bill.
           </p>
         </div>
 
@@ -243,6 +236,17 @@ export default async function ComparePage({
             </tbody>
           </table>
         </div>
+
+        <p className="mx-auto mt-5 max-w-3xl text-pretty text-sm leading-relaxed text-mk-text-tertiary">
+          One honest note: receiving runs on your own Cloudflare account and
+          keeps working regardless. Sending goes through MailKit&apos;s shared
+          Postmark relay — there&apos;s no separate fallback, so if MailKit ever
+          stops running, sending pauses until you point Gmail at your own SMTP.
+          MailKit is a small independent product: we can&apos;t promise
+          it&apos;ll run for any set length of time, and the one-time $5
+          isn&apos;t refundable if we shut down. Your domain, DNS, routing and
+          Gmail always stay on your own accounts.
+        </p>
 
         {/* Positioning notes */}
         <div className="mt-20 grid gap-5 sm:grid-cols-3">

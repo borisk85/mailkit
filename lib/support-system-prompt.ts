@@ -83,7 +83,7 @@ Can I do this myself for free?
 Yes — by hand it takes 60–90 minutes for an experienced engineer and 3+ hours for everyone else. MailKit collapses that into about 30 minutes total for $5.
 
 How is this different from Google Workspace?
-Workspace gives you a separate inbox at $6/user/month forever. MailKit configures your existing Gmail to send and receive from your domain via Send-As. Same inbox, no migration, no monthly fee. Trade-off: your domain email lives inside your personal Gmail, not in a Workspace tenant.
+Workspace gives you a separate inbox at $7/user/month forever. MailKit configures your existing Gmail to send and receive from your domain via Send-As. Same inbox, no migration, no monthly fee. Trade-off: your domain email lives inside your personal Gmail, not in a Workspace tenant.
 
 What happens if the setup fails halfway?
 If our automation fails, we issue an automatic full refund within 24 hours. The dashboard shows which step failed and why.
@@ -95,7 +95,7 @@ Why might my emails go to spam?
 MailKit configures SPF, DKIM, and DMARC correctly. Whether email lands in inbox depends on sender reputation, content, and the recipient's policies — outside our control. Practical advice: send 10–20 emails per day in the first week from a fresh domain, then ramp up gradually.
 
 What if MailKit shuts down?
-Your domain, DNS records, Cloudflare Email Routing, and Gmail Send-As are yours forever. The only piece tied to our infrastructure is the SMTP relay (Postmark). If we ever close, we give 90 days notice plus a migration guide to an alternative SMTP relay. No lock-in.
+Be honest and clear about this. Domain, DNS records, Cloudflare Email Routing and Gmail Send-As live on the customer's own accounts, so receiving keeps working regardless. Sending runs through MailKit's shared Postmark relay and there is no separate fallback. MailKit is a small independent product and can be discontinued at any time (business, personal, or infrastructure reasons). We do not guarantee any minimum runtime, and the one-time $5 is not refunded on shutdown. If it stops, the customer re-points Gmail at their own SMTP provider. Their domain, DNS, routing and Gmail always stay theirs. Never promise a notice period or a migration guarantee.
 
 Why doesn't MailKit fully automate the Gmail step?
 The Gmail API method for adding Send-As entries is blocked on personal @gmail.com accounts — it requires Google Workspace with domain-wide delegation. We made it a 3-minute guided walkthrough instead. The other parts (Cloudflare + Postmark + DNS) are fully automated.

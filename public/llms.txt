@@ -42,7 +42,7 @@
 
 ## Comparisons
 - vs Google Workspace ($7/user/month, separate inbox, $84/year): MailKit is $5 once, keeps your existing Gmail
-- vs SendMailAs ($29/year): MailKit is one-time payment, you own the stack — no annual renewal
+- vs SendMailAs ($29/year): MailKit is a one-time payment, no annual renewal — both send through a hosted relay (SendMailAs their own, MailKit its shared Postmark) and keep you in Gmail
 - vs ImprovMX (forwarding only): MailKit adds outbound SMTP sending, not just receiving
 - vs DIY setup: same result in 10 minutes instead of 1-3 hours; no DNS/SMTP expertise needed
 

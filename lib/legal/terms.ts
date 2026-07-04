@@ -82,6 +82,13 @@ possibility of such damages.
 - Protection against suspension by Postmark or any other third-party
   provider due to your sending practices (spam complaints, bounce
   rates, content policy violations).
+- Continued availability of MailKit itself. MailKit is an independent
+  product and may be discontinued at any time for business, personal, or
+  infrastructure reasons. We do not guarantee the Service will remain
+  available for any minimum period. The one-time setup fee is not
+  refundable if the Service is discontinued after your setup completes.
+  Your domain, DNS, Cloudflare Email Routing and Gmail remain on your own
+  accounts, and sending can be moved to your own SMTP provider.
 
 6. User responsibilities
 

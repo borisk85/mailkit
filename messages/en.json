@@ -65,7 +65,7 @@
       "heading": "Five dollars. One time. Done.",
       "subhead": "No subscription. No recurring fee. No surprise charges next month.",
       "price": "$5",
-      "priceUnit": "One-time payment. Yours forever.",
+      "priceUnit": "One-time payment. No subscription.",
       "inclusionsHeading": "What's included",
       "inclusions": [
         "Receiving and sending set up for you",
@@ -167,7 +167,7 @@
         {
           "id": "smtp-dependency",
           "q": "What if MailKit shuts down?",
-          "a": "Your domain, DNS records, Cloudflare Email Routing, and Gmail Send-As are yours forever. They live on your accounts, not ours. The only piece tied to our infrastructure is the SMTP relay (Postmark). If we ever close, we give you 90 days notice plus a guide to migrate the SMTP relay to your own Postmark or alternative provider account. No lock-in."
+          "a": "Your domain, DNS records, Cloudflare Email Routing and Gmail Send-As live on your own accounts, so receiving keeps working no matter what. Sending goes through MailKit's shared Postmark relay, and there is no separate fallback. MailKit is a small independent product — it can be discontinued at any time (for business, personal or infrastructure reasons), and we don't promise it will run for any set length of time. If it stops, sending pauses until you re-point Gmail at your own SMTP provider, and the one-time $5 is not refunded on shutdown. What always stays yours: your domain, DNS, routing and Gmail."
         },
         {
           "id": "timing",
@@ -197,7 +197,7 @@
         {
           "id": "vs-workspace",
           "q": "How is this different from Google Workspace?",
-          "a": "Google Workspace gives you a separate inbox at $6/user/month forever: a new mailbox to check, a separate password, full migration if you stop paying. MailKit configures your existing Gmail to send and receive from your domain via Gmail Send-As. Same Gmail inbox, no migration, no monthly fee. The trade-off: with MailKit your domain email lives inside your personal Gmail, not in a Workspace tenant."
+          "a": "Google Workspace gives you a separate inbox at $7/user/month forever: a new mailbox to check, a separate password, full migration if you stop paying. MailKit configures your existing Gmail to send and receive from your domain via Gmail Send-As. Same Gmail inbox, no migration, no monthly fee. The trade-off: with MailKit your domain email lives inside your personal Gmail, not in a Workspace tenant."
         },
         {
           "id": "fail",

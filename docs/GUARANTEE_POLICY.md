@@ -111,6 +111,12 @@ product description / checkout fine print, в receipt email после поку�
 > - Failures caused by your domain expiration, registrar changes, or
 >   account suspensions at third-party services (Cloudflare, Postmark,
 >   Google) outside our control.
+> - MailKit being discontinued. MailKit is an independent product and may
+>   be discontinued at any time for business, personal, or infrastructure
+>   reasons. We make no guarantee that the Service will remain available
+>   for any minimum period, and the one-time setup fee is not refundable
+>   if the Service is discontinued after your setup completes. Your domain,
+>   DNS, Cloudflare Email Routing and Gmail remain on your own accounts.
 >
 > **How refunds are processed:** Refunds are issued through the original
 > payment method via Lemon Squeezy. Processing time depends on your
