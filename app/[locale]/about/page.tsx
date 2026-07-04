@@ -1,6 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
-import { ChevronLeft } from "lucide-react";
 import { setRequestLocale } from "next-intl/server";
 
 import { Footer } from "@/components/landing/footer";
@@ -49,14 +47,6 @@ export default async function AboutPage({
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
         />
-
-        <Link
-          href="/"
-          className="mb-8 inline-flex items-center gap-1 text-sm text-mk-text-tertiary transition-colors hover:text-mk-text-secondary"
-        >
-          <ChevronLeft className="size-4" aria-hidden />
-          Back to homepage
-        </Link>
 
         <h1 className="mk-display-2 text-balance text-mk-text-primary">
           About
