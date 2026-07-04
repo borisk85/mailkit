@@ -91,4 +91,6 @@ Details: [docs/MARKETING_ANGLES.md](docs/MARKETING_ANGLES.md), [docs/GUARANTEE_P
 
 ## UI Verification
 
+**Playwright/браузер — ТОЛЬКО для вопросов про дизайн/вёрстку/визуал** (как что-то выглядит, layout, responsive, контраст, наличие элемента). На НЕ-UI задачах (правка href/ссылок, логика, факты, значения, копи-текст, конфиг, «так ли по коду») браузер НЕ поднимать — это жжёт время Boris; проверять чтением кода + `pnpm typecheck`.
+
 После изменений UI — `pnpm dev` + Playwright screenshot перед показом Boris. Playwright МОЖЕТ: layout, responsive, формы, навигация, console errors. Playwright НЕ МОЖЕТ: Google OAuth, реальный LS checkout, реальные API calls с ключами.
