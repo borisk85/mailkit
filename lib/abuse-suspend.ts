@@ -5,6 +5,10 @@ import {
   sendDeliverabilityWarnEmail,
   sendSendLimitBlockEmail,
 } from "@/lib/integrations/postmark-transactional";
+import {
+  createPostmarkAccountClient,
+  type PostmarkAccountClient,
+} from "@/lib/integrations/postmark";
 import { notifyOwnerViaTelegram } from "@/lib/notifications/telegram";
 import {
   type DeliverabilityEvaluation,
@@ -73,6 +77,52 @@ async function findActivePurchaseForDomain(
   };
 }
 
+async function findPostmarkServerIdForDomain(
+  admin: AdminClient,
+  domain: string,
+): Promise<number | null> {
+  const { data } = await admin
+    .from("setup_runs")
+    .select("postmark_server_id")
+    .eq("domain", domain)
+    .eq("status", "done")
+    .not("postmark_server_id", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(1);
+
+  const row = (data ?? [])[0];
+  if (!row?.postmark_server_id) return null;
+  return row.postmark_server_id as number;
+}
+
+async function suspendTenantInPostmark(
+  admin: AdminClient,
+  pm: PostmarkAccountClient,
+  domain: string,
+): Promise<"ok" | "skipped" | `failed=${string}`> {
+  let serverId: number | null;
+  try {
+    serverId = await findPostmarkServerIdForDomain(admin, domain);
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    return `failed=lookup:${msg.slice(0, 80)}`;
+  }
+
+  if (serverId === null) return "skipped";
+
+  try {
+    await pm.suspendServer(serverId);
+    return "ok";
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    // Already-suspended servers return a 4xx — treat as ok, not an error.
+    if (msg.toLowerCase().includes("already") || msg.includes("409")) {
+      return "ok";
+    }
+    return `failed=${msg.slice(0, 80)}`;
+  }
+}
+
 async function flagSuspended(
   admin: AdminClient,
   purchaseId: string,
@@ -127,9 +177,19 @@ function nextResumeHint(window: WindowType): string {
   return "when the day counter resets at 00:00 UTC";
 }
 
+function makePostmarkClientOrNull(): PostmarkAccountClient | null {
+  const token = process.env.POSTMARK_ACCOUNT_TOKEN;
+  if (!token) return null;
+  try {
+    return createPostmarkAccountClient(token);
+  } catch {
+    return null;
+  }
+}
+
 /**
  * Layer 1 action — domain hit the per-domain rate limit. Sends are
- * paused, customer is emailed, audit row written.
+ * paused, customer is emailed, audit row written, Postmark server disabled.
  */
 export async function suspendForRateLimit(
   admin: AdminClient,
@@ -151,8 +211,14 @@ export async function suspendForRateLimit(
 
   const purchase = await findActivePurchaseForDomain(admin, domain);
 
+  let pmSuspendNote = "auto_suspend_postmark_server:skipped";
   if (purchase) {
     await flagSuspended(admin, purchase.id, "rate_limit");
+    const pm = makePostmarkClientOrNull();
+    if (pm) {
+      const result = await suspendTenantInPostmark(admin, pm, domain);
+      pmSuspendNote = `auto_suspend_postmark_server:${result}`;
+    }
   }
 
   await insertAbuseEvent(admin, {
@@ -162,7 +228,7 @@ export async function suspendForRateLimit(
     thresholdValue: window.limit,
     observedValue: window.count,
     purchaseId: purchase?.id,
-    notes: `window=${tripped}, count=${window.count}, limit=${window.limit}`,
+    notes: `window=${tripped}, count=${window.count}, limit=${window.limit}; ${pmSuspendNote}`,
   });
 
   let emailed = false;
@@ -209,8 +275,14 @@ export async function actOnDeliverability(
 
   const purchase = await findActivePurchaseForDomain(admin, domain);
 
+  let pmSuspendNote = "";
   if (evaluation.action === "suspended" && purchase) {
     await flagSuspended(admin, purchase.id, evaluation.reason);
+    const pm = makePostmarkClientOrNull();
+    if (pm) {
+      const result = await suspendTenantInPostmark(admin, pm, domain);
+      pmSuspendNote = `; auto_suspend_postmark_server:${result}`;
+    }
   }
 
   // Pick the rate that drove the decision so the audit row + email
@@ -236,7 +308,7 @@ export async function actOnDeliverability(
     observedValue: formatRateForStorage(drivingRate),
     purchaseId: purchase?.id,
     snapshotId,
-    notes: `requests=${evaluation.counts.requests}, bounced=${evaluation.counts.bounced}, complained=${evaluation.counts.complained}, unsubscribed=${evaluation.counts.unsubscribed}`,
+    notes: `requests=${evaluation.counts.requests}, bounced=${evaluation.counts.bounced}, complained=${evaluation.counts.complained}, unsubscribed=${evaluation.counts.unsubscribed}${pmSuspendNote}`,
   });
 
   let emailed = false;

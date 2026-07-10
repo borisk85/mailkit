@@ -62,19 +62,30 @@ type AbuseEventRow = {
   notes: string | null;
 };
 
+type SetupRunRow = {
+  id: string;
+  domain: string;
+  status: string;
+  postmark_server_id: number | null;
+  created_at: string;
+};
+
 function makeAdmin(init: {
   purchases?: PurchaseRow[];
   abuse_events?: AbuseEventRow[];
+  setup_runs?: SetupRunRow[];
 }) {
   const tables = {
     purchases: [...(init.purchases ?? [])],
     abuse_events: [...(init.abuse_events ?? [])],
+    setup_runs: [...(init.setup_runs ?? [])],
   };
 
   function query(name: keyof typeof tables) {
     const rows = tables[name];
     const filters: Array<[string, unknown]> = [];
     const isFilters: Array<[string, unknown]> = [];
+    const notIsNullCols: string[] = [];
     const containsFilters: Array<Record<string, unknown>> = [];
     let op: "select" | "update" | "insert" | null = null;
     let payload: unknown = null;
@@ -104,6 +115,10 @@ function makeAdmin(init: {
         isFilters.push([col, val]);
         return api;
       },
+      not(col: string, op2: string, _val: unknown) {
+        if (op2 === "is") notIsNullCols.push(col);
+        return api;
+      },
       contains(_col: string, val: Record<string, unknown>) {
         containsFilters.push(val);
         return api;
@@ -119,7 +134,7 @@ function makeAdmin(init: {
       then(resolve: (v: unknown) => unknown) {
         const rowsAsRecords = rows as unknown as Record<string, unknown>[];
         if (op === "update") {
-          const targets = applyFilters(rowsAsRecords, filters, isFilters);
+          const targets = applyFilters(rowsAsRecords, filters, isFilters, []);
           for (const r of targets)
             Object.assign(r, payload as Record<string, unknown>);
           return Promise.resolve({ data: null, error: null }).then(resolve);
@@ -133,7 +148,12 @@ function makeAdmin(init: {
           return Promise.resolve({ data: null, error: null }).then(resolve);
         }
         if (op === "select") {
-          let out = applyFilters(rowsAsRecords, filters, isFilters);
+          let out = applyFilters(
+            rowsAsRecords,
+            filters,
+            isFilters,
+            notIsNullCols,
+          );
           if (containsFilters.length > 0) {
             out = out.filter((r) => {
               const cd = (r.custom_data ?? {}) as Record<string, unknown>;
@@ -180,10 +200,12 @@ function applyFilters(
   rows: Record<string, unknown>[],
   eqs: Array<[string, unknown]>,
   iss: Array<[string, unknown]>,
+  notIsNullCols: string[],
 ): Record<string, unknown>[] {
   return rows.filter((r) => {
     for (const [c, v] of eqs) if (r[c] !== v) return false;
     for (const [c, v] of iss) if (r[c] !== v) return false;
+    for (const c of notIsNullCols) if (r[c] == null) return false;
     return true;
   });
 }
@@ -486,5 +508,206 @@ describe("actOnDeliverability", () => {
     expect(r.emailed).toBe(false);
     expect(admin._tables.abuse_events).toHaveLength(1);
     expect(admin._tables.abuse_events[0].purchase_id).toBeNull();
+  });
+});
+
+// ──────────────────────────────────────────────────────────────
+// ABUSE-4: Hard-suspend Postmark tenant on flagSuspended
+// ──────────────────────────────────────────────────────────────
+describe("ABUSE-4: Postmark server hard-suspend on suspension", () => {
+  const ACCOUNT_BASE = "https://api.postmarkapp.com";
+
+  function setupRun(serverId: number | null = 42): SetupRunRow {
+    return {
+      id: "run-1",
+      domain: "ex.com",
+      status: "done",
+      postmark_server_id: serverId,
+      created_at: "2026-04-26T10:00:00Z",
+    };
+  }
+
+  function rateEval(): SendLimitEvaluation {
+    return {
+      overLimit: true,
+      exceeded: ["minute"],
+      windows: {
+        day: { count: 0, limit: 500, windowStart: null },
+        hour: { count: 0, limit: 50, windowStart: null },
+        minute: { count: 6, limit: 5, windowStart: "2026-04-26T17:42:00Z" },
+      },
+    };
+  }
+
+  beforeEach(() => {
+    process.env.POSTMARK_ACCOUNT_TOKEN = "test-account-token";
+    server.use(
+      http.post(`${POSTMARK_BASE}/email`, () =>
+        HttpResponse.json({ MessageID: "m1" }),
+      ),
+    );
+  });
+
+  afterEach(() => {
+    delete process.env.POSTMARK_ACCOUNT_TOKEN;
+  });
+
+  test("rate_limit suspend: Postmark editServer called once, result in notes", async () => {
+    let suspendCalled = 0;
+    server.use(
+      http.put(`${ACCOUNT_BASE}/servers/42`, async ({ request }) => {
+        const body = (await request.json()) as Record<string, unknown>;
+        if (body.SmtpApiActivated === false) suspendCalled++;
+        return HttpResponse.json({ ID: 42, SmtpApiActivated: false });
+      }),
+    );
+
+    const admin = makeAdmin({
+      purchases: [purchase()],
+      setup_runs: [setupRun(42)],
+    });
+    await suspendForRateLimit(
+      admin as unknown as Parameters<typeof suspendForRateLimit>[0],
+      { domain: "ex.com", evaluation: rateEval() },
+    );
+
+    expect(suspendCalled).toBe(1);
+    const ev = admin._tables.abuse_events[0];
+    expect(ev.notes).toContain("auto_suspend_postmark_server:ok");
+  });
+
+  test("deliverability suspend: Postmark server disabled + notes logged", async () => {
+    let suspendCalled = 0;
+    server.use(
+      http.put(`${ACCOUNT_BASE}/servers/42`, async () => {
+        suspendCalled++;
+        return HttpResponse.json({ ID: 42, SmtpApiActivated: false });
+      }),
+    );
+
+    const admin = makeAdmin({
+      purchases: [purchase()],
+      setup_runs: [setupRun(42)],
+    });
+    await actOnDeliverability(
+      admin as unknown as Parameters<typeof actOnDeliverability>[0],
+      {
+        domain: "ex.com",
+        evaluation: {
+          action: "suspended",
+          reason: "complaint_threshold",
+          rates: { bounce: 0, complaint: 0.5, unsubscribe: 0 },
+          counts: { requests: 100, bounced: 0, complained: 5, unsubscribed: 0 },
+          thresholds: DEFAULT_DELIVERABILITY_THRESHOLDS,
+        },
+      },
+    );
+
+    expect(suspendCalled).toBe(1);
+    const ev = admin._tables.abuse_events[0];
+    expect(ev.notes).toContain("auto_suspend_postmark_server:ok");
+  });
+
+  test("warned action: Postmark server NOT suspended", async () => {
+    let suspendCalled = 0;
+    server.use(
+      http.put(`${ACCOUNT_BASE}/servers/42`, () => {
+        suspendCalled++;
+        return HttpResponse.json({ ID: 42 });
+      }),
+    );
+
+    const admin = makeAdmin({
+      purchases: [purchase()],
+      setup_runs: [setupRun(42)],
+    });
+    await actOnDeliverability(
+      admin as unknown as Parameters<typeof actOnDeliverability>[0],
+      {
+        domain: "ex.com",
+        evaluation: {
+          action: "warned",
+          reason: "unsubscribe_threshold",
+          rates: { bounce: 0, complaint: 0, unsubscribe: 3 },
+          counts: { requests: 100, bounced: 0, complained: 0, unsubscribed: 3 },
+          thresholds: DEFAULT_DELIVERABILITY_THRESHOLDS,
+        },
+      },
+    );
+
+    expect(suspendCalled).toBe(0);
+  });
+
+  test("no postmark_server_id in setup_runs → skipped in notes, no API call", async () => {
+    let apiCalled = false;
+    server.use(
+      http.put(`${ACCOUNT_BASE}/servers/:id`, () => {
+        apiCalled = true;
+        return HttpResponse.json({});
+      }),
+    );
+
+    const admin = makeAdmin({
+      purchases: [purchase()],
+      setup_runs: [setupRun(null)],
+    });
+    await suspendForRateLimit(
+      admin as unknown as Parameters<typeof suspendForRateLimit>[0],
+      { domain: "ex.com", evaluation: rateEval() },
+    );
+
+    expect(apiCalled).toBe(false);
+    expect(admin._tables.abuse_events[0].notes).toContain(
+      "auto_suspend_postmark_server:skipped",
+    );
+  });
+
+  test("POSTMARK_ACCOUNT_TOKEN missing → skipped gracefully, suspension still records", async () => {
+    delete process.env.POSTMARK_ACCOUNT_TOKEN;
+    let apiCalled = false;
+    server.use(
+      http.put(`${ACCOUNT_BASE}/servers/:id`, () => {
+        apiCalled = true;
+        return HttpResponse.json({});
+      }),
+    );
+
+    const admin = makeAdmin({
+      purchases: [purchase()],
+      setup_runs: [setupRun(42)],
+    });
+    const r = await suspendForRateLimit(
+      admin as unknown as Parameters<typeof suspendForRateLimit>[0],
+      { domain: "ex.com", evaluation: rateEval() },
+    );
+
+    expect(apiCalled).toBe(false);
+    expect(r.suspended).toBe(true);
+    expect(admin._tables.purchases[0].suspended_at).not.toBeNull();
+    expect(admin._tables.abuse_events[0].notes).toContain(
+      "auto_suspend_postmark_server:skipped",
+    );
+  });
+
+  test("Postmark API error → failed= in notes, DB suspension still completes", async () => {
+    server.use(
+      http.put(`${ACCOUNT_BASE}/servers/42`, () =>
+        HttpResponse.json({ message: "server error" }, { status: 500 }),
+      ),
+    );
+
+    const admin = makeAdmin({
+      purchases: [purchase()],
+      setup_runs: [setupRun(42)],
+    });
+    const r = await suspendForRateLimit(
+      admin as unknown as Parameters<typeof suspendForRateLimit>[0],
+      { domain: "ex.com", evaluation: rateEval() },
+    );
+
+    expect(r.suspended).toBe(true);
+    expect(admin._tables.purchases[0].suspended_at).not.toBeNull();
+    const notes = admin._tables.abuse_events[0].notes as string;
+    expect(notes).toContain("auto_suspend_postmark_server:failed=");
   });
 });
